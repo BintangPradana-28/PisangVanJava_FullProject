@@ -1,0 +1,4 @@
+#!/bin/sh
+cd pisang-goreng-van-java
+npx lint-staged
+npx secretlint "**/*"
