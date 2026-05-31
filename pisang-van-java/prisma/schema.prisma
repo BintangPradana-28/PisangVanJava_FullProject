@@ -235,15 +235,18 @@ model Favorite {
 }
 
 model Banner {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   title       String
   subtitle    String?
   badge       String?
   imageUrl    String?
-  isActive    Boolean  @default(true)
+  isActive    Boolean   @default(true)
   linkUrl     String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  startDate   DateTime? // Untuk penjadwalan promo
+  endDate     DateTime? // Untuk batas akhir promo
+  priority    Int       @default(0) // Untuk urutan carousel
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   @@index([isActive])
 }

@@ -11,7 +11,7 @@ export default function BannersClient({ initialBanners }: { initialBanners: Bann
   const [editingBanner, setEditingBanner] = useState<Banner | null>(null)
   const [loading, setLoading] = useState(false)
 
-  const emptyForm = { title: '', subtitle: '', badge: '', imageUrl: '', isActive: false, linkUrl: '' }
+  const emptyForm = { title: '', subtitle: '', badge: '', imageUrl: '', isActive: false, linkUrl: '', startDate: '', endDate: '', priority: 0 }
   const [form, setForm] = useState(emptyForm)
 
   const handleOpenModal = (b?: Banner) => {
@@ -23,7 +23,10 @@ export default function BannersClient({ initialBanners }: { initialBanners: Bann
         badge: b.badge || '',
         imageUrl: b.imageUrl || '',
         isActive: b.isActive,
-        linkUrl: b.linkUrl || ''
+        linkUrl: b.linkUrl || '',
+        startDate: b.startDate ? new Date(b.startDate).toISOString().slice(0, 16) : '',
+        endDate: b.endDate ? new Date(b.endDate).toISOString().slice(0, 16) : '',
+        priority: b.priority || 0
       })
     } else {
       setEditingBanner(null)
@@ -46,16 +49,11 @@ export default function BannersClient({ initialBanners }: { initialBanners: Bann
       const data = await res.json()
       if (data.success) {
         toast.success(editingBanner ? 'Banner diperbarui' : 'Banner ditambahkan')
-        if (data.data.isActive) {
-          // deactivate others
-          setBanners(prev => prev.map(b => b.id === data.data.id ? data.data : { ...b, isActive: false }))
-        } else {
-          setBanners(prev => {
-            const exists = prev.find(b => b.id === data.data.id)
-            if (exists) return prev.map(b => b.id === data.data.id ? data.data : b)
-            return [data.data, ...prev]
-          })
-        }
+        setBanners(prev => {
+          const exists = prev.find(b => b.id === data.data.id)
+          if (exists) return prev.map(b => b.id === data.data.id ? data.data : b)
+          return [data.data, ...prev]
+        })
         setShowModal(false)
       } else {
         toast.error('Gagal menyimpan banner')
@@ -91,11 +89,7 @@ export default function BannersClient({ initialBanners }: { initialBanners: Bann
       const data = await res.json()
       if (data.success) {
         toast.success(data.data.isActive ? 'Banner diaktifkan' : 'Banner dinonaktifkan')
-        if (data.data.isActive) {
-          setBanners(prev => prev.map(b => b.id === data.data.id ? data.data : { ...b, isActive: false }))
-        } else {
-          setBanners(prev => prev.map(b => b.id === data.data.id ? data.data : b))
-        }
+        setBanners(prev => prev.map(b => b.id === data.data.id ? data.data : b))
       }
     } catch {
       toast.error('Gagal mengubah status')
@@ -182,7 +176,21 @@ export default function BannersClient({ initialBanners }: { initialBanners: Bann
                 <label className="block text-brown-500 font-semibold mb-1">URL Gambar</label>
                 <input value={form.imageUrl} onChange={e => setForm({...form, imageUrl: e.target.value})} placeholder="https://..." type="url" className="w-full p-2 rounded-xl border border-cream-200" />
               </div>
-              <div className="flex gap-2">
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block text-brown-500 font-semibold mb-1">Mulai Tayang (Opsional)</label>
+                  <input type="datetime-local" value={form.startDate} onChange={e => setForm({...form, startDate: e.target.value})} className="w-full p-2 rounded-xl border border-cream-200" />
+                </div>
+                <div>
+                  <label className="block text-brown-500 font-semibold mb-1">Akhir Tayang (Opsional)</label>
+                  <input type="datetime-local" value={form.endDate} onChange={e => setForm({...form, endDate: e.target.value})} className="w-full p-2 rounded-xl border border-cream-200" />
+                </div>
+              </div>
+              <div>
+                <label className="block text-brown-500 font-semibold mb-1">Prioritas Urutan (Opsional)</label>
+                <input type="number" value={form.priority} onChange={e => setForm({...form, priority: parseInt(e.target.value) || 0})} className="w-full p-2 rounded-xl border border-cream-200" placeholder="0" />
+              </div>
+              <div className="flex gap-2 pt-2">
                 <button type="submit" disabled={loading} className="flex-1 bg-green-wa text-white font-bold py-3 rounded-xl">{loading ? '...' : 'Simpan'}</button>
                 <button type="button" onClick={() => setShowModal(false)} className="flex-1 bg-cream-200 text-brown-600 font-bold py-3 rounded-xl">Batal</button>
               </div>

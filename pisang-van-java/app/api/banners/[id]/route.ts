@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/src/features/auth/authOptions";
 import { prisma } from "@/lib/prisma";
+import { bannerSchema } from "../schema";
 
 async function checkAdmin() {
   const session = await getServerSession(authOptions);
@@ -14,7 +15,15 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
   try {
     const { id } = await params;
-    const data = await req.json();
+    const rawData = await req.json();
+    const parseResult = bannerSchema.safeParse(rawData);
+    
+    if (!parseResult.success) {
+      return NextResponse.json({ success: false, error: "Validation Failed", details: parseResult.error.format() }, { status: 400 });
+    }
+
+    const data = parseResult.data;
+
     const banner = await prisma.banner.update({
       where: { id },
       data: {
@@ -24,15 +33,11 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
         imageUrl: data.imageUrl,
         isActive: data.isActive,
         linkUrl: data.linkUrl,
+        startDate: data.startDate ? new Date(data.startDate) : null,
+        endDate: data.endDate ? new Date(data.endDate) : null,
+        priority: data.priority,
       },
     });
-
-    if (banner.isActive) {
-      await prisma.banner.updateMany({
-        where: { id: { not: banner.id } },
-        data: { isActive: false },
-      });
-    }
 
     return NextResponse.json({ success: true, data: banner });
   } catch (error) {
