@@ -4,6 +4,7 @@ import { useState } from 'react'
 import toast from 'react-hot-toast'
 import Image from 'next/image'
 import { Banner } from '@prisma/client'
+import ImageUploadDropzone from '@/components/admin/ImageUploadDropzone'
 
 export default function BannersClient({ initialBanners }: { initialBanners: Banner[] }) {
   const [banners, setBanners] = useState<Banner[]>(initialBanners)
@@ -172,9 +173,12 @@ export default function BannersClient({ initialBanners }: { initialBanners: Bann
                 <label className="block text-brown-500 font-semibold mb-1">Sub Judul (Opsional)</label>
                 <textarea value={form.subtitle} onChange={e => setForm({...form, subtitle: e.target.value})} className="w-full p-2 rounded-xl border border-cream-200 resize-none" rows={2} />
               </div>
-              <div>
-                <label className="block text-brown-500 font-semibold mb-1">URL Gambar</label>
-                <input value={form.imageUrl} onChange={e => setForm({...form, imageUrl: e.target.value})} placeholder="https://..." type="url" className="w-full p-2 rounded-xl border border-cream-200" />
+              <div className="mb-4">
+                <ImageUploadDropzone 
+                  value={form.imageUrl} 
+                  onChange={(url) => setForm({...form, imageUrl: url})} 
+                  label="Gambar Banner Promo"
+                />
               </div>
               <div className="grid grid-cols-2 gap-2">
                 <div>

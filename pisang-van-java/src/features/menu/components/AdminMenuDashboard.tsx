@@ -6,6 +6,7 @@ import { createMenuVariantSchema, CreateMenuVariantInput } from '../schemas'
 import Image from 'next/image'
 import toast from 'react-hot-toast'
 import { toggleAvailability } from '@/app/actions/menu'
+import ImageUploadDropzone from '@/components/admin/ImageUploadDropzone'
 
 export default function AdminMenuDashboard({ initialProducts }: { initialProducts: ProductType[] }) {
   const [products, setProducts] = useState<ProductType[]>(initialProducts)
@@ -267,14 +268,11 @@ export default function AdminMenuDashboard({ initialProducts }: { initialProduct
             </div>
           </div>
           
-          <div>
-            <label className="block text-xs font-semibold text-brown-500 uppercase tracking-wider mb-2">URL Gambar (Opsional)</label>
-            <input 
-              type="text" 
-              placeholder="https://images.unsplash.com/photo-..." 
-              className="w-full border border-cream-300 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-brown-500 transition-all"
+          <div className="mb-4">
+            <ImageUploadDropzone 
               value={formData.imageUrl || ''} 
-              onChange={e => setFormData({...formData, imageUrl: e.target.value})} 
+              onChange={(url) => setFormData({...formData, imageUrl: url})} 
+              label="Foto Produk"
             />
           </div>
 
