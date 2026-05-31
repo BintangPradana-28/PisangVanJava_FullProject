@@ -12,12 +12,12 @@ import {
 import MidtransPayButton from "@/components/user/MidtransPayButton";
 
 interface PaymentPageProps {
-  params: {
+  params: Promise<{
     orderId: string;
-  };
-  searchParams?: {
+  }>;
+  searchParams?: Promise<{
     payment?: string | string[];
-  };
+  }>;
 }
 
 const paymentSearchSchema = z
@@ -27,13 +27,16 @@ const paymentSearchSchema = z
   .strict();
 
 export default async function PaymentPage({ params, searchParams }: PaymentPageProps) {
+  const resolvedParams = await params;
+  const resolvedSearchParams = await searchParams;
+
   const actor = await requireCheckoutActor();
   if (actor === null) {
     redirect("/member-login");
   }
 
   const parsedParams = paymentFormInputSchema.safeParse({
-    orderId: params.orderId,
+    orderId: resolvedParams.orderId,
   });
 
   if (!parsedParams.success) {
@@ -41,7 +44,7 @@ export default async function PaymentPage({ params, searchParams }: PaymentPageP
   }
 
   const parsedSearch = paymentSearchSchema.safeParse({
-    payment: searchParams?.payment,
+    payment: resolvedSearchParams?.payment,
   });
   const paymentFailed = parsedSearch.success && parsedSearch.data.payment === "failed";
 

@@ -4,8 +4,8 @@ const prisma = new PrismaClient();
 
 async function main() {
   const order = await prisma.order.findUnique({
-    where: { id: 'cmpt1ietb0005989u7h3gokqp' },
-    select: { userId: true, source: true, status: true, id: true }
+    where: { id: 'cmpt388j80007dv9kw0oxu6yk' },
+    select: { userId: true, source: true, status: true, id: true, customerName: true }
   });
   console.log('Order Details:', order);
   
