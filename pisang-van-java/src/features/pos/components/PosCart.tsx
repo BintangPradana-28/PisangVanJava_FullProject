@@ -1,8 +1,7 @@
-'use client'
-
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ProductType } from '@/src/features/menu/components/MenuCards'
 import { Topping } from './PosModifierModal'
+import { saveToOfflineQueue, getOfflineQueueCount } from './OfflineSyncManager'
 import toast from 'react-hot-toast'
 
 export interface CartItem {
@@ -23,6 +22,28 @@ interface PosCartProps {
 
 export default function PosCart({ items, onUpdateQuantity, onRemoveItem, onClearCart }: PosCartProps) {
   const [isProcessing, setIsProcessing] = useState(false)
+  const [isOnline, setIsOnline] = useState(true)
+  const [queueCount, setQueueCount] = useState(0)
+
+  useEffect(() => {
+    // Initialize state
+    setIsOnline(navigator.onLine)
+    setQueueCount(getOfflineQueueCount())
+
+    const handleOnline = () => setIsOnline(true)
+    const handleOffline = () => setIsOnline(false)
+    const updateQueue = () => setQueueCount(getOfflineQueueCount())
+
+    window.addEventListener('online', handleOnline)
+    window.addEventListener('offline', handleOffline)
+    window.addEventListener('offline_queue_updated', updateQueue)
+
+    return () => {
+      window.removeEventListener('online', handleOnline)
+      window.removeEventListener('offline', handleOffline)
+      window.removeEventListener('offline_queue_updated', updateQueue)
+    }
+  }, [])
   
   const totalPrice = items.reduce((sum, item) => sum + item.subtotal, 0)
 
@@ -35,21 +56,31 @@ export default function PosCart({ items, onUpdateQuantity, onRemoveItem, onClear
     setIsProcessing(true)
     const toastId = toast.loading('Memproses transaksi...')
 
+    // Mapping Client Cart to API Schema
+    const payload = {
+      offlineId: crypto.randomUUID(), // Idempotency key for Phase 4
+      customerName: "Pelanggan Kasir", // Can be dynamic if we add a field
+      customerPhone: "-",
+      paymentMethod,
+      totalPrice,
+      items: items.map(item => ({
+        variantId: item.product.id,
+        toppingId: item.topping?.id || null,
+        baseType: item.baseType,
+        quantity: item.quantity,
+        unitPrice: item.subtotal / item.quantity,
+        subtotal: item.subtotal
+      }))
+    }
+
     try {
-      // Mapping Client Cart to API Schema
-      const payload = {
-        customerName: "Pelanggan Kasir", // Can be dynamic if we add a field
-        customerPhone: "-",
-        paymentMethod,
-        totalPrice,
-        items: items.map(item => ({
-          variantId: item.product.id,
-          toppingId: item.topping?.id || null,
-          baseType: item.baseType,
-          quantity: item.quantity,
-          unitPrice: item.subtotal / item.quantity,
-          subtotal: item.subtotal
-        }))
+      if (!isOnline) {
+        // Network is explicitly down. Queue it immediately.
+        saveToOfflineQueue(payload)
+        toast.success('Mode Offline: Pesanan Masuk Antrean.', { id: toastId, icon: '📶' })
+        onClearCart()
+        setIsProcessing(false)
+        return
       }
 
       const res = await fetch('/api/pos/orders', {
@@ -69,8 +100,14 @@ export default function PosCart({ items, onUpdateQuantity, onRemoveItem, onClear
       onClearCart() // Reset cart after success
 
     } catch (error: any) {
-      // User specifically requested: "jika habis beri pemberitahuan"
-      toast.error(error.message, { id: toastId, duration: 5000 })
+      // If it's a TypeError (Network Error), intercept and push to queue
+      if (error instanceof TypeError || error.message.includes('Failed to fetch')) {
+        saveToOfflineQueue(payload)
+        toast.error('Koneksi terputus. Pesanan Masuk Antrean.', { id: toastId })
+        onClearCart()
+      } else {
+        toast.error(error.message, { id: toastId, duration: 5000 })
+      }
     } finally {
       setIsProcessing(false)
     }
@@ -87,7 +124,18 @@ export default function PosCart({ items, onUpdateQuantity, onRemoveItem, onClear
 
       {/* Header */}
       <div className="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-        <h2 className="text-xl font-bold text-gray-800">Keranjang Kasir</h2>
+        <div className="flex items-center gap-3">
+          <h2 className="text-xl font-bold text-gray-800">Keranjang Kasir</h2>
+          {/* Queue Indicator Rule */}
+          {queueCount > 0 && (
+            <div className="relative flex items-center justify-center cursor-help" title={`${queueCount} transaksi menunggu sinkronisasi`}>
+              <span className="text-2xl text-gray-400">☁️</span>
+              <span className="absolute -top-1 -right-2 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full border-2 border-gray-50">
+                {queueCount}
+              </span>
+            </div>
+          )}
+        </div>
         <span className="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-sm font-bold">
           {items.length} Item
         </span>
@@ -151,12 +199,14 @@ export default function PosCart({ items, onUpdateQuantity, onRemoveItem, onClear
           >
             Tunai
           </button>
+          {/* Payment Lock Rule: Disable QRIS when offline */}
           <button
             onClick={() => handleCheckout('QRIS')}
-            disabled={items.length === 0 || isProcessing}
-            className="w-full bg-blue-500 text-white font-bold py-4 rounded-2xl text-lg flex justify-center items-center active:scale-[0.98] transition-transform shadow-lg shadow-blue-500/30 disabled:opacity-50 disabled:shadow-none"
+            disabled={items.length === 0 || isProcessing || !isOnline}
+            className="w-full bg-blue-500 text-white font-bold py-4 rounded-2xl text-lg flex flex-col justify-center items-center active:scale-[0.98] transition-transform shadow-lg shadow-blue-500/30 disabled:opacity-50 disabled:shadow-none disabled:bg-gray-400"
           >
-            QRIS
+            <span>QRIS</span>
+            {!isOnline && <span className="text-[10px] uppercase font-bold text-gray-200 tracking-wider">Terkunci (Offline)</span>}
           </button>
         </div>
       </div>

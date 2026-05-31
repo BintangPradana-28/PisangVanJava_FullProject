@@ -16,6 +16,7 @@ const orderItemSchema = z.object({
 
 // Schema for the entire POS order payload
 const posOrderSchema = z.object({
+  offlineId: z.string().optional(), // Idempotency key from client
   customerName: z.string().min(1, "Nama Pelanggan wajib diisi").default("Walk-in Customer"),
   customerPhone: z.string().default("-"),
   items: z.array(orderItemSchema).min(1, "Keranjang tidak boleh kosong"),
@@ -50,6 +51,18 @@ export async function POST(req: NextRequest) {
 
     // Use Prisma $transaction to ensure Atomicity and prevent Race Conditions
     const result = await prisma.$transaction(async (tx) => {
+      // 0. Idempotency Check (Offline Sync Armor)
+      if (data.offlineId) {
+        const existingOrder = await tx.order.findUnique({
+          where: { id: data.offlineId },
+        });
+        if (existingOrder) {
+          // Idempotent response: The transaction was already processed in a previous flaky network attempt.
+          // We safely return success without deducting stock or recreating the order.
+          return existingOrder;
+        }
+      }
+
       // 1. Double check stock for all items
       for (const item of data.items) {
         const variant = await tx.menuVariant.findUnique({
@@ -70,6 +83,7 @@ export async function POST(req: NextRequest) {
       // 2. Create the Order
       const newOrder = await tx.order.create({
         data: {
+          ...(data.offlineId ? { id: data.offlineId } : {}),
           customerName: data.customerName,
           customerPhone: data.customerPhone,
           totalPrice: data.totalPrice,
