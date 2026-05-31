@@ -290,14 +290,32 @@ export default function AdminMenuDashboard({ initialProducts }: { initialProduct
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-brown-500 uppercase tracking-wider mb-2">Tags (Opsional, pisahkan dengan koma)</label>
-            <input 
-              type="text" 
-              placeholder="Manis, Gurih, Best Seller" 
-              className="w-full border border-cream-300 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-brown-500 transition-all"
-              value={formData.tags?.join(', ') || ''} 
-              onChange={e => setFormData({...formData, tags: e.target.value.split(',').map(s => s.trim()).filter(s => s)})} 
-            />
+            <label className="block text-xs font-semibold text-brown-500 uppercase tracking-wider mb-2">Tags (Pilih yang sesuai)</label>
+            <div className="flex flex-wrap gap-2">
+              {['Manis', 'Gurih', 'Premium', 'Best Seller', 'Baru', 'Rekomendasi'].map(tag => {
+                const isSelected = formData.tags?.includes(tag) || false;
+                return (
+                  <button
+                    key={tag}
+                    type="button"
+                    onClick={() => {
+                      const newTags = isSelected 
+                        ? (formData.tags || []).filter(t => t !== tag)
+                        : [...(formData.tags || []), tag];
+                      setFormData({ ...formData, tags: newTags });
+                    }}
+                    className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
+                      isSelected 
+                        ? 'bg-brown-600 text-white border-brown-600' 
+                        : 'bg-white text-brown-500 border-brown-200 hover:border-brown-400'
+                    }`}
+                  >
+                    {isSelected ? '✓ ' : '+ '} {tag}
+                  </button>
+                )
+              })}
+            </div>
+            <p className="text-[10px] text-brown-400 mt-2">Pilih tag agar badge muncul di kartu produk pelanggan. Jangan ada typo!</p>
           </div>
           
           <div className="flex gap-4 pt-4 border-t border-cream-100">
