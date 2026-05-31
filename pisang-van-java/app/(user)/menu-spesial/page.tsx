@@ -5,7 +5,29 @@ import MenuGrid from '@/components/user/MenuGrid'
 import HeroBanner from './HeroBanner' // We'll extract the hero part to a small component or just inline it
 import Link from 'next/link'
 
-export const dynamic = 'force-dynamic'
+import { unstable_cache } from 'next/cache'
+
+// Removing force-dynamic to allow Next.js optimizations
+// export const dynamic = 'force-dynamic'
+
+const getCachedProducts = unstable_cache(
+  async () => {
+    try {
+      return await prisma.menuVariant.findMany({
+        where: { isDeleted: false },
+        orderBy: { flavorName: 'asc' },
+        include: {
+          reviews: { select: { rating: true } }
+        }
+      });
+    } catch (e) {
+      console.error("[Safe Log] DB fetch failed for menu-spesial", e);
+      return [];
+    }
+  },
+  ['menu-spesial-products'],
+  { revalidate: 60, tags: ['menu'] }
+);
 
 export default async function MenuSpesialPage(props: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
@@ -15,14 +37,8 @@ export default async function MenuSpesialPage(props: {
   const filter = typeof searchParams.filter === 'string' ? searchParams.filter : 'all'
   const flavor = typeof searchParams.flavor === 'string' ? searchParams.flavor : 'all'
 
-  // Fetch all active products with review aggregates
-  const dbProducts = await prisma.menuVariant.findMany({
-    where: { isDeleted: false },
-    orderBy: { flavorName: 'asc' },
-    include: {
-      reviews: { select: { rating: true } }
-    }
-  })
+  // Fetch all active products with review aggregates (Cached)
+  const dbProducts = await getCachedProducts()
 
   // Compute rating & reviewCount per variant
   const products = dbProducts.map((p) => ({

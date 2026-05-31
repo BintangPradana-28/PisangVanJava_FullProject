@@ -3,6 +3,7 @@ import { ProductType } from '@/src/features/menu/components/MenuCards'
 import { Topping } from './PosModifierModal'
 import { saveToOfflineQueue, getOfflineQueueCount } from './OfflineSyncManager'
 import toast from 'react-hot-toast'
+import PosReceiptModal, { ReceiptData } from './PosReceiptModal'
 
 export interface CartItem {
   id: string // temporary client-side id
@@ -24,6 +25,7 @@ export default function PosCart({ items, onUpdateQuantity, onRemoveItem, onClear
   const [isProcessing, setIsProcessing] = useState(false)
   const [isOnline, setIsOnline] = useState(true)
   const [queueCount, setQueueCount] = useState(0)
+  const [receiptData, setReceiptData] = useState<ReceiptData | null>(null)
 
   useEffect(() => {
     // Initialize state
@@ -78,7 +80,15 @@ export default function PosCart({ items, onUpdateQuantity, onRemoveItem, onClear
         // Network is explicitly down. Queue it immediately.
         saveToOfflineQueue(payload)
         toast.success('Mode Offline: Pesanan Masuk Antrean.', { id: toastId, icon: '📶' })
-        onClearCart()
+        
+        setReceiptData({
+          orderId: payload.offlineId,
+          date: new Date(),
+          items: [...items],
+          totalPrice,
+          paymentMethod,
+          cashierName: "Kasir POS (Offline)"
+        })
         setIsProcessing(false)
         return
       }
@@ -97,14 +107,29 @@ export default function PosCart({ items, onUpdateQuantity, onRemoveItem, onClear
       }
 
       toast.success('Transaksi Berhasil! Pesanan dikirim ke dapur.', { id: toastId })
-      onClearCart() // Reset cart after success
+      
+      setReceiptData({
+        orderId: data.data?.id,
+        date: new Date(),
+        items: [...items],
+        totalPrice,
+        paymentMethod,
+        cashierName: "Kasir POS"
+      })
 
     } catch (error: any) {
       // If it's a TypeError (Network Error), intercept and push to queue
       if (error instanceof TypeError || error.message.includes('Failed to fetch')) {
         saveToOfflineQueue(payload)
         toast.error('Koneksi terputus. Pesanan Masuk Antrean.', { id: toastId })
-        onClearCart()
+        setReceiptData({
+          orderId: payload.offlineId,
+          date: new Date(),
+          items: [...items],
+          totalPrice,
+          paymentMethod,
+          cashierName: "Kasir POS (Offline)"
+        })
       } else {
         toast.error(error.message, { id: toastId, duration: 5000 })
       }
@@ -210,6 +235,15 @@ export default function PosCart({ items, onUpdateQuantity, onRemoveItem, onClear
           </button>
         </div>
       </div>
+
+      <PosReceiptModal 
+        isOpen={!!receiptData} 
+        data={receiptData} 
+        onClose={() => {
+          setReceiptData(null)
+          onClearCart()
+        }} 
+      />
     </div>
   )
 }

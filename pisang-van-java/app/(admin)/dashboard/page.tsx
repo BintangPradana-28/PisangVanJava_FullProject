@@ -33,7 +33,8 @@ async function getDashboardData() {
       },
     }),
     prisma.order.findMany({
-      where: { createdAt: { gte: today } }
+      where: { createdAt: { gte: today } },
+      select: { totalPrice: true }
     }),
     prisma.order.count({
       where: { status: 'pending' }
@@ -52,7 +53,8 @@ async function getDashboardData() {
 
   const weekStart = new Date(last7Days[0])
   const weekOrders = await prisma.order.findMany({
-    where: { createdAt: { gte: weekStart } }
+    where: { createdAt: { gte: weekStart } },
+    select: { createdAt: true, totalPrice: true }
   })
 
   const chartData = last7Days.map(date => {

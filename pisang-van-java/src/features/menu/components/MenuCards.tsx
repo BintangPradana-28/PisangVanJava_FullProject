@@ -25,6 +25,7 @@ export interface ProductType {
   rating?: number
   reviewCount?: number
   stock: number
+  isActive: boolean
 }
 
 interface Props {

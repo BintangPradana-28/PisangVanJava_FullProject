@@ -7,11 +7,10 @@ import MenuCards, {
 import nextDynamic from 'next/dynamic';
 import { unstable_cache } from 'next/cache';
 
-export const dynamic = 'force-dynamic'
-
+// REMOVED force-dynamic to allow ISR and static shell generation
 const About = nextDynamic(() => import('@/components/user/About'), { ssr: true });
-const Gallery = nextDynamic(() => import('@/components/user/Gallery'), { ssr: true });
-const LocationMap = nextDynamic(() => import('@/src/features/settings/components/LocationMap'), { ssr: true });
+const Gallery = nextDynamic(() => import('@/components/user/Gallery'), { ssr: false });
+const LocationMap = nextDynamic(() => import('@/src/features/settings/components/LocationMap'), { ssr: false });
 const Footer = nextDynamic(() => import('@/components/user/Footer'), { ssr: true });
 
 // Server Component — fetches data at request time using SWR Caching
