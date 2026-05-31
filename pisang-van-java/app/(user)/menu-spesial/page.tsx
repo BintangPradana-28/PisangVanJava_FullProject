@@ -7,11 +7,10 @@ import Link from 'next/link'
 
 export const dynamic = 'force-dynamic'
 
-export default async function MenuSpesialPage({
-  searchParams,
-}: {
-  searchParams: { [key: string]: string | string[] | undefined }
+export default async function MenuSpesialPage(props: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
+  const searchParams = await props.searchParams;
   const q      = typeof searchParams.q      === 'string' ? searchParams.q      : ''
   const filter = typeof searchParams.filter === 'string' ? searchParams.filter : 'all'
   const flavor = typeof searchParams.flavor === 'string' ? searchParams.flavor : 'all'

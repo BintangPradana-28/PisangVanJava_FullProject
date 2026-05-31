@@ -122,7 +122,7 @@ export default function SearchFilterBar({ totalItems }: SearchFilterBarProps) {
       </div>
 
       {/* ── Row 2: Base Type Tabs (Sticky, pill-style) ──────────────────────── */}
-      <div className="max-w-[1200px] mx-auto px-4 sm:px-6 pb-2 flex gap-2 overflow-x-auto scrollbar-none">
+      <div className="max-w-[1200px] mx-auto px-4 sm:px-6 pb-4 flex gap-2 overflow-x-auto scrollbar-none">
         {BASE_TABS.map((tab) => {
           const active = baseFilter === tab.key
           return (
@@ -146,7 +146,7 @@ export default function SearchFilterBar({ totalItems }: SearchFilterBarProps) {
       {/* ── Row 3: Flavor Family Chips (drag-scrollable) ────────────────────── */}
       <div
         ref={chipRowRef}
-        className="max-w-[1200px] mx-auto px-4 sm:px-6 pb-3 flex gap-2 overflow-x-auto scrollbar-none select-none"
+        className="max-w-[1200px] mx-auto px-4 sm:px-6 pb-4 pt-1 flex gap-2 overflow-x-auto scrollbar-none select-none"
         style={{ cursor: 'grab' }}
         onMouseDown={onMouseDown}
         onMouseLeave={onMouseLeave}
