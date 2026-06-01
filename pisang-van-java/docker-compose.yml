@@ -3,6 +3,11 @@ services:
   db:
     image: postgres:15-alpine
     restart: always
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /var/run/postgresql
     environment:
       POSTGRES_USER: pguser
       POSTGRES_PASSWORD: pgpassword

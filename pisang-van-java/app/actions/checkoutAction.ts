@@ -66,7 +66,7 @@ export async function submitCheckoutAction(rawPayload: unknown) {
   } catch (error) {
     // 5. OPAQUE ERRORS & BLIND LOGGING
     const errorId = randomUUID();
-    console.error(`[CRITICAL] Checkout Action Error [ID: ${errorId}] - System failure.`, error);
+    console.error('[CRITICAL] Checkout Action Error [ID: %s] - System failure. Error details: %O', errorId, error);
     return { success: false, error: "Internal Server Error. Please contact support." };
   }
 }
