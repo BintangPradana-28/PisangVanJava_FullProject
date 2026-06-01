@@ -3,6 +3,8 @@ allowBuilds:
   '@prisma/engines': true
   '@sentry/cli': set this to true or false
   argon2: true
+  core-js: set this to true or false
   msw: true
   prisma: true
+  protobufjs: set this to true or false
   sharp: true
