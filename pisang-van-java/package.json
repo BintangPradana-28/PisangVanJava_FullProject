@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && next build && pnpm sentry:sourcemaps",
+    "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
     "db:push": "prisma db push",
@@ -17,7 +17,7 @@
     "format": "biome format --write .",
     "lint:biome": "biome lint .",
     "check": "biome check --write .",
-    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org i-do-not-have-any-organization --project javascript-nextjs .next && sentry-cli sourcemaps upload --org i-do-not-have-any-organization --project javascript-nextjs .next"
+    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org pisang-van-java --project pisang-van-java .next && sentry-cli sourcemaps upload --org pisang-van-java --project pisang-van-java .next"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",
