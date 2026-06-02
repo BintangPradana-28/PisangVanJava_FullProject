@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
       newStatus = 'cancelled';
     }
 
-    if (newStatus === 'cancelled' && order.status !== 'cancelled') {
+    if (newStatus === 'paid' && order.status !== 'paid') {
       const orderWithItems = await prisma.order.findUnique({
         where: { id: order_id },
         include: { items: true }
@@ -73,11 +73,10 @@ export async function POST(req: NextRequest) {
             paymentPaidAt
           }
         }),
-        // Restock items since the order is cancelled
         ...(orderWithItems?.items || []).map(item =>
           prisma.menuVariant.update({
             where: { id: item.variantId },
-            data: { stock: { increment: item.quantity } }
+            data: { stock: { decrement: item.quantity } }
           })
         )
       ]);

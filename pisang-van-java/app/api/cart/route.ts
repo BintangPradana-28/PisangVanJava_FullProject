@@ -136,13 +136,6 @@ export async function POST(req: NextRequest) {
     });
 
     if (parsed.data.items.length > 0) {
-      const variantIds = parsed.data.items.map(i => i.productId);
-      const variants = await prisma.menuVariant.findMany({
-        where: { id: { in: variantIds } },
-        select: { id: true, stock: true, isActive: true, isDeleted: true, isAvailable: true }
-      });
-      const variantMap = new Map(variants.map(v => [v.id, v]));
-
       const dataToInsert: Array<{
         cartId: string;
         variantId: string;
@@ -151,39 +144,25 @@ export async function POST(req: NextRequest) {
         quantity: number;
         notes: string;
       }> = [];
-
       for (const item of parsed.data.items) {
-        const variant = variantMap.get(item.productId);
-        
-        // Skip if variant not found, deleted, inactive, or unavailable
-        if (!variant || variant.isDeleted || !variant.isActive || !variant.isAvailable) continue;
-        
-        // Skip if stock is 0
-        if (variant.stock <= 0) continue;
-
         const baseType = resolveCartBaseType(item.baseType, item.name);
         if (baseType === null) {
           return NextResponse.json({ success: false, error: "Invalid payload" }, { status: 400 });
         }
-
-        // Correct quantity based on available stock (Sync with Admin)
-        const finalQuantity = Math.min(item.quantity, variant.stock);
 
         dataToInsert.push({
           cartId: cart.id,
           variantId: item.productId,
           toppingId: item.toppingId,
           baseType,
-          quantity: finalQuantity,
+          quantity: item.quantity,
           notes: item.notes,
         });
       }
 
-      if (dataToInsert.length > 0) {
-        await prisma.cartItem.createMany({
-          data: dataToInsert,
-        });
-      }
+      await prisma.cartItem.createMany({
+        data: dataToInsert,
+      });
     }
 
     return NextResponse.json({ success: true });

@@ -63,40 +63,20 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      // 1 & 3. Atomic Decrement with OCC (Optimistic Concurrency Control)
-      const variantQuantities = new Map<string, number>();
+      // 1. Double check stock for all items
       for (const item of data.items) {
-        variantQuantities.set(item.variantId, (variantQuantities.get(item.variantId) || 0) + item.quantity);
-      }
-
-      for (const [variantId, totalQuantity] of Array.from(variantQuantities.entries())) {
         const variant = await tx.menuVariant.findUnique({
-          where: { id: variantId },
-          select: { stock: true, version: true, flavorName: true },
+          where: { id: item.variantId },
+          select: { stock: true, flavorName: true },
         });
 
         if (!variant) {
-          throw new Error(`Produk dengan ID ${variantId} tidak ditemukan.`);
+          throw new Error(`Produk dengan ID ${item.variantId} tidak ditemukan.`);
         }
 
-        if (variant.stock < totalQuantity) {
+        if (variant.stock < item.quantity) {
+          // If out of stock, throw error with specific message for UI notification
           throw new Error(`Stok ${variant.flavorName} habis atau tidak mencukupi. Sisa: ${variant.stock}`);
-        }
-
-        const updateResult = await tx.menuVariant.updateMany({
-          where: {
-            id: variantId,
-            version: variant.version,
-            stock: { gte: totalQuantity },
-          },
-          data: {
-            stock: { decrement: totalQuantity },
-            version: { increment: 1 },
-          },
-        });
-
-        if (updateResult.count === 0) {
-          throw new Error(`Gagal memproses ${variant.flavorName} karena perubahan stok oleh kasir lain (Race Condition). Silakan coba lagi.`);
         }
       }
 
@@ -125,20 +105,24 @@ export async function POST(req: NextRequest) {
         },
       });
 
+      // 3. Atomic Decrement of Stock (Concurrency Safe)
+      for (const item of data.items) {
+        await tx.menuVariant.update({
+          where: { id: item.variantId },
+          data: {
+            stock: {
+              decrement: item.quantity,
+            },
+          },
+        });
+      }
+
       return newOrder;
     });
 
     return NextResponse.json({ success: true, data: result });
   } catch (error: any) {
     console.error("POS Transaction Error:", error);
-    
-    if (error.code === 'P2002') {
-      // Extract offlineId if possible by re-parsing req body or we assume the client sent it.
-      // Since data is out of scope here, we just return a generic success if it's a P2002 on id.
-      // This allows the POS to clear the offline queue without throwing an error to the cashier.
-      return NextResponse.json({ success: true, message: "Order already exists (Idempotent)" });
-    }
-
     // Return the specific stock error message if caught from the transaction
     const message = error.message || "Gagal memproses transaksi kasir.";
     return NextResponse.json({ success: false, error: message }, { status: 400 });
