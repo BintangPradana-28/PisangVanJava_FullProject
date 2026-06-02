@@ -83,16 +83,37 @@ export async function PATCH(req: NextRequest, { params }: OrderRouteContext) {
   }
 
   try {
-    const order = await prisma.order.update({
+    const existingOrder = await prisma.order.findUnique({
       where: { id: parsedParams.data.orderId },
-      data: { status: parsedStatus.data },
-      select: {
-        id: true,
-        customerName: true,
-        customerPhone: true,
-        status: true,
-      },
+      include: { items: true },
     });
+
+    if (!existingOrder) {
+      return NextResponse.json({ success: false, error: "Order not found" }, { status: 404 });
+    }
+
+    const isCancelling = parsedStatus.data === "cancelled" && existingOrder.status !== "cancelled";
+
+    const [order] = await prisma.$transaction([
+      prisma.order.update({
+        where: { id: parsedParams.data.orderId },
+        data: { status: parsedStatus.data },
+        select: {
+          id: true,
+          customerName: true,
+          customerPhone: true,
+          status: true,
+        },
+      }),
+      ...(isCancelling
+        ? existingOrder.items.map((item) =>
+            prisma.menuVariant.update({
+              where: { id: item.variantId },
+              data: { stock: { increment: item.quantity } },
+            })
+          )
+        : []),
+    ]);
 
     await logAudit("UPDATE_ORDER_STATUS", "Order", order.id, { newStatus: parsedStatus.data });
 
