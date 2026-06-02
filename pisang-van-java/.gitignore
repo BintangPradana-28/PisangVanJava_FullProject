@@ -13,3 +13,6 @@ coverage/
 
 .vercel
 .env*
+
+# Sentry Config File
+.sentryclirc

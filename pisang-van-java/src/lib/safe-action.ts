@@ -6,7 +6,7 @@ import * as Sentry from '@sentry/nextjs'
 class ActionError extends Error {}
 
 export const actionClient = createSafeActionClient({
-  handleReturnedServerError(e) {
+  handleServerError(e: Error) {
     if (e instanceof ActionError) {
       return e.message
     }

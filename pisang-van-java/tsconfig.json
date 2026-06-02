@@ -27,9 +27,7 @@
         "./*"
       ]
     },
-    "types": [
-      "jest"
-    ]
+    "types": []
   },
   "include": [
     "next-env.d.ts",
@@ -40,6 +38,12 @@
   ],
   "exclude": [
     "node_modules",
+    "__tests__",
+    "*.test.ts",
+    "*.test.tsx",
+    "*.spec.ts",
+    "*.spec.tsx",
+    "vitest.config.ts",
     "test-*.ts",
     "test-*.js",
     "check-*.js",

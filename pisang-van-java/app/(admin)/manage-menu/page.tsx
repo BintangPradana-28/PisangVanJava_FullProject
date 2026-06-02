@@ -37,6 +37,7 @@ export default async function ManageMenuPage() {
     isAvailable: p.isAvailable,
     stock: p.stock,
     tags: p.tags || [],
+    isActive: p.isActive,
   }));
 
   return (

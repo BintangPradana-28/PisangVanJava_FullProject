@@ -1,0 +1,62 @@
+﻿node.exe : npm warn Unknown project config "only-built-dependencies". This will stop working in the next major version 
+of npm. See `npm help npmrc` for supported config options.
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (npm warn Unknow...config options.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+__tests__/products.test.ts(2,1): error TS2593: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig.
+__tests__/products.test.ts(3,3): error TS2593: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig.
+__tests__/products.test.ts(3,41): error TS2304: Cannot find name 'expect'.
+__tests__/products.test.ts(4,3): error TS2593: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig.
+__tests__/products.test.ts(6,7): error TS2304: Cannot find name 'expect'.
+__tests__/products.test.ts(7,7): error TS2304: Cannot find name 'expect'.
+__tests__/products.test.ts(8,7): error TS2304: Cannot find name 'expect'.
+__tests__/products.test.ts(11,3): error TS2593: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig.
+__tests__/products.test.ts(13,5): error TS2304: Cannot find name 'expect'.
+__tests__/products.test.ts(16,1): error TS2593: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig.
+__tests__/products.test.ts(17,3): error TS2593: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig.
+__tests__/products.test.ts(17,40): error TS2304: Cannot find name 'expect'.
+__tests__/products.test.ts(18,3): error TS2593: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig.
+__tests__/products.test.ts(18,62): error TS2304: Cannot find name 'expect'.
+__tests__/security.test.ts(4,1): error TS2593: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig.
+__tests__/security.test.ts(5,3): error TS2593: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig.
+__tests__/security.test.ts(6,5): error TS2593: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig.
+__tests__/security.test.ts(13,7): error TS2304: Cannot find name 'expect'.
+__tests__/security.test.ts(16,5): error TS2593: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig.
+__tests__/security.test.ts(25,7): error TS2304: Cannot find name 'expect'.
+__tests__/security.test.ts(28,5): error TS2593: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig.
+__tests__/security.test.ts(35,7): error TS2304: Cannot find name 'expect'.
+__tests__/utils.test.ts(2,1): error TS2593: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig.
+__tests__/utils.test.ts(3,3): error TS2593: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig.
+__tests__/utils.test.ts(3,39): error TS2304: Cannot find name 'expect'.
+__tests__/utils.test.ts(4,3): error TS2593: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig.
+__tests__/utils.test.ts(4,30): error TS2304: Cannot find name 'expect'.
+__tests__/utils.test.ts(6,1): error TS2593: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig.
+__tests__/utils.test.ts(7,3): error TS2593: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig.
+__tests__/utils.test.ts(7,39): error TS2304: Cannot find name 'expect'.
+__tests__/utils.test.ts(8,3): error TS2593: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig.
+__tests__/utils.test.ts(8,39): error TS2304: Cannot find name 'expect'.
+__tests__/utils.test.ts(10,1): error TS2593: Cannot find name 'describe'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig.
+__tests__/utils.test.ts(11,3): error TS2593: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig.
+__tests__/utils.test.ts(13,5): error TS2304: Cannot find name 'expect'.
+__tests__/utils.test.ts(14,5): error TS2304: Cannot find name 'expect'.
+__tests__/utils.test.ts(16,3): error TS2593: Cannot find name 'it'. Do you need to install type definitions for a test runner? Try `npm i --save-dev @types/jest` or `npm i --save-dev @types/mocha` and then add 'jest' or 'mocha' to the types field in your tsconfig.
+__tests__/utils.test.ts(18,5): error TS2304: Cannot find name 'expect'.
+__tests__/utils.test.ts(19,5): error TS2304: Cannot find name 'expect'.
+app/(admin)/manage-menu/page.tsx(47,29): error TS2322: Type '{ id: string; flavorName: string; priceKembung: number; priceLumpia: number; priceKrispy: number; wholesaleKembung: number; wholesaleLumpia: number; wholesaleKrispy: number; imageUrl: string | null; deskripsi_topping: string | null; isAvailable: boolean; stock: number; tags: string[]; }[]' is not assignable to type 'ProductType[]'.
+  Property 'isActive' is missing in type '{ id: string; flavorName: string; priceKembung: number; priceLumpia: number; priceKrispy: number; wholesaleKembung: number; wholesaleLumpia: number; wholesaleKrispy: number; imageUrl: string | null; deskripsi_topping: string | null; isAvailable: boolean; stock: number; tags: string[]; }' but required in type 'ProductType'.
+app/(user)/menu-spesial/page.tsx(89,17): error TS2322: Type '{ id: string; flavorName: string; priceKembung: number; priceLumpia: number; priceKrispy: number; wholesaleKembung: number; wholesaleLumpia: number; wholesaleKrispy: number; imageUrl: string | null; ... 4 more ...; reviewCount: number | undefined; }[]' is not assignable to type 'ProductType[]'.
+  Property 'isActive' is missing in type '{ id: string; flavorName: string; priceKembung: number; priceLumpia: number; priceKrispy: number; wholesaleKembung: number; wholesaleLumpia: number; wholesaleKrispy: number; imageUrl: string | null; ... 4 more ...; reviewCount: number | undefined; }' but required in type 'ProductType'.
+app/(user)/page.tsx(34,13): error TS2322: Type '{ id: string; flavorName: string; priceKembung: number; priceLumpia: number; priceKrispy: number; imageUrl: string | null; isAvailable: boolean; stock: number; tags: string[]; deskripsi_topping: string | null; ... 4 more ...; reviewCount: number | undefined; }[]' is not assignable to type 'ProductType[]'.
+  Property 'isActive' is missing in type '{ id: string; flavorName: string; priceKembung: number; priceLumpia: number; priceKrispy: number; imageUrl: string | null; isAvailable: boolean; stock: number; tags: string[]; deskripsi_topping: string | null; ... 4 more ...; reviewCount: number | undefined; }' but required in type 'ProductType'.
+app/(user)/page.tsx(58,11): error TS2741: Property 'isActive' is missing in type '{ id: string; flavorName: string; priceKembung: number; priceLumpia: number; priceKrispy: number; imageUrl: string; isAvailable: true; stock: number; tags: string[]; wholesaleKembung: number; wholesaleLumpia: number; wholesaleKrispy: number; }' but required in type 'ProductType'.
+app/(user)/page.tsx(72,11): error TS2741: Property 'isActive' is missing in type '{ id: string; flavorName: string; priceKembung: number; priceLumpia: number; priceKrispy: number; imageUrl: null; isAvailable: true; stock: number; tags: never[]; wholesaleKembung: number; wholesaleLumpia: number; wholesaleKrispy: number; }' but required in type 'ProductType'.
+app/(user)/page.tsx(86,11): error TS2741: Property 'isActive' is missing in type '{ id: string; flavorName: string; priceKembung: number; priceLumpia: number; priceKrispy: number; imageUrl: null; isAvailable: true; stock: number; tags: never[]; wholesaleKembung: number; wholesaleLumpia: number; wholesaleKrispy: number; }' but required in type 'ProductType'.
+app/(user)/page.tsx(108,9): error TS2741: Property 'isActive' is missing in type '{ id: string; flavorName: string; priceKembung: number; priceLumpia: number; priceKrispy: number; imageUrl: null; isAvailable: true; stock: number; tags: never[]; wholesaleKembung: number; wholesaleLumpia: number; wholesaleKrispy: number; }' but required in type 'ProductType'.
+src/lib/midtrans.ts(1,28): error TS7016: Could not find a declaration file for module 'midtrans-client'. 'C:/Users/prada/Downloads/PisangVanJava_FullProject/pisang-van-java/node_modules/.pnpm/midtrans-client@1.4.3/node_modules/midtrans-client/index.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/midtrans-client` if it exists or add a new declaration (.d.ts) file containing `declare module 'midtrans-client';`
+src/lib/safe-action.ts(9,3): error TS2561: Object literal may only specify known properties, but 'handleReturnedServerError' does not exist in type 'CreateClientOpts<undefined, string, undefined, false>'. Did you mean to write 'handleServerError'?
+src/lib/safe-action.ts(9,29): error TS7006: Parameter 'e' implicitly has an 'any' type.
+vitest.config.ts(2,19): error TS2307: Cannot find module '@vitejs/plugin-react' or its corresponding type declarations.

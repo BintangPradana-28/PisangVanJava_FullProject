@@ -58,6 +58,7 @@ export default async function MenuSpesialPage(props: {
       ? Math.round((p.reviews.reduce((s, r) => s + r.rating, 0) / p.reviews.length) * 10) / 10
       : undefined,
     reviewCount: p.reviews.length > 0 ? p.reviews.length : undefined,
+    isActive: p.isActive,
   }))
 
   // Two-pass filter: base-type tab → flavor-family chip → search query

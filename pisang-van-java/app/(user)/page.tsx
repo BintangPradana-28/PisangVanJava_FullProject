@@ -8,10 +8,10 @@ import nextDynamic from 'next/dynamic';
 import { unstable_cache } from 'next/cache';
 
 // REMOVED force-dynamic to allow ISR and static shell generation
-const About = nextDynamic(() => import('@/components/user/About'), { ssr: true });
-const Gallery = nextDynamic(() => import('@/components/user/Gallery'), { ssr: false });
-const LocationMap = nextDynamic(() => import('@/src/features/settings/components/LocationMap'), { ssr: false });
-const Footer = nextDynamic(() => import('@/components/user/Footer'), { ssr: true });
+const About = nextDynamic(() => import('@/components/user/About'));
+const Gallery = nextDynamic(() => import('@/components/user/Gallery'));
+const LocationMap = nextDynamic(() => import('@/src/features/settings/components/LocationMap'));
+const Footer = nextDynamic(() => import('@/components/user/Footer'));
 
 // Server Component — fetches data at request time using SWR Caching
 const getCachedMenu = unstable_cache(
@@ -49,6 +49,7 @@ const getCachedMenu = unstable_cache(
           wholesaleKrispy: p.wholesaleKrispy,
           rating: agg && agg._avg.rating ? Math.round(agg._avg.rating * 10) / 10 : undefined,
           reviewCount: agg && agg._count.rating > 0 ? agg._count.rating : undefined,
+          isActive: p.isActive,
         };
       });
 
@@ -68,6 +69,7 @@ const getCachedMenu = unstable_cache(
             wholesaleKembung: 0,
             wholesaleLumpia: 0,
             wholesaleKrispy: 0,
+            isActive: true,
           },
           {
             id: "2",
@@ -82,6 +84,7 @@ const getCachedMenu = unstable_cache(
             wholesaleKembung: 0,
             wholesaleLumpia: 0,
             wholesaleKrispy: 0,
+            isActive: true,
           },
           {
             id: "3",
@@ -96,6 +99,7 @@ const getCachedMenu = unstable_cache(
             wholesaleKembung: 0,
             wholesaleLumpia: 0,
             wholesaleKrispy: 0,
+            isActive: true,
           },
         ];
       }
@@ -118,6 +122,7 @@ const getCachedMenu = unstable_cache(
           wholesaleKembung: 0,
           wholesaleLumpia: 0,
           wholesaleKrispy: 0,
+          isActive: true,
         },
       ];
     }
