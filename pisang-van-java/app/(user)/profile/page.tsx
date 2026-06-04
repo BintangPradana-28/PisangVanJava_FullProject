@@ -58,7 +58,7 @@ export default function ProfileDataDiriPage() {
 
   useEffect(() => {
     if (status === 'unauthenticated') {
-      router.push('/login?callbackUrl=/profile')
+      router.push('/member-login?callbackUrl=/profile')
     }
   }, [status, router])
 

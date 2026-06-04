@@ -114,11 +114,20 @@ export default async function middleware(
   }
 
   // getToken() uses the NEXTAUTH_SECRET env var automatically
-  // Works on Edge Runtime — no Node.js dependency
-  const token = await getToken({
+  // NextAuth sometimes fails to infer secureCookie correctly on Vercel edge
+  let token = await getToken({
     req,
     secret: process.env.NEXTAUTH_SECRET,
+    secureCookie: true,
   });
+
+  if (!token) {
+    token = await getToken({
+      req,
+      secret: process.env.NEXTAUTH_SECRET,
+      secureCookie: false,
+    });
+  }
 
   // ── 4. Unauthenticated — redirect to correct login page ──────────────────
   if (!token) {
