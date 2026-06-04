@@ -57,6 +57,7 @@ export default function MidtransPayButton({ snapToken }: Props) {
 
   const handlePay = () => {
     if (!isReady || !window.snap) return
+    window.navigator.vibrate?.(50) // Haptic feedback
     setIsPaying(true)
 
     window.snap.pay(snapToken, {
@@ -96,7 +97,7 @@ export default function MidtransPayButton({ snapToken }: Props) {
     <button
       onClick={handlePay}
       disabled={!isReady || isPaying}
-      className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#D4802A] px-4 py-3.5 text-sm font-bold text-white transition-all hover:bg-[#b56d24] shadow-lg disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
+      className="flex w-full items-center justify-center gap-2 rounded-xl bg-amber-brand px-4 py-3.5 text-sm font-bold text-white transition-all hover:bg-amber-600 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
     >
       {isPaying ? (
         <><Loader2 className="h-4 w-4 animate-spin" /> Membuka Pembayaran...</>

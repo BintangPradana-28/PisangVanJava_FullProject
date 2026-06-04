@@ -76,6 +76,7 @@ export default function MemberRegisterPage() {
       formData.append('email', data.email)
       formData.append('whatsapp', data.whatsapp)
       formData.append('password', data.password)
+      formData.append('consent', data.consent ? 'true' : 'false')
       
       const result = await registerUser(formData)
       

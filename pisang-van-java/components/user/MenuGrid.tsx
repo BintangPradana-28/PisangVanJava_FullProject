@@ -21,8 +21,9 @@ const formatPrice = (price: number) =>
 
 const getFallbackImage = (name: string) => {
   const n = name.toLowerCase();
-  if (n.includes("cokelat") || n.includes("coklat")) return "/images/flavors/taro.png";
-  if (n.includes("keju")) return "/images/flavors/matcha.png";
+  if (n.includes("matcha")) return "/images/flavors/matcha.png";
+  if (n.includes("taro")) return "/images/flavors/taro.png";
+  if (n.includes("blueberry") || n.includes("bluberi")) return "/images/flavors/blueberry.png";
   if (n.includes("strawberry") || n.includes("stroberi")) return "/images/flavors/strawberry.png";
   return "/kitchen.png"; // Default local fallback
 };
