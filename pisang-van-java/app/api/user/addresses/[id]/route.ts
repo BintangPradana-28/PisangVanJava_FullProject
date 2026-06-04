@@ -13,6 +13,8 @@ const addressSchema = z.object({
   isDefault: z.boolean().default(false),
 });
 
+const putAddressSchema = addressSchema.partial();
+
 export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -33,7 +35,7 @@ export async function PUT(
     }
 
     const body = await req.json();
-    const parsed = addressSchema.safeParse(body);
+    const parsed = putAddressSchema.safeParse(body);
     
     if (!parsed.success) {
       return NextResponse.json({
@@ -63,12 +65,12 @@ export async function PUT(
     const updated = await prisma.address.update({
       where: { id: addressId },
       data: {
-        label,
-        fullAddress,
-        latitude: latitude ?? null,
-        longitude: longitude ?? null,
-        notes: notes ?? null,
-        isDefault: finalIsDefault,
+        ...(label !== undefined && { label }),
+        ...(fullAddress !== undefined && { fullAddress }),
+        ...(latitude !== undefined && { latitude }),
+        ...(longitude !== undefined && { longitude }),
+        ...(notes !== undefined && { notes }),
+        ...(finalIsDefault !== undefined && { isDefault: finalIsDefault }),
       },
     });
 

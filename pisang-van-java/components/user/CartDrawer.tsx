@@ -317,7 +317,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                       </div>
                       
                       <button
-                        onClick={() => removeFromCart(item.productId, item.toppingName, item.notes)}
+                        onClick={() => removeFromCart(index)}
                         className="text-zinc-400 hover:text-red-500 transition-colors text-xs"
                         aria-label="Hapus item"
                       >
@@ -328,7 +328,9 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                     <div className="flex items-center justify-between mt-2 pt-2 border-t border-zinc-100/50 dark:border-zinc-800/30">
                       <div className="flex items-center gap-2">
                         <button
-                          onClick={() => updateQuantity(item.productId, item.toppingName, item.notes, item.quantity - 1)}
+                          onClick={() => item.quantity === 1 
+                                ? removeFromCart(index)
+                                : updateQuantity(index, item.quantity - 1)}
                           className="w-6 h-6 rounded-full border border-zinc-300 dark:border-zinc-700 flex items-center justify-center text-xs text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors"
                         >
                           -
@@ -337,7 +339,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                           {item.quantity}
                         </span>
                         <button
-                          onClick={() => updateQuantity(item.productId, item.toppingName, item.notes, item.quantity + 1)}
+                          onClick={() => updateQuantity(index, item.quantity + 1)}
                           className="w-6 h-6 rounded-full border border-zinc-300 dark:border-zinc-700 flex items-center justify-center text-xs text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors"
                         >
                           +

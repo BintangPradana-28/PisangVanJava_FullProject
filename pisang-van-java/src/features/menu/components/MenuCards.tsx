@@ -48,7 +48,7 @@ const getFallbackImageUrl = (name: string): string => {
   if (lowercaseName.includes('taro')) return '/images/flavors/taro.png'
   if (lowercaseName.includes('cokelat') || lowercaseName.includes('coklat')) return '/images/flavors/taro.png'
   if (lowercaseName.includes('keju')) return '/images/flavors/matcha.png'
-  return '/images/kitchen.png'
+  return '/kitchen.png'
 }
 
 const ProductImage = ({ src, alt, available }: { src: string; alt: string; available: boolean }) => {
@@ -63,7 +63,7 @@ const ProductImage = ({ src, alt, available }: { src: string; alt: string; avail
         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 360px"
         loading="lazy"
         className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
-        onError={() => setImgSrc("/images/kitchen.png")}
+        onError={() => setImgSrc("/kitchen.png")}
         placeholder="blur"
         blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
       />

@@ -3,14 +3,17 @@
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useCartStore } from '@/src/lib/store/useCartStore'
+import toast from 'react-hot-toast'
 
 interface OrderItem {
   id: string
   baseType: string
   quantity: number
   subtotal: number
-  variant: { flavorName: string }
-  topping?: { name: string; emoji: string | null } | null
+  variant: { id: string; flavorName: string; priceKembung: number; priceLumpia: number; priceKrispy: number }
+  topping?: { id: string; name: string; emoji: string | null; price: number } | null
 }
 
 interface Order {
@@ -45,6 +48,31 @@ export default function OrderHistory({ phone = '', useAuth = false }: Props) {
   const [isLoading, setIsLoading] = useState(true)
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [error, setError]       = useState<string | null>(null)
+  
+  const router = useRouter()
+  const addToCart = useCartStore((s) => s.addItem)
+
+  const handleReorder = (order: Order) => {
+    order.items.forEach((item) => {
+      let basePrice = item.variant.priceKembung
+      if (item.baseType === 'Lumpia') basePrice = item.variant.priceLumpia
+      if (item.baseType === 'Krispy') basePrice = item.variant.priceKrispy
+
+      addToCart({
+        productId: item.variant.id,
+        name: `${item.variant.flavorName} (${item.baseType})`,
+        basePrice,
+        toppingName: item.topping ? `${item.topping.emoji || ''} ${item.topping.name}`.trim() : null,
+        toppingPrice: item.topping ? item.topping.price : 0,
+        quantity: item.quantity,
+        notes: '',
+        toppingId: item.topping?.id || null,
+        baseType: item.baseType,
+      })
+    })
+    toast.success('Pesanan ditambahkan ke keranjang')
+    router.push('/keranjang')
+  }
 
   const fetchOrders = useCallback(async () => {
     if (!useAuth && !phone) { setIsLoading(false); return }
@@ -208,14 +236,21 @@ export default function OrderHistory({ phone = '', useAuth = false }: Props) {
 
                     {/* Action for done orders → review CTA */}
                     {order.status === 'done' && (
-                      <div className="mt-3 p-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/40 rounded-xl flex items-center justify-between">
+                      <div className="mt-3 p-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/40 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-3">
                         <p className="text-xs text-amber-700 dark:text-amber-400 font-medium">
-                          🌟 Pesanan selesai! Bagikan pengalaman Anda.
+                          🌟 Pesanan selesai! Bagikan pengalaman atau pesan lagi.
                         </p>
-                        <Link href="/ulasan"
-                          className="text-xs font-bold bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded-lg transition-all shrink-0 ml-2">
-                          Tulis Ulasan
-                        </Link>
+                        <div className="flex gap-2 w-full sm:w-auto">
+                          <Link href="/ulasan"
+                            className="flex-1 sm:flex-none text-center text-xs font-bold border border-amber-500 text-amber-600 hover:bg-amber-100 dark:hover:bg-amber-900/50 px-3 py-1.5 rounded-lg transition-all">
+                            Ulas
+                          </Link>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); handleReorder(order); }}
+                            className="flex-1 sm:flex-none text-center text-xs font-bold bg-[#D4802A] hover:bg-[#b56d24] text-white px-3 py-1.5 rounded-lg transition-all shadow-sm">
+                            Pesan Lagi
+                          </button>
+                        </div>
                       </div>
                     )}
 

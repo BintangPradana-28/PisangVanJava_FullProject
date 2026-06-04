@@ -12,6 +12,7 @@ export default function MidtransPayButton({ snapToken }: Props) {
   const router = useRouter()
   const [isReady, setIsReady] = useState(false)
   const [isPaying, setIsPaying] = useState(false)
+  const [hasError, setHasError] = useState(false)
 
   useEffect(() => {
     // Load Midtrans Snap script
@@ -25,14 +26,32 @@ export default function MidtransPayButton({ snapToken }: Props) {
     // Midtrans actually uses `data-client-key` attribute.
     const clientKey = process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY || ''
     
-    const script = document.createElement('script')
-    script.src = scriptUrl
-    script.setAttribute('data-client-key', clientKey)
-    script.onload = () => setIsReady(true)
-    document.body.appendChild(script)
+    if (window.snap) {
+      setIsReady(true)
+      return
+    }
+    
+    // In React Strict Mode, useEffect runs twice. If we append and then immediately remove the script,
+    // the browser aborts the fetch and fires onerror. To prevent this, we check if it already exists
+    // and we DON'T remove it on cleanup.
+    let script = document.querySelector(`script[src="${scriptUrl}"]`) as HTMLScriptElement
+    
+    if (!script) {
+      script = document.createElement('script')
+      script.src = scriptUrl
+      script.setAttribute('data-client-key', clientKey)
+      document.body.appendChild(script)
+    }
+
+    const handleLoad = () => setIsReady(true)
+    const handleError = () => setHasError(true)
+
+    script.addEventListener('load', handleLoad)
+    script.addEventListener('error', handleError)
 
     return () => {
-      document.body.removeChild(script)
+      script.removeEventListener('load', handleLoad)
+      script.removeEventListener('error', handleError)
     }
   }, [])
 
@@ -59,16 +78,30 @@ export default function MidtransPayButton({ snapToken }: Props) {
     })
   }
 
+  if (hasError) {
+    return (
+      <div className="w-full text-center p-3 border border-red-200 bg-red-50 text-red-600 rounded-xl text-sm shadow-sm">
+        <p className="font-bold flex items-center justify-center gap-2">
+          <span className="text-lg">⚠️</span> Sistem Pembayaran Terblokir
+        </p>
+        <p className="text-xs mt-1 mb-2">Harap matikan Adblocker (seperti Adblock Plus) di browser Anda untuk melanjutkan pembayaran.</p>
+        <button onClick={() => window.location.reload()} className="text-xs font-bold underline text-red-700 hover:text-red-800">
+          Muat Ulang Halaman
+        </button>
+      </div>
+    )
+  }
+
   return (
     <button
       onClick={handlePay}
       disabled={!isReady || isPaying}
-      className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#D4802A] px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-[#b56d24] shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+      className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#D4802A] px-4 py-3.5 text-sm font-bold text-white transition-all hover:bg-[#b56d24] shadow-lg disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
     >
       {isPaying ? (
         <><Loader2 className="h-4 w-4 animate-spin" /> Membuka Pembayaran...</>
       ) : (
-        <><CreditCard className="h-4 w-4" aria-hidden="true" /> Bayar Sekarang</>
+        <><CreditCard className="h-4 w-4" aria-hidden="true" /> {isReady ? 'Bayar Sekarang' : 'Memuat Sistem...'}</>
       )}
     </button>
   )

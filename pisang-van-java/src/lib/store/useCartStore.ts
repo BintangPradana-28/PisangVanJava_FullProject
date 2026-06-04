@@ -24,8 +24,8 @@ interface CartState {
   _hasHydrated: boolean
   setHasHydrated: (state: boolean) => void
   addItem: (item: Omit<CartItem, 'totalPrice'>) => void
-  removeItem: (productId: string, toppingName: string | null, notes: string) => void
-  updateQuantity: (productId: string, toppingName: string | null, notes: string, quantity: number) => void
+  removeItem: (index: number) => void
+  updateQuantity: (index: number, quantity: number) => void
   clearCart: () => void
   setItems: (items: CartItem[]) => void
   mergeItems: (dbItems: CartItem[], localItems: CartItem[]) => CartItem[]
@@ -38,8 +38,13 @@ function computeTotal(basePrice: number, toppingPrice: number, quantity: number)
   return (basePrice + toppingPrice) * quantity
 }
 
-function isSameItem(a: CartItem, b: { productId: string; toppingName: string | null; notes: string }): boolean {
-  return a.productId === b.productId && a.toppingName === b.toppingName && a.notes === b.notes
+function isSameItem(a: CartItem, b: Partial<CartItem>): boolean {
+  return (
+    a.productId === b.productId &&
+    a.baseType === b.baseType &&
+    a.toppingId === b.toppingId &&
+    a.notes === b.notes
+  )
 }
 
 function mergeCarts(dbCart: CartItem[], localCart: CartItem[]): CartItem[] {
@@ -92,20 +97,20 @@ export const useCartStore = create<CartState>()(
         })
       },
 
-      removeItem: (productId, toppingName, notes) => {
+      removeItem: (index) => {
         set((state) => ({
-          items: state.items.filter((item) => !isSameItem(item, { productId, toppingName, notes })),
+          items: state.items.filter((_, i) => i !== index),
         }))
       },
 
-      updateQuantity: (productId, toppingName, notes, quantity) => {
+      updateQuantity: (index, quantity) => {
         if (quantity <= 0) {
-          get().removeItem(productId, toppingName, notes)
+          get().removeItem(index)
           return
         }
         set((state) => ({
-          items: state.items.map((item) => {
-            if (isSameItem(item, { productId, toppingName, notes })) {
+          items: state.items.map((item, i) => {
+            if (i === index) {
               return {
                 ...item,
                 quantity,

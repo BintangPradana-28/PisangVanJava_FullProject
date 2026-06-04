@@ -427,8 +427,8 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
                               <button
                                 onClick={() =>
                                   item.quantity === 1
-                                    ? removeFromCart(item.productId, item.toppingName, item.notes)
-                                    : updateQuantity(item.productId, item.toppingName, item.notes, item.quantity - 1)
+                                    ? removeFromCart(index)
+                                    : updateQuantity(index, item.quantity - 1)
                                 }
                                 className={`w-7 h-7 rounded-full flex items-center justify-center transition-all active:scale-90 ${
                                   item.quantity === 1
@@ -443,7 +443,7 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
                                 {item.quantity}
                               </span>
                               <button
-                                onClick={() => updateQuantity(item.productId, item.toppingName, item.notes, item.quantity + 1)}
+                                onClick={() => updateQuantity(index, item.quantity + 1)}
                                 className="w-7 h-7 rounded-full flex items-center justify-center bg-[#D4802A] text-white hover:bg-[#b56d24] transition-all active:scale-90"
                                 aria-label="Tambah kuantitas"
                               >
@@ -458,7 +458,7 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
 
                         {/* Remove Button */}
                         <button
-                          onClick={() => removeFromCart(item.productId, item.toppingName, item.notes)}
+                          onClick={() => removeFromCart(index)}
                           className="p-1.5 rounded-lg text-zinc-300 dark:text-zinc-600 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 transition-all active:scale-90"
                           aria-label="Hapus item"
                         >

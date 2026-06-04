@@ -18,6 +18,7 @@ export async function GET(req: NextRequest) {
         items: {
           include: {
             topping: true,
+            variant: true
           }
         }
       }

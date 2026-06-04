@@ -120,7 +120,7 @@ export default function KeranjangPage() {
                         </p>
                         <div className="flex items-center gap-1.5">
                           <button
-                            onClick={() => updateQuantity(item.productId, item.toppingName, item.notes, item.quantity - 1)}
+                            onClick={() => updateQuantity(i, item.quantity - 1)}
                             className="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-600 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors active:scale-90"
                           >
                             <Minus className="h-3.5 w-3.5" />
@@ -129,14 +129,14 @@ export default function KeranjangPage() {
                             {item.quantity}
                           </span>
                           <button
-                            onClick={() => updateQuantity(item.productId, item.toppingName, item.notes, item.quantity + 1)}
+                            onClick={() => updateQuantity(i, item.quantity + 1)}
                             className="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-600 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors active:scale-90"
                           >
                             <Plus className="h-3.5 w-3.5" />
                           </button>
                           <button
                             onClick={() => {
-                              removeItem(item.productId, item.toppingName, item.notes)
+                              removeItem(i)
                               toast.success('Item dihapus')
                             }}
                             className="w-7 h-7 rounded-lg bg-red-50 dark:bg-red-950/30 flex items-center justify-center text-red-500 hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors active:scale-90 ml-1"
