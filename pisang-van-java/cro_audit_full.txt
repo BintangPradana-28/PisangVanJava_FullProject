@@ -1,0 +1,52 @@
+<USER_REQUEST>
+🔬 FORENSIC CRO AUDIT: PISANG VAN JAVA
+Enterprise-Grade Conversion Architecture Blueprint — 2026
+
+PHASE 1: FORENSIC CONVERSION AUDIT — THE LEAKS
+Looking at your screenshots, I can identify these specific conversion killers before we even get to prescriptions:
+LEAK #1 — The Modifier Modal is a Friction Grenade
+Evidence: Image 14 shows your topping selector as a full-modal overlay with checkboxes.
+The problem: Checkboxes require two cognitive steps — read label, then scan for price, then decide. On mobile, the tap target for each checkbox row is ~44px but the cognitive load is 300ms of hesitation per option. At 5 toppings, that's 1.5 seconds of pure decision anxiety.
+The CRO science: Hick's Law says decision time increases logarithmically with the number of choices. You're presenting 5 unranked toppings with identical visual weight. There is no "recommended path."
+The hemorrhage: Users who open the modifier modal and close it without adding to cart represent your highest-intent abandonment cohort. These are buyers who reached the precipice and turned back because the UI created doubt.
+
+LEAK #2 — The Hero Section is an LCP Bomb
+Evidence: Image 1 shows a full-viewport dark background image with text overlaid. Image 2 shows a "SCROLL DOWN" cue still in view, indicating the hero is taller than the viewport.
+The specific crime: A dark-tinted food background image as the LCP element. Food photography renders poorly at compression levels needed for fast mobile load. On a 4G connection throttled to 37 KB/s (visible in your status bar), that hero image is taking 3–8 seconds to paint. Your LCP target for 2026 is under 1.2 seconds.
+The actual damage: Every 100ms of LCP delay above 1.5s correlates with approximately 1% drop in conversion for mobile F&B. Your hero is not converting anyone — it is a welcome screen for a restaurant that costs you real money per visit.
+
+LEAK #3 — The Checkout Drawer Reveals Hidden Cost Architecture
+Evidence: Image 12 → 13 shows a two-tab cart drawer (Keranjang / 
+<truncated 12301 bytes>
+ no other modifications, will measurably reduce modifier modal abandonment.
+
+coba nanti tanyakan,apakah middleware yang dimaksud itu middleware.ts atau proxy.ts.kemudian syntax yang saya berikan itu dari contoh referensi,kalau kamu ingin menggunakan silahkan tetapi sesuaikan dengan progres yang tadi kita kerjakan dan kembangkan (anti vibe coding & slopsquating).fokus saja pada update dan jangan ubah file diluar konteks topik pertanyaan saya.
+
+@[GEMINI.md] @[pisang-van-java] @[debugger.md] @[fullstack-developer.md] 
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-06-04T11:16:16+07:00.
+
+The user's current state is as follows:
+Active Document: c:\Users\prada\Downloads\PisangVanJava_FullProject\pisang-van-java\.gitignore (LANGUAGE_UNSPECIFIED)
+Cursor is on line: 21
+Other open documents:
+- c:\Users\prada\Downloads\PisangVanJava_FullProject\.gitignore (LANGUAGE_UNSPECIFIED)
+- c:\Users\prada\Downloads\PisangVanJava_FullProject\pisang-van-java\.env.local (LANGUAGE_UNSPECIFIED)
+- c:\Users\prada\Downloads\PisangVanJava_FullProject\pisang-van-java\.env.sentry-build-plugin (LANGUAGE_UNSPECIFIED)
+- c:\Users\prada\Downloads\PisangVanJava_FullProject\pisang-van-java\.env (LANGUAGE_UNSPECIFIED)
+- c:\Users\prada\Downloads\PisangVanJava_FullProject\pisang-van-java\app\api\cart\route.ts (LANGUAGE_TYPESCRIPT)
+Running terminal commands:
+- pnpm run start (in c:\Users\prada\Downloads\PisangVanJava_FullProject\pisang-van-java, running for 12m6s)
+
+The user has mentioned some items in the form @[ITEM]. Here is extra information about the items that were mentioned by the user, in the order that they appear:
+
+@[GEMINI.md] is a [File]:
+c:\Users\prada\Downloads\PisangVanJava_FullProject\GEMINI.md
+@[pisang-van-java] is a [Directory]:
+c:\Users\prada\Downloads\PisangVanJava_FullProject\pisang-van-java
+@[debugger.md] is a [File]:
+c:\Users\prada\Downloads\PisangVanJava_FullProject\debugger.md
+@[fullstack-developer.md] is a [File]:
+c:\Users\prada\Downloads\PisangVanJava_FullProject\fullstack-developer.md
+</ADDITIONAL_METADATA>

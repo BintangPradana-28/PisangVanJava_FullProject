@@ -21,6 +21,8 @@ export interface CartItem {
 interface CartState {
   items: CartItem[]
   isDBSynced: boolean
+  _hasHydrated: boolean
+  setHasHydrated: (state: boolean) => void
   addItem: (item: Omit<CartItem, 'totalPrice'>) => void
   removeItem: (productId: string, toppingName: string | null, notes: string) => void
   updateQuantity: (productId: string, toppingName: string | null, notes: string, quantity: number) => void
@@ -66,6 +68,9 @@ export const useCartStore = create<CartState>()(
     (set, get) => ({
       items: [],
       isDBSynced: false,
+      _hasHydrated: false,
+
+      setHasHydrated: (state) => set({ _hasHydrated: state }),
 
       addItem: (newItem) => {
         set((state) => {
@@ -133,6 +138,12 @@ export const useCartStore = create<CartState>()(
         return localStorage
       }),
       partialize: (state) => ({ items: state.items }),
+      skipHydration: true,
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          state.setHasHydrated(true)
+        }
+      },
     },
   ),
 )

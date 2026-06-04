@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -8,7 +8,7 @@ import { useSession, signOut } from 'next-auth/react'
 import { useTheme } from '@/context/ThemeContext'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSettings } from '@/context/SettingsContext'
-import { useCartCount } from '@/src/lib/store/useCartStore'
+import { useCartCount, useCartStore } from '@/src/lib/store/useCartStore'
 import CartModal from './CartModal'
 
 export default function Navbar() {
@@ -17,6 +17,7 @@ export default function Navbar() {
   const { locale, setLocale, t } = useLanguage()
   const { getSetting } = useSettings()
   const cartCount = useCartCount()
+  const isHydrated = useCartStore((s) => s._hasHydrated)
   const pathname = usePathname()
 
   const [isOpen, setIsOpen] = useState(false)
@@ -24,6 +25,9 @@ export default function Navbar() {
   const [scrollProgress, setScrollProgress] = useState(0)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [isCartOpen, setIsCartOpen] = useState(false)
+  // Sprint 3: Cart badge pop animation — track count changes
+  const [cartPopKey, setCartPopKey] = useState(0)
+  const prevCartCountRef = useRef(cartCount)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -41,8 +45,24 @@ export default function Navbar() {
       }
     }
     window.addEventListener('scroll', handleScroll, { passive: true })
+    
+    // Sprint 4: Rehydrate zustand store manually to avoid hydration mismatch
+    useCartStore.persist.rehydrate()
+
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+
+  // Sprint 3: Trigger cart-pop animation when cartCount increases
+  useEffect(() => {
+    if (cartCount > prevCartCountRef.current) {
+      setCartPopKey(k => k + 1)
+      // Haptic feedback on mobile (8ms = tactile, not annoying)
+      if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+        try { navigator.vibrate(8) } catch {}
+      }
+    }
+    prevCartCountRef.current = cartCount
+  }, [cartCount])
 
   // On home page we don't need scroll spy anymore if we link to actual pages
   const isHome = pathname === '/'
@@ -186,8 +206,11 @@ export default function Navbar() {
               aria-label="Buka Keranjang Belanja"
             >
               <span className="text-lg">🛒</span>
-              {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-white dark:border-zinc-950 animate-pulse">
+              {isHydrated && cartCount > 0 && (
+                <span
+                  key={cartPopKey}
+                  className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-white dark:border-zinc-950 cart-pop"
+                >
                   {cartCount}
                 </span>
               )}

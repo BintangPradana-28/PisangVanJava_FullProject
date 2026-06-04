@@ -9,6 +9,7 @@ import toast from 'react-hot-toast'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
+import { Drawer } from 'vaul'
 
 interface QuickViewModalProps {
   product: ProductType | null
@@ -156,16 +157,17 @@ export default function QuickViewModal({ product, allProducts = [], onClose }: Q
     : product.flavorName
 
   return (
-    <div 
-      onClick={onClose}
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 bg-black/60 backdrop-blur-sm animate-fade-in"
-    >
-      <div 
-        className="relative w-full max-w-lg h-[90vh] sm:h-auto sm:max-h-[90vh] flex flex-col bg-white dark:bg-zinc-900 sm:rounded-3xl rounded-t-3xl overflow-hidden shadow-2xl transition-all duration-300 animate-slide-up"
-        onClick={(e) => e.stopPropagation()}
-      >
+    <Drawer.Root open={!!product} onOpenChange={(open) => { if (!open) onClose() }} shouldScaleBackground={false}>
+      <Drawer.Portal>
+        <Drawer.Overlay className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm animate-fade-in" />
+        <Drawer.Content className="fixed bottom-0 left-0 right-0 z-50 flex flex-col w-full max-w-lg mx-auto h-[90vh] md:h-auto md:max-h-[90vh] bg-white dark:bg-zinc-900 rounded-t-3xl md:rounded-3xl md:bottom-4 outline-none overflow-hidden shadow-2xl">
+          
+          {/* Drag Handle — mobile bottom sheet indicator */}
+          <div className="md:hidden flex justify-center pt-3 pb-2 shrink-0 bg-white dark:bg-zinc-900">
+            <div className="w-12 h-1.5 rounded-full bg-zinc-300 dark:bg-zinc-600" />
+          </div>
         {/* Header Modal (Tetap di Atas) */}
-        <div className="relative shrink-0 w-full aspect-video sm:h-48 bg-gradient-to-br from-amber-100 to-amber-200 dark:from-zinc-800 dark:to-zinc-950 flex flex-col items-center justify-center">
+        <div className="relative shrink-0 w-full aspect-video md:h-48 bg-gradient-to-br from-amber-100 to-amber-200 dark:from-zinc-800 dark:to-zinc-950 flex flex-col items-center justify-center">
           {product.imageUrl ? (
             <Image
               src={product.imageUrl}
@@ -199,7 +201,7 @@ export default function QuickViewModal({ product, allProducts = [], onClose }: Q
         </div>
 
         {/* Body (Bisa di-Scroll) */}
-        <div className="flex-1 overflow-y-auto p-6 bg-zinc-50 dark:bg-zinc-900/50">
+        <div className="flex-1 overflow-y-auto p-6 bg-zinc-50 dark:bg-zinc-900/50" style={{ overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch' }}>
           
           {/* Section Tipe (Grid 3 kolom) */}
           <div className="mb-8">
@@ -241,24 +243,24 @@ export default function QuickViewModal({ product, allProducts = [], onClose }: Q
                   return (
                     <label
                       key={topping.id}
-                      className={`flex flex-col p-3 border-2 rounded-xl cursor-pointer transition-all ${
+                      className={`flex flex-col p-3.5 min-h-[44px] min-w-[44px] border-2 rounded-xl cursor-pointer transition-all select-none active:scale-[0.97] ${
                         isSelected 
                           ? 'border-[#D4802A] bg-[#D4802A]/5' 
                           : 'border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-800/50'
                       }`}
                     >
-                      <div className="flex items-center gap-2 mb-1">
+                      <div className="flex items-center gap-2.5 mb-1">
                         <input
                           type="checkbox"
                           checked={isSelected}
                           onChange={() => handleToppingToggle(topping.id)}
-                          className="accent-[#D4802A] w-4 h-4 rounded"
+                          className="accent-[#D4802A] w-5 h-5 rounded cursor-pointer shrink-0"
                         />
                         <span className="text-sm font-bold text-zinc-800 dark:text-zinc-200 truncate">
                           {topping.emoji} {topping.name}
                         </span>
                       </div>
-                      <span className="text-xs font-bold text-green-600 dark:text-green-400 pl-6">
+                      <span className="text-xs font-bold text-green-600 dark:text-green-400 pl-[30px]">
                         +{formatPrice(topping.price)}
                       </span>
                     </label>
@@ -326,7 +328,8 @@ export default function QuickViewModal({ product, allProducts = [], onClose }: Q
           </button>
 
         </div>
-      </div>
-    </div>
+      </Drawer.Content>
+      </Drawer.Portal>
+    </Drawer.Root>
   )
 }

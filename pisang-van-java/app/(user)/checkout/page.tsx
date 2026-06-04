@@ -10,6 +10,7 @@ import { z } from 'zod'
 import { useCartStore, useCartTotal } from '@/src/lib/store/useCartStore'
 import { useSettings } from '@/context/SettingsContext'
 import { validateVoucher } from '@/src/features/checkout/actions'
+import { isStoreOpen } from '@/src/lib/time'
 
 // ── Response Schema ─────────────────────────────────────────────────────────
 const orderResponseSchema = z.discriminatedUnion('success', [
@@ -137,6 +138,10 @@ export default function CheckoutPage() {
   const subtotalAfterDisc  = Math.max(cartTotal - discount, 0)
   const grandTotal         = delivery === 'DELIVERY' ? subtotalAfterDisc + deliveryFee : subtotalAfterDisc
 
+  const jamOperasional = getSetting('jam_operasional', '10.00–21.00')
+  const isManualOpen = getSetting('store_open', 'true') === 'true'
+  const storeStatus = isStoreOpen(jamOperasional, isManualOpen)
+
   // ── Voucher handler ───────────────────────────────────────────────────────
   const handleApplyVoucher = async () => {
     const code = voucherCode.trim()
@@ -260,6 +265,21 @@ export default function CheckoutPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-zinc-50 dark:bg-zinc-950">
         <div className="w-10 h-10 rounded-full border-4 border-amber-500 border-t-transparent animate-spin" />
+      </div>
+    )
+  }
+
+  if (!storeStatus.isOpen) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-zinc-50 dark:bg-zinc-950 p-4">
+        <div className="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-100 dark:border-zinc-800 shadow-sm p-8 text-center max-w-md">
+          <div className="text-5xl mb-4">🏪</div>
+          <h2 className="font-serif text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-2">Kedai Tutup</h2>
+          <p className="text-zinc-500 mb-6">{storeStatus.message}</p>
+          <Link href="/menu-spesial" className="bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-8 rounded-2xl transition-all shadow-md shadow-amber-200">
+            Kembali ke Menu
+          </Link>
+        </div>
       </div>
     )
   }

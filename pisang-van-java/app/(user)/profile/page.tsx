@@ -145,13 +145,7 @@ export default function ProfilePage() {
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
             <div className="bg-white dark:bg-zinc-900 rounded-3xl p-6 shadow-xl border border-zinc-200/50 dark:border-zinc-800/80">
               <h2 className="font-serif text-lg font-bold text-zinc-800 dark:text-zinc-100 mb-5">Riwayat Pesanan Saya</h2>
-              {userPhone ? (
-                <OrderHistory phone={userPhone} />
-              ) : (
-                <div className="text-center py-8 text-zinc-400">
-                  <p className="text-sm">Tambahkan nomor WhatsApp di tab Profil untuk melihat riwayat pesanan.</p>
-                </div>
-              )}
+              <OrderHistory useAuth={true} />
             </div>
           </motion.div>
         ) : (

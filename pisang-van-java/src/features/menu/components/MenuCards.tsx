@@ -42,25 +42,42 @@ const formatPrice = (price: number): string => {
 
 const getFallbackImageUrl = (name: string): string => {
   const lowercaseName = name.toLowerCase()
-  if (lowercaseName.includes('matcha')) {
-    return '/images/flavors/matcha.png'
-  }
-  if (lowercaseName.includes('strawberry') || lowercaseName.includes('stroberi')) {
-    return '/images/flavors/strawberry.png'
-  }
-  if (lowercaseName.includes('blueberry') || lowercaseName.includes('bluberi')) {
-    return '/images/flavors/blueberry.png'
-  }
-  if (lowercaseName.includes('taro')) {
-    return '/images/flavors/taro.png'
-  }
-  if (lowercaseName.includes('cokelat') || lowercaseName.includes('coklat')) {
-    return 'https://lh3.googleusercontent.com/aida-public/AB6AXuBj4eUVL4GCnyXWfJPOOd9fAAG9IxfaNxn7XlL0ezKjhPebxL4ZQuTq75Cyv8_DEpTEXWQ-wVbufB-cMwyGHieei2jGWIlLG2w8WLrne_pM3P3cZuTxOL5UfH0LeZuAK3jhuZU0DA4A6yJbLm4rGFnfHBlQRU81JrRhBI1Td1w-q4U0n5lau31RqJU7sH8hqx_96O56Q_ZdQNYi59sOZ3GahcZk33rHTp-CwMKrjQXohknO-GwV4axvtwl-4-Y9IdSElxWbmHxafFKU'
-  }
-  if (lowercaseName.includes('keju')) {
-    return 'https://lh3.googleusercontent.com/aida-public/AB6AXuBMWvSvKGrg2mmGKWECW2kybDnREQg3WBlizL5Q1m-7Oh1StWch03nIoEf4EB_leSfQarUhhHO2RbXfYcfV7UKG-3Jcvw-Yesby_DKL5dC_lzExI4yYbGqg-DELiSQld71ZqOIwqG8yK-IgUdR7AiAoxxbdV0AOAELOoktia4g4fXClFEA9R-CdFgKKfV1LOvIhQrGUWC5U3rP_fvFzja6kAhE2f5oGaH6uG0lt5BatUZNK92rZekDwOp5hEcbWRmBfaDCeqCL5riRF'
-  }
-  return 'https://lh3.googleusercontent.com/aida-public/AB6AXuB9LDm-0dz2bLyJgspWeoXpBM_q2p0viEQ3K2S2MhuSf5S5rdGQSfvR2RvTz_gWhe-LKgSzT0N8benG0sTrXkPwbOo_DqG8NeBu7XIPyms32RLdnWqUQ81MQxvOEsTPkzyTH8n45bhr0MIMG_Rv6S5w3Zo5nF-a590KXFVpcne08grJ0MH5PARTwrDYePvrFd7tzyhEw1Cx6_7K-kjmGj4TsXh9Xop3zMBCABCChMVbJzXOcm4BMRs0kWkzWEiEZ3-aXvEPFGT20x3B'
+  if (lowercaseName.includes('matcha')) return '/images/flavors/matcha.png'
+  if (lowercaseName.includes('strawberry') || lowercaseName.includes('stroberi')) return '/images/flavors/strawberry.png'
+  if (lowercaseName.includes('blueberry') || lowercaseName.includes('bluberi')) return '/images/flavors/blueberry.png'
+  if (lowercaseName.includes('taro')) return '/images/flavors/taro.png'
+  if (lowercaseName.includes('cokelat') || lowercaseName.includes('coklat')) return '/images/flavors/taro.png'
+  if (lowercaseName.includes('keju')) return '/images/flavors/matcha.png'
+  return '/images/kitchen.png'
+}
+
+const ProductImage = ({ src, alt, available }: { src: string; alt: string; available: boolean }) => {
+  const [imgSrc, setImgSrc] = useState(src)
+
+  return (
+    <div className="relative w-full aspect-[4/3] bg-zinc-100 dark:bg-zinc-950 overflow-hidden">
+      <Image
+        src={imgSrc}
+        alt={alt}
+        fill
+        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 360px"
+        loading="lazy"
+        className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+        onError={() => setImgSrc("/images/kitchen.png")}
+        placeholder="blur"
+        blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
+      />
+      {available ? (
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm border border-zinc-100 dark:border-zinc-800 rounded-full px-3 py-1 text-xs font-bold text-primary dark:text-zinc-300">
+          Freshly Fried
+        </div>
+      ) : (
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-red-600/90 backdrop-blur-sm border border-red-700 rounded-full px-3 py-1 text-xs font-bold text-white shadow-md">
+          Sold Out
+        </div>
+      )}
+    </div>
+  )
 }
 
 const getSalesMagnetTag = (flavorName: string): string => {
@@ -177,25 +194,7 @@ export default function MenuCards({ products }: Props) {
                   className={`bg-white dark:bg-zinc-900 rounded-3xl overflow-hidden border border-outline-variant/30 dark:border-zinc-800/60 hover:border-secondary/40 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col group ${!available ? 'opacity-80 grayscale-[50%]' : ''}`}
                 >
                   {/* Image Container */}
-                  <div className="relative w-full aspect-[4/3] bg-zinc-100 dark:bg-zinc-950 overflow-hidden">
-                    <Image
-                      src={image}
-                      alt={product.flavorName}
-                      fill
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 360px"
-                      loading="lazy"
-                      className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
-                    />
-                    {available ? (
-                      <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm border border-zinc-100 dark:border-zinc-800 rounded-full px-3 py-1 text-xs font-bold text-primary dark:text-zinc-300">
-                        Freshly Fried
-                      </div>
-                    ) : (
-                      <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-red-600/90 backdrop-blur-sm border border-red-700 rounded-full px-3 py-1 text-xs font-bold text-white shadow-md">
-                        Sold Out
-                      </div>
-                    )}
-                  </div>
+                  <ProductImage src={image} alt={product.flavorName} available={available} />
 
                   {/* Card Content */}
                   <div className="p-6.5 flex flex-col items-center text-center flex-grow">

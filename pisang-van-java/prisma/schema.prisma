@@ -30,31 +30,31 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  accounts      Account[]
-  resetTokens   ResetToken[]
-  favorites     Favorite[]
-  reviews       Review[]
-  cart          Cart?
-  orders        Order[]
-  b2bDeals      B2BDeal[]
-  addresses     Address[]
+  accounts    Account[]
+  resetTokens ResetToken[]
+  favorites   Favorite[]
+  reviews     Review[]
+  cart        Cart?
+  orders      Order[]
+  b2bDeals    B2BDeal[]
+  addresses   Address[]
 
   @@index([email])
 }
 
 model Account {
-  id                 String  @id @default(cuid())
-  userId             String
-  type               String
-  provider           String
-  providerAccountId  String
-  refresh_token      String?
-  access_token       String?
-  expires_at         Int?
-  token_type         String?
-  scope              String?
-  id_token           String?
-  session_state      String?
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -81,15 +81,15 @@ model MenuVariant {
   wholesaleKembung  Int         @default(0)
   wholesaleLumpia   Int         @default(0)
   wholesaleKrispy   Int         @default(0)
-  harga             Float?      // Legacy column
-  deskripsi_topping String?     // Legacy column
+  harga             Float? // Legacy column
+  deskripsi_topping String? // Legacy column
   imageUrl          String?     @map("foto_url")
   isActive          Boolean     @default(true)
   isAvailable       Boolean     @default(true) // Untuk stok harian
-  stock             Int         @default(999)  // Pessimistic Locking / OCC
-  version           Int         @default(1)    // Optimistic Concurrency Control
+  stock             Int         @default(999) // Pessimistic Locking / OCC
+  version           Int         @default(1) // Optimistic Concurrency Control
   isDeleted         Boolean     @default(false) // Untuk Soft Delete
-  tags              String[]    @default([])    // Array of string for tagging (e.g., "Manis", "Gurih")
+  tags              String[]    @default([]) // Array of string for tagging (e.g., "Manis", "Gurih")
   createdAt         DateTime    @default(now())
   updatedAt         DateTime    @updatedAt
   orderItems        OrderItem[]
@@ -139,30 +139,30 @@ model Topping {
 }
 
 model Order {
-  id            String      @id @default(cuid())
-  userId        String?
-  customerName  String
-  customerPhone String
-  totalPrice    Float
-  status        String      @default("pending") // pending, paid, processing, ready, done, cancelled
-  notes         String?
-  source        String      @default("whatsapp") // whatsapp, online, walk-in
-  voucherCode   String?     // Nullable, if they used a voucher
-  discountAmount Float      @default(0) // Total discount applied
-  deliveryMethod String     @default("DELIVERY")
-  deliveryFee   Float       @default(0)
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-  
-  // -- Midtrans Integration --
-  midtransToken         String?  
-  midtransTransactionId String?  @unique
-  paymentStatus         String?  
-  paymentPaidAt         DateTime? 
+  id             String   @id @default(cuid())
+  userId         String?
+  customerName   String
+  customerPhone  String
+  totalPrice     Float
+  status         String   @default("pending") // pending, paid, processing, ready, done, cancelled
+  notes          String?
+  source         String   @default("whatsapp") // whatsapp, online, walk-in
+  voucherCode    String? // Nullable, if they used a voucher
+  discountAmount Float    @default(0) // Total discount applied
+  deliveryMethod String   @default("DELIVERY")
+  deliveryFee    Float    @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
-  user          User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
-  items         OrderItem[]
-  reviews       Review[]
+  // -- Midtrans Integration --
+  midtransToken         String?
+  midtransTransactionId String?   @unique
+  paymentStatus         String?
+  paymentPaidAt         DateTime?
+
+  user    User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  items   OrderItem[]
+  reviews Review[]
 
   @@index([userId])
   @@index([status])
@@ -170,20 +170,20 @@ model Order {
 }
 
 model Voucher {
-  id            String      @id @default(cuid())
-  code          String      @unique
-  discountType  String      @default("PERCENTAGE") // PERCENTAGE atau FIXED
+  id            String   @id @default(cuid())
+  code          String   @unique
+  discountType  String   @default("PERCENTAGE") // PERCENTAGE atau FIXED
   discountValue Float
-  minPurchase   Float       @default(0)
-  maxDiscount   Float?      // Nullable, if null = unlimited
-  startDate     DateTime    @default(now())
+  minPurchase   Float    @default(0)
+  maxDiscount   Float? // Nullable, if null = unlimited
+  startDate     DateTime @default(now())
   endDate       DateTime
-  usageLimit    Int         @default(0) // 0 means unlimited
-  usedCount     Int         @default(0)
-  isActive      Boolean     @default(true)
-  applicableTo  String      @default("ALL") // ALL, CUSTOMER, RESELLER
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  usageLimit    Int      @default(0) // 0 means unlimited
+  usedCount     Int      @default(0)
+  isActive      Boolean  @default(true)
+  applicableTo  String   @default("ALL") // ALL, CUSTOMER, RESELLER
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   @@index([code])
 }
@@ -198,9 +198,9 @@ model OrderItem {
   unitPrice Float
   subtotal  Float
 
-  order   Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  variant MenuVariant  @relation(fields: [variantId], references: [id])
-  topping Topping?     @relation(fields: [toppingId], references: [id])
+  order   Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  variant MenuVariant @relation(fields: [variantId], references: [id])
+  topping Topping?    @relation(fields: [toppingId], references: [id])
 
   @@index([orderId])
   @@index([variantId])
@@ -209,11 +209,11 @@ model OrderItem {
 
 model AuditLog {
   id         String   @id @default(cuid())
-  action     String   // e.g. "CREATE", "UPDATE", "DELETE"
-  resource   String   // e.g. "MenuVariant", "Topping"
+  action     String // e.g. "CREATE", "UPDATE", "DELETE"
+  resource   String // e.g. "MenuVariant", "Topping"
   resourceId String
-  userId     String?  // Who did it (can be null if system)
-  details    String?  // JSON string of changes
+  userId     String? // Who did it (can be null if system)
+  details    String? // JSON string of changes
   ipAddress  String?
   createdAt  DateTime @default(now())
 
@@ -228,8 +228,8 @@ model Favorite {
   variantId String
   createdAt DateTime @default(now())
 
-  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  variant   MenuVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  user    User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  variant MenuVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
 
   @@unique([userId, variantId])
   @@index([userId])
@@ -237,36 +237,36 @@ model Favorite {
 }
 
 model Banner {
-  id          String    @id @default(cuid())
-  title       String
-  subtitle    String?
-  badge       String?
-  imageUrl    String?
-  isActive    Boolean   @default(true)
-  linkUrl     String?
-  startDate   DateTime? // Untuk penjadwalan promo
-  endDate     DateTime? // Untuk batas akhir promo
-  priority    Int       @default(0) // Untuk urutan carousel
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id        String    @id @default(cuid())
+  title     String
+  subtitle  String?
+  badge     String?
+  imageUrl  String?
+  isActive  Boolean   @default(true)
+  linkUrl   String?
+  startDate DateTime? // Untuk penjadwalan promo
+  endDate   DateTime? // Untuk batas akhir promo
+  priority  Int       @default(0) // Untuk urutan carousel
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
   @@index([isActive])
 }
 
 model Review {
-  id        String   @id @default(cuid())
-  userId    String
-  orderId   String
-  variantId String?
-  rating          Int      // 1-5
+  id              String   @id @default(cuid())
+  userId          String
+  orderId         String
+  variantId       String?
+  rating          Int // 1-5
   comment         String?
   imageUrl        String?
   isVerifiedBuyer Boolean  @default(false)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
-  user    User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  order   Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  user    User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  order   Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
   variant MenuVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
 
   @@unique([userId, orderId]) // Satu user hanya bisa review 1x per order
@@ -288,18 +288,18 @@ model Cart {
 }
 
 model CartItem {
-  id          String   @id @default(cuid())
-  cartId      String
-  cart        Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
-  variantId   String
-  variant     MenuVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
-  toppingId   String?
-  topping     Topping? @relation(fields: [toppingId], references: [id], onDelete: Cascade)
-  baseType    String
-  quantity    Int
-  notes       String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String      @id @default(cuid())
+  cartId    String
+  cart      Cart        @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  variantId String
+  variant   MenuVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  toppingId String?
+  topping   Topping?    @relation(fields: [toppingId], references: [id], onDelete: Cascade)
+  baseType  String
+  quantity  Int
+  notes     String?
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
 
   @@index([cartId])
   @@index([variantId])
@@ -309,16 +309,16 @@ model CartItem {
 model Address {
   id          String   @id @default(cuid())
   userId      String
-  label       String   // e.g., "Rumah", "Kantor"
+  label       String // e.g., "Rumah", "Kantor"
   fullAddress String
   latitude    Float?
   longitude   Float?
-  notes       String?  // patokan alamat, e.g. "Depan warung merah"
+  notes       String? // patokan alamat, e.g. "Depan warung merah"
   isDefault   Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+
   @@index([userId])
 }
 
@@ -352,10 +352,10 @@ model B2BDeal {
   stage       DealStage @default(PROSPECTING)
   ownerId     String?
   notes       String?   @db.Text
-  
-  owner       User?     @relation(fields: [ownerId], references: [id], onDelete: SetNull)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+
+  owner     User?    @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([stage])
   @@index([ownerId])

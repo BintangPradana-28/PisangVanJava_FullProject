@@ -57,7 +57,7 @@ export default async function PaymentPage({ params, searchParams }: PaymentPageP
   const alreadyPaid = order.status === "paid";
 
   return (
-    <section className="min-h-screen bg-zinc-50 px-4 py-10 dark:bg-zinc-950">
+    <section className="min-h-screen bg-zinc-50 px-4 py-10 pb-32 md:pb-10 dark:bg-zinc-950">
       <div className="mx-auto flex max-w-4xl flex-col gap-6">
         <Link href="/menu-spesial" className="inline-flex w-fit items-center gap-2 text-sm font-semibold text-zinc-600 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white">
           <ArrowLeft className="h-4 w-4" aria-hidden="true" />
@@ -171,6 +171,14 @@ export default async function PaymentPage({ params, searchParams }: PaymentPageP
               </div>
             </div>
 
+            {/* ETA Banner if Processing/Paid */}
+            {(order.status === 'paid' || order.status === 'processing') && order.deliveryMethod === 'DELIVERY' && (
+              <div className="mb-5 flex items-center gap-3 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm font-semibold text-amber-700 dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-400">
+                <span className="text-xl">⏱️</span>
+                <span>Estimasi tiba: 30-45 menit</span>
+              </div>
+            )}
+
             <div className="mb-5 flex items-start gap-3 rounded-lg border border-zinc-200 bg-zinc-50 p-3 text-xs text-zinc-600 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-300">
               <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-green-700 dark:text-green-400" aria-hidden="true" />
               <span>Pembayaran diproses dengan aman oleh Midtrans.</span>
@@ -192,6 +200,34 @@ export default async function PaymentPage({ params, searchParams }: PaymentPageP
             )}
           </aside>
         </div>
+      </div>
+
+      {/* Mobile Sticky Bottom Bar */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-zinc-200 bg-white p-4 px-6 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] dark:border-zinc-800 dark:bg-zinc-950 md:hidden pb-safe">
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <p className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">Total Tagihan</p>
+            <p className="font-serif text-xl font-bold text-[#D4802A] dark:text-amber-400">{formatPrice(order.totalPrice)}</p>
+          </div>
+          <div className="text-right">
+            <p className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">Order ID</p>
+            <p className="text-sm font-bold text-zinc-900 dark:text-zinc-100">#{order.id.slice(-8)}</p>
+          </div>
+        </div>
+        {canPay ? (
+          order.midtransToken ? (
+            <MidtransPayButton snapToken={order.midtransToken} />
+          ) : (
+            <div className="w-full text-center p-3 text-sm text-red-600 font-bold bg-red-50 rounded-lg border border-red-200">
+              Gagal membuat sesi pembayaran (Token Missing).
+            </div>
+          )
+        ) : (
+          <Link href="/track-order" className="flex w-full items-center justify-center gap-2 rounded-lg bg-zinc-900 px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-zinc-800 dark:bg-white dark:text-zinc-950 dark:hover:bg-zinc-200">
+            <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
+            Lihat Riwayat Pesanan
+          </Link>
+        )}
       </div>
     </section>
   );

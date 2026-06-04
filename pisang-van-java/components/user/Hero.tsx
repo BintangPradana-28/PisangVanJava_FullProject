@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { preload } from "react-dom";
 import { useLanguage } from "@/context/LanguageContext";
 import { Star, Clock, ChevronRight } from "lucide-react";
 
@@ -40,6 +41,9 @@ export default function Hero({
     "https://lh3.googleusercontent.com/aida-public/AB6AXuCuoAcWHG4QUqFwzpuBNIiaBkLcJz1LV9m6p9PxV2_qn2WSGWrEBvMDt8FRrqMy_OoFbvbxPhWt-rkUfOJb6etQcez1ASToorW3mXf5JS_xl10v3v70igMCcIrAMpBGGaEu04I3Of3ciTtE2-7xONBem-5vFcik2fJR33PPVUjV0FJFGjlkjfzgQPrhIoCaiuE8cwWt7W1RSkuSY1Z9FKR9sgdyodxJg59Nruc3CsWtal9atky3HkE_WCrMJk7WkLsMqPddUVASBgtH";
   const ctaLink = banner?.linkUrl || "/menu-spesial";
 
+  // LEAK 2: Explicitly preload the hero image to prevent any Suspense boundary delays
+  preload(bgImage, { as: "image", fetchPriority: "high" });
+
   const renderTitle = () => {
     if (title.includes("Van Java")) {
       const parts = title.split("Van Java");
@@ -67,6 +71,7 @@ export default function Hero({
           alt="Banner Promosi Van Java"
           fill
           priority
+          fetchPriority="high"
           sizes="100vw"
           className="object-cover opacity-40"
         />

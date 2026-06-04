@@ -12,6 +12,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { useSettings } from '@/context/SettingsContext'
 import { validateVoucher } from '@/src/features/checkout/actions'
 import toast from 'react-hot-toast'
+import { isStoreOpen } from '@/src/lib/time'
 
 // ============================================================
 // ZOD SCHEMA — Client-side Quarantine (VP Engineering mandate)
@@ -131,6 +132,10 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
   const discountAmount = appliedVoucher?.discountAmount ?? 0
   const discountedSubtotal = Math.max(cartTotal - discountAmount, 0)
   const finalTotal = deliveryMethod === 'DELIVERY' ? discountedSubtotal + deliveryFee : discountedSubtotal
+
+  const jamOperasional = getSetting('jam_operasional', '10.00–21.00')
+  const isManualOpen = getSetting('store_open', 'true') === 'true'
+  const storeStatus = isStoreOpen(jamOperasional, isManualOpen)
 
   // Reset voucher kalau cart berubah
   useEffect(() => {
@@ -660,7 +665,7 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
                         <span className={`font-semibold ${
                           deliveryFee > 0 ? 'text-zinc-600 dark:text-zinc-300' : 'text-green-600 dark:text-green-400'
                         }`}>
-                          {deliveryFee > 0 ? formatPrice(deliveryFee) : 'Gratis 🎉'}
+                          {deliveryFee > 0 ? formatPrice(deliveryFee) : 'Gratis 🎉 (Jarak < 5km)'}
                         </span>
                       </div>
                     )}
@@ -673,12 +678,20 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
                   {/* CTA Buttons */}
                   <div className="flex gap-2">
                     {activeTab === 'cart' && (
-                      <button
-                        onClick={() => setActiveTab('checkout')}
-                        className="flex-1 py-3.5 bg-[#D4802A] hover:bg-[#b56d24] text-white font-bold rounded-2xl shadow-lg shadow-[#D4802A]/25 transition-all active:scale-95 text-sm flex items-center justify-center gap-2"
-                      >
-                        Lanjut ke Checkout →
-                      </button>
+                      <div className="flex flex-col gap-2 w-full">
+                        {!storeStatus.isOpen && (
+                          <div className="text-center p-2 rounded-xl bg-red-50 text-red-600 text-xs font-bold border border-red-200">
+                            {storeStatus.message}
+                          </div>
+                        )}
+                        <button
+                          onClick={() => setActiveTab('checkout')}
+                          disabled={!storeStatus.isOpen}
+                          className="w-full py-3.5 bg-[#D4802A] hover:bg-[#b56d24] text-white font-bold rounded-2xl shadow-lg shadow-[#D4802A]/25 transition-all active:scale-95 text-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          Lanjut ke Checkout →
+                        </button>
+                      </div>
                     )}
                     {activeTab === 'checkout' && (
                       <>
@@ -714,6 +727,13 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
                         </button>
                       </>
                     )}
+                  </div>
+                  
+                  {/* Trust Signal */}
+                  <div className="flex items-center justify-center pt-2">
+                    <p className="text-[10px] text-zinc-400 dark:text-zinc-500 font-medium flex items-center gap-1">
+                      🔒 Pembayaran diproses aman oleh Midtrans
+                    </p>
                   </div>
                 </div>
               )}

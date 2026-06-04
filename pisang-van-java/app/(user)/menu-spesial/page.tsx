@@ -4,6 +4,7 @@ import SearchFilterBar from '@/components/user/SearchFilterBar'
 import MenuGrid from '@/components/user/MenuGrid'
 import HeroBanner from './HeroBanner' // We'll extract the hero part to a small component or just inline it
 import Link from 'next/link'
+import { cookies } from 'next/headers'
 
 import { unstable_cache } from 'next/cache'
 
@@ -36,6 +37,17 @@ export default async function MenuSpesialPage(props: {
   const q      = typeof searchParams.q      === 'string' ? searchParams.q      : ''
   const filter = typeof searchParams.filter === 'string' ? searchParams.filter : 'all'
   const flavor = typeof searchParams.flavor === 'string' ? searchParams.flavor : 'all'
+
+  // Module 4: Edge Middleware Personalization Context
+  const cookieStore = await cookies()
+  const menuContextCookie = cookieStore.get('x-menu-context')?.value
+  let promoContext = { earlyMorning: false, lunch: false, lateAfternoon: false, evening: false, isLateNight: false }
+  
+  if (menuContextCookie) {
+    try {
+      promoContext = JSON.parse(menuContextCookie)
+    } catch(e) {}
+  }
 
   // Fetch all active products with review aggregates (Cached)
   const dbProducts = await getCachedProducts()
@@ -77,6 +89,32 @@ export default async function MenuSpesialPage(props: {
     
     return matchSearch && matchBase && matchFlavor
   })
+
+  // Module 4: Reorder based on Edge Time-of-Day Context (Cookie)
+  if (promoContext.evening || promoContext.lateAfternoon) {
+    filtered.sort((a, b) => {
+      const aHasKembung = a.priceKembung > 0 ? 1 : 0
+      const bHasKembung = b.priceKembung > 0 ? 1 : 0
+      return bHasKembung - aHasKembung
+    })
+  } else if (promoContext.earlyMorning) {
+    filtered.sort((a, b) => {
+      const aHasKrispy = a.priceKrispy > 0 ? 1 : 0
+      const bHasKrispy = b.priceKrispy > 0 ? 1 : 0
+      return bHasKrispy - aHasKrispy
+    })
+  } else if (promoContext.isLateNight) {
+    filtered.sort((a, b) => {
+      const isMilky = (name: string) => name.toLowerCase().includes('susu') || name.toLowerCase().includes('milky') || name.toLowerCase().includes('coklat') ? 1 : 0
+      return isMilky(b.flavorName) - isMilky(a.flavorName)
+    })
+  } else if (promoContext.lunch) {
+    filtered.sort((a, b) => {
+      const aHasLumpia = a.priceLumpia > 0 ? 1 : 0
+      const bHasLumpia = b.priceLumpia > 0 ? 1 : 0
+      return bHasLumpia - aHasLumpia
+    })
+  }
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--background-custom)', color: 'var(--text-custom)' }}>

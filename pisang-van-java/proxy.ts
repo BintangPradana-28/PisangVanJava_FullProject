@@ -46,6 +46,36 @@ export default async function middleware(req: NextRequest, event: import("next/s
     console.error("[SECURITY] Global Rate Limiter failed, bypassing...", error);
   }
 
+  // Sprint 6/Module 4: Edge Proxy Time-of-Day Context for /menu-spesial
+  if (req.nextUrl.pathname.startsWith('/menu-spesial')) {
+    // Gunakan getUTCHours() + 7 yang sudah ada karena sangat reliable untuk Edge
+    const currentHour = new Date(new Date().getTime() + 7 * 60 * 60 * 1000).getUTCHours();
+    
+    // Derive menu priority context
+    const context = {
+      earlyMorning: currentHour >= 4 && currentHour < 7,
+      lunch: currentHour >= 11 && currentHour < 14,
+      lateAfternoon: currentHour >= 16 && currentHour < 18, // Menggantikan preIftar agar berlaku year-round
+      evening: currentHour >= 18 && currentHour < 21,
+      isLateNight: currentHour >= 21 || currentHour < 4
+    };
+
+    const contextStr = JSON.stringify(context);
+    const existingCookie = req.cookies.get('x-menu-context')?.value;
+
+    const res = NextResponse.next();
+    
+    // Optimasi: Hanya set cookie jika berubah
+    if (existingCookie !== contextStr) {
+      res.cookies.set('x-menu-context', contextStr, {
+        httpOnly: false, // Must be readable by client Zustand / React
+        maxAge: 1800,    // 30 minutes
+      });
+    }
+    
+    return res;
+  }
+
   // Pass to NextAuth middleware without Type Saboteurs
   return authMiddleware(req as unknown as NextRequestWithAuth, event);
 }
@@ -65,6 +95,9 @@ export const config = {
     "/checkout/:path*",
     "/profil/:path*",
     "/track-order/:path*",
-    "/api/cart/:path*"
+    "/api/cart/:path*",
+    
+    // Public Routes with Edge Logic
+    "/menu-spesial/:path*"
   ],
 };

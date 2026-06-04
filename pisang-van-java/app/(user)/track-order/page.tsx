@@ -362,9 +362,16 @@ export default function TrackOrderPage() {
                         </div>
                       )}
 
-                      {/* Status label */}
-                      <div className="text-sm font-semibold mb-3" style={{ color: '#D4802A' }}>
-                        {STATUS_LABELS[order.status]}
+                      {/* Status label & ETA */}
+                      <div className="mb-3">
+                        <div className="text-sm font-semibold" style={{ color: '#D4802A' }}>
+                          {STATUS_LABELS[order.status]}
+                        </div>
+                        {(order.status === 'paid' || order.status === 'processing' || order.status === 'pending') && (
+                          <div className="text-xs font-medium text-amber-700 bg-amber-50 dark:bg-amber-950/20 px-2 py-1 rounded-md inline-flex items-center gap-1 mt-1.5 border border-amber-200/50">
+                            ⏱️ Estimasi tiba: 30-45 menit
+                          </div>
+                        )}
                       </div>
 
                       {/* Items */}

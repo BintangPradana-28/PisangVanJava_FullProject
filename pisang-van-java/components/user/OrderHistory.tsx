@@ -36,22 +36,28 @@ const formatPrice = (n: number) =>
   new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(n)
 
 interface Props {
-  phone: string
+  phone?: string
+  useAuth?: boolean
 }
 
-export default function OrderHistory({ phone }: Props) {
+export default function OrderHistory({ phone = '', useAuth = false }: Props) {
   const [orders, setOrders]     = useState<Order[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [error, setError]       = useState<string | null>(null)
 
   const fetchOrders = useCallback(async () => {
-    if (!phone) { setIsLoading(false); return }
+    if (!useAuth && !phone) { setIsLoading(false); return }
     setIsLoading(true)
     setError(null)
     try {
-      const encodedPhone = encodeURIComponent(phone)
-      const res  = await fetch(`/api/orders/track?phone=${encodedPhone}`, { credentials: 'include', cache: 'no-store' })
+      let res;
+      if (useAuth) {
+        res = await fetch(`/api/user/orders`, { credentials: 'include', cache: 'no-store' })
+      } else {
+        const encodedPhone = encodeURIComponent(phone)
+        res = await fetch(`/api/orders/track?phone=${encodedPhone}`, { credentials: 'include', cache: 'no-store' })
+      }
       const data = await res.json()
       if (data.success) {
         setOrders(data.data)
@@ -88,15 +94,40 @@ export default function OrderHistory({ phone }: Props) {
 
   if (orders.length === 0) {
     return (
-      <div className="bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-12 text-center">
+      <div className="bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-8 sm:p-12 text-center">
         <div className="text-5xl mb-4">📋</div>
-        <h3 className="font-bold text-zinc-700 dark:text-zinc-300 mb-2">Belum Ada Pesanan</h3>
-        <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-5">
+        <h3 className="font-bold text-zinc-800 dark:text-zinc-200 mb-2 text-lg">Belum Ada Pesanan</h3>
+        <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-6 max-w-sm mx-auto">
           Yuk, mulai pesan Pisang Van Java kesukaan Anda!
         </p>
+        
+        {/* Sprint 5: Visual loyalty progress placeholder */}
+        <div className="max-w-xs mx-auto mb-8 p-4 bg-white dark:bg-zinc-800 rounded-xl border border-zinc-100 dark:border-zinc-700 shadow-sm text-left">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">Member Emas</span>
+            <span className="text-[10px] font-medium text-zinc-400 dark:text-zinc-500">0/3 Pesanan</span>
+          </div>
+          <div className="h-2 w-full bg-zinc-100 dark:bg-zinc-700 rounded-full overflow-hidden">
+            <div className="h-full bg-amber-400 w-[5%]" />
+          </div>
+          <p className="text-[10px] text-zinc-500 mt-2">Pesan 3x lagi untuk membuka Member Emas!</p>
+        </div>
+
+        {/* Sprint 5: Popular products suggestion */}
+        <div className="mb-8">
+          <p className="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-4">🔥 Coba yang populer minggu ini</p>
+          <div className="flex justify-center gap-3 flex-wrap">
+            {['Coklat Keju (Kembung)', 'Matcha (Krispy)', 'Tiramisu (Lumpia)'].map(item => (
+              <div key={item} className="px-3 py-1.5 text-xs font-medium bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 border border-amber-100 dark:border-amber-900/40 rounded-lg">
+                {item}
+              </div>
+            ))}
+          </div>
+        </div>
+
         <Link href="/menu-spesial"
-          className="inline-flex items-center gap-2 bg-[#D4802A] hover:bg-[#b56d24] text-white font-bold text-sm px-6 py-3 rounded-xl transition-all active:scale-95">
-          🍌 Lihat Menu
+          className="inline-flex items-center gap-2 bg-[#D4802A] hover:bg-[#b56d24] text-white font-bold text-sm px-8 py-3.5 rounded-full transition-all active:scale-95 shadow-md shadow-[#D4802A]/20">
+          🍌 Pesan Sekarang
         </Link>
       </div>
     )
@@ -188,11 +219,16 @@ export default function OrderHistory({ phone }: Props) {
                       </div>
                     )}
 
-                    {/* Pending → reminder */}
-                    {(order.status === 'pending' || order.status === 'confirmed' || order.status === 'ready') && (
-                      <p className="mt-3 text-xs text-center text-zinc-400">
-                        Pesanan Anda sedang diproses. Kami akan segera menghubungi Anda.
-                      </p>
+                    {/* Pending → reminder & ETA */}
+                    {(order.status === 'pending' || order.status === 'confirmed' || order.status === 'ready' || order.status === 'processing' || order.status === 'paid') && (
+                      <div className="mt-3 bg-amber-50/50 dark:bg-amber-950/10 border border-amber-100/50 dark:border-amber-900/30 rounded-xl p-3 text-center">
+                        <p className="text-xs text-zinc-500 mb-1">
+                          Pesanan Anda sedang diproses. Kami akan segera menghubungi Anda.
+                        </p>
+                        <span className="text-xs font-bold text-amber-700 bg-amber-100/50 dark:bg-amber-900/30 px-2 py-1 rounded-md inline-flex items-center gap-1 mt-1">
+                          ⏱️ Estimasi tiba: 30-45 menit
+                        </span>
+                      </div>
                     )}
                   </div>
                 </motion.div>
