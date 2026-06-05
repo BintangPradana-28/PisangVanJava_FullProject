@@ -92,7 +92,9 @@
   },
   "pnpm": {
     "approvedBuilds": {
-      "@sentry/cli": true
+      "@sentry/cli": true,
+      "core-js": true,
+      "protobufjs": true
     }
   }
 }
