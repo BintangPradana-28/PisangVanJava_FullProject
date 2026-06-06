@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/src/auth";
 import { prisma } from "@/lib/prisma";
-import bcrypt from "bcryptjs";
+import { hashPassword, verifyPassword } from "@/src/lib/password";
 import crypto from "crypto";
 import { z } from "zod";
 
@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, error: "PIN Manajer belum diatur." }, { status: 400 });
     }
 
-    const isValid = await bcrypt.compare(pin, setting.value);
+    const isValid = await verifyPassword(setting.value, pin);
     if (!isValid) {
       return NextResponse.json({ success: false, error: "PIN Salah." }, { status: 401 });
     }
@@ -95,14 +95,14 @@ export async function PUT(req: NextRequest) {
       if (!oldPin) {
         return NextResponse.json({ success: false, error: "PIN Lama wajib diisi." }, { status: 400 });
       }
-      const isOldValid = await bcrypt.compare(oldPin, setting.value);
+      const isOldValid = await verifyPassword(setting.value, oldPin);
       if (!isOldValid) {
         return NextResponse.json({ success: false, error: "PIN Lama salah." }, { status: 401 });
       }
     }
 
     // Hash new PIN securely
-    const hashedPin = await bcrypt.hash(newPin, 12);
+    const hashedPin = await hashPassword(newPin);
 
     await prisma.siteSetting.upsert({
       where: { key: PIN_SETTING_KEY },

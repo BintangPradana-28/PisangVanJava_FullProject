@@ -2,20 +2,17 @@ import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import { PrismaAdapter } from "@auth/prisma-adapter";
-import bcrypt from "bcryptjs";
 import { headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
-import { Role } from "@prisma/client";
 import { loginSchema } from "@/src/features/auth/schemas";
 import { rateLimit } from "@/lib/redis";
 import * as Sentry from "@sentry/nextjs";
+import { authConfig } from "./auth.config";
+import { verifyPassword } from "@/src/lib/password";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  ...authConfig,
   adapter: PrismaAdapter(prisma),
-  session: {
-    strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 Days
-  },
   providers: [
     GoogleProvider({
       clientId: process.env.AUTH_GOOGLE_ID || "MOCK_CLIENT_ID",
@@ -75,14 +72,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           throw new Error("Akun Anda telah ditangguhkan. Hubungi admin.");
         }
 
-        // 4. BCRYPT VERIFICATION
+        // 4. ARGON2ID VERIFICATION
         let isPasswordValid = false;
         try {
-          if (user.passwordHash.startsWith("$argon2")) {
-            throw new Error("Sistem keamanan telah ditingkatkan. Silakan lakukan 'Lupa Sandi' untuk mengatur ulang akses Anda.");
-          } else {
-            isPasswordValid = await bcrypt.compare(password, user.passwordHash);
-          }
+          isPasswordValid = await verifyPassword(user.passwordHash, password);
         } catch (error) {
           Sentry.captureException(error);
           throw new Error("Email atau Sandi tidak valid.");
@@ -102,54 +95,4 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
     }),
   ],
-  callbacks: {
-    async jwt({ token, user, trigger, session }) {
-      if (user) {
-        token.id = user.id;
-        token.role = (user as any).role;
-        token.isBanned = (user as any).isBanned;
-      }
-      if ((!token.role || token.isBanned === undefined) && token.sub) {
-        const dbUser = await prisma.user.findUnique({
-          where: { id: token.sub },
-          select: { role: true, id: true, isBanned: true, name: true, image: true },
-        });
-        if (dbUser) {
-          token.role = dbUser.role;
-          token.id = dbUser.id;
-          token.isBanned = dbUser.isBanned;
-          if (dbUser.name) token.name = dbUser.name;
-          if (dbUser.image) token.picture = dbUser.image;
-        }
-      }
-      if (trigger === "update" && session) {
-        if (session.role) token.role = session.role;
-        if (session.name) token.name = session.name;
-        if (session.image) token.picture = session.image;
-      }
-      return token;
-    },
-    async session({ session, token }) {
-      if (session.user) {
-        session.user.id = (token.id as string) || (token.sub as string);
-        session.user.role = (token.role as Role) || "CUSTOMER";
-        session.user.isBanned = token.isBanned as boolean;
-      }
-      return session;
-    },
-  },
-  pages: {
-    signIn: "/member-login",
-  },
-  secret: process.env.NEXTAUTH_SECRET || "default_secret_key_change_me_in_production",
-  debug: false, 
-  logger: {
-    error(error) {
-      console.error("[NEXTAUTH SECURITY ERROR]:", error);
-    },
-    warn(code) {
-      console.warn("[NEXTAUTH WARN]:", code);
-    },
-    debug(code) {}
-  }
 });

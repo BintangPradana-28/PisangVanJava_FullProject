@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/src/auth";
+import NextAuth from "next-auth";
+import { authConfig } from "@/src/auth.config";
+
+const { auth } = NextAuth(authConfig);
 import { globalRateLimit, redis } from "@/lib/redis";
 
 // ─── Route definitions ────────────────────────────────────────────────────────

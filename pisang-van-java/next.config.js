@@ -8,7 +8,7 @@ const nextConfig = {
       { protocol: 'https', hostname: 'lh3.googleusercontent.com' } // Google OAuth avatars
     ],
   },
-  serverExternalPackages: ['@prisma/client', 'bcryptjs'],
+  serverExternalPackages: ['@prisma/client', '@node-rs/argon2'],
 
   async headers() {
     return [

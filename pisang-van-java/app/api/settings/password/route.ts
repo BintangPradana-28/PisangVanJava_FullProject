@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { auth } from "@/src/auth";
-import bcrypt from 'bcryptjs'
+import { hashPassword, verifyPassword } from '@/src/lib/password'
 
 export async function POST(req: NextRequest) {
   const session = await auth()
@@ -19,10 +19,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: false, error: 'User tidak ditemukan atau tidak menggunakan password' }, { status: 404 })
   }
   
-  const valid = await bcrypt.compare(currentPassword, user.passwordHash)
+  const valid = await verifyPassword(user.passwordHash, currentPassword)
   if (!valid) return NextResponse.json({ success: false, error: 'Password lama salah' }, { status: 400 })
   
-  const hashed = await bcrypt.hash(newPassword, 12)
+  const hashed = await hashPassword(newPassword)
   await prisma.user.update({ where: { id: user.id }, data: { passwordHash: hashed } })
   return NextResponse.json({ success: true, message: 'Password berhasil diubah' })
 }

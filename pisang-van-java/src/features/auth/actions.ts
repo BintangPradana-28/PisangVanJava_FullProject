@@ -2,7 +2,7 @@
 
 import { prisma } from '@/lib/prisma'
 import { registerSchema, forgotPasswordSchema } from './schemas'
-import bcrypt from 'bcryptjs'
+import { hashPassword } from '@/src/lib/password'
 import { redis, rateLimit } from '@/lib/redis'
 import crypto from 'crypto'
 import { headers } from 'next/headers'
@@ -46,8 +46,7 @@ export async function registerUser(formData: FormData) {
       return { success: false, error: 'Pendaftaran ditolak. Jika Anda sudah memiliki akun, silakan masuk.' }
     }
 
-    // 5. SECONDARY HASHING: BCRYPTJS MANDATE
-    const passwordHash = await bcrypt.hash(password, 12)
+    const passwordHash = await hashPassword(password)
 
     // 6. LEAST PRIVILEGE DB INSERT
     await prisma.user.create({

@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client'
-import bcrypt from 'bcryptjs'
+import { hashPassword } from '../src/lib/password'
 
 const prisma = new PrismaClient()
 
@@ -7,7 +7,7 @@ async function main() {
   console.log('Menjalankan seeder untuk skema baru...')
 
   // 1. Seed Admin User
-  const hashedPassword = await bcrypt.hash('admin123', 12)
+  const hashedPassword = await hashPassword('admin123')
   await prisma.user.upsert({
     where: { email: 'admin@admin.com' },
     update: { passwordHash: hashedPassword },

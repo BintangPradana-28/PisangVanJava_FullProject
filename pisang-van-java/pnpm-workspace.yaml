@@ -4,6 +4,7 @@ allowBuilds:
   '@sentry/cli': true
   argon2: true
   core-js: true
+  esbuild: true
   msw: true
   prisma: true
   protobufjs: true
