@@ -39,7 +39,7 @@ export default async function UlasanPage(props: {
     return name[0] + '*'.repeat(name.length - 2) + name[name.length - 1]
   }
 
-  const data = reviews.map((r) => ({
+  const data = reviews.map((r: any) => ({
     id:        r.id,
     userId:    r.userId,
     userName:  maskName(r.user?.name),

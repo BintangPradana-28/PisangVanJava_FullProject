@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
 import toast from 'react-hot-toast'
-import { useCartStore, useCartTotal, useCartCount } from '@/src/lib/store/useCartStore'
+import { useCartStore, selectCartItems, selectCartTotal, selectCartItemCount } from '@/src/stores/cart.store'
 import { useLanguage } from '@/context/LanguageContext'
 import { Minus, Plus, Trash2, ShoppingBag, ArrowLeft } from 'lucide-react'
 
@@ -16,12 +16,12 @@ export default function KeranjangPage() {
   const router = useRouter()
   const { t } = useLanguage()
 
-  const cartItems = useCartStore((s) => s.items)
+  const cartItems = useCartStore(selectCartItems)
   const updateQuantity = useCartStore((s) => s.updateQuantity)
   const removeItem = useCartStore((s) => s.removeItem)
   const clearCart = useCartStore((s) => s.clearCart)
-  const cartTotal = useCartTotal()
-  const cartCount = useCartCount()
+  const cartTotal = useCartStore(selectCartTotal)
+  const cartCount = useCartStore(selectCartItemCount)
 
   const handleClearCart = () => {
     clearCart()
@@ -86,9 +86,9 @@ export default function KeranjangPage() {
             {/* Cart Items */}
             <div className="space-y-3 mb-8">
               <AnimatePresence mode="popLayout">
-                {cartItems.map((item, i) => (
+                {cartItems.map((item) => (
                   <motion.div
-                    key={`${item.productId}-${item.toppingName}-${item.notes}-${i}`}
+                    key={item.cartItemId}
                     layout
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
@@ -100,27 +100,27 @@ export default function KeranjangPage() {
                       {/* Info */}
                       <div className="flex-1 min-w-0">
                         <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100 truncate">
-                          {item.name}
+                          {item.variantName}
                         </h3>
-                        {item.toppingName && (
-                          <p className="text-xs text-amber-600 mt-0.5">+ {item.toppingName}</p>
+                        {item.toppings.length > 0 && (
+                          <p className="text-xs text-amber-600 mt-0.5">+ {item.toppings.map(t => t.name).join(', ')}</p>
                         )}
                         {item.notes && (
                           <p className="text-xs text-zinc-400 italic mt-0.5">&quot;{item.notes}&quot;</p>
                         )}
                         <p className="text-xs text-zinc-400 mt-1">
-                          {formatPrice(item.basePrice + item.toppingPrice)} / pcs
+                          {formatPrice(item.basePrice + item.toppings.reduce((sum, t) => sum + t.priceAdd, 0))} / pcs
                         </p>
                       </div>
 
                       {/* Qty + Price */}
                       <div className="flex flex-col items-end gap-2 shrink-0">
                         <p className="text-sm font-bold text-amber-600 dark:text-amber-400">
-                          {formatPrice(item.totalPrice)}
+                          <CartItemSubtotal cartItemId={item.cartItemId} formatPrice={formatPrice} />
                         </p>
                         <div className="flex items-center gap-1.5">
                           <button
-                            onClick={() => updateQuantity(i, item.quantity - 1)}
+                            onClick={() => updateQuantity(item.cartItemId, item.quantity - 1)}
                             className="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-600 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors active:scale-90"
                           >
                             <Minus className="h-3.5 w-3.5" />
@@ -129,14 +129,14 @@ export default function KeranjangPage() {
                             {item.quantity}
                           </span>
                           <button
-                            onClick={() => updateQuantity(i, item.quantity + 1)}
+                            onClick={() => updateQuantity(item.cartItemId, item.quantity + 1)}
                             className="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-600 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors active:scale-90"
                           >
                             <Plus className="h-3.5 w-3.5" />
                           </button>
                           <button
                             onClick={() => {
-                              removeItem(i)
+                              removeItem(item.cartItemId)
                               toast.success('Item dihapus')
                             }}
                             className="w-7 h-7 rounded-lg bg-red-50 dark:bg-red-950/30 flex items-center justify-center text-red-500 hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors active:scale-90 ml-1"
@@ -174,4 +174,9 @@ export default function KeranjangPage() {
       </div>
     </div>
   )
+}
+
+function CartItemSubtotal({ cartItemId, formatPrice }: { cartItemId: string, formatPrice: (n: number) => string }) {
+  const subtotal = useCartStore(selectItemSubtotal(cartItemId))
+  return <>{formatPrice(subtotal)}</>
 }

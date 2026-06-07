@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react'
 import { ProductType } from '@/src/features/menu/components/MenuCards'
-import { useCartStore } from '@/src/lib/store/useCartStore'
+import { useCartStore, type CartTopping } from '@/src/stores/cart.store'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSettings } from '@/context/SettingsContext'
 import toast from 'react-hot-toast'
@@ -129,27 +129,25 @@ export default function QuickViewModal({ product, allProducts = [], onClose }: Q
   const handleAddToCart = () => {
     if (!isFormValid || !isStoreOpen) return
 
-    const toppingName = selectedToppings.length > 0 
-      ? selectedToppings.map(id => {
-          const top = toppingsData.find(t => t.id === id)
-          return top ? `${top.emoji || ''} ${top.name}`.trim() : ''
-        }).filter(Boolean).join(' + ')
-      : null
+    const mappedToppings: CartTopping[] = selectedToppings.map(id => {
+      const top = toppingsData.find(t => t.id === id)
+      return {
+        toppingId: id,
+        name: top ? top.name : '',
+        priceAdd: top ? top.price : 0
+      }
+    })
 
-    const toppingId = selectedToppings.length > 0 ? selectedToppings[0] : null
     const finalProductId = matchedProduct ? matchedProduct.id : product.id
     const finalProductName = `${selectedFlavor} (${selectedType})`
 
     addToCart({
-      productId: finalProductId,
-      name: finalProductName,
+      menuVariantId: finalProductId,
+      variantName: finalProductName,
       basePrice: basePrice,
-      toppingName,
-      toppingPrice: toppingsPrice,
+      toppings: mappedToppings,
       quantity,
       notes,
-      toppingId,
-      baseType: selectedType,
     })
 
     toast.success(t('toast_added'), {

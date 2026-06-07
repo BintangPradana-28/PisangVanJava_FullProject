@@ -8,7 +8,7 @@ import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { formatPrice } from '@/lib/utils'
 import { useLanguage } from '@/context/LanguageContext'
-import { useCartStore } from '@/src/lib/store/useCartStore'
+import { useCartStore } from '@/src/stores/cart.store'
 import toast from 'react-hot-toast'
 import { z } from 'zod'
 import { supabaseBrowserClient } from '@/src/lib/supabase-client'
@@ -33,6 +33,7 @@ const orderItemSchema = z.object({
     nama_varian: z.string().optional(),
   }).strict(),
   topping: z.object({
+    id: z.string().optional(),
     name: z.string(),
     emoji: z.string().nullable().optional(),
   }).strict().nullable(),
@@ -120,14 +121,12 @@ function ReorderButton({ order }: { order: Order }) {
         const basePrice = resolveBasePrice(item.baseType, live)
 
         addToCart({
-          productId:    live.id,
-          name:         `${variantName} (${item.baseType})`,
+          menuVariantId: live.id,
+          variantName:   `${variantName} (${item.baseType})`,
           basePrice,
-          toppingName:  item.topping?.name  ?? null,
-          toppingPrice: item.topping ? 2000 : 0,
-          toppingId:    null,
-          quantity:     item.quantity,
-          notes:        '',
+          toppings:      item.topping ? [{ toppingId: item.topping.id || 'unknown', name: item.topping.name, priceAdd: 2000 }] : [],
+          quantity:      item.quantity,
+          notes:         '',
         })
         addedCount++
       }

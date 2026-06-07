@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
       select: { variantId: true },
     });
 
-    const favoriteVariantIds = favorites.map((fav) => fav.variantId);
+    const favoriteVariantIds = favorites.map((fav: any) => fav.variantId);
 
     return NextResponse.json({ success: true, data: favoriteVariantIds });
   } catch (error) {

@@ -27,7 +27,7 @@ export async function GET() {
     if (last7[day] !== undefined) last7[day] += o.totalPrice
   })
 
-  const totalRevenue = allOrders.filter(o => o.status === 'done').reduce((s, o) => s + o.totalPrice, 0)
+  const totalRevenue = allOrders.filter(o => o.status === 'done').reduce((s: any, o: any) => s + o.totalPrice, 0)
   const totalOrders  = allOrders.length
   const doneOrders   = allOrders.filter(o => o.status === 'done').length
   const sourceCount  = allOrders.reduce((acc: Record<string, number>, o) => { acc[o.source] = (acc[o.source] || 0) + 1; return acc }, {})

@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
       },
     })
 
-    const data = reviews.map((r) => {
+    const data = reviews.map((r: any) => {
       // Mask user name
       const maskName = (name: string | null) => {
         if (!name) return 'A****n'

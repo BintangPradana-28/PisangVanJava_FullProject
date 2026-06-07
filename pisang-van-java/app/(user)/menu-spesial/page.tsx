@@ -9,26 +9,22 @@ import { cookies } from 'next/headers'
 import { unstable_cache } from 'next/cache'
 
 // Removing force-dynamic to allow Next.js optimizations
-// export const dynamic = 'force-dynamic'
+export const dynamic = 'force-dynamic'
 
-const getCachedProducts = unstable_cache(
-  async () => {
-    try {
-      return await prisma.menuVariant.findMany({
-        where: { isDeleted: false },
-        orderBy: { flavorName: 'asc' },
-        include: {
-          reviews: { select: { rating: true } }
-        }
-      });
-    } catch (e) {
-      console.error("[Safe Log] DB fetch failed for menu-spesial", e);
-      return [];
-    }
-  },
-  ['menu-spesial-products'],
-  { revalidate: 60, tags: ['menu'] }
-);
+const getCachedProducts = async () => {
+  try {
+    return await prisma.menuVariant.findMany({
+      where: { isDeleted: false },
+      orderBy: { flavorName: 'asc' },
+      include: {
+        reviews: { select: { rating: true } }
+      }
+    });
+  } catch (e) {
+    console.error("[Safe Log] DB fetch failed for menu-spesial", e);
+    return [];
+  }
+};
 
 export default async function MenuSpesialPage(props: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
@@ -53,7 +49,7 @@ export default async function MenuSpesialPage(props: {
   const dbProducts = await getCachedProducts()
 
   // Compute rating & reviewCount per variant
-  const products = dbProducts.map((p) => ({
+  const products = dbProducts.map((p: any) => ({
     id: p.id,
     flavorName: p.flavorName,
     priceKembung: p.priceKembung,
@@ -74,7 +70,7 @@ export default async function MenuSpesialPage(props: {
   }))
 
   // Two-pass filter: base-type tab → flavor-family chip → search query
-  const filtered = products.filter((p) => {
+  const filtered = products.filter((p: any) => {
     const name        = p.flavorName.toLowerCase()
     const matchSearch = q      === ''    || name.includes(q.toLowerCase())
     
@@ -92,24 +88,24 @@ export default async function MenuSpesialPage(props: {
 
   // Module 4: Reorder based on Edge Time-of-Day Context (Cookie)
   if (promoContext.evening || promoContext.lateAfternoon) {
-    filtered.sort((a, b) => {
+    filtered.sort((a: any, b: any) => {
       const aHasKembung = a.priceKembung > 0 ? 1 : 0
       const bHasKembung = b.priceKembung > 0 ? 1 : 0
       return bHasKembung - aHasKembung
     })
   } else if (promoContext.earlyMorning) {
-    filtered.sort((a, b) => {
+    filtered.sort((a: any, b: any) => {
       const aHasKrispy = a.priceKrispy > 0 ? 1 : 0
       const bHasKrispy = b.priceKrispy > 0 ? 1 : 0
       return bHasKrispy - aHasKrispy
     })
   } else if (promoContext.isLateNight) {
-    filtered.sort((a, b) => {
+    filtered.sort((a: any, b: any) => {
       const isMilky = (name: string) => name.toLowerCase().includes('susu') || name.toLowerCase().includes('milky') || name.toLowerCase().includes('coklat') ? 1 : 0
       return isMilky(b.flavorName) - isMilky(a.flavorName)
     })
   } else if (promoContext.lunch) {
-    filtered.sort((a, b) => {
+    filtered.sort((a: any, b: any) => {
       const aHasLumpia = a.priceLumpia > 0 ? 1 : 0
       const bHasLumpia = b.priceLumpia > 0 ? 1 : 0
       return bHasLumpia - aHasLumpia

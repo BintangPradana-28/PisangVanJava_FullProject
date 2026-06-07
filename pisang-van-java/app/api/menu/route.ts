@@ -80,11 +80,13 @@ export async function GET() {
       prisma.menuVariant.findMany({
         where: { isDeleted: false, isActive: true },
         orderBy: { flavorName: "asc" },
-        include: { reviews: { select: { rating: true } } }
+        include: { reviews: { select: { rating: true } } },
+        cacheStrategy: { ttl: 60, swr: 60 } // Prisma Accelerate Edge Cache
       }),
       prisma.topping.findMany({
         where: { isActive: true },
         orderBy: { name: "asc" },
+        cacheStrategy: { ttl: 60, swr: 60 } // Prisma Accelerate Edge Cache
       }),
     ]);
 

@@ -71,8 +71,8 @@ export async function GET(_: NextRequest) {
     }
 
     const formattedItems = cart.items
-      .filter((item) => !item.variant.isDeleted && item.variant.isActive)
-      .map((item) => {
+      .filter((item: any) => !item.variant.isDeleted && item.variant.isActive)
+      .map((item: any) => {
       const baseType = normalizeStoredBaseType(item.baseType);
       if (baseType === null) {
         throw new Error("INVALID_STORED_CART_BASE_TYPE");

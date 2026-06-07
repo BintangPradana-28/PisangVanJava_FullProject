@@ -3,6 +3,7 @@ import { auth } from "@/src/auth";
 import { prisma } from "@/lib/prisma";
 import { updateMenuVariantSchema } from "@/src/features/menu/schemas";
 import { sseEmitter } from "@/lib/eventEmitter";
+import { StockManager } from "@/src/lib/stock-manager";
 import { revalidatePath, revalidateTag } from "next/cache";
 import xss from "xss";
 // GET /api/admin/menu/[id]
@@ -74,6 +75,13 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       where: { id },
       data: dataToUpdate,
     });
+
+    // ─── 🛡️ REDIS CACHE HEALING ───────────────────────────────────────────
+    // If the Admin updates the stock manually, we MUST sync it to Redis
+    // Otherwise, the Lua Script will oversell based on stale cache data.
+    if (updatedVariant.stock !== undefined && updatedVariant.stock !== null) {
+      await StockManager.syncStockFromDB(id, updatedVariant.stock);
+    }
 
     const ip = req.headers.get("x-forwarded-for") || "unknown";
 

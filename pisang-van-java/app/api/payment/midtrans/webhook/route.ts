@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { verifyMidtransSignature } from "@/src/features/payment/service";
 import * as Sentry from "@sentry/nextjs";
 import { sendOrderConfirmationEmail } from "@/src/features/payment/email";
+import { redis } from "@/lib/redis";
 
 export async function POST(req: NextRequest) {
   try {
@@ -29,6 +30,18 @@ export async function POST(req: NextRequest) {
       Sentry.captureMessage(`[SECURITY] Invalid Midtrans signature detected for order: ${order_id}`, "fatal");
       return NextResponse.json({ success: false, error: "Forbidden: Signature mismatch" }, { status: 403 });
     }
+
+    // Zero-Trust: Distributed Idempotency & Concurrency Guard via Redis NX
+    // Prevents race conditions and duplicate processing from concurrent Midtrans webhooks
+    const lockKey = `midtrans:webhook:lock:${transaction_id}:${status_code}`;
+    const acquired = await redis.set(lockKey, "locked", { nx: true, ex: 300 }); // Lock for 5 minutes
+    
+    if (!acquired) {
+      console.warn(`[SECURITY] Duplicate webhook blocked by Redis NX Guard for transaction: ${transaction_id}`);
+      // Return 200 so Midtrans marks it as successfully delivered without us double-processing it
+      return NextResponse.json({ success: true, message: "Webhook already processed or currently processing" });
+    }
+
 
     // Verify order exists and amount matches
     const order = await prisma.order.findUnique({
@@ -77,24 +90,28 @@ export async function POST(req: NextRequest) {
         include: { items: true }
       });
       
-      await prisma.$transaction([
-        prisma.order.update({
-          where: { id: order_id },
+      await prisma.$transaction(async (tx: any) => {
+        const updateCount = await tx.order.updateMany({
+          where: { id: order_id, status: { not: 'cancelled' } },
           data: {
             status: newStatus,
             paymentStatus: transaction_status,
             midtransTransactionId: transaction_id,
             paymentPaidAt
           }
-        }),
-        // Restore stock when cancelled
-        ...(orderWithItems?.items || []).map(item =>
-          prisma.menuVariant.updateMany({
-            where: { id: item.variantId },
-            data: { stock: { increment: item.quantity } }
-          })
-        )
-      ]);
+        });
+
+        // Zero-Trust: Only restore stock IF this exact transaction was the one to transition the order to cancelled.
+        // Prevents ghost inventory inflation via concurrent webhook replays.
+        if (updateCount.count > 0) {
+          for (const item of orderWithItems?.items || []) {
+            await tx.menuVariant.updateMany({
+              where: { id: item.variantId },
+              data: { stock: { increment: item.quantity } }
+            });
+          }
+        }
+      });
     } else {
       await prisma.order.update({
         where: { id: order_id },

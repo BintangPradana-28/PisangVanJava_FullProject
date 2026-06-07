@@ -7,7 +7,7 @@ import { CreditCard, MessageCircle, TicketPercent, ShoppingCart, X, Minus, Plus,
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useCartStore, useCartTotal, type CartItem } from '@/src/lib/store/useCartStore'
+import { useCartStore, selectCartItems, selectCartDisplayTotal, selectItemSubtotal, type CartItem } from '@/src/stores/cart.store'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSettings } from '@/context/SettingsContext'
 import { validateVoucher } from '@/src/features/checkout/actions'
@@ -54,6 +54,14 @@ interface CheckoutPayloadItem {
   notes: string | null
 }
 
+function resolveBaseType(name: string): BaseType | null {
+  const normalized = name.toLowerCase()
+  if (normalized.includes('kembung')) return 'kembung'
+  if (normalized.includes('lumpia')) return 'lumpia'
+  if (normalized.includes('krispy')) return 'krispy'
+  return null
+}
+
 const createOrderResponseSchema = z.discriminatedUnion('success', [
   z.object({
     success: z.literal(true),
@@ -66,27 +74,11 @@ const createOrderResponseSchema = z.discriminatedUnion('success', [
   }).strict(),
   z.object({
     success: z.literal(false),
-    error: z.string().min(1).max(120),
+    error: z.string().min(1),
   }).strict(),
 ])
 
-function resolveBaseType(item: CartItem): BaseType | null {
-  const explicitBaseType = item.baseType ?? null
-  if (explicitBaseType !== null) {
-    return normalizeBaseType(explicitBaseType)
-  }
-  const match = item.name.match(/\((Kembung|Lumpia|Krispy|kembung|lumpia|krispy)\)$/)
-  if (match === null) return null
-  return normalizeBaseType(match[1])
-}
 
-function normalizeBaseType(value: string): BaseType | null {
-  const normalized = value.trim().toLowerCase()
-  if (normalized === 'kembung' || normalized === 'lumpia' || normalized === 'krispy') {
-    return normalized
-  }
-  return null
-}
 
 const formatPrice = (amount: number) =>
   new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount)
@@ -96,11 +88,11 @@ const formatPrice = (amount: number) =>
 // ============================================================
 export default function CartModal({ isOpen, onClose }: CartModalProps) {
   const router = useRouter()
-  const cartItems = useCartStore((s) => s.items)
+  const cartItems = useCartStore(selectCartItems)
   const updateQuantity = useCartStore((s) => s.updateQuantity)
   const removeFromCart = useCartStore((s) => s.removeItem)
   const clearCart = useCartStore((s) => s.clearCart)
-  const cartTotal = useCartTotal()
+  const cartTotal = useCartStore(selectCartDisplayTotal)
   const { t } = useLanguage()
   const { getSetting } = useSettings()
 
@@ -212,12 +204,12 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
     }
 
     const checkoutItems = cartItems.map((item): CheckoutPayloadItem | null => {
-      const baseType = resolveBaseType(item)
+      const baseType = resolveBaseType(item.variantName)
       if (baseType === null) return null
-      const notes = item.notes.trim()
+      const notes = item.notes ? item.notes.trim() : ''
       return {
-        variantId: item.productId,
-        toppingId: item.toppingId ?? null,
+        variantId: item.menuVariantId,
+        toppingId: item.toppings.length > 0 ? item.toppings[0].toppingId : null,
         baseType,
         quantity: item.quantity,
         notes: notes.length > 0 ? notes : null,
@@ -400,7 +392,7 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
                   <div className="p-5 space-y-3">
                     {cartItems.map((item, index) => (
                       <motion.div
-                        key={`${item.productId}-${item.toppingName ?? 'none'}-${index}`}
+                        key={`${item.cartItemId}`}
                         initial={{ opacity: 0, y: 8 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, x: -20 }}
@@ -414,9 +406,9 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
 
                         {/* Product Detail */}
                         <div className="flex-1 min-w-0">
-                          <h4 className="font-bold text-sm text-zinc-800 dark:text-zinc-100 truncate">{item.name}</h4>
-                          {item.toppingName && (
-                            <p className="text-xs text-[#D4802A] font-medium mt-0.5">+ {item.toppingName}</p>
+                          <h4 className="font-bold text-sm text-zinc-800 dark:text-zinc-100 truncate">{item.variantName}</h4>
+                          {item.toppings.length > 0 && (
+                            <p className="text-xs text-[#D4802A] font-medium mt-0.5">+ {item.toppings.map(t => t.name).join(', ')}</p>
                           )}
                           {item.notes && (
                             <p className="text-xs text-zinc-400 dark:text-zinc-500 italic mt-0.5 truncate">"{item.notes}"</p>
@@ -427,8 +419,8 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
                               <button
                                 onClick={() =>
                                   item.quantity === 1
-                                    ? removeFromCart(index)
-                                    : updateQuantity(index, item.quantity - 1)
+                                    ? removeFromCart(item.cartItemId)
+                                    : updateQuantity(item.cartItemId, item.quantity - 1)
                                 }
                                 className={`w-7 h-7 rounded-full flex items-center justify-center transition-all active:scale-90 ${
                                   item.quantity === 1
@@ -443,7 +435,7 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
                                 {item.quantity}
                               </span>
                               <button
-                                onClick={() => updateQuantity(index, item.quantity + 1)}
+                                onClick={() => updateQuantity(item.cartItemId, item.quantity + 1)}
                                 className="w-7 h-7 rounded-full flex items-center justify-center bg-[#D4802A] text-white hover:bg-[#b56d24] transition-all active:scale-90"
                                 aria-label="Tambah kuantitas"
                               >
@@ -452,13 +444,15 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
                             </div>
 
                             {/* Price */}
-                            <span className="text-sm font-bold text-[#D4802A]">{formatPrice(item.totalPrice)}</span>
+                            <span className="text-sm font-bold text-[#D4802A]">
+                              <CartItemSubtotal cartItemId={item.cartItemId} formatPrice={formatPrice} />
+                            </span>
                           </div>
                         </div>
 
                         {/* Remove Button */}
                         <button
-                          onClick={() => removeFromCart(index)}
+                          onClick={() => removeFromCart(item.cartItemId)}
                           className="p-1.5 rounded-lg text-zinc-300 dark:text-zinc-600 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 transition-all active:scale-90"
                           aria-label="Hapus item"
                         >
@@ -744,4 +738,9 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
       )}
     </AnimatePresence>
   )
+}
+
+function CartItemSubtotal({ cartItemId, formatPrice }: { cartItemId: string, formatPrice: (n: number) => string }) {
+  const subtotal = useCartStore(selectItemSubtotal(cartItemId))
+  return <>{formatPrice(subtotal)}</>
 }

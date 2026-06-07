@@ -1,1 +1,5 @@
-pnpm test
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "🛡️ Running pre-commit hooks (Secretlint + Biome)..."
+pnpm lint-staged

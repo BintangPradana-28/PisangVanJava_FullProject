@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useCartStore } from '@/src/lib/store/useCartStore'
+import { useCartStore } from '@/src/stores/cart.store'
 import toast from 'react-hot-toast'
 
 interface OrderItem {
@@ -59,15 +59,12 @@ export default function OrderHistory({ phone = '', useAuth = false }: Props) {
       if (item.baseType === 'Krispy') basePrice = item.variant.priceKrispy
 
       addToCart({
-        productId: item.variant.id,
-        name: `${item.variant.flavorName} (${item.baseType})`,
+        menuVariantId: item.variant.id,
+        variantName: `${item.variant.flavorName} (${item.baseType})`,
         basePrice,
-        toppingName: item.topping ? `${item.topping.emoji || ''} ${item.topping.name}`.trim() : null,
-        toppingPrice: item.topping ? item.topping.price : 0,
+        toppings: item.topping ? [{ toppingId: item.topping.id, name: item.topping.name, priceAdd: item.topping.price }] : [],
         quantity: item.quantity,
         notes: '',
-        toppingId: item.topping?.id || null,
-        baseType: item.baseType,
       })
     })
     toast.success('Pesanan ditambahkan ke keranjang')

@@ -10,9 +10,30 @@ datasource db {
 }
 
 enum Role {
+  SUPER_ADMIN
   ADMIN
+  KITCHEN
+  CASHIER
   CUSTOMER
   RESELLER
+}
+
+enum OrderStatus {
+  PENDING_PAYMENT
+  PROCESSING
+  READY
+  COMPLETED
+  CANCELED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  CHALLENGE
+  FAILED
+  CANCELED
+  EXPIRED
+  REFUNDED
 }
 
 model User {
@@ -165,7 +186,7 @@ model Order {
   customerName   String
   customerPhone  String
   totalPrice     Float
-  status         String   @default("pending") // pending, paid, processing, ready, done, cancelled
+  status         OrderStatus @default(PENDING_PAYMENT)
   notes          String?
   source         String   @default("whatsapp") // whatsapp, online, walk-in
   voucherCode    String? // Nullable, if they used a voucher
@@ -178,8 +199,8 @@ model Order {
   // -- Midtrans Integration --
   midtransToken         String?
   midtransTransactionId String?   @unique
-  paymentStatus         String?
-  paymentPaidAt         DateTime?
+  payment               Payment?
+  confirmedAt           DateTime?
 
   user    User?       @relation(fields: [userId], references: [id], onDelete: Restrict)
   items   OrderItem[]
@@ -392,4 +413,26 @@ model AuthLog {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   
   @@index([userId, createdAt])
+}
+
+model Payment {
+  id                String        @id @default(cuid())
+  orderId           String        @unique
+  order             Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  transactionId     String?       @unique // Midtrans transaction_id
+  midtransOrderId   String        @unique // e.g. "PVJ-{orderId}-{timestamp}"
+  status            PaymentStatus @default(PENDING)
+  paymentType       String?       // "qris", "bank_transfer", dll
+  paymentChannel    String?       // bank name or qris acquirer
+  grossAmount       Decimal       @db.Decimal(15, 2)
+  fraudStatus       String?
+  settlementTime    DateTime?
+  expiryTime        DateTime?
+  vaNumber          String?
+  acquirer          String?
+  currency          String        @default("IDR")
+  rawWebhookPayload Json?
+  idempotencyKey    String?       @unique
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
 }

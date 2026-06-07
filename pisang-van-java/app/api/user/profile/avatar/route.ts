@@ -1,22 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/src/auth";
 import { prisma } from "@/lib/prisma";
-import { createClient } from "@supabase/supabase-js";
+import { createSupabaseAuthClient } from "@/src/lib/supabase-auth-client";
 import { v4 as uuidv4 } from "uuid";
-
-// Check environment variables
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY! || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-
-const supabase = createClient(supabaseUrl, supabaseKey);
 
 export async function POST(req: NextRequest) {
   try {
     const session = await auth();
     const userId = session?.user?.id;
-    if (!session || !userId) {
-      return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
+    const supabaseToken = session?.supabaseAccessToken;
+
+    if (!session || !userId || !supabaseToken) {
+      return NextResponse.json({ success: false, message: "Unauthorized or missing JWT bridge." }, { status: 401 });
     }
+
+    const supabase = createSupabaseAuthClient(supabaseToken);
 
     const formData = await req.formData();
     const file = formData.get("file") as File;

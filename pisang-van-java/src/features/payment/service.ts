@@ -69,8 +69,22 @@ export function verifyMidtransSignature(
   grossAmount: string,
   signatureKey: string
 ): boolean {
-  const serverKey = process.env.MIDTRANS_SERVER_KEY || '';
-  const payload = `${orderId}${statusCode}${grossAmount}${serverKey}`;
-  const calculatedSignature = crypto.createHash('sha512').update(payload).digest('hex');
-  return calculatedSignature === signatureKey;
+  try {
+    const serverKey = process.env.MIDTRANS_SERVER_KEY || '';
+    const payload = `${orderId}${statusCode}${grossAmount}${serverKey}`;
+    const calculatedSignature = crypto.createHash('sha512').update(payload).digest('hex');
+    
+    // Timing-attack safe equality check (Zero-Trust)
+    const calculatedBuffer = Buffer.from(calculatedSignature, 'hex');
+    const providedBuffer = Buffer.from(signatureKey, 'hex');
+    
+    if (calculatedBuffer.length !== providedBuffer.length) {
+      return false;
+    }
+    
+    return crypto.timingSafeEqual(calculatedBuffer, providedBuffer);
+  } catch (error) {
+    console.error("[SECURITY] Signature verification error:", error);
+    return false;
+  }
 }

@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import toast from 'react-hot-toast'
 import Link from 'next/link'
 import { z } from 'zod'
-import { useCartStore, useCartTotal } from '@/src/lib/store/useCartStore'
+import { useCartStore, useCartTotal } from '@/src/stores/cart.store'
 import { useSettings } from '@/context/SettingsContext'
 import { validateVoucher } from '@/src/features/checkout/actions'
 import { isStoreOpen } from '@/src/lib/time'
@@ -19,7 +19,7 @@ const orderResponseSchema = z.discriminatedUnion('success', [
     data: z.object({
       orderId: z.string(),
       redirectType: z.enum(['WHATSAPP', 'PAYMENT']),
-      redirectUrl: z.string().min(1).max(3000),
+      redirectUrl: z.string().min(1),
       totalPrice: z.number().finite().int().min(0),
     }),
   }),
@@ -197,11 +197,11 @@ export default function CheckoutPage() {
     if (!consent) { toast.error('Setujui kebijakan privasi terlebih dahulu'); return }
 
     const items = cartItems.map(item => {
-      const baseType = resolveBaseType(item.baseType ?? item.name)
+      const baseType = resolveBaseType(item.variantName)
       if (!baseType) return null
       return {
-        variantId: item.productId,
-        toppingId: item.toppingId ?? null,
+        variantId: item.menuVariantId,
+        toppingId: item.toppings && item.toppings.length > 0 ? item.toppings[0].toppingId : null,
         baseType,
         quantity: item.quantity,
         notes: item.notes?.trim() || null,
@@ -326,19 +326,21 @@ export default function CheckoutPage() {
                       🛒 Periksa Pesanan Anda
                     </h2>
                     <div className="space-y-3">
-                      {cartItems.map((item, i) => (
-                        <div key={`${item.productId}-${i}`} className="flex justify-between items-start py-3 border-b border-zinc-50 dark:border-zinc-800 last:border-0">
+                      {cartItems.map((item, i) => {
+                        const itemTotal = (item.basePrice + (item.toppings?.reduce((sum, t) => sum + t.priceAdd, 0) || 0)) * item.quantity
+                        return (
+                        <div key={`${item.cartItemId}`} className="flex justify-between items-start py-3 border-b border-zinc-50 dark:border-zinc-800 last:border-0">
                           <div>
-                            <p className="text-sm font-bold text-zinc-800 dark:text-zinc-100">{item.name}</p>
-                            {item.toppingName && <p className="text-xs text-amber-600 mt-0.5">+ {item.toppingName}</p>}
+                            <p className="text-sm font-bold text-zinc-800 dark:text-zinc-100">{item.variantName}</p>
+                            {item.toppings?.map(t => <p key={t.toppingId} className="text-xs text-amber-600 mt-0.5">+ {t.name}</p>)}
                             {item.notes && <p className="text-xs text-zinc-400 italic mt-0.5">"{item.notes}"</p>}
                           </div>
                           <div className="text-right ml-4 shrink-0">
-                            <p className="text-sm font-bold text-zinc-800 dark:text-zinc-100">{formatPrice(item.totalPrice)}</p>
+                            <p className="text-sm font-bold text-zinc-800 dark:text-zinc-100">{formatPrice(itemTotal)}</p>
                             <p className="text-xs text-zinc-400">×{item.quantity}</p>
                           </div>
                         </div>
-                      ))}
+                      )})}
                     </div>
                     <div className="mt-4 flex justify-between items-center">
                       <Link href="/menu-spesial" className="text-xs text-amber-600 font-semibold hover:underline">← Tambah item</Link>
@@ -626,15 +628,17 @@ export default function CheckoutPage() {
               </h3>
 
               <div className="space-y-2.5 mb-4">
-                {cartItems.map((item, i) => (
-                  <div key={`${item.productId}-${i}`} className="flex justify-between text-sm gap-2">
+                {cartItems.map((item, i) => {
+                  const itemTotal = (item.basePrice + (item.toppings?.reduce((sum, t) => sum + t.priceAdd, 0) || 0)) * item.quantity
+                  return (
+                  <div key={`${item.cartItemId}`} className="flex justify-between text-sm gap-2">
                     <div className="min-w-0">
-                      <span className="text-zinc-700 dark:text-zinc-300 font-medium truncate block">{item.name}</span>
-                      {item.toppingName && <span className="text-xs text-amber-500">+{item.toppingName}</span>}
+                      <span className="text-zinc-700 dark:text-zinc-300 font-medium truncate block">{item.variantName}</span>
+                      {item.toppings?.map(t => <span key={t.toppingId} className="text-xs text-amber-500 block">+{t.name}</span>)}
                     </div>
-                    <span className="text-zinc-800 dark:text-zinc-100 font-semibold shrink-0">{formatPrice(item.totalPrice)}</span>
+                    <span className="text-zinc-800 dark:text-zinc-100 font-semibold shrink-0">{formatPrice(itemTotal)}</span>
                   </div>
-                ))}
+                )})}
               </div>
 
               <div className="border-t border-zinc-100 dark:border-zinc-800 pt-4 space-y-2">

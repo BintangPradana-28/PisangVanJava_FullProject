@@ -1,0 +1,14 @@
+# infra/cloudflare/terraform.tfvars.example
+#
+# CARA PENGGUNAAN:
+# cp terraform.tfvars.example terraform.tfvars
+# Edit terraform.tfvars dengan nilai asli
+# JANGAN commit terraform.tfvars ke Git (sudah ada di .gitignore)
+#
+# Atau gunakan environment variables:
+#   export TF_VAR_cloudflare_api_token="<your-token>"
+#   export TF_VAR_cloudflare_zone_id="<your-zone-id>"
+
+cloudflare_api_token = "GANTI_DENGAN_API_TOKEN_CLOUDFLARE"
+cloudflare_zone_id   = "GANTI_DENGAN_32_KARAKTER_ZONE_ID"
+vercel_cname_target  = "cname.vercel-dns.com"

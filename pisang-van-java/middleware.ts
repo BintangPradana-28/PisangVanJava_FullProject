@@ -5,24 +5,30 @@ import { authConfig } from "@/src/auth.config";
 const { auth } = NextAuth(authConfig);
 import { globalRateLimit, redis } from "@/lib/redis";
 
-// ─── Route definitions ────────────────────────────────────────────────────────
+// ─── Native TypeScript RBAC Route Map ───────────────────────────────────────────
 
-const ADMIN_PATHS = [
-  "/dashboard",
-  "/manage-menu",
-  "/orders",
-  "/reports",
-  "/settings",
-  "/toppings",
-  "/api/admin",
-];
+type AllowedRoles = ("SUPER_ADMIN" | "ADMIN" | "KITCHEN" | "CASHIER" | "CUSTOMER" | "RESELLER")[];
 
-const CUSTOMER_PROTECTED_PATHS = [
-  "/checkout",
-  "/profile",
-  "/track-order",
-  "/api/cart",
-];
+const PROTECTED: Record<string, AllowedRoles> = {
+  // STRICT ADMIN
+  "/dashboard": ["SUPER_ADMIN", "ADMIN"],
+  "/manage-menu": ["SUPER_ADMIN", "ADMIN"],
+  "/settings": ["SUPER_ADMIN", "ADMIN"],
+  "/reports": ["SUPER_ADMIN", "ADMIN"],
+  "/toppings": ["SUPER_ADMIN", "ADMIN"],
+  "/api/admin": ["SUPER_ADMIN", "ADMIN"],
+  
+  // STAFF
+  "/orders": ["SUPER_ADMIN", "ADMIN", "KITCHEN", "CASHIER"],
+  "/kasir": ["SUPER_ADMIN", "ADMIN", "CASHIER"],
+  "/kitchen": ["SUPER_ADMIN", "ADMIN", "KITCHEN"],
+
+  // CUSTOMER BOUNDARY
+  "/checkout": ["CUSTOMER", "RESELLER", "SUPER_ADMIN", "ADMIN"],
+  "/profile": ["CUSTOMER", "RESELLER", "SUPER_ADMIN", "ADMIN"],
+  "/track-order": ["CUSTOMER", "RESELLER", "SUPER_ADMIN", "ADMIN"],
+  "/api/cart": ["CUSTOMER", "RESELLER", "SUPER_ADMIN", "ADMIN"],
+};
 
 const EDGE_CONTEXT_PATHS = ["/menu-spesial"];
 
@@ -42,16 +48,20 @@ function deriveMenuContext(hour: number) {
   };
 }
 
-function isAdminPath(pathname: string): boolean {
-  return ADMIN_PATHS.some((p) => pathname.startsWith(p));
-}
-
-function isCustomerProtectedPath(pathname: string): boolean {
-  return CUSTOMER_PROTECTED_PATHS.some((p) => pathname.startsWith(p));
-}
-
 function isEdgeContextPath(pathname: string): boolean {
   return EDGE_CONTEXT_PATHS.some((p) => pathname.startsWith(p));
+}
+
+/**
+ * Resolves the required roles for a given pathname by checking the PROTECTED map.
+ */
+function getRequiredRoles(pathname: string): AllowedRoles | null {
+  for (const [route, roles] of Object.entries(PROTECTED)) {
+    if (pathname.startsWith(route)) {
+      return roles;
+    }
+  }
+  return null;
 }
 
 // ─── Main middleware (wrapped with Auth.js v5) ───────────────────────────────
@@ -94,16 +104,14 @@ export default auth(async (req) => {
     return res;
   }
 
-  // ── 3. Auth guard — read JWT token via req.auth ───────────────────────────
-  const needsAuth = isAdminPath(pathname) || isCustomerProtectedPath(pathname);
-
+  // ── 3. Route Protection & RBAC Resolution ───────────────────────────────────
+  const requiredRoles = getRequiredRoles(pathname);
   const token = req.auth?.user;
 
   // ── 3.5. Banned User Check ────────────────────────────────────────────────
-  if (token && needsAuth) {
+  if (token && requiredRoles) {
     let isBanned = token.isBanned;
     
-    // Check Redis for immediate revocation if not flagged in JWT yet
     if (!isBanned) {
       try {
         const bannedInRedis = await redis.get(`banned:${token.id}`);
@@ -121,13 +129,16 @@ export default auth(async (req) => {
     }
   }
 
-  if (!needsAuth) {
+  if (!requiredRoles) {
+    // Route is fully public
     return NextResponse.next();
   }
 
-  // ── 4. Unauthenticated — redirect to correct login page ──────────────────
+  // ── 4. Unauthenticated Boundary ──────────────────────────────────────────────
   if (!token) {
-    const loginUrl = isAdminPath(pathname)
+    // Determine login portal based on route intent
+    const isStaffRoute = requiredRoles.includes("ADMIN") && !requiredRoles.includes("CUSTOMER");
+    const loginUrl = isStaffRoute
       ? new URL("/login", req.url)
       : new URL("/member-login", req.url);
 
@@ -135,9 +146,12 @@ export default auth(async (req) => {
     return NextResponse.redirect(loginUrl);
   }
 
-  // ── 5. Authenticated but wrong role for admin routes ─────────────────────
-  if (isAdminPath(pathname) && token.role !== "ADMIN") {
-    return NextResponse.redirect(new URL("/", req.url));
+  // ── 5. Native Role Validation (The Core Security Check) ────────────────────
+  const userRole = token.role as string;
+  if (!requiredRoles.includes(userRole as any)) {
+    // Authorized but Forbidden
+    console.warn(`[RBAC BLOCK] User ${token.id} (${userRole}) attempted to access ${pathname}`);
+    return NextResponse.redirect(new URL("/", req.url)); // Send back to home or a 403 page
   }
 
   return NextResponse.next();

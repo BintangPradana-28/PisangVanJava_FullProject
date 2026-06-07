@@ -1,0 +1,6 @@
+# infra/.gitignore
+infra/cloudflare/terraform.tfvars
+infra/cloudflare/.terraform/
+infra/cloudflare/*.tfstate
+infra/cloudflare/*.tfstate.backup
+infra/cloudflare/.terraform.lock.hcl

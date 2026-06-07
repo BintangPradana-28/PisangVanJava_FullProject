@@ -1,6 +1,5 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import GoogleProvider from "next-auth/providers/google";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
@@ -14,11 +13,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
   adapter: PrismaAdapter(prisma),
   providers: [
-    GoogleProvider({
-      clientId: process.env.AUTH_GOOGLE_ID || "MOCK_CLIENT_ID",
-      clientSecret: process.env.AUTH_GOOGLE_SECRET || "MOCK_CLIENT_SECRET",
-      allowDangerousEmailAccountLinking: true,
-    }),
+    ...authConfig.providers, // Import Edge-compatible providers (Google)
+
     CredentialsProvider({
       name: "Credentials",
       credentials: {

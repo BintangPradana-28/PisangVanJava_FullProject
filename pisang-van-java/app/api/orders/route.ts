@@ -132,13 +132,13 @@ export async function POST(req: NextRequest) {
       },
       { status: 201 },
     );
-  } catch (error) {
-    if (error instanceof CheckoutSecurityError) {
-      return NextResponse.json({ success: false, error: "Checkout rejected" }, { status: error.statusCode });
+  } catch (error: any) {
+    if (error instanceof CheckoutSecurityError || error?.name === "CheckoutSecurityError") {
+      return NextResponse.json({ success: false, error: error.reason || "Checkout rejected" }, { status: error.statusCode || 400 });
     }
 
     console.error("[SECURITY] Order creation failed.", error);
-    return NextResponse.json({ success: false, error: "Server error" }, { status: 500 });
+    return NextResponse.json({ success: false, error: `Server error: ${error?.message || "Unknown error"}` }, { status: 500 });
   }
 }
 

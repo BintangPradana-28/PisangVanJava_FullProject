@@ -83,15 +83,34 @@ export async function PATCH(req: NextRequest, { params }: OrderRouteContext) {
   }
 
   try {
-    const order = await prisma.order.update({
-      where: { id: parsedParams.data.orderId },
-      data: { status: parsedStatus.data },
-      select: {
-        id: true,
-        customerName: true,
-        customerPhone: true,
-        status: true,
-      },
+    const order = await prisma.$transaction(async (tx: any) => {
+      // If transitioning to cancelled, we must restore stock exactly once.
+      if (parsedStatus.data === "cancelled") {
+        const orderWithItems = await tx.order.findUnique({
+          where: { id: parsedParams.data.orderId },
+          include: { items: true },
+        });
+
+        if (orderWithItems && orderWithItems.status !== "cancelled") {
+          for (const item of orderWithItems.items) {
+            await tx.menuVariant.updateMany({
+              where: { id: item.variantId },
+              data: { stock: { increment: item.quantity } },
+            });
+          }
+        }
+      }
+
+      return tx.order.update({
+        where: { id: parsedParams.data.orderId },
+        data: { status: parsedStatus.data },
+        select: {
+          id: true,
+          customerName: true,
+          customerPhone: true,
+          status: true,
+        },
+      });
     });
 
     await logAudit("UPDATE_ORDER_STATUS", "Order", order.id, { newStatus: parsedStatus.data });

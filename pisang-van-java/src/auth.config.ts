@@ -1,4 +1,17 @@
-import type { NextAuthConfig } from "next-auth";
+import type { NextAuthConfig, DefaultSession } from "next-auth";
+import GoogleProvider from "next-auth/providers/google";
+import * as jwt from "jose";
+
+declare module "next-auth" {
+  interface Session {
+    supabaseAccessToken?: string;
+    user: {
+      id: string;
+      role: string;
+      isBanned: boolean;
+    } & DefaultSession["user"]
+  }
+}
 
 export const authConfig = {
   pages: {
@@ -28,6 +41,23 @@ export const authConfig = {
         session.user.id = (token.id as string) || (token.sub as string);
         session.user.role = (token.role as any) || "CUSTOMER";
         session.user.isBanned = token.isBanned as boolean;
+        
+        // ─── SUPABASE JOSE JWT BRIDGE ──────────────────────────────────────
+        const signingSecret = process.env.SUPABASE_JWT_SECRET;
+        if (signingSecret) {
+          const payload = {
+            aud: "authenticated",
+            exp: Math.floor(new Date(session.expires).getTime() / 1000),
+            sub: session.user.id,
+            email: session.user.email,
+            role: "authenticated",
+          };
+          session.supabaseAccessToken = await new jwt.SignJWT(payload)
+            .setProtectedHeader({ alg: "HS256" })
+            .sign(new TextEncoder().encode(signingSecret));
+        } else {
+          console.warn("[SECURITY] SUPABASE_JWT_SECRET is missing. Storage RLS will fail.");
+        }
       }
       return session;
     },
@@ -43,5 +73,11 @@ export const authConfig = {
     },
     debug(code) {}
   },
-  providers: [], // Add providers in auth.ts
+  providers: [
+    GoogleProvider({
+      clientId: process.env.AUTH_GOOGLE_ID || "MOCK_CLIENT_ID",
+      clientSecret: process.env.AUTH_GOOGLE_SECRET || "MOCK_CLIENT_SECRET",
+      allowDangerousEmailAccountLinking: true,
+    }),
+  ],
 } satisfies NextAuthConfig;

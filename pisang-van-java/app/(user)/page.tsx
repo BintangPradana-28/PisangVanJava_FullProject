@@ -31,7 +31,7 @@ const getCachedMenu = unstable_cache(
       });
       const aggregateMap = new Map(reviewAggregates.map(r => [r.variantId, r]));
 
-      const products: ProductType[] = dbProducts.map((p) => {
+      const products: ProductType[] = dbProducts.map((p: any) => {
         const agg = aggregateMap.get(p.id);
         return {
           id: p.id,

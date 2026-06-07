@@ -6,11 +6,12 @@ import { prisma } from "@/lib/prisma";
 import { redis } from "@/lib/redis";
 import xss from "xss";
 import { generateSnapToken } from "@/src/features/payment/service";
-import type { Prisma } from "@prisma/client";
+import { OrderStatus, Prisma } from "@prisma/client";
+import { createPendingPayment } from "@/src/features/payment/payment.service";
 
 const ROLE_VALUES = ["ADMIN", "CUSTOMER", "RESELLER"] as const;
 const BASE_TYPE_VALUES = ["kembung", "lumpia", "krispy"] as const;
-const ORDER_STATUS_VALUES = ["pending", "paid", "processing", "ready", "done", "cancelled"] as const;
+const ORDER_STATUS_VALUES = ["PENDING_PAYMENT", "PROCESSING", "READY", "COMPLETED", "CANCELED"] as const;
 const PAYMENT_METHOD_VALUES = ["WHATSAPP", "ONLINE"] as const;
 
 const resourceIdSchema = z
@@ -374,7 +375,7 @@ export async function createCheckoutOrder(
   input: CreateOrderInput,
   actor: CheckoutActor,
 ): Promise<CreateCheckoutOrderResult> {
-  const result = await prisma.$transaction(async (tx) => {
+  const result = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
     const variantIds = Array.from(new Set(input.items.map((item) => item.variantId)));
     const toppingIds = Array.from(
       new Set(
@@ -512,7 +513,7 @@ export async function createCheckoutOrder(
         customerName: xss(input.customerName),
         customerPhone: input.customerPhone,
         totalPrice,
-        status: "pending",
+        status: OrderStatus.PENDING_PAYMENT,
         notes: normalizeNullableText(input.notes) ? xss(normalizeNullableText(input.notes) as string) : null,
         source,
         voucherCode: voucherApplication?.code ?? null,
@@ -565,7 +566,7 @@ export async function createCheckoutOrder(
       grossAmount: result.totalPrice,
       customerName: input.customerName,
       customerPhone: input.customerPhone,
-      items: result.preparedItems.map(item => ({
+      items: result.preparedItems.map((item: any) => ({
         id: item.variantId,
         price: item.unitPrice,
         quantity: item.quantity,
@@ -577,6 +578,13 @@ export async function createCheckoutOrder(
       await prisma.order.update({
         where: { id: result.orderId },
         data: { midtransToken: snapToken }
+      });
+
+      // P0 #10: Buat Payment record setelah snap token sukses di-generate
+      await createPendingPayment({
+        orderId: result.orderId,
+        midtransOrderId: result.orderId,
+        grossAmount: new Prisma.Decimal(result.totalPrice),
       });
     }
 
@@ -604,7 +612,7 @@ export async function createCheckoutOrder(
     deliveryFee: result.deliveryFee,
     totalPrice: result.totalPrice,
     voucherCode: input.voucherCode ?? null,
-    itemLines: result.preparedItems.map((item) => item.whatsappLine),
+    itemLines: result.preparedItems.map((item: any) => item.whatsappLine),
   });
 
   return {
@@ -672,10 +680,10 @@ export async function processPaymentForActor(orderId: string, actor: CheckoutAct
       id: orderId,
       userId: actor.userId,
       source: "online",
-      status: "pending",
+      status: OrderStatus.PENDING_PAYMENT,
     },
     data: {
-      status: "paid",
+      status: OrderStatus.PROCESSING,
     },
   });
 
@@ -858,7 +866,7 @@ async function resolveWhatsAppNumber(): Promise<string | null> {
 
   const orderedKeys = ["kontak_whatsapp", "nomor_wa"];
   for (const key of orderedKeys) {
-    const setting = settings.find((candidate) => candidate.key === key);
+    const setting = settings.find((candidate: any) => candidate.key === key);
     const value = setting?.value.trim();
     if (value !== undefined && /^62[1-9][0-9]{7,14}$/.test(value)) {
       return value;

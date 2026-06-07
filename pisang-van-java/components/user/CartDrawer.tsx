@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import { CreditCard, MessageCircle, TicketPercent } from 'lucide-react'
 import { z } from 'zod'
-import { useCartStore, useCartTotal, type CartItem } from '@/src/lib/store/useCartStore'
+import { useCartStore, selectCartItems, selectCartDisplayTotal, selectItemSubtotal, type CartItem } from '@/src/stores/cart.store'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSettings } from '@/context/SettingsContext'
 import { validateVoucher } from '@/src/features/checkout/actions'
@@ -32,6 +32,14 @@ interface CheckoutPayloadItem {
   notes: string | null
 }
 
+function resolveBaseType(name: string): BaseType | null {
+  const normalized = name.toLowerCase()
+  if (normalized.includes('kembung')) return 'kembung'
+  if (normalized.includes('lumpia')) return 'lumpia'
+  if (normalized.includes('krispy')) return 'krispy'
+  return null
+}
+
 const createOrderResponseSchema = z.discriminatedUnion('success', [
   z.object({
     success: z.literal(true),
@@ -44,40 +52,19 @@ const createOrderResponseSchema = z.discriminatedUnion('success', [
   }).strict(),
   z.object({
     success: z.literal(false),
-    error: z.string().min(1).max(120),
+    error: z.string().min(1),
   }).strict(),
 ])
 
-function resolveBaseType(item: CartItem): BaseType | null {
-  const explicitBaseType = item.baseType ?? null
-  if (explicitBaseType !== null) {
-    return normalizeBaseType(explicitBaseType)
-  }
 
-  const match = item.name.match(/\((Kembung|Lumpia|Krispy|kembung|lumpia|krispy)\)$/)
-  if (match === null) {
-    return null
-  }
-
-  return normalizeBaseType(match[1])
-}
-
-function normalizeBaseType(value: string): BaseType | null {
-  const normalized = value.trim().toLowerCase()
-  if (normalized === 'kembung' || normalized === 'lumpia' || normalized === 'krispy') {
-    return normalized
-  }
-
-  return null
-}
 
 export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
   const router = useRouter()
-  const cartItems = useCartStore((s) => s.items)
+  const cartItems = useCartStore(selectCartItems)
   const updateQuantity = useCartStore((s) => s.updateQuantity)
   const removeFromCart = useCartStore((s) => s.removeItem)
   const clearCart = useCartStore((s) => s.clearCart)
-  const cartTotal = useCartTotal()
+  const cartTotal = useCartStore(selectCartDisplayTotal)
   const { t } = useLanguage()
   const { getSetting } = useSettings()
   const [address, setAddress] = useState('')
@@ -168,15 +155,12 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
     }
 
     const checkoutItems = cartItems.map((item): CheckoutPayloadItem | null => {
-      const baseType = resolveBaseType(item)
-      if (baseType === null) {
-        return null
-      }
-
-      const notes = item.notes.trim()
+      const baseType = resolveBaseType(item.variantName)
+      if (baseType === null) return null
+      const notes = item.notes ? item.notes.trim() : ''
       return {
-        variantId: item.productId,
-        toppingId: item.toppingId ?? null,
+        variantId: item.menuVariantId,
+        toppingId: item.toppings.length > 0 ? item.toppings[0].toppingId : null,
         baseType,
         quantity: item.quantity,
         notes: notes.length > 0 ? notes : null,
@@ -296,17 +280,17 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
               ) : (
                 cartItems.map((item, index) => (
                   <div
-                    key={`${item.productId}-${item.toppingName || 'none'}-${index}`}
+                    key={`${item.cartItemId}`}
                     className="p-4 border border-zinc-100 dark:border-zinc-850 bg-zinc-50/40 dark:bg-zinc-800/20 rounded-2xl flex flex-col gap-2 relative"
                   >
                     <div className="flex justify-between items-start">
                       <div>
                         <h4 className="font-sans text-sm font-bold text-zinc-800 dark:text-zinc-100">
-                          {item.name}
+                          {item.variantName}
                         </h4>
-                        {item.toppingName && (
+                        {item.toppings.length > 0 && (
                           <span className="text-xs text-secondary font-medium block">
-                            + {t('cart_topping')}: {item.toppingName}
+                            + {t('cart_topping')}: {item.toppings.map(t => t.name).join(', ')}
                           </span>
                         )}
                         {item.notes && (
@@ -317,7 +301,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                       </div>
                       
                       <button
-                        onClick={() => removeFromCart(index)}
+                        onClick={() => removeFromCart(item.cartItemId)}
                         className="text-zinc-400 hover:text-red-500 transition-colors text-xs"
                         aria-label="Hapus item"
                       >
@@ -329,8 +313,8 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => item.quantity === 1 
-                                ? removeFromCart(index)
-                                : updateQuantity(index, item.quantity - 1)}
+                                ? removeFromCart(item.cartItemId)
+                                : updateQuantity(item.cartItemId, item.quantity - 1)}
                           className="w-6 h-6 rounded-full border border-zinc-300 dark:border-zinc-700 flex items-center justify-center text-xs text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors"
                         >
                           -
@@ -339,7 +323,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                           {item.quantity}
                         </span>
                         <button
-                          onClick={() => updateQuantity(index, item.quantity + 1)}
+                          onClick={() => updateQuantity(item.cartItemId, item.quantity + 1)}
                           className="w-6 h-6 rounded-full border border-zinc-300 dark:border-zinc-700 flex items-center justify-center text-xs text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors"
                         >
                           +
@@ -347,7 +331,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                       </div>
 
                       <span className="text-sm font-bold text-brown dark:text-amber-400">
-                        {formatPrice(item.totalPrice)}
+                        <CartItemSubtotal cartItemId={item.cartItemId} formatPrice={formatPrice} />
                       </span>
                     </div>
                   </div>
@@ -533,4 +517,9 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
       )}
     </AnimatePresence>
   )
+}
+
+function CartItemSubtotal({ cartItemId, formatPrice }: { cartItemId: string, formatPrice: (n: number) => string }) {
+  const subtotal = useCartStore(selectItemSubtotal(cartItemId))
+  return <>{formatPrice(subtotal)}</>
 }

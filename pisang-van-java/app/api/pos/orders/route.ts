@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
     const data = parseResult.data;
 
     // Use Prisma $transaction to ensure Atomicity and prevent Race Conditions
-    const result = await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx: any) => {
       // 0. Idempotency Check (Offline Sync Armor)
       if (data.offlineId) {
         const existingOrder = await tx.order.findUnique({

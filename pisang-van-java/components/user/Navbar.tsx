@@ -8,7 +8,7 @@ import { useSession, signOut } from 'next-auth/react'
 import { useTheme } from '@/context/ThemeContext'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSettings } from '@/context/SettingsContext'
-import { useCartCount, useCartStore } from '@/src/lib/store/useCartStore'
+import { useCartStore, selectCartItemCount } from '@/src/stores/cart.store'
 import CartModal from './CartModal'
 
 export default function Navbar() {
@@ -16,7 +16,7 @@ export default function Navbar() {
   const { theme, toggleTheme, mounted } = useTheme()
   const { locale, setLocale, t } = useLanguage()
   const { getSetting } = useSettings()
-  const cartCount = useCartCount()
+  const cartCount = useCartStore(selectCartItemCount)
   const isHydrated = useCartStore((s) => s._hasHydrated)
   const pathname = usePathname()
 
