@@ -124,7 +124,7 @@ function ReorderButton({ order }: { order: Order }) {
           menuVariantId: live.id,
           variantName:   `${variantName} (${item.baseType})`,
           basePrice,
-          toppings:      item.topping ? [{ toppingId: item.topping.id || 'unknown', name: item.topping.name, priceAdd: 2000 }] : [],
+          toppings:      item.toppings ? item.toppings.map((t: any) => ({ toppingId: t.id || 'unknown', name: t.name, priceAdd: 2000 })) : [],
           quantity:      item.quantity,
           notes:         '',
         })
@@ -148,12 +148,12 @@ function ReorderButton({ order }: { order: Order }) {
   return (
     <button
       onClick={handleReorder}
-      disabled={loading || order.status === 'cancelled'}
-      title={order.status === 'cancelled' ? 'Pesanan dibatalkan' : 'Tambahkan semua item ke keranjang'}
+      disabled={loading || order.status === 'CANCELED'}
+      title={order.status === 'CANCELED' ? 'Pesanan dibatalkan' : 'Tambahkan semua item ke keranjang'}
       className="flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-full transition-all duration-200 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
       style={{
-        background: order.status === 'cancelled' ? 'var(--surface-custom)' : '#D4802A',
-        color:      order.status === 'cancelled' ? 'var(--text-custom)'    : 'white',
+        background: order.status === 'CANCELED' ? 'var(--surface-custom)' : '#D4802A',
+        color:      order.status === 'CANCELED' ? 'var(--text-custom)'    : 'white',
       }}
     >
       {loading ? (
@@ -323,7 +323,7 @@ export default function TrackOrderPage() {
               ) : (
                 orders.map((order) => {
                   const stepIdx   = STATUS_STEPS.indexOf(order.status)
-                  const cancelled = order.status === 'cancelled'
+                  const cancelled = order.status === 'CANCELED'
                   return (
                     <div
                       key={order.id}
@@ -366,7 +366,7 @@ export default function TrackOrderPage() {
                         <div className="text-sm font-semibold" style={{ color: '#D4802A' }}>
                           {STATUS_LABELS[order.status]}
                         </div>
-                        {(order.status === 'paid' || order.status === 'processing' || order.status === 'pending') && (
+                        {(order.status === 'PROCESSING' || order.status === 'READY' || order.status === 'PENDING_PAYMENT') && (
                           <div className="text-xs font-medium text-amber-700 bg-amber-50 dark:bg-amber-950/20 px-2 py-1 rounded-md inline-flex items-center gap-1 mt-1.5 border border-amber-200/50">
                             ⏱️ Estimasi tiba: 30-45 menit
                           </div>
@@ -379,10 +379,10 @@ export default function TrackOrderPage() {
                           <div key={item.id} className="flex justify-between text-sm">
                             <span style={{ color: 'var(--text-custom)', opacity: 0.8 }}>
                               {item.variant.flavorName ?? item.variant.nama_varian} ({item.baseType})
-                              {item.topping && (
-                                <span style={{ opacity: 0.55 }}>
-                                  {' '}+ {item.topping.emoji} {item.topping.name}
-                                </span>
+                              {item.toppings && item.toppings.length > 0 && (
+                                <p className="mt-1 text-xs text-amber-600 dark:text-amber-400 font-medium">
+                                  {' '}+ {item.toppings.map((t: any) => `${t.emoji || ''} ${t.name}`).join(', ')}
+                                </p>
                               )}
                               {' '}×{item.quantity}
                             </span>
@@ -399,7 +399,7 @@ export default function TrackOrderPage() {
 
                       {/* ── Reorder & Review & Invoice CTA ────────────────────────────── */}
                       <div className="mt-4 pt-3 border-t border-zinc-100 dark:border-zinc-800 flex justify-end gap-2 flex-wrap">
-                        {order.status !== 'cancelled' && (
+                        {order.status !== 'CANCELED' && (
                           <a
                             href={`/api/orders/${order.id}/invoice`}
                             target="_blank"
@@ -409,7 +409,7 @@ export default function TrackOrderPage() {
                             📄 Invoice
                           </a>
                         )}
-                        {order.status === 'done' && (
+                        {order.status === 'COMPLETED' && (
                           <Link
                             href={`/ulasan?orderId=${order.id}`}
                             className="flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-full transition-all duration-200 active:scale-95 border border-amber-500 text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20"

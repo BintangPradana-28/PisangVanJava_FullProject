@@ -472,7 +472,7 @@ export default function OrdersClient({ initialOrders }: { initialOrders: Order[]
                             <span className="text-brown-600">
                               {item.variant.flavorName}
                               <span className="text-xs text-brown-400 ml-1">({item.baseType})</span>
-                              {item.topping && <span className="text-xs text-secondary ml-1">+ {item.topping.emoji} {item.topping.name}</span>}
+                              {item.toppings && item.toppings.length > 0 && <span className="text-xs text-secondary ml-1">+ {item.toppings.map((t: any) => `${t.emoji || ''} ${t.name}`).join(', ')}</span>}
                               {item.quantity > 1 && <span className="text-xs text-brown-400 ml-1">×{item.quantity}</span>}
                             </span>
                             <span className="font-semibold text-brown-700 shrink-0 ml-2">{formatPrice(item.subtotal)}</span>

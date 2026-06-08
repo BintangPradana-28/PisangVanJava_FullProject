@@ -29,10 +29,10 @@ const getCachedMenu = unstable_cache(
         _avg: { rating: true },
         _count: { rating: true },
       });
-      const aggregateMap = new Map(reviewAggregates.map(r => [r.variantId, r]));
+      const aggregateMap = new Map(reviewAggregates.map((r: any) => [r.variantId, r]));
 
       const products: ProductType[] = dbProducts.map((p: any) => {
-        const agg = aggregateMap.get(p.id);
+        const agg = aggregateMap.get(p.id) as any;
         return {
           id: p.id,
           flavorName: p.flavorName,
@@ -107,7 +107,7 @@ const getCachedMenu = unstable_cache(
       return products;
     } catch (error) {
       // Global Error Handling: Jika terjadi gagal koneksi, tampilkan mock data saja agar tidak crash (Graceful Degradation)
-      console.error("[Safe Log] Database connection error during menu fetch");
+      console.warn("[Safe Log] Database connection error during menu fetch");
       return [
         {
           id: "1",
@@ -149,7 +149,7 @@ const getCachedBanner = unstable_cache(
         }
       });
     } catch (error) {
-      console.error("[Safe Log] Database connection error during banner fetch");
+      console.warn("[Safe Log] Database connection error during banner fetch");
       return null;
     }
   },
@@ -165,7 +165,7 @@ const getCachedReviews = unstable_cache(
         _count: { rating: true },
       });
     } catch (error) {
-      console.error("[Safe Log] Database connection error during review aggregate fetch");
+      console.warn("[Safe Log] Database connection error during review aggregate fetch");
       return { _avg: { rating: null }, _count: { rating: 0 } };
     }
   },

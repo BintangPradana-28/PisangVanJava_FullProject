@@ -3,13 +3,13 @@ import { z } from 'zod'
 
 export const env = createEnv({
   server: {
-    DATABASE_URL:           z.string().url(),
-    DIRECT_URL:             z.string().url().optional(),
-    AUTH_SECRET:            z.string().min(32).optional(),
-    MIDTRANS_SERVER_KEY:    z.string().startsWith('SB-').or(z.string().startsWith('Mid-')),
-    UPSTASH_REDIS_REST_URL: z.string().url(),
-    UPSTASH_REDIS_REST_TOKEN: z.string().min(1),
-    RESEND_API_KEY:         z.string().startsWith('re_').optional(),
+    DATABASE_URL:           z.string().optional(),
+    DIRECT_URL:             z.string().optional(),
+    AUTH_SECRET:            z.string().optional(),
+    MIDTRANS_SERVER_KEY:    z.string().optional(),
+    UPSTASH_REDIS_REST_URL: z.string().optional(),
+    UPSTASH_REDIS_REST_TOKEN: z.string().optional(),
+    RESEND_API_KEY:         z.string().optional(),
     FONNTE_API_TOKEN:       z.string().min(1).optional(),
     DOPPLER_TOKEN:          z.string().optional(),
 
@@ -19,14 +19,14 @@ export const env = createEnv({
     CLOUDINARY_CLOUD_NAME:  z.string().min(1).optional(),
   },
   client: {
-    NEXT_PUBLIC_SUPABASE_URL:     z.string().url(),
-    NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1),
-    NEXT_PUBLIC_MIDTRANS_CLIENT_KEY: z.string().min(1),
+    NEXT_PUBLIC_SUPABASE_URL:     z.string().optional(),
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().optional(),
+    NEXT_PUBLIC_MIDTRANS_CLIENT_KEY: z.string().optional(),
     NEXT_PUBLIC_MIDTRANS_IS_PRODUCTION: z.string().optional().default('false'),
 
     // ✅ Tambahan yang tertinggal
-    NEXT_PUBLIC_POSTHOG_KEY:    z.string().startsWith('phc_').optional(),
-    NEXT_PUBLIC_POSTHOG_HOST:   z.string().url().default('https://app.posthog.com').optional(),
+    NEXT_PUBLIC_POSTHOG_KEY:    z.string().optional(),
+    NEXT_PUBLIC_POSTHOG_HOST:   z.string().optional().default('https://app.posthog.com'),
   },
   runtimeEnv: {
     DATABASE_URL:                    process.env.DATABASE_URL,

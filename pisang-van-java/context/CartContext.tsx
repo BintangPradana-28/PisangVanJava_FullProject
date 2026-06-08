@@ -49,8 +49,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     if (status === 'authenticated') {
       // Sync from DB (menggunakan route handler karena NextAuth v4 bug di Server Actions)
       fetch('/api/cart', { cache: 'no-store', credentials: 'include' })
-        .then(res => res.json())
-        .then(data => {
+        .then(async (res) => {
+          if (!res.ok) return { success: false, data: [] }
+          return res.json().catch(() => ({ success: false, data: [] }))
+        })
+        .then((data) => {
           if (data.success && data.data) {
             // Jika ada cart dari local, gabungkan!
             if (initialLocalCart.length > 0) {

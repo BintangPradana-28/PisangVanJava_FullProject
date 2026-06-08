@@ -1,42 +1,66 @@
 'use client'
 
 import { useEffect } from 'react'
+import * as Sentry from '@sentry/nextjs'
 import Link from 'next/link'
+import { AlertTriangle, RefreshCw, Home } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 
-export default function UserError({
-  error,
-  reset,
-}: {
+interface GlobalErrorProps {
   error: Error & { digest?: string }
   reset: () => void
-}) {
+}
+
+export default function UserAreaError({ error, reset }: GlobalErrorProps) {
   useEffect(() => {
-    console.error("Public Boundary Error:", error.message)
+    Sentry.captureException(error, {
+      tags: {
+        boundary: 'user-area-global',
+        digest: error.digest ?? 'unknown',
+      },
+    })
   }, [error])
 
   return (
-    <div className="min-h-screen bg-cream-50 flex items-center justify-center p-4">
-      <div className="bg-white p-8 sm:p-10 rounded-3xl shadow-xl max-w-lg w-full text-center border border-cream-200">
-        <div className="text-6xl mb-6">🍌💥</div>
-        <h2 className="font-serif text-3xl font-bold text-brown-700 mb-3">
-          Waduh, ada yang salah!
-        </h2>
-        <p className="text-zinc-500 mb-8 font-sans leading-relaxed">
-          Maaf, terjadi kesalahan saat memuat halaman ini. Tim kami sedang berusaha memperbaikinya.
+    <div className="min-h-screen bg-[#FAF7F2] flex items-center justify-center px-4">
+      <div className="w-full max-w-md bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center">
+        <div className="w-16 h-16 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
+          <AlertTriangle className="w-8 h-8 text-red-400" />
+        </div>
+
+        <h1 className="text-xl font-semibold text-gray-900 mb-2">
+          Terjadi Kesalahan
+        </h1>
+        <p className="text-gray-500 text-sm mb-6">
+          Halaman ini mengalami gangguan. Tim kami sudah diberitahu dan sedang
+          memperbaikinya.
         </p>
-        <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <button
-            onClick={() => reset()}
-            className="px-6 py-3 bg-amber-brand text-white font-bold rounded-xl hover:bg-amber-600 transition-colors shadow-md hover:shadow-lg"
+
+        {error.digest && (
+          <p className="text-xs text-gray-400 font-mono mb-6">
+            Kode error: {error.digest}
+          </p>
+        )}
+
+        <div className="flex flex-col gap-3">
+          <Button
+            onClick={reset}
+            className="w-full bg-amber-500 hover:bg-amber-600 text-white rounded-full py-3 font-medium flex items-center justify-center gap-2"
           >
-            Coba Muat Ulang
-          </button>
-          <Link
-            href="/"
-            className="px-6 py-3 bg-cream-100 text-brown-700 font-bold rounded-xl hover:bg-cream-200 transition-colors"
+            <RefreshCw className="w-4 h-4" />
+            Coba Lagi
+          </Button>
+
+          <Button
+            asChild
+            variant="outline"
+            className="w-full rounded-full border-gray-200 text-gray-700 py-3 font-medium flex items-center justify-center gap-2"
           >
-            Kembali ke Beranda
-          </Link>
+            <Link href="/">
+              <Home className="w-4 h-4" />
+              Kembali ke Beranda
+            </Link>
+          </Button>
         </div>
       </div>
     </div>

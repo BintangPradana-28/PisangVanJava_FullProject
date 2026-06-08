@@ -21,16 +21,25 @@ export interface CartItem {
   addedAt:       string   // ISO string
 }
 
+export interface ConflictState {
+  local: CartItem[];
+  db: CartItem[];
+}
+
 interface CartStore {
   items:          CartItem[]
   _hasHydrated:   boolean
+  conflictState:  ConflictState | null
 
   // Mutations
   addItem:        (item: Omit<CartItem, 'cartItemId' | 'addedAt'>) => void
+  setItems:       (items: CartItem[]) => void
   removeItem:     (cartItemId: string) => void
   updateQuantity: (cartItemId: string, qty: number) => void
   clearCart:      () => void
   setHasHydrated: (v: boolean) => void
+  setConflictState: (state: ConflictState | null) => void
+  resolveConflict: (resolution: 'MERGED' | 'LOCAL' | 'DB', mergedItems?: CartItem[]) => void
 }
 
 // ── Selectors ─────────────────────────────────────────────────────────────────
@@ -39,14 +48,14 @@ export const selectCartItemCount  = (s: CartStore) =>
   s.items.reduce((acc, i) => acc + i.quantity, 0)
 export const selectCartDisplayTotal = (s: CartStore) =>
   s.items.reduce((acc, item) => {
-    const toppingTotal = item.toppings.reduce((t, tp) => t + tp.priceAdd, 0)
+    const toppingTotal = item.toppings ? item.toppings.reduce((sum, t) => sum + t.priceAdd, 0) : 0
     return acc + (item.basePrice + toppingTotal) * item.quantity
   }, 0)
 export const selectItemSubtotal = (cartItemId: string) =>
   (s: CartStore) => {
     const item = s.items.find(i => i.cartItemId === cartItemId)
     if (!item) return 0
-    const toppingTotal = item.toppings.reduce((t, tp) => t + tp.priceAdd, 0)
+    const toppingTotal = item.toppings ? item.toppings.reduce((sum, t) => sum + t.priceAdd, 0) : 0
     return (item.basePrice + toppingTotal) * item.quantity
   }
 
@@ -54,16 +63,17 @@ export const selectItemSubtotal = (cartItemId: string) =>
 export const useCartStore = create<CartStore>()(
   persist(
     immer((set) => ({
-      items:        [],
+      items: [],
       _hasHydrated: false,
+      conflictState: null,
 
       addItem: (newItem) => set((state) => {
-        // Cek apakah variant + toppings sama persis → increment qty
+        // Cek apakah variant + topping sama persis → increment qty
         const existing = state.items.find(i =>
           i.menuVariantId === newItem.menuVariantId &&
           i.notes === newItem.notes &&
-          JSON.stringify(i.toppings.map(t => t.toppingId).sort()) ===
-          JSON.stringify(newItem.toppings.map(t => t.toppingId).sort())
+          i.toppings?.length === newItem.toppings?.length &&
+          i.toppings?.every((t, idx) => t.toppingId === newItem.toppings?.[idx]?.toppingId)
         )
         if (existing) {
           existing.quantity += newItem.quantity
@@ -75,6 +85,8 @@ export const useCartStore = create<CartStore>()(
           })
         }
       }),
+
+      setItems: (items) => set({ items }),
 
       removeItem: (cartItemId) => set((state) => {
         state.items = state.items.filter(i => i.cartItemId !== cartItemId)
@@ -94,12 +106,29 @@ export const useCartStore = create<CartStore>()(
       clearCart: () => set((state) => { state.items = [] }),
 
       setHasHydrated: (v) => set((state) => { state._hasHydrated = v }),
+
+      setConflictState: (state) => set((s) => { s.conflictState = state }),
+
+      resolveConflict: (resolution, mergedItems) => set((state) => {
+        if (!state.conflictState) return
+        
+        if (resolution === 'MERGED' && mergedItems) {
+          state.items = mergedItems
+        } else if (resolution === 'LOCAL') {
+          state.items = state.conflictState.local
+        } else if (resolution === 'DB') {
+          state.items = state.conflictState.db
+        }
+        
+        state.conflictState = null
+      }),
     })),
     {
       name:    'pvj-cart-v2',
       storage: createJSONStorage(() => localStorage),
       // ✅ skipHydration — zero SSR mismatch
       skipHydration: true,
+      partialize: (state) => ({ items: state.items }), // Jangan simpan conflictState ke storage
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true)
       },

@@ -84,6 +84,7 @@ export default function Navbar() {
   }
 
   const handleSignOut = () => {
+    useCartStore.getState().clearCart()
     signOut({ callbackUrl: '/' })
   }
 

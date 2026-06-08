@@ -55,7 +55,7 @@ export default async function KontakLeadsPage() {
                     </td>
                   </tr>
                 ) : (
-                  leads.map((lead) => (
+                  leads.map((lead: any) => (
                     <tr key={lead.id} className="hover:bg-cream-50 transition-colors">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="font-medium text-brown-800">

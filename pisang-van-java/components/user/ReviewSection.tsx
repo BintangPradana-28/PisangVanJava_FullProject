@@ -31,7 +31,10 @@ export default function ReviewSection({ variantId }: ReviewSectionProps) {
     if (filterPhoto) url += `&withPhoto=true`
 
     fetch(url)
-      .then((res) => res.json())
+      .then(async (res) => {
+        if (!res.ok) return { success: false, data: [] }
+        return res.json().catch(() => ({ success: false, data: [] }))
+      })
       .then((data) => {
         if (data.success) {
           setReviews(data.data as ReviewItem[])

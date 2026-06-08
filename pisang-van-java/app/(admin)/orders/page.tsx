@@ -35,7 +35,7 @@ export default async function OrdersPage() {
               flavorName: true,
             },
           },
-          topping: {
+          toppings: {
             select: {
               name: true,
               emoji: true,
@@ -46,7 +46,7 @@ export default async function OrdersPage() {
     },
   })
 
-  const formattedOrders = orders.map(o => ({
+  const formattedOrders = orders.map((o: any) => ({
     id: o.id,
     customerName: o.customerName,
     customerPhone: o.customerPhone,
@@ -57,7 +57,7 @@ export default async function OrdersPage() {
     createdAt: o.createdAt.toISOString(),
     deliveryMethod: o.deliveryMethod,
     deliveryFee: o.deliveryFee,
-    items: o.items.map(item => ({
+    items: o.items.map((item: any) => ({
       id: item.id,
       baseType: item.baseType,
       quantity: item.quantity,
@@ -66,10 +66,10 @@ export default async function OrdersPage() {
       variant: {
         flavorName: item.variant.flavorName,
       },
-      topping: item.topping === null ? null : {
-        name: item.topping.name,
-        emoji: item.topping.emoji,
-      },
+      toppings: item.toppings ? item.toppings.map((t: any) => ({
+        name: t.name,
+        emoji: t.emoji,
+      })) : [],
     }))
   }))
 

@@ -22,7 +22,7 @@ export default async function ManageMenuPage() {
   })
 
   // Data yang dikirim ke Client Component
-  const products = dbProducts.map(p => ({
+  const products = dbProducts.map((p: any) => ({
     id: p.id,
     flavorName: p.flavorName,
     priceKembung: p.priceKembung,

@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, type NextRequest, type NextFetchEvent } from "next/server";
 import NextAuth from "next-auth";
 import { authConfig } from "@/src/auth.config";
 
@@ -66,7 +66,7 @@ function getRequiredRoles(pathname: string): AllowedRoles | null {
 
 // ─── Main middleware (wrapped with Auth.js v5) ───────────────────────────────
 
-export default auth(async (req) => {
+const authMiddleware = auth(async (req) => {
   const { pathname } = req.nextUrl;
 
   // ── 1. Global rate limiting (runs on all matched routes) ──────────────────
@@ -147,8 +147,8 @@ export default auth(async (req) => {
   }
 
   // ── 5. Native Role Validation (The Core Security Check) ────────────────────
-  const userRole = token.role as string;
-  if (!requiredRoles.includes(userRole as any)) {
+  const userRole = token.role as AllowedRoles[number];
+  if (!requiredRoles.includes(userRole)) {
     // Authorized but Forbidden
     console.warn(`[RBAC BLOCK] User ${token.id} (${userRole}) attempted to access ${pathname}`);
     return NextResponse.redirect(new URL("/", req.url)); // Send back to home or a 403 page
@@ -156,6 +156,48 @@ export default auth(async (req) => {
 
   return NextResponse.next();
 });
+
+export default async function middleware(req: NextRequest, event: NextFetchEvent) {
+  const nonce = btoa(crypto.randomUUID());
+  
+  // KNOWN GAP: style-src masih menggunakan 'unsafe-inline'
+  // karena Next.js font optimization inject inline styles.
+  // Mitigasi: style injection tidak bisa eksekusi JavaScript,
+  // risiko terbatas pada UI manipulation, bukan code execution.
+  const cspHeader = `
+    default-src 'self';
+    script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https://maps.googleapis.com https://challenges.cloudflare.com;
+    style-src 'self' 'unsafe-inline';
+    img-src 'self' blob: data: https://res.cloudinary.com https://lh3.googleusercontent.com https://vamxyslzeimlsofhgmry.supabase.co https://maps.gstatic.com https://maps.googleapis.com;
+    font-src 'self' data:;
+    connect-src 'self' https://*.supabase.co https://*.upstash.io https://api.midtrans.com https://app.sandbox.midtrans.com https://app.posthog.com https://us.posthog.com https://eu.posthog.com https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com https://api.biteship.com https://api.fonnte.com https://*.sentry.io https://o*.ingest.sentry.io https://maps.googleapis.com https://challenges.cloudflare.com;
+    frame-src 'self' https://app.midtrans.com https://app.sandbox.midtrans.com https://challenges.cloudflare.com;
+    object-src 'none';
+    base-uri 'self';
+    form-action 'self' https://app.midtrans.com https://app.sandbox.midtrans.com;
+    report-uri /api/csp-report;
+    report-to csp-endpoint;
+  `.replace(/\s{2,}/g, ' ').trim();
+
+  req.headers.set("x-nonce", nonce);
+
+  // Execute auth middleware
+  const response = (await authMiddleware(req, event)) || NextResponse.next({
+    request: {
+      headers: req.headers,
+    }
+  });
+
+  // Inject CSP into response
+  response.headers.set("Content-Security-Policy-Report-Only", cspHeader);
+  response.headers.set("Report-To", JSON.stringify({
+    group: 'csp-endpoint',
+    max_age: 10886400,
+    endpoints: [{ url: '/api/csp-report' }]
+  }));
+
+  return response;
+}
 
 // ─── Route matcher ────────────────────────────────────────────────────────────
 

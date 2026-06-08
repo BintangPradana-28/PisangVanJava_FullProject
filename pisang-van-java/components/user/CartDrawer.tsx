@@ -160,7 +160,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
       const notes = item.notes ? item.notes.trim() : ''
       return {
         variantId: item.menuVariantId,
-        toppingId: item.toppings.length > 0 ? item.toppings[0].toppingId : null,
+        toppingIds: item.toppings ? item.toppings.map((t: any) => t.toppingId) : [],
         baseType,
         quantity: item.quantity,
         notes: notes.length > 0 ? notes : null,
@@ -288,10 +288,10 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                         <h4 className="font-sans text-sm font-bold text-zinc-800 dark:text-zinc-100">
                           {item.variantName}
                         </h4>
-                        {item.toppings.length > 0 && (
-                          <span className="text-xs text-secondary font-medium block">
-                            + {t('cart_topping')}: {item.toppings.map(t => t.name).join(', ')}
-                          </span>
+                        {item.toppings && item.toppings.length > 0 && (
+                          <div className="text-xs text-[#D4802A] font-medium">
+                            + {t('cart_topping')}: {item.toppings.map((t: any) => t.name).join(', ')}
+                          </div>
                         )}
                         {item.notes && (
                           <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-1 italic">

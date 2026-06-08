@@ -37,7 +37,7 @@ export async function sendOrderConfirmationEmail(orderId: string): Promise<boole
 
     const formatPrice = (n: number) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(n)
 
-    const mappedItems = order.items.map(item => ({
+    const mappedItems = order.items.map((item: any) => ({
       name: `${item.variant.flavorName} (${item.baseType})${item.topping ? ` + ${item.topping.name}` : ''}`,
       qty: item.quantity,
       subtotal: formatPrice(item.subtotal),

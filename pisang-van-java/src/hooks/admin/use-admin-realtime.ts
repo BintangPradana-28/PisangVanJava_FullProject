@@ -1,15 +1,14 @@
 'use client'
 import { useEffect } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
-import { createClient } from '@/src/lib/supabase-client'
+import { supabaseBrowserClient } from '@/src/lib/supabase-client'
 import toast from 'react-hot-toast'
 
 export function useAdminRealtimeSync() {
   const queryClient = useQueryClient()
-  const supabase = createClient()
-
   useEffect(() => {
-    const channel = supabase
+    if (!supabaseBrowserClient) return
+    const channel = supabaseBrowserClient
       .channel('pvj-admin-internal')
 
       // Live new order masuk
@@ -53,6 +52,6 @@ export function useAdminRealtimeSync() {
 
       .subscribe()
 
-    return () => { supabase.removeChannel(channel) }
-  }, [queryClient, supabase])
+    return () => { supabaseBrowserClient?.removeChannel(channel) }
+  }, [queryClient])
 }

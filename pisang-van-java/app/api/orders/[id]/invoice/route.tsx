@@ -51,7 +51,7 @@ const Invoice = ({ order }: { order: any }) => (
           <View style={styles.tableRow} key={i}>
             <View style={styles.tableColWide}>
               <Text style={styles.text}>{item.variant.flavorName} ({item.baseType})</Text>
-              {item.topping && <Text style={{fontSize: 10, color: '#666', marginTop: 2}}>+ {item.topping.name}</Text>}
+              {item.toppings && item.toppings.length > 0 && <Text style={{fontSize: 10, color: '#666', marginTop: 2}}>+ {item.toppings.map((t: any) => t.name).join(', ')}</Text>}
             </View>
             <View style={styles.tableColCenter}><Text style={styles.text}>{item.quantity}</Text></View>
             <View style={styles.tableCol}><Text style={styles.text}>Rp {item.subtotal.toLocaleString('id-ID')}</Text></View>

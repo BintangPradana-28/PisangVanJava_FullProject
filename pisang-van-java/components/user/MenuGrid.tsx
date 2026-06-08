@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from 'framer-motion';
+import { isStoreOpen as checkStoreOpen } from '@/src/lib/time';
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -77,7 +78,9 @@ export default function MenuGrid({ products }: { products: ProductType[] }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { getSetting } = useSettings();
-  const isStoreOpen = getSetting("store_open", "true") === "true";
+  const jamOperasional = getSetting("jam_operasional", "10.00–21.00");
+  const storeMode = getSetting("store_status", "AUTO");
+  const { isOpen: isStoreOpen } = checkStoreOpen(jamOperasional, storeMode);
   const [selected, setSelected] = useState<ProductType | null>(null);
 
   const { data: session } = useSession();
@@ -86,7 +89,10 @@ export default function MenuGrid({ products }: { products: ProductType[] }) {
   useEffect(() => {
     if (session?.user) {
       fetch("/api/favorites")
-        .then((res) => res.json())
+        .then(async (res) => {
+          if (!res.ok) return { success: false, data: [] }
+          return res.json().catch(() => ({ success: false, data: [] }))
+        })
         .then((data) => {
           if (data.success) setFavorites(data.data);
         })

@@ -260,7 +260,17 @@ export default function SettingsClient({ settings, adminName }: Props) {
                     <label className="block text-xs font-semibold text-brown-400 uppercase tracking-wider mb-1.5">
                       {s.label || s.key}
                     </label>
-                    {isBoolean ? (
+                    {s.key === 'store_status' ? (
+                      <select
+                        value={values[s.key] || 'AUTO'}
+                        onChange={e => setValues(v => ({ ...v, [s.key]: e.target.value }))}
+                        className="w-full bg-cream-50 border border-cream-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-brand/50 transition-all"
+                      >
+                        <option value="AUTO">Otomatis (Ikuti Jam Operasional)</option>
+                        <option value="OPEN">Buka Paksa (Selalu Buka)</option>
+                        <option value="CLOSED">Tutup Sementara (Selalu Tutup)</option>
+                      </select>
+                    ) : isBoolean ? (
                       <button
                         onClick={() => setValues(v => ({ ...v, [s.key]: v[s.key] === 'true' ? 'false' : 'true' }))}
                         className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${

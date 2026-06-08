@@ -1,9 +1,22 @@
 export function isStoreOpen(
   jamOperasional: string,
-  isManualOpen: boolean = true
+  storeMode: string = 'AUTO' // 'AUTO' | 'OPEN' | 'CLOSED'
 ): { isOpen: boolean; message: string } {
-  if (!isManualOpen) return { isOpen: false, message: 'Kedai sedang tutup sementara.' }
   
+  // [CISO MANDATE]: QA Testing Bypass via Environment Variable
+  if (process.env.NEXT_PUBLIC_QA_BYPASS_STORE_OPEN === 'true') {
+    return { isOpen: true, message: 'QA TESTING BYPASS: Kedai Buka.' }
+  }
+
+  // Admin Force Override
+  if (storeMode === 'CLOSED' || storeMode === 'false') {
+    return { isOpen: false, message: 'Kedai sedang tutup sementara.' }
+  }
+  if (storeMode === 'OPEN' || storeMode === 'true') {
+    return { isOpen: true, message: 'Kedai buka (Manual Override).' }
+  }
+  
+  // Default 'AUTO': Follow operational hours
   const timeRegex = /(\d{1,2})[.:](\d{2})\s*[-–]\s*(\d{1,2})[.:](\d{2})/;
   const match = jamOperasional.match(timeRegex);
   

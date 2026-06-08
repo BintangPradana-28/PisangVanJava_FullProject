@@ -5,6 +5,7 @@ import { ProductType } from '@/src/features/menu/components/MenuCards'
 import { useCartStore, type CartTopping } from '@/src/stores/cart.store'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSettings } from '@/context/SettingsContext'
+import { isStoreOpen as checkStoreOpen } from '@/src/lib/time'
 import toast from 'react-hot-toast'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
@@ -30,7 +31,9 @@ export default function QuickViewModal({ product, allProducts = [], onClose }: Q
   const addToCart = useCartStore((s) => s.addItem)
   const { t } = useLanguage()
   const { getSetting } = useSettings()
-  const isStoreOpen = getSetting('store_open', 'true') === 'true'
+  const jamOperasional = getSetting('jam_operasional', '10.00–21.00')
+  const storeMode = getSetting('store_status', 'AUTO')
+  const { isOpen: isStoreOpen } = checkStoreOpen(jamOperasional, storeMode)
   const { data: session } = useSession()
   const isReseller = session?.user.role === 'RESELLER'
   const router = useRouter()
@@ -64,8 +67,11 @@ export default function QuickViewModal({ product, allProducts = [], onClose }: Q
   // Fetch toppings
   useEffect(() => {
     fetch('/api/toppings')
-      .then(res => res.json())
-      .then(res => {
+      .then(async (res) => {
+        if (!res.ok) return { success: false, data: [] }
+        return res.json().catch(() => ({ success: false, data: [] }))
+      })
+      .then((res) => {
         if (res.success && Array.isArray(res.data)) {
           const activeToppings = res.data.filter((top: Topping) => top.isActive)
           setToppingsData(activeToppings)
@@ -99,9 +105,9 @@ export default function QuickViewModal({ product, allProducts = [], onClose }: Q
   }
 
   const basePrice = getProductPrice(matchedProduct || product, selectedType)
-  const toppingsPrice = selectedToppings.reduce((sum, toppingId) => {
-    const topping = toppingsData.find((t) => t.id === toppingId)
-    return sum + (topping ? topping.price : 0)
+  const toppingsPrice = selectedToppings.reduce((total, tId) => {
+    const topping = toppingsData.find(t => t.id === tId)
+    return total + (topping?.price || 0)
   }, 0)
 
   const unitPrice = basePrice + toppingsPrice
@@ -115,10 +121,9 @@ export default function QuickViewModal({ product, allProducts = [], onClose }: Q
     }).format(amount)
   }
 
-  // Handle Topping Toggle
   const handleToppingToggle = (toppingId: string) => {
-    setSelectedToppings((prev) =>
-      prev.includes(toppingId)
+    setSelectedToppings((prev) => 
+      prev.includes(toppingId) 
         ? prev.filter((id) => id !== toppingId)
         : [...prev, toppingId]
     )
@@ -129,14 +134,14 @@ export default function QuickViewModal({ product, allProducts = [], onClose }: Q
   const handleAddToCart = () => {
     if (!isFormValid || !isStoreOpen) return
 
-    const mappedToppings: CartTopping[] = selectedToppings.map(id => {
-      const top = toppingsData.find(t => t.id === id)
-      return {
-        toppingId: id,
-        name: top ? top.name : '',
-        priceAdd: top ? top.price : 0
-      }
-    })
+    const finalToppings: CartTopping[] = selectedToppings
+      .map(tId => toppingsData.find(t => t.id === tId))
+      .filter((t): t is Topping => t !== undefined)
+      .map(t => ({
+        toppingId: t.id,
+        name: t.name,
+        priceAdd: t.price
+      }))
 
     const finalProductId = matchedProduct ? matchedProduct.id : product.id
     const finalProductName = `${selectedFlavor} (${selectedType})`
@@ -145,7 +150,7 @@ export default function QuickViewModal({ product, allProducts = [], onClose }: Q
       menuVariantId: finalProductId,
       variantName: finalProductName,
       basePrice: basePrice,
-      toppings: mappedToppings,
+      toppings: finalToppings,
       quantity,
       notes,
     })
@@ -168,7 +173,7 @@ export default function QuickViewModal({ product, allProducts = [], onClose }: Q
     <Drawer.Root open={!!product} onOpenChange={(open) => { if (!open) onClose() }} shouldScaleBackground={false}>
       <Drawer.Portal>
         <Drawer.Overlay className="fixed inset-0 z-50 bg-black/40 backdrop-blur-[2px] animate-fade-in" />
-        <Drawer.Content className="fixed bottom-0 md:bottom-auto md:top-[20vh] left-0 right-0 z-50 flex flex-col w-full max-w-lg mx-auto h-[60vh] bg-white dark:bg-zinc-900 rounded-t-3xl md:rounded-3xl outline-none shadow-[0_-10px_40px_rgba(0,0,0,0.15)]">
+        <Drawer.Content className="fixed inset-x-0 bottom-0 z-50 flex flex-col w-full max-w-lg mx-auto h-[70vh] md:h-auto md:max-h-[85vh] md:top-0 md:bottom-0 md:my-auto md:!transform-none bg-white dark:bg-zinc-900 rounded-t-3xl md:rounded-3xl overflow-hidden outline-none shadow-[0_-10px_40px_rgba(0,0,0,0.15)] md:animate-in md:fade-in md:zoom-in-95">
           
           {/* Drag Handle — mobile bottom sheet indicator */}
           <div className="md:hidden flex justify-center pt-3 pb-2 shrink-0 bg-white dark:bg-zinc-900 rounded-t-3xl">
@@ -241,9 +246,10 @@ export default function QuickViewModal({ product, allProducts = [], onClose }: Q
                         <div className="flex items-center gap-2.5 mb-1">
                           <input
                             type="checkbox"
+                            name="topping"
                             checked={isSelected}
                             onChange={() => handleToppingToggle(topping.id)}
-                            className="accent-[#D4802A] w-5 h-5 rounded cursor-pointer shrink-0"
+                            className="accent-[#D4802A] w-5 h-5 rounded-full cursor-pointer shrink-0"
                           />
                           <span className="text-sm font-bold text-zinc-800 dark:text-zinc-200 truncate flex items-center gap-1.5">
                             ⭐ {topping.emoji} {topping.name} <span className="text-xs text-zinc-500 font-normal hidden sm:inline">(Paling Populer)</span>
@@ -281,9 +287,10 @@ export default function QuickViewModal({ product, allProducts = [], onClose }: Q
                               <div className="flex items-center gap-2.5 mb-1">
                                 <input
                                   type="checkbox"
+                                  name="topping"
                                   checked={isSelected}
                                   onChange={() => handleToppingToggle(topping.id)}
-                                  className="accent-[#D4802A] w-5 h-5 rounded cursor-pointer shrink-0"
+                                  className="accent-[#D4802A] w-5 h-5 rounded-full cursor-pointer shrink-0"
                                 />
                                 <span className="text-sm font-bold text-zinc-800 dark:text-zinc-200 truncate">
                                   {topping.emoji} {topping.name}

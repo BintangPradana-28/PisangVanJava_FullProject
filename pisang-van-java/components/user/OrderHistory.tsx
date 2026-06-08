@@ -62,7 +62,7 @@ export default function OrderHistory({ phone = '', useAuth = false }: Props) {
         menuVariantId: item.variant.id,
         variantName: `${item.variant.flavorName} (${item.baseType})`,
         basePrice,
-        toppings: item.topping ? [{ toppingId: item.topping.id, name: item.topping.name, priceAdd: item.topping.price }] : [],
+        toppings: item.toppings.map((t: any) => ({ toppingId: t.id, name: t.name, priceAdd: t.price })),
         quantity: item.quantity,
         notes: '',
       })
@@ -219,7 +219,7 @@ export default function OrderHistory({ phone = '', useAuth = false }: Props) {
                           <span className="text-zinc-600 dark:text-zinc-400">
                             {item.variant.flavorName}
                             <span className="text-xs text-zinc-400 ml-1">({item.baseType})</span>
-                            {item.topping && <span className="text-xs text-amber-500 ml-1">+ {item.topping.emoji} {item.topping.name}</span>}
+                            {item.toppings && item.toppings.length > 0 && <span className="text-xs text-amber-500 ml-1">+ {item.toppings.map((t: any) => `${t.emoji || ''} ${t.name}`).join(', ')}</span>}
                             {item.quantity > 1 && <span className="text-xs text-zinc-400 ml-1">×{item.quantity}</span>}
                           </span>
                           <span className="font-semibold text-zinc-700 dark:text-zinc-300 shrink-0">{formatPrice(item.subtotal)}</span>

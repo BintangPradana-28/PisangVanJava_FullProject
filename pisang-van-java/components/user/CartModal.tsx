@@ -126,8 +126,8 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
   const finalTotal = deliveryMethod === 'DELIVERY' ? discountedSubtotal + deliveryFee : discountedSubtotal
 
   const jamOperasional = getSetting('jam_operasional', '10.00–21.00')
-  const isManualOpen = getSetting('store_open', 'true') === 'true'
-  const storeStatus = isStoreOpen(jamOperasional, isManualOpen)
+  const storeMode = getSetting('store_status', 'AUTO')
+  const storeStatus = isStoreOpen(jamOperasional, storeMode)
 
   // Reset voucher kalau cart berubah
   useEffect(() => {
@@ -209,7 +209,7 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
       const notes = item.notes ? item.notes.trim() : ''
       return {
         variantId: item.menuVariantId,
-        toppingId: item.toppings.length > 0 ? item.toppings[0].toppingId : null,
+        toppingIds: item.toppings ? item.toppings.map((t: any) => t.toppingId) : [],
         baseType,
         quantity: item.quantity,
         notes: notes.length > 0 ? notes : null,
@@ -407,9 +407,10 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
                         {/* Product Detail */}
                         <div className="flex-1 min-w-0">
                           <h4 className="font-bold text-sm text-zinc-800 dark:text-zinc-100 truncate">{item.variantName}</h4>
-                          {item.toppings.length > 0 && (
-                            <p className="text-xs text-[#D4802A] font-medium mt-0.5">+ {item.toppings.map(t => t.name).join(', ')}</p>
-                          )}
+                          {item.toppings && item.toppings.length > 0 && (
+                            <span className="text-xs text-amber-500 font-medium">
+                              + {item.toppings.map((t: any) => t.name).join(', ')}
+                          </span>)}
                           {item.notes && (
                             <p className="text-xs text-zinc-400 dark:text-zinc-500 italic mt-0.5 truncate">"{item.notes}"</p>
                           )}

@@ -1,3 +1,4 @@
+import 'server-only'
 import midtransClient from 'midtrans-client'
 import { env } from '@/src/env'
 

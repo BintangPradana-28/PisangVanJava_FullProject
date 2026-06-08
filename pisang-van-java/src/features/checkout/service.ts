@@ -61,7 +61,7 @@ export const validateVoucherInputSchema = z
 export const checkoutItemInputSchema = z
   .object({
     variantId: resourceIdSchema,
-    toppingId: resourceIdSchema.nullable(),
+    toppingIds: z.array(resourceIdSchema).max(5).default([]),
     baseType: z.enum(BASE_TYPE_VALUES),
     quantity: z.number().int().min(1).max(99),
     notes: z.string().trim().max(160).nullable().optional(),
@@ -166,7 +166,7 @@ interface ToppingRecord {
 
 interface PreparedOrderItem {
   variantId: string;
-  toppingId: string | null;
+  toppingIds: string[];
   baseType: BaseType;
   quantity: number;
   unitPrice: number;
@@ -219,10 +219,10 @@ export interface PaymentOrderView {
     variant: {
       flavorName: string;
     };
-    topping: {
+    toppings: Array<{
       name: string;
       emoji: string | null;
-    } | null;
+    }>;
   }>;
 }
 
@@ -379,9 +379,7 @@ export async function createCheckoutOrder(
     const variantIds = Array.from(new Set(input.items.map((item) => item.variantId)));
     const toppingIds = Array.from(
       new Set(
-        input.items
-          .map((item) => item.toppingId)
-          .filter((toppingId): toppingId is string => toppingId !== null),
+        input.items.flatMap((item) => item.toppingIds)
       ),
     );
 
@@ -426,17 +424,17 @@ export async function createCheckoutOrder(
         throw new CheckoutSecurityError(400);
       }
 
-      let topping: ToppingRecord | null = null;
-      if (item.toppingId !== null) {
-        const selectedTopping = toppingById.get(item.toppingId);
+      let itemToppings: ToppingRecord[] = [];
+      for (const tId of item.toppingIds) {
+        const selectedTopping = toppingById.get(tId);
         if (selectedTopping === undefined || !selectedTopping.isActive) {
           throw new CheckoutSecurityError(400);
         }
-        topping = selectedTopping;
+        itemToppings.push(selectedTopping);
       }
 
       const basePrice = selectBasePrice(variant, item.baseType, actor.role);
-      const toppingPrice = topping === null ? 0 : topping.price;
+      const toppingPrice = itemToppings.reduce((sum, t) => sum + t.price, 0);
       const unitPrice = basePrice + toppingPrice;
       const itemSubtotal = unitPrice * item.quantity;
       const notes = normalizeNullableText(item.notes);
@@ -444,13 +442,13 @@ export async function createCheckoutOrder(
 
       preparedItems.push({
         variantId: item.variantId,
-        toppingId: item.toppingId,
+        toppingIds: item.toppingIds,
         baseType: item.baseType,
         quantity: item.quantity,
         unitPrice,
         subtotal: itemSubtotal,
-        name: `${variant.flavorName} (${item.baseType})${topping ? ` + ${topping.name}` : ''}`,
-        whatsappLine: buildWhatsAppItemLine(variant.flavorName, item.baseType, item.quantity, topping, itemSubtotal, notes),
+        name: `${variant.flavorName} (${item.baseType})${itemToppings.length > 0 ? ` + ${itemToppings.map(t => t.name).join(", ")}` : ''}`,
+        whatsappLine: buildWhatsAppItemLine(variant.flavorName, item.baseType, item.quantity, itemToppings, itemSubtotal, notes),
       });
     }
 
@@ -523,7 +521,7 @@ export async function createCheckoutOrder(
         items: {
           create: preparedItems.map((item) => ({
             variantId: item.variantId,
-            toppingId: item.toppingId,
+            toppings: item.toppingIds.length > 0 ? { connect: item.toppingIds.map((id) => ({ id })) } : undefined,
             baseType: item.baseType,
             quantity: item.quantity,
             unitPrice: item.unitPrice,
@@ -540,12 +538,13 @@ export async function createCheckoutOrder(
     // ATOMIC CART ANNIHILATION
     // Destroy all items in this user's cart synchronously within the transaction.
     // This prevents "Ghost Carts" if the user disconnects before the client sends a DELETE request.
-    await tx.cartItem.deleteMany({
+    await tx.userCart.updateMany({
       where: {
-        cart: {
-          userId: actor.userId,
-        },
+        userId: actor.userId,
       },
+      data: {
+        items: []
+      }
     });
 
     return {
@@ -558,6 +557,10 @@ export async function createCheckoutOrder(
       preparedItems,
     };
   });
+
+  // [CACHE INVALIDATION] Hapus Redis cache setelah transaksi sukses.
+  // Jika gagal di tengah jalan, cart utuh. Jika sukses, Redis bersih.
+  await redis.del(`user:cart:${actor.userId}`);
 
   if (input.paymentMethod === "ONLINE") {
     // Zero-Trust: Generate Midtrans Snap Token securely from backend
@@ -657,7 +660,7 @@ export async function getPaymentOrderForActor(
               flavorName: true,
             },
           },
-          topping: {
+          toppings: {
             select: {
               name: true,
               emoji: true,
@@ -894,13 +897,13 @@ function buildWhatsAppItemLine(
   flavorName: string,
   baseType: BaseType,
   quantity: number,
-  topping: ToppingRecord | null | undefined,
+  toppings: ToppingRecord[],
   subtotal: number,
   notes: string | null,
 ): string {
   let line = `- ${quantity}x ${flavorName} (${baseType})\n`;
-  if (topping !== null && topping !== undefined) {
-    line += `  Topping: ${topping.name}\n`;
+  if (toppings.length > 0) {
+    line += `  Topping: ${toppings.map(t => t.name).join(", ")}\n`;
   }
   if (notes !== null) {
     line += `  Catatan: "${notes}"\n`;

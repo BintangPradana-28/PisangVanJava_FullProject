@@ -53,8 +53,8 @@ export default async function PaymentPage({ params, searchParams }: PaymentPageP
     notFound();
   }
 
-  const canPay = order.status === "pending";
-  const alreadyPaid = order.status === "paid";
+  const canPay = order.status === "PENDING_PAYMENT";
+  const alreadyPaid = order.status === "PROCESSING" || order.status === "READY" || order.status === "COMPLETED";
 
   return (
     <section className="min-h-screen bg-zinc-50 px-4 py-10 pb-32 md:pb-10 dark:bg-zinc-950">
@@ -103,10 +103,14 @@ export default async function PaymentPage({ params, searchParams }: PaymentPageP
                     <p className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
                       {item.quantity}x {item.variant.flavorName} ({item.baseType})
                     </p>
-                    {item.topping !== null && (
-                      <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
-                        Topping: {item.topping.emoji} {item.topping.name}
-                      </p>
+                    {item.toppings && item.toppings.length > 0 && (
+                      <div className="mt-1 flex flex-wrap gap-1">
+                        {item.toppings.map((t: any, idx: number) => (
+                          <span key={idx} className="text-[11px] text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800/50 px-1.5 py-0.5 rounded border border-zinc-200 dark:border-zinc-800">
+                            Topping: {t.emoji} {t.name}
+                          </span>
+                        ))}
+                      </div>
                     )}
                   </div>
                   <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{formatPrice(item.subtotal)}</span>
@@ -153,26 +157,23 @@ export default async function PaymentPage({ params, searchParams }: PaymentPageP
               <div className="flex justify-between gap-4">
                 <span className="text-zinc-500 dark:text-zinc-400">Status</span>
                 <span className={`text-right text-xs font-bold px-2.5 py-1 rounded-full ${
-                  order.status === 'paid' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
-                  order.status === 'processing' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
-                  order.status === 'pending' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' :
-                  order.status === 'cancelled' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' :
+                  order.status === 'PROCESSING' || order.status === 'READY' || order.status === 'COMPLETED' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
+                  order.status === 'PENDING_PAYMENT' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' :
+                  order.status === 'CANCELED' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' :
                   'bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300'
                 }`}>
-                  {order.status === 'pending' ? 'Menunggu Pembayaran' :
-                   order.status === 'paid' ? 'Sudah Dibayar' :
-                   order.status === 'processing' ? 'Sedang Diproses' :
-                   order.status === 'confirmed' ? 'Dikonfirmasi' :
-                   order.status === 'ready' ? 'Siap Diambil' :
-                   order.status === 'done' ? 'Selesai' :
-                   order.status === 'cancelled' ? 'Dibatalkan' :
+                  {order.status === 'PENDING_PAYMENT' ? 'Menunggu Pembayaran' :
+                   order.status === 'PROCESSING' ? 'Sedang Diproses' :
+                   order.status === 'READY' ? 'Siap Diambil / Dikirim' :
+                   order.status === 'COMPLETED' ? 'Selesai' :
+                   order.status === 'CANCELED' ? 'Dibatalkan' :
                    order.status}
                 </span>
               </div>
             </div>
 
             {/* ETA Banner if Processing/Paid */}
-            {(order.status === 'paid' || order.status === 'processing') && order.deliveryMethod === 'DELIVERY' && (
+            {(order.status === 'PROCESSING' || order.status === 'READY') && order.deliveryMethod === 'DELIVERY' && (
               <div className="mb-5 flex items-center gap-3 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm font-semibold text-amber-700 dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-400">
                 <span className="text-xl">⏱️</span>
                 <span>Estimasi tiba: 30-45 menit</span>

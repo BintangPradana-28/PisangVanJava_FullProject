@@ -27,9 +27,9 @@ export default async function ReportsPage(props: { searchParams: Promise<{ range
     prisma.topping.count({ where: { isActive: true } }),
   ])
 
-  const formattedOrders = orders.map(o => ({
+  const formattedOrders = orders.map((o: any) => ({
     ...o,
-    items: o.items.map(item => ({
+    items: o.items.map((item: any) => ({
       ...item,
       variant: {
         flavorName: item.variant.flavorName

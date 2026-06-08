@@ -40,7 +40,7 @@ async function getDashboardData() {
     })
   ])
 
-  const todayRevenue = todaysOrders.reduce((sum, o) => sum + o.totalPrice, 0)
+  const todayRevenue = todaysOrders.reduce((sum: any, o: any) => sum + o.totalPrice, 0)
   
   // Hitung grafik penjualan 7 hari terakhir
   const last7Days = Array.from({length: 7}).map((_, i) => {
@@ -57,13 +57,13 @@ async function getDashboardData() {
   })
 
   const chartData = last7Days.map(date => {
-    const dayOrders = weekOrders.filter(o => {
+    const dayOrders = weekOrders.filter((o: any) => {
       const oDate = new Date(o.createdAt)
       return oDate.getDate() === date.getDate() && oDate.getMonth() === date.getMonth()
     })
     return {
       date: date.toLocaleDateString('id-ID', { weekday: 'short' }),
-      total: dayOrders.reduce((sum, o) => sum + o.totalPrice, 0),
+      total: dayOrders.reduce((sum: any, o: any) => sum + o.totalPrice, 0),
       count: dayOrders.length
     }
   })
@@ -144,7 +144,7 @@ export default async function DashboardPage() {
             <div className="flex-1 space-y-4 overflow-y-auto max-h-[220px] pr-2 custom-scrollbar">
               {data.recentOrders.length === 0 ? (
                 <div className="h-full flex items-center justify-center text-brown-300 text-sm">Belum ada pesanan masuk</div>
-              ) : data.recentOrders.map((order) => (
+              ) : data.recentOrders.map((order: any) => (
                 <div key={order.id} className="flex items-start gap-3 border-b border-cream-100 pb-3 last:border-0 last:pb-0">
                   <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center text-xs shrink-0 mt-0.5">
                     {order.source === 'whatsapp' ? '💬' : '🚶'}

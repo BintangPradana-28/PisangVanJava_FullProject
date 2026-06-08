@@ -85,13 +85,13 @@ export async function PATCH(req: NextRequest, { params }: OrderRouteContext) {
   try {
     const order = await prisma.$transaction(async (tx: any) => {
       // If transitioning to cancelled, we must restore stock exactly once.
-      if (parsedStatus.data === "cancelled") {
+      if (parsedStatus.data === "CANCELED") {
         const orderWithItems = await tx.order.findUnique({
           where: { id: parsedParams.data.orderId },
           include: { items: true },
         });
 
-        if (orderWithItems && orderWithItems.status !== "cancelled") {
+        if (orderWithItems && orderWithItems.status !== "CANCELED") {
           for (const item of orderWithItems.items) {
             await tx.menuVariant.updateMany({
               where: { id: item.variantId },
@@ -115,7 +115,7 @@ export async function PATCH(req: NextRequest, { params }: OrderRouteContext) {
 
     await logAudit("UPDATE_ORDER_STATUS", "Order", order.id, { newStatus: parsedStatus.data });
 
-    if (parsedStatus.data === "processing" || parsedStatus.data === "ready" || parsedStatus.data === "cancelled") {
+    if (parsedStatus.data === "PROCESSING" || parsedStatus.data === "READY" || parsedStatus.data === "CANCELED") {
       await sendWhatsAppNotification(order.customerPhone, order.customerName, parsedStatus.data, order.id);
     }
 

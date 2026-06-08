@@ -22,20 +22,20 @@ export async function GET() {
     const d = new Date(); d.setDate(d.getDate() - i)
     last7[d.toISOString().slice(0, 10)] = 0
   }
-  allOrders.filter(o => o.status === 'done').forEach(o => {
+  allOrders.filter((o: any) => o.status === 'done').forEach((o: any) => {
     const day = o.createdAt.toISOString().slice(0, 10)
     if (last7[day] !== undefined) last7[day] += o.totalPrice
   })
 
-  const totalRevenue = allOrders.filter(o => o.status === 'done').reduce((s: any, o: any) => s + o.totalPrice, 0)
+  const totalRevenue = allOrders.filter((o: any) => o.status === 'done').reduce((s: any, o: any) => s + o.totalPrice, 0)
   const totalOrders  = allOrders.length
-  const doneOrders   = allOrders.filter(o => o.status === 'done').length
-  const sourceCount  = allOrders.reduce((acc: Record<string, number>, o) => { acc[o.source] = (acc[o.source] || 0) + 1; return acc }, {})
+  const doneOrders   = allOrders.filter((o: any) => o.status === 'done').length
+  const sourceCount  = allOrders.reduce((acc: Record<string, number>, o: any) => { acc[o.source] = (acc[o.source] || 0) + 1; return acc }, {})
 
   // Map nama_varian to flavorName to maintain client compatibility
-  const formattedRecentOrders = recentOrders.map(o => ({
+  const formattedRecentOrders = recentOrders.map((o: any) => ({
     ...o,
-    items: o.items.map(item => ({
+    items: o.items.map((item: any) => ({
       ...item,
       variant: {
         ...item.variant,

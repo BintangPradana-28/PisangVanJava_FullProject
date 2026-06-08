@@ -36,7 +36,10 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     fetch('/api/settings')
-      .then((res) => res.json())
+      .then(async (res) => {
+        if (!res.ok) return { success: false, data: [] }
+        return res.json().catch(() => ({ success: false, data: [] }))
+      })
       .then((res) => {
         if (res.success && Array.isArray(res.data)) {
           const mapped: Record<string, string> = {}

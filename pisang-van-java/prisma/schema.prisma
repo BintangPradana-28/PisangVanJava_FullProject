@@ -57,7 +57,7 @@ model User {
   resetTokens ResetToken[]
   favorites   Favorite[]
   reviews     Review[]
-  cart        Cart?
+  cart        UserCart?
   orders      Order[]
   b2bDeals    B2BDeal[]
   addresses   Address[]
@@ -137,7 +137,7 @@ model MenuVariant {
   orderItems        OrderItem[]
   favorites         Favorite[]
   reviews           Review[]
-  cartItems         CartItem[]
+
 
   @@index([flavorName]) // Database Indexing
   @@index([isDeleted])
@@ -175,7 +175,7 @@ model Topping {
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
   orderItems OrderItem[]
-  cartItems  CartItem[]
+
 
   @@index([isActive])
 }
@@ -234,7 +234,6 @@ model OrderItem {
   id        String  @id @default(cuid())
   orderId   String
   variantId String
-  toppingId String?
   baseType  String
   quantity  Int
   unitPrice Float
@@ -242,11 +241,10 @@ model OrderItem {
 
   order   Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
   variant MenuVariant @relation(fields: [variantId], references: [id])
-  topping Topping?    @relation(fields: [toppingId], references: [id])
+  toppings Topping[]
 
   @@index([orderId])
   @@index([variantId])
-  @@index([toppingId])
 }
 
 model AuditLog {
@@ -318,34 +316,15 @@ model Review {
   @@index([createdAt])
 }
 
-model Cart {
-  id        String     @id @default(cuid())
-  userId    String     @unique
-  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  items     CartItem[]
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+model UserCart {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items     Json     @default("[]") // JSONB format
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId])
-}
-
-model CartItem {
-  id        String      @id @default(cuid())
-  cartId    String
-  cart      Cart        @relation(fields: [cartId], references: [id], onDelete: Cascade)
-  variantId String
-  variant   MenuVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
-  toppingId String?
-  topping   Topping?    @relation(fields: [toppingId], references: [id], onDelete: Cascade)
-  baseType  String
-  quantity  Int
-  notes     String?
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-
-  @@index([cartId])
-  @@index([variantId])
-  @@index([toppingId])
 }
 
 model Address {
@@ -436,3 +415,4 @@ model Payment {
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
 }
+

@@ -1,5 +1,6 @@
+import 'server-only';
 import crypto from 'crypto';
-import midtransClient from 'midtrans-client';
+import { snap } from '@/src/lib/midtrans';
 
 interface MidtransItem {
   id: string;
@@ -27,11 +28,7 @@ export async function generateSnapToken(params: GenerateSnapTokenParams): Promis
       return null;
     }
 
-    let snap = new midtransClient.Snap({
-      isProduction: isProduction,
-      serverKey: process.env.MIDTRANS_SERVER_KEY || '',
-      clientKey: process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY || ''
-    });
+
 
     const requestData = {
       transaction_details: {

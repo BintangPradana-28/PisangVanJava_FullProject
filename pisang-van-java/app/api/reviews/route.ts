@@ -69,7 +69,7 @@ export async function GET(req: NextRequest) {
     
     if (allReviews.length > 0) {
       let sum = 0
-      allReviews.forEach(r => {
+      allReviews.forEach((r: any) => {
         sum += r.rating
         if (starCounts[r.rating as keyof typeof starCounts] !== undefined) {
           starCounts[r.rating as keyof typeof starCounts]++

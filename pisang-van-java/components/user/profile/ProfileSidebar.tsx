@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { User, MapPin, ShoppingBag, Ticket, Shield, LogOut, ChevronRight } from 'lucide-react'
 import { signOut, useSession } from 'next-auth/react'
+import { useCartStore } from '@/src/stores/cart.store'
 import Image from 'next/image'
 
 const menuItems = [
@@ -60,7 +61,10 @@ export default function ProfileSidebar() {
           <div className="hidden md:block w-full h-px bg-zinc-100 dark:bg-zinc-800 my-4" />
 
           <button
-            onClick={() => signOut({ callbackUrl: '/' })}
+            onClick={() => {
+              useCartStore.getState().clearCart()
+              signOut({ callbackUrl: '/' })
+            }}
             className="flex items-center gap-3 px-4 py-3.5 md:py-3 rounded-2xl whitespace-nowrap transition-all font-medium text-sm text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30"
           >
             <LogOut className="w-5 h-5 text-red-500 dark:text-red-400" />

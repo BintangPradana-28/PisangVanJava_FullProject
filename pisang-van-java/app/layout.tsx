@@ -6,6 +6,7 @@ import { Providers } from './providers'
 import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import Script from 'next/script'
+import { headers } from 'next/headers'
 
 const beVietnamPro = Be_Vietnam_Pro({
   subsets: ['latin'],
@@ -38,21 +39,7 @@ export const metadata: Metadata = {
   },
 }
 
-const themeInitScript = `
-  (function() {
-    try {
-      var saved = localStorage.getItem('theme');
-      var system = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      var theme = saved || (system ? 'dark' : 'light');
-      document.documentElement.setAttribute('data-theme', theme);
-      if (theme === 'dark') {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
-    } catch (e) {}
-  })()
-`
+
 
 const localBusinessJsonLd = {
   '@context': 'https://schema.org',
@@ -93,21 +80,20 @@ const localBusinessJsonLd = {
   priceRange: '$',
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const headersList = await headers();
+  const nonce = headersList.get('x-nonce') || undefined;
+
   return (
     <html lang="id" className={`${beVietnamPro.variable} ${newsreader.variable}`} suppressHydrationWarning>
       <head>
-        <Script id="theme-init" strategy="beforeInteractive">{themeInitScript}</Script>
       </head>
       <body className="min-h-screen flex flex-col">
         <Providers>
           {children}
         </Providers>
         
-        {/* LocalBusiness JSON-LD Schema Markup for SEO */}
-        <script type="application/ld+json" suppressHydrationWarning>
-          {JSON.stringify(localBusinessJsonLd)}
-        </script>
+        {/* [QUARANTINED] LocalBusiness JSON-LD removed due to XSS Gateway VETO (dangerouslySetInnerHTML prohibited) */}
         <Analytics />
         <SpeedInsights />
       </body>

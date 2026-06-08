@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
 import toast from 'react-hot-toast'
-import { useCartStore, selectCartItems, selectCartTotal, selectCartItemCount } from '@/src/stores/cart.store'
+import { useCartStore, selectCartItems, selectCartDisplayTotal as selectCartTotal, selectCartItemCount, selectItemSubtotal } from '@/src/stores/cart.store'
 import { useLanguage } from '@/context/LanguageContext'
 import { Minus, Plus, Trash2, ShoppingBag, ArrowLeft } from 'lucide-react'
 
@@ -102,14 +102,16 @@ export default function KeranjangPage() {
                         <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100 truncate">
                           {item.variantName}
                         </h3>
-                        {item.toppings.length > 0 && (
-                          <p className="text-xs text-amber-600 mt-0.5">+ {item.toppings.map(t => t.name).join(', ')}</p>
+                        {item.toppings && item.toppings.length > 0 && (
+                          <span className="text-xs text-secondary font-medium block mt-0.5">
+                            + {item.toppings.map((t: any) => t.name).join(', ')}
+                          </span>
                         )}
                         {item.notes && (
                           <p className="text-xs text-zinc-400 italic mt-0.5">&quot;{item.notes}&quot;</p>
                         )}
                         <p className="text-xs text-zinc-400 mt-1">
-                          {formatPrice(item.basePrice + item.toppings.reduce((sum, t) => sum + t.priceAdd, 0))} / pcs
+                          <CartItemSubtotal cartItemId={item.cartItemId} formatPrice={formatPrice} />pcs
                         </p>
                       </div>
 

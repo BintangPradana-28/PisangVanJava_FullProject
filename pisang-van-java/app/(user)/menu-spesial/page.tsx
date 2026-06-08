@@ -21,7 +21,7 @@ const getCachedProducts = async () => {
       }
     });
   } catch (e) {
-    console.error("[Safe Log] DB fetch failed for menu-spesial", e);
+    console.warn("[Safe Log] DB fetch failed for menu-spesial", e?.message || e);
     return [];
   }
 };
@@ -63,7 +63,7 @@ export default async function MenuSpesialPage(props: {
     stock: p.stock,
     tags: p.tags || [],
     rating: p.reviews.length > 0
-      ? Math.round((p.reviews.reduce((s, r) => s + r.rating, 0) / p.reviews.length) * 10) / 10
+      ? Math.round((p.reviews.reduce((s: any, r: any) => s + r.rating, 0) / p.reviews.length) * 10) / 10
       : undefined,
     reviewCount: p.reviews.length > 0 ? p.reviews.length : undefined,
     isActive: p.isActive,

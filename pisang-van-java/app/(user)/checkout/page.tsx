@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import toast from 'react-hot-toast'
 import Link from 'next/link'
 import { z } from 'zod'
-import { useCartStore, useCartTotal } from '@/src/stores/cart.store'
+import { useCartStore, selectCartDisplayTotal } from '@/src/stores/cart.store'
 import { useSettings } from '@/context/SettingsContext'
 import { validateVoucher } from '@/src/features/checkout/actions'
 import { isStoreOpen } from '@/src/lib/time'
@@ -63,7 +63,7 @@ export default function CheckoutPage() {
   const { data: session, status: authStatus } = useSession()
   const cartItems = useCartStore((s) => s.items)
   const clearCart = useCartStore((s) => s.clearCart)
-  const cartTotal = useCartTotal()
+  const cartTotal = useCartStore(selectCartDisplayTotal)
   const { getSetting }      = useSettings()
 
   // Form state
@@ -139,8 +139,8 @@ export default function CheckoutPage() {
   const grandTotal         = delivery === 'DELIVERY' ? subtotalAfterDisc + deliveryFee : subtotalAfterDisc
 
   const jamOperasional = getSetting('jam_operasional', '10.00–21.00')
-  const isManualOpen = getSetting('store_open', 'true') === 'true'
-  const storeStatus = isStoreOpen(jamOperasional, isManualOpen)
+  const storeMode = getSetting('store_status', 'AUTO')
+  const storeStatus = isStoreOpen(jamOperasional, storeMode)
 
   // ── Voucher handler ───────────────────────────────────────────────────────
   const handleApplyVoucher = async () => {
@@ -201,7 +201,7 @@ export default function CheckoutPage() {
       if (!baseType) return null
       return {
         variantId: item.menuVariantId,
-        toppingId: item.toppings && item.toppings.length > 0 ? item.toppings[0].toppingId : null,
+        toppingIds: item.toppings ? item.toppings.map((t: any) => t.toppingId) : [],
         baseType,
         quantity: item.quantity,
         notes: item.notes?.trim() || null,
@@ -327,12 +327,12 @@ export default function CheckoutPage() {
                     </h2>
                     <div className="space-y-3">
                       {cartItems.map((item, i) => {
-                        const itemTotal = (item.basePrice + (item.toppings?.reduce((sum, t) => sum + t.priceAdd, 0) || 0)) * item.quantity
+                        const itemTotal = (item.basePrice + (item.toppings ? item.toppings.reduce((sum: number, t: any) => sum + t.priceAdd, 0) : 0)) * item.quantity
                         return (
                         <div key={`${item.cartItemId}`} className="flex justify-between items-start py-3 border-b border-zinc-50 dark:border-zinc-800 last:border-0">
                           <div>
                             <p className="text-sm font-bold text-zinc-800 dark:text-zinc-100">{item.variantName}</p>
-                            {item.toppings?.map(t => <p key={t.toppingId} className="text-xs text-amber-600 mt-0.5">+ {t.name}</p>)}
+                            {item.toppings && item.toppings.length > 0 && <p className="text-xs text-amber-600 mt-0.5">+ {item.toppings.map((t: any) => t.name).join(', ')}</p>}
                             {item.notes && <p className="text-xs text-zinc-400 italic mt-0.5">"{item.notes}"</p>}
                           </div>
                           <div className="text-right ml-4 shrink-0">
@@ -629,12 +629,12 @@ export default function CheckoutPage() {
 
               <div className="space-y-2.5 mb-4">
                 {cartItems.map((item, i) => {
-                  const itemTotal = (item.basePrice + (item.toppings?.reduce((sum, t) => sum + t.priceAdd, 0) || 0)) * item.quantity
+                  const itemTotal = (item.basePrice + (item.toppings ? item.toppings.reduce((sum: number, t: any) => sum + t.priceAdd, 0) : 0)) * item.quantity
                   return (
                   <div key={`${item.cartItemId}`} className="flex justify-between text-sm gap-2">
                     <div className="min-w-0">
                       <span className="text-zinc-700 dark:text-zinc-300 font-medium truncate block">{item.variantName}</span>
-                      {item.toppings?.map(t => <span key={t.toppingId} className="text-xs text-amber-500 block">+{t.name}</span>)}
+                      {item.toppings && item.toppings.length > 0 && <span className="text-xs text-amber-500 block">+{item.toppings.map((t: any) => t.name).join(', ')}</span>}
                     </div>
                     <span className="text-zinc-800 dark:text-zinc-100 font-semibold shrink-0">{formatPrice(itemTotal)}</span>
                   </div>
