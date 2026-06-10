@@ -26,6 +26,13 @@ enum OrderStatus {
   CANCELED
 }
 
+enum ComplaintStatus {
+  OPEN
+  INVESTIGATING
+  RESOLVED
+  REJECTED
+}
+
 enum PaymentStatus {
   PENDING
   PAID
@@ -47,8 +54,20 @@ model User {
   address       String?
   role          Role      @default(CUSTOMER)
   koinPisang    Int       @default(0) // Gamification (Loyalty Points)
+
+  // Sistem Referral
+  referralCode  String?   @unique // Kode unik milik user (misal: PVJ-BUDI123)
+  referredBy    String?   // ID user yang mengundang mereka
+  hasOrdered    Boolean   @default(false) // Penanda apakah user sudah pernah order
+
   isBanned      Boolean   @default(false)
   isDeleted     Boolean   @default(false)
+  deletedAt     DateTime?
+  
+  notificationPrefs Json?    @default("{\"email\":true,\"push\":false,\"promo\":true,\"order\":true}")
+  twoFactorEnabled  Boolean  @default(false)
+  twoFactorSecret   String?
+
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
@@ -62,6 +81,7 @@ model User {
   b2bDeals    B2BDeal[]
   addresses   Address[]
   authLogs    AuthLog[]
+  complaints  Complaint[]
 
   @@index([email])
 }
@@ -205,6 +225,7 @@ model Order {
   user    User?       @relation(fields: [userId], references: [id], onDelete: Restrict)
   items   OrderItem[]
   reviews Review[]
+  complaints Complaint[]
 
   @@index([userId])
   @@index([status])
@@ -260,6 +281,26 @@ model AuditLog {
   @@index([resourceId])
   @@index([userId])
   @@index([createdAt])
+}
+
+model Complaint {
+  id               String          @id @default(cuid())
+  userId           String
+  orderId          String?         
+  subject          String
+  description      String          @db.Text
+  adminResponse    String?         @db.Text
+  compensationKoin Int             @default(0)
+  status           ComplaintStatus @default(OPEN)
+  
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  user             User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  order            Order?          @relation(fields: [orderId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([status])
 }
 
 model Favorite {

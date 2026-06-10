@@ -76,6 +76,7 @@ export const createOrderInputSchema = z
     paymentMethod: z.enum(PAYMENT_METHOD_VALUES),
     notes: z.string().trim().max(500).nullable().optional(),
     voucherCode: voucherCodeSchema.nullable().optional(),
+    usePoints: z.boolean().default(false),
     items: z.array(checkoutItemInputSchema).min(1).max(40),
   })
   .strict()
@@ -86,6 +87,14 @@ export const createOrderInputSchema = z
         code: "custom",
         path: ["notes"],
         message: "Delivery address is required.",
+      });
+    }
+
+    if (value.usePoints && value.voucherCode) {
+      context.addIssue({
+        code: "custom",
+        path: ["usePoints"],
+        message: "Tidak dapat menggabungkan koin dan voucher secara bersamaan.",
       });
     }
   });
@@ -177,7 +186,7 @@ interface PreparedOrderItem {
 
 export interface CreateCheckoutOrderResult {
   orderId: string;
-  redirectType: "WHATSAPP" | "PAYMENT";
+  redirectType: "WHATSAPP" | "PAYMENT" | "CASHLESS_SUCCESS";
   redirectUrl: string;
   totalPrice: number;
 }
@@ -453,12 +462,47 @@ export async function createCheckoutOrder(
     }
 
     const deliveryFee = await resolveDeliveryFee(input.deliveryMethod, tx);
-    const voucherApplication = await resolveVoucherApplication(input.voucherCode, subtotal, actor.role, tx);
-    const discountAmount = voucherApplication?.discountAmount ?? 0;
+    let discountAmount = 0;
+    let voucherApplication = null;
+    let pointsToUse = 0;
+
+    if (input.voucherCode) {
+      voucherApplication = await resolveVoucherApplication(input.voucherCode, subtotal, actor.role, tx);
+      discountAmount = voucherApplication?.discountAmount ?? 0;
+    } else if (input.usePoints) {
+      const userRecord = await tx.user.findUnique({
+        where: { id: actor.userId },
+        select: { koinPisang: true }
+      });
+      if (userRecord && userRecord.koinPisang > 0) {
+         const maxDiscount = subtotal + deliveryFee;
+         pointsToUse = Math.min(userRecord.koinPisang, maxDiscount);
+         discountAmount = pointsToUse;
+      }
+    }
+
     const totalPrice = subtotal - discountAmount + deliveryFee;
 
     if (!Number.isSafeInteger(totalPrice) || totalPrice < 0) {
       throw new CheckoutSecurityError(400);
+    }
+
+    const earnedPoints = Math.floor(totalPrice * 0.01);
+    const netPointChange = earnedPoints - pointsToUse;
+
+    if (netPointChange !== 0) {
+      const updateResult = await tx.user.updateMany({
+        where: {
+          id: actor.userId,
+          ...(pointsToUse > 0 ? { koinPisang: { gte: pointsToUse } } : {})
+        },
+        data: {
+          koinPisang: netPointChange >= 0 ? { increment: netPointChange } : { decrement: Math.abs(netPointChange) }
+        }
+      });
+      if (updateResult.count === 0) {
+         throw new CheckoutSecurityError(409); // Conflict: Insufficient points during transaction
+      }
     }
 
     if (voucherApplication !== null) {
@@ -563,6 +607,39 @@ export async function createCheckoutOrder(
   await redis.del(`user:cart:${actor.userId}`);
 
   if (input.paymentMethod === "ONLINE") {
+    if (result.totalPrice === 0) {
+      // 0 IDR BYPASS (CASHLESS VIA POINTS/VOUCHER)
+      await prisma.order.update({
+        where: { id: result.orderId },
+        data: { 
+          status: OrderStatus.PROCESSING,
+          confirmedAt: new Date()
+        }
+      });
+      
+      await createPendingPayment({
+        orderId: result.orderId,
+        midtransOrderId: result.orderId,
+        grossAmount: new Prisma.Decimal(0),
+      });
+
+      await prisma.payment.update({
+        where: { orderId: result.orderId },
+        data: {
+          status: "PAID",
+          paymentType: "koin_pisang",
+          settlementTime: new Date()
+        }
+      });
+
+      return {
+        orderId: result.orderId,
+        redirectType: "CASHLESS_SUCCESS",
+        redirectUrl: `/profile/pesanan`,
+        totalPrice: 0,
+      };
+    }
+
     // Zero-Trust: Generate Midtrans Snap Token securely from backend
     const snapToken = await generateSnapToken({
       orderId: result.orderId,

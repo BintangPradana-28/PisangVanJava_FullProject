@@ -13,6 +13,7 @@ const navItems = [
   { href: '/toppings',    icon: '✨', label: 'Topping'      },
   { href: '/manage-users',icon: '👥', label: 'Pengguna & Reseller' },
   { href: '/manage-vouchers',icon: '🎟️', label: 'Manajemen Voucher' },
+  { href: '/complaints',  icon: '🆘', label: 'Laporan Masalah' },
   { href: '/reports',     icon: '📈', label: 'Laporan'      },
   { href: '/settings',    icon: '⚙️', label: 'Pengaturan'   },
   { href: '/banners',     icon: '🖼️', label: 'Banner & Promo'},

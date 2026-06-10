@@ -12,6 +12,8 @@ import { useCartStore } from '@/src/stores/cart.store'
 import toast from 'react-hot-toast'
 import { z } from 'zod'
 import { supabaseBrowserClient } from '@/src/lib/supabase-client'
+import { useQuery } from '@tanstack/react-query'
+import { api } from '@/src/lib/api'
 
 const STATUS_STEPS = ['pending', 'paid', 'processing', 'ready', 'done']
 const STATUS_ICONS: Record<string, string> = {
@@ -32,11 +34,11 @@ const orderItemSchema = z.object({
     flavorName: z.string().optional(),
     nama_varian: z.string().optional(),
   }).strict(),
-  topping: z.object({
+  toppings: z.array(z.object({
     id: z.string().optional(),
     name: z.string(),
     emoji: z.string().nullable().optional(),
-  }).strict().nullable(),
+  })).optional().nullable(),
 }).strict()
 
 const orderSchema = z.object({
@@ -95,9 +97,8 @@ function ReorderButton({ order }: { order: Order }) {
   const handleReorder = async () => {
     setLoading(true)
     try {
-      // Fetch current prices from the menu API to avoid stale price data
-      const res  = await fetch('/api/menu')
-      const json: unknown = await res.json()
+      // Fetch current prices from the menu API using ofetch
+      const json = await api('/api/menu')
       const parsedMenu = menuResponseSchema.safeParse(json)
       if (!parsedMenu.success) {
         throw new Error('INVALID_MENU_RESPONSE')
@@ -174,8 +175,7 @@ export default function TrackOrderPage() {
   const { t, locale }                        = useLanguage()
   const [phone,   setPhone]                  = useState('')
   const [orders,  setOrders]                 = useState<Order[] | null>(null)
-  const [loading, setLoading]                = useState(false)
-  const [error,   setError]                  = useState('')
+  const [errorLocal, setErrorLocal]          = useState('')
   const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'disconnected'>('disconnected')
 
   const STATUS_LABELS: Record<string, string> = {
@@ -187,25 +187,37 @@ export default function TrackOrderPage() {
     cancelled: t('status_cancelled'),
   }
 
-  const handleSearch = async () => {
-    if (!phone.trim()) { setError(t('track_toast_invalid_phone')); return }
-    setLoading(true); setError(''); setOrders(null)
-    try {
-      const res  = await fetch(`/api/orders/track?phone=${encodeURIComponent(phone.trim())}`)
-      const data: unknown = await res.json()
+  const { data: fetchedOrders, isFetching: loading, error: queryError, refetch } = useQuery({
+    queryKey: ['trackOrder', phone],
+    queryFn: async () => {
+      const data = await api(`/api/orders/track?phone=${encodeURIComponent(phone.trim())}`)
       const parsedData = trackOrdersResponseSchema.safeParse(data)
       if (!parsedData.success) {
-        setError(t('track_toast_conn_error'))
-        return
+        throw new Error(t('track_toast_conn_error'))
       }
-      if (parsedData.data.success) setOrders(parsedData.data.data)
-      else setError(parsedData.data.error || t('track_toast_not_found'))
-    } catch {
-      setError(t('track_toast_conn_error'))
-    } finally {
-      setLoading(false)
-    }
+      if (parsedData.data.success) {
+        return parsedData.data.data
+      } else {
+        throw new Error(parsedData.data.error || t('track_toast_not_found'))
+      }
+    },
+    enabled: false,
+    retry: 0,
+  })
+
+  // Sync react-query data to local state for Supabase real-time optimistic updates
+  useEffect(() => {
+    if (fetchedOrders) setOrders(fetchedOrders)
+  }, [fetchedOrders])
+
+  const handleSearch = () => {
+    if (!phone.trim()) { setErrorLocal(t('track_toast_invalid_phone')); return }
+    setErrorLocal('')
+    setOrders(null)
+    refetch()
   }
+
+  const displayError = errorLocal || (queryError ? queryError.message : '')
 
   // ── Supabase Realtime Subscription ───────────────────────────────────────────
   useEffect(() => {
@@ -279,7 +291,7 @@ export default function TrackOrderPage() {
               {loading ? '...' : t('track_btn_check')}
             </button>
           </div>
-          {error && <p className="text-red-500 text-sm mt-3">⚠️ {error}</p>}
+          {displayError && <p className="text-red-500 text-sm mt-3">⚠️ {displayError}</p>}
         </div>
 
         {/* Results */}

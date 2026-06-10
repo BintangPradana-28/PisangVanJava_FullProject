@@ -13,7 +13,7 @@ interface OrderItem {
   quantity: number
   subtotal: number
   variant: { id: string; flavorName: string; priceKembung: number; priceLumpia: number; priceKrispy: number }
-  topping?: { id: string; name: string; emoji: string | null; price: number } | null
+  toppings?: { id: string; name: string; emoji: string | null; price: number }[] | null
 }
 
 interface Order {
@@ -62,7 +62,7 @@ export default function OrderHistory({ phone = '', useAuth = false }: Props) {
         menuVariantId: item.variant.id,
         variantName: `${item.variant.flavorName} (${item.baseType})`,
         basePrice,
-        toppings: item.toppings.map((t: any) => ({ toppingId: t.id, name: t.name, priceAdd: t.price })),
+        toppings: item.toppings ? item.toppings.map((t: any) => ({ toppingId: t.id, name: t.name, priceAdd: t.price })) : [],
         quantity: item.quantity,
         notes: '',
       })

@@ -53,7 +53,7 @@ export default function MemberRegisterPage() {
     formState: { errors, isSubmitting },
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
-    defaultValues: { name: '', email: '', whatsapp: '', password: '', consent: false }
+    defaultValues: { name: '', email: '', whatsapp: '', password: '', referralCode: '', consent: false }
   })
 
   const passwordValue = watch('password') || ''
@@ -76,6 +76,7 @@ export default function MemberRegisterPage() {
       formData.append('email', data.email)
       formData.append('whatsapp', data.whatsapp)
       formData.append('password', data.password)
+      if (data.referralCode) formData.append('referralCode', data.referralCode)
       formData.append('consent', data.consent ? 'true' : 'false')
       
       const result = await registerUser(formData)
@@ -169,6 +170,12 @@ export default function MemberRegisterPage() {
                       <div className={`flex-1 rounded-full ${strengthScore >= 4 ? 'bg-green-500' : 'bg-zinc-300 dark:bg-zinc-700'}`} />
                     </div>
                   )}
+                </motion.div>
+
+                <motion.div variants={item}>
+                  <label className="block text-[11px] font-bold tracking-widest uppercase mb-1.5" style={{ color: '#D4802A' }}>Kode Referral (Opsional)</label>
+                  <input type="text" placeholder="Masukkan kode jika ada" className={inputCls} {...register('referralCode')} />
+                  {errors.referralCode && <p className="text-red-500 text-xs mt-1 font-medium">{errors.referralCode.message}</p>}
                 </motion.div>
 
                 <motion.div variants={item} className="flex items-start gap-2 pt-1">

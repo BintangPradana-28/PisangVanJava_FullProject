@@ -15,6 +15,7 @@ export async function registerUser(formData: FormData) {
       email: formData.get('email'),
       whatsapp: formData.get('whatsapp'),
       password: formData.get('password'),
+      referralCode: formData.get('referralCode') || undefined,
       consent: formData.get('consent') === 'on' || formData.get('consent') === 'true',
     }
 
@@ -24,7 +25,7 @@ export async function registerUser(formData: FormData) {
       return { success: false, error: 'Validasi gagal. Pastikan semua data diisi dengan format yang benar.' }
     }
 
-    const { name, email, password, whatsapp } = parsed.data
+    const { name, email, password, whatsapp, referralCode } = parsed.data
 
     // 3. THE IRON GATE: IP RATE LIMITING
     const headerStore = await headers()
@@ -48,6 +49,16 @@ export async function registerUser(formData: FormData) {
 
     const passwordHash = await hashPassword(password)
 
+    let validReferralCode = null;
+    if (referralCode) {
+      const referrer = await prisma.user.findUnique({
+        where: { referralCode }
+      });
+      if (referrer) {
+        validReferralCode = referrer.referralCode;
+      }
+    }
+
     // 6. LEAST PRIVILEGE DB INSERT
     await prisma.user.create({
       data: {
@@ -56,6 +67,7 @@ export async function registerUser(formData: FormData) {
         phone: whatsapp,
         passwordHash,
         role: 'CUSTOMER', // Default absolut, anti-mass assignment
+        referredBy: validReferralCode,
       },
       select: { id: true }
     })

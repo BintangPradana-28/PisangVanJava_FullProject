@@ -9,8 +9,8 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
       queries: {
         // Data dianggap fresh selama 60 detik
         staleTime: 60 * 1000,
-        // Refetch otomatis saat user balik ke tab
-        refetchOnWindowFocus: true,
+        // Matikan refetch otomatis saat user balik ke tab (menurut AI rekomendasi agar tidak mengganggu admin)
+        refetchOnWindowFocus: false,
         // Refetch saat reconnect internet (penting untuk PWA offline)
         refetchOnReconnect: true,
         // Retry 2x saat gagal

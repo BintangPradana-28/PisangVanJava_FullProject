@@ -69,3 +69,48 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: false, message: "Internal Server Error" }, { status: 500 });
   }
 }
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const session = await auth();
+    const userId = session?.user?.id;
+    const supabaseToken = session?.supabaseAccessToken;
+
+    if (!session || !userId || !supabaseToken) {
+      return NextResponse.json({ success: false, message: "Unauthorized or missing JWT bridge." }, { status: 401 });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { image: true }
+    });
+
+    if (!user || !user.image) {
+      return NextResponse.json({ success: false, message: "Tidak ada foto untuk dihapus" }, { status: 400 });
+    }
+
+    // Extract filename from URL (assuming format: .../avatars/filename.ext)
+    const urlParts = user.image.split('/');
+    const fileName = urlParts[urlParts.length - 1];
+
+    if (fileName) {
+      const supabase = createSupabaseAuthClient(supabaseToken);
+      const { error: deleteError } = await supabase.storage.from("avatars").remove([fileName]);
+      if (deleteError) {
+         console.error("Supabase Storage Delete Error:", deleteError);
+         // Lanjutkan hapus di DB meskipun gagal di storage untuk konsistensi user experience
+      }
+    }
+
+    // Hapus dari DB
+    await prisma.user.update({
+      where: { id: userId },
+      data: { image: null },
+    });
+
+    return NextResponse.json({ success: true, message: "Foto berhasil dihapus" });
+  } catch (error) {
+    console.error("DELETE /api/user/profile/avatar Error:", error);
+    return NextResponse.json({ success: false, message: "Internal Server Error" }, { status: 500 });
+  }
+}

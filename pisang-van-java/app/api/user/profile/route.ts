@@ -42,6 +42,10 @@ export async function GET(req: NextRequest) {
         phone: true,
         address: true,
         image: true,
+        koinPisang: true,
+        accounts: {
+          select: { provider: true }
+        }
       },
     });
 

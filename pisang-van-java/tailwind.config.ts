@@ -106,6 +106,11 @@ module.exports = {
       backgroundImage: {
         'hero-pattern': "url(\"data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='30' cy='30' r='1.5' fill='rgba(212,128,42,0.15)'/%3E%3C/svg%3E\")",
       },
+      boxShadow: {
+        'sbx-card': '0 0 0.5px rgba(0,0,0,0.14), 0 1px 1px rgba(0,0,0,0.24)',
+        'sbx-nav': '0 1px 3px rgba(0,0,0,0.1), 0 2px 2px rgba(0,0,0,0.06), 0 0 2px rgba(0,0,0,0.07)',
+        'sbx-frap': '0 0 6px rgba(0,0,0,0.24), 0 8px 12px rgba(0,0,0,0.14)',
+      },
     },
   },
   plugins: [],

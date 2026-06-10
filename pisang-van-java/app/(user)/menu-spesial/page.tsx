@@ -21,7 +21,7 @@ const getCachedProducts = async () => {
       }
     });
   } catch (e) {
-    console.warn("[Safe Log] DB fetch failed for menu-spesial", e?.message || e);
+    console.warn("[Safe Log] DB fetch failed for menu-spesial", e instanceof Error ? e.message : String(e));
     return [];
   }
 };

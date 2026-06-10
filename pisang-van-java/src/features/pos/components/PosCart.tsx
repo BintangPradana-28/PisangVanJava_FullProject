@@ -4,6 +4,9 @@ import { Topping } from './PosModifierModal'
 import { saveToOfflineQueue, getOfflineQueueCount } from './OfflineSyncManager'
 import toast from 'react-hot-toast'
 import PosReceiptModal, { ReceiptData } from './PosReceiptModal'
+import { useMutation } from '@tanstack/react-query'
+import { api } from '@/src/lib/api'
+import { FetchError } from 'ofetch'
 
 export interface CartItem {
   id: string // temporary client-side id
@@ -22,7 +25,6 @@ interface PosCartProps {
 }
 
 export default function PosCart({ items, onUpdateQuantity, onRemoveItem, onClearCart }: PosCartProps) {
-  const [isProcessing, setIsProcessing] = useState(false)
   const [isOnline, setIsOnline] = useState(true)
   const [queueCount, setQueueCount] = useState(0)
   const [receiptData, setReceiptData] = useState<ReceiptData | null>(null)
@@ -52,11 +54,64 @@ export default function PosCart({ items, onUpdateQuantity, onRemoveItem, onClear
   // Formatting utility
   const formatRupiah = (num: number) => `Rp ${num.toLocaleString('id-ID')}`
 
-  const handleCheckout = async (paymentMethod: 'CASH' | 'QRIS') => {
-    if (items.length === 0) return
+  const checkoutMutation = useMutation({
+    mutationFn: async ({ payload, paymentMethod }: { payload: any, paymentMethod: 'CASH' | 'QRIS' }) => {
+      if (!isOnline) {
+        saveToOfflineQueue(payload)
+        return { offline: true, payload, paymentMethod }
+      }
+      const data = await api<{ success: boolean; data?: any; error?: string }>('/api/pos/orders', {
+        method: 'POST',
+        body: payload,
+      })
+      if (!data.success) throw new Error(data.error || 'Gagal memproses transaksi')
+      return { offline: false, data, payload, paymentMethod }
+    },
+    retry: 0,
+    onSuccess: (res) => {
+      if (res.offline) {
+        toast.success('Mode Offline: Pesanan Masuk Antrean.', { icon: '📶' })
+        setReceiptData({
+          orderId: res.payload.offlineId,
+          date: new Date(),
+          items: [...items],
+          totalPrice,
+          paymentMethod: res.paymentMethod,
+          cashierName: "Kasir POS (Offline)"
+        })
+      } else {
+        toast.success('Transaksi Berhasil! Pesanan dikirim ke dapur.')
+        setReceiptData({
+          orderId: res.data?.data?.id || res.payload.offlineId,
+          date: new Date(),
+          items: [...items],
+          totalPrice,
+          paymentMethod: res.paymentMethod,
+          cashierName: "Kasir POS"
+        })
+      }
+    },
+    onError: (error: FetchError | Error, variables) => {
+      if (error instanceof TypeError || error.message.includes('Failed to fetch') || error.message.includes('fetch failed')) {
+        saveToOfflineQueue(variables.payload)
+        toast.error('Koneksi terputus. Pesanan Masuk Antrean.')
+        setReceiptData({
+          orderId: variables.payload.offlineId,
+          date: new Date(),
+          items: [...items],
+          totalPrice,
+          paymentMethod: variables.paymentMethod,
+          cashierName: "Kasir POS (Offline)"
+        })
+      } else {
+        const msg = error instanceof FetchError ? (error.data?.error || 'Gagal memproses transaksi') : error.message
+        toast.error(msg, { duration: 5000 })
+      }
+    }
+  })
 
-    setIsProcessing(true)
-    const toastId = toast.loading('Memproses transaksi...')
+  const handleCheckout = (paymentMethod: 'CASH' | 'QRIS') => {
+    if (items.length === 0 || checkoutMutation.isPending) return
 
     // Mapping Client Cart to API Schema
     const payload = {
@@ -75,73 +130,13 @@ export default function PosCart({ items, onUpdateQuantity, onRemoveItem, onClear
       }))
     }
 
-    try {
-      if (!isOnline) {
-        // Network is explicitly down. Queue it immediately.
-        saveToOfflineQueue(payload)
-        toast.success('Mode Offline: Pesanan Masuk Antrean.', { id: toastId, icon: '📶' })
-        
-        setReceiptData({
-          orderId: payload.offlineId,
-          date: new Date(),
-          items: [...items],
-          totalPrice,
-          paymentMethod,
-          cashierName: "Kasir POS (Offline)"
-        })
-        setIsProcessing(false)
-        return
-      }
-
-      const res = await fetch('/api/pos/orders', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      })
-
-      const data = await res.json()
-
-      if (!res.ok || !data.success) {
-        // If out of stock, API returns 400 with specific message
-        throw new Error(data.error || 'Gagal memproses transaksi')
-      }
-
-      toast.success('Transaksi Berhasil! Pesanan dikirim ke dapur.', { id: toastId })
-      
-      setReceiptData({
-        orderId: data.data?.id,
-        date: new Date(),
-        items: [...items],
-        totalPrice,
-        paymentMethod,
-        cashierName: "Kasir POS"
-      })
-
-    } catch (error: any) {
-      // If it's a TypeError (Network Error), intercept and push to queue
-      if (error instanceof TypeError || error.message.includes('Failed to fetch')) {
-        saveToOfflineQueue(payload)
-        toast.error('Koneksi terputus. Pesanan Masuk Antrean.', { id: toastId })
-        setReceiptData({
-          orderId: payload.offlineId,
-          date: new Date(),
-          items: [...items],
-          totalPrice,
-          paymentMethod,
-          cashierName: "Kasir POS (Offline)"
-        })
-      } else {
-        toast.error(error.message, { id: toastId, duration: 5000 })
-      }
-    } finally {
-      setIsProcessing(false)
-    }
+    checkoutMutation.mutate({ payload, paymentMethod })
   }
 
   return (
     <div className="w-full h-full bg-white flex flex-col border-l border-gray-100 shadow-xl relative">
       {/* Overlay if processing */}
-      {isProcessing && (
+      {checkoutMutation.isPending && (
         <div className="absolute inset-0 bg-white/60 backdrop-blur-sm z-10 flex items-center justify-center">
           <div className="font-bold text-orange-600 animate-pulse">Memproses...</div>
         </div>
@@ -219,7 +214,7 @@ export default function PosCart({ items, onUpdateQuantity, onRemoveItem, onClear
         <div className="grid grid-cols-2 gap-3">
           <button
             onClick={() => handleCheckout('CASH')}
-            disabled={items.length === 0 || isProcessing}
+            disabled={items.length === 0 || checkoutMutation.isPending}
             className="w-full bg-green-500 text-white font-bold py-4 rounded-2xl text-lg flex justify-center items-center active:scale-[0.98] transition-transform shadow-lg shadow-green-500/30 disabled:opacity-50 disabled:shadow-none"
           >
             Tunai
@@ -227,7 +222,7 @@ export default function PosCart({ items, onUpdateQuantity, onRemoveItem, onClear
           {/* Payment Lock Rule: Disable QRIS when offline */}
           <button
             onClick={() => handleCheckout('QRIS')}
-            disabled={items.length === 0 || isProcessing || !isOnline}
+            disabled={items.length === 0 || checkoutMutation.isPending || !isOnline}
             className="w-full bg-blue-500 text-white font-bold py-4 rounded-2xl text-lg flex flex-col justify-center items-center active:scale-[0.98] transition-transform shadow-lg shadow-blue-500/30 disabled:opacity-50 disabled:shadow-none disabled:bg-gray-400"
           >
             <span>QRIS</span>

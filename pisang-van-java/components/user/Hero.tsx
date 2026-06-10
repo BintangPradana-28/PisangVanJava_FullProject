@@ -79,7 +79,7 @@ export default function Hero({
         <div className="absolute inset-0 bg-gradient-to-t from-[#1a0f0a] via-[#1a0f0a]/80 to-black/30" />
       </div>
 
-      <div className="relative z-10 max-w-[1200px] w-full mx-auto px-6 py-24 md:py-32 grid lg:grid-cols-2 gap-12 items-center">
+      <div className="relative z-10 max-w-[1200px] w-full mx-auto px-6 py-24 md:py-32 grid lg:grid-cols-[3fr_2fr] gap-12 items-center">
         {/* Text Area */}
         <div className="text-left">
           {badge && (
@@ -148,7 +148,7 @@ export default function Hero({
           <div className="flex flex-wrap gap-4 items-center">
             <Link
               href={ctaLink}
-              className="inline-flex items-center gap-3 bg-[#D4802A] hover:bg-[#b56d24] text-white font-bold text-base px-10 py-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-0.5 active:scale-95 group focus:outline-none focus:ring-4 focus:ring-[#D4802A]/40"
+              className="inline-flex items-center gap-3 bg-amber-brand hover:bg-amber-brand/90 text-white font-bold text-base px-10 py-4 rounded-full shadow-sbx-card hover:shadow-lg transition-all duration-200 active:scale-95 group focus:outline-none focus:ring-4 focus:ring-amber-brand/40"
             >
               <ShoppingBagIcon />
               <span>{t("hero_order_btn")}</span>
@@ -175,7 +175,7 @@ export default function Hero({
 
         {/* Visual Element */}
         <div className="hidden lg:flex justify-end">
-          <div className="relative w-full max-w-[450px] aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl border-8 border-white/10 bg-black/50">
+          <div className="relative w-full aspect-[4/3] rounded-[12px] overflow-hidden shadow-sbx-card border-8 border-white/10 bg-black/50">
             <Image
               src={
                 banner?.imageUrl ||

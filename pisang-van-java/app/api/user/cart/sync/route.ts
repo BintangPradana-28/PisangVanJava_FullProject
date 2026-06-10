@@ -80,8 +80,8 @@ export async function POST(req: Request) {
       })
     ]);
 
-    const variantMap = new Map(variants.map(v => [v.id, v]));
-    const toppingMap = new Map(toppings.map(t => [t.id, t]));
+    const variantMap = new Map<string, any>(variants.map((v: any) => [v.id, v]));
+    const toppingMap = new Map<string, any>(toppings.map((t: any) => [t.id, t]));
 
     // Override basePrice dan toppings.priceAdd dengan harga aktual dari database
     const validatedItems = items.map((item: any) => {

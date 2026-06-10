@@ -6,7 +6,7 @@ import toast from 'react-hot-toast'
 import { formatPrice } from '@/lib/utils'
 import { supabaseBrowserClient } from '@/src/lib/supabase-client'
 
-type OrderStatus = 'pending' | 'paid' | 'confirmed' | 'ready' | 'done' | 'cancelled'
+type OrderStatus = 'PENDING_PAYMENT' | 'PROCESSING' | 'READY' | 'COMPLETED' | 'CANCELED'
 
 interface OrderItem {
   id: string
@@ -15,7 +15,7 @@ interface OrderItem {
   unitPrice: number
   subtotal: number
   variant: { flavorName: string }
-  topping?: { name: string; emoji: string | null } | null
+  toppings?: { name: string; emoji: string | null }[] | null
 }
 
 interface Order {
@@ -33,15 +33,14 @@ interface Order {
 }
 
 const STATUS_CONFIG: Record<OrderStatus, { label: string; color: string; bg: string; next?: OrderStatus }> = {
-  pending:   { label: 'Pending',       color: 'text-yellow-700', bg: 'bg-yellow-100',   next: 'confirmed' },
-  paid:      { label: 'Dibayar',       color: 'text-emerald-700',bg: 'bg-emerald-100',  next: 'confirmed' },
-  confirmed: { label: 'Dikonfirmasi', color: 'text-blue-700',    bg: 'bg-blue-100',     next: 'ready' },
-  ready:     { label: 'Siap Antar',   color: 'text-purple-700',  bg: 'bg-purple-100',   next: 'done' },
-  done:      { label: 'Selesai',       color: 'text-green-700',   bg: 'bg-green-100' },
-  cancelled: { label: 'Dibatalkan',   color: 'text-red-700',     bg: 'bg-red-100' },
+  PENDING_PAYMENT: { label: 'Pending', color: 'text-yellow-700', bg: 'bg-yellow-100', next: 'PROCESSING' },
+  PROCESSING:      { label: 'Diproses', color: 'text-blue-700', bg: 'bg-blue-100', next: 'READY' },
+  READY:           { label: 'Siap Antar', color: 'text-purple-700', bg: 'bg-purple-100', next: 'COMPLETED' },
+  COMPLETED:       { label: 'Selesai', color: 'text-green-700', bg: 'bg-green-100' },
+  CANCELED:        { label: 'Dibatalkan', color: 'text-red-700', bg: 'bg-red-100' },
 }
 
-const STATUS_ORDER: OrderStatus[] = ['pending', 'paid', 'confirmed', 'ready', 'done', 'cancelled']
+const STATUS_ORDER: OrderStatus[] = ['PENDING_PAYMENT', 'PROCESSING', 'READY', 'COMPLETED', 'CANCELED']
 const SOURCE_ICON: Record<string, string> = { whatsapp: '💬', online: '💳', 'walk-in': '🚶', phone: '📞' }
 
 type DateFilter = 'today' | 'week' | 'month' | 'all'
@@ -91,7 +90,7 @@ export default function OrdersClient({ initialOrders }: { initialOrders: Order[]
   const [expandedId, setExpandedId]   = useState<string | null>(null)
   const [updating, setUpdating]       = useState<string | null>(null)
   const [bulkSelected, setBulkSelected] = useState<Set<string>>(new Set())
-  const [bulkStatus, setBulkStatus]   = useState<OrderStatus>('confirmed')
+  const [bulkStatus, setBulkStatus]   = useState<OrderStatus>('PROCESSING')
   const [isBulkUpdating, setIsBulkUpdating] = useState(false)
   const [lastRefresh, setLastRefresh] = useState(new Date())
   const [hasNewOrder, setHasNewOrder] = useState(false)
@@ -244,7 +243,7 @@ export default function OrdersClient({ initialOrders }: { initialOrders: Order[]
 
   const openWhatsApp = (order: Order) => {
     const items = order.items.map(i =>
-      `• ${i.variant.flavorName} (${i.baseType})${i.topping ? ` + ${i.topping.emoji || ''} ${i.topping.name}` : ''} ×${i.quantity} = ${formatPrice(i.subtotal)}`
+      `• ${i.variant.flavorName} (${i.baseType})${i.toppings && i.toppings.length > 0 ? ` + ${i.toppings.map((t: any) => `${t.emoji || ''} ${t.name}`).join(', ')}` : ''} ×${i.quantity} = ${formatPrice(i.subtotal)}`
     ).join('\n')
     const msg = encodeURIComponent(`Halo ${order.customerName}! 🍌\n\nKonfirmasi pesanan Anda:\n${items}\n\nTotal: ${formatPrice(order.totalPrice)}\n\nTerima kasih telah memesan di Pisang Van Java!`)
     window.open(`https://wa.me/${order.customerPhone}?text=${msg}`, '_blank')
@@ -264,10 +263,10 @@ export default function OrdersClient({ initialOrders }: { initialOrders: Order[]
   // ── Summary stats ────────────────────────────────────────────────────────
   const stats = {
     total: orders.length,
-    revenue: orders.filter(o => o.status === 'done').reduce((s, o) => s + o.totalPrice, 0),
-    active: orders.filter(o => ['pending','paid','confirmed','ready'].includes(o.status)).length,
-    done: orders.filter(o => o.status === 'done').length,
-    pending: orders.filter(o => o.status === 'pending').length,
+    revenue: orders.filter(o => o.status === 'COMPLETED').reduce((s, o) => s + o.totalPrice, 0),
+    active: orders.filter(o => ['PENDING_PAYMENT','PROCESSING','READY'].includes(o.status)).length,
+    done: orders.filter(o => o.status === 'COMPLETED').length,
+    pending: orders.filter(o => o.status === 'PENDING_PAYMENT').length,
   }
 
   return (
@@ -279,11 +278,11 @@ export default function OrdersClient({ initialOrders }: { initialOrders: Order[]
           <h1 className="font-serif text-2xl font-bold text-brown-700">Pusat Komando Pesanan</h1>
           <div className="flex items-center gap-2 mt-0.5">
             <span className="text-xs text-brown-400">{stats.total} total • Diperbarui {lastRefresh.toLocaleTimeString('id-ID')}</span>
-          {hasNewOrder && (
+            {hasNewOrder && (
               <motion.span
                 initial={{ scale: 0 }} animate={{ scale: 1 }}
                 className="text-[10px] font-bold bg-red-500 text-white px-2 py-0.5 rounded-full cursor-pointer"
-                onClick={() => { setHasNewOrder(false); setStatusFilter('pending') }}
+                onClick={() => { setHasNewOrder(false); setStatusFilter('PENDING_PAYMENT') }}
               >
                 PESANAN BARU!
               </motion.span>
@@ -472,7 +471,7 @@ export default function OrdersClient({ initialOrders }: { initialOrders: Order[]
                             <span className="text-brown-600">
                               {item.variant.flavorName}
                               <span className="text-xs text-brown-400 ml-1">({item.baseType})</span>
-                              {item.toppings && item.toppings.length > 0 && <span className="text-xs text-secondary ml-1">+ {item.toppings.map((t: any) => `${t.emoji || ''} ${t.name}`).join(', ')}</span>}
+                              {item.toppings && item.toppings.length > 0 && <span className="text-zinc-400 font-normal"> + {item.toppings.map((t: any) => `${t.emoji || ''} ${t.name}`).join(', ')}</span>}
                               {item.quantity > 1 && <span className="text-xs text-brown-400 ml-1">×{item.quantity}</span>}
                             </span>
                             <span className="font-semibold text-brown-700 shrink-0 ml-2">{formatPrice(item.subtotal)}</span>
@@ -512,9 +511,9 @@ export default function OrdersClient({ initialOrders }: { initialOrders: Order[]
                           </button>
                         )}
 
-                        {order.status !== 'cancelled' && order.status !== 'done' && (
+                        {order.status !== 'CANCELED' && order.status !== 'COMPLETED' && (
                           <button
-                            onClick={() => updateStatus(order.id, 'cancelled')}
+                            onClick={() => updateStatus(order.id, 'CANCELED')}
                             disabled={updating === order.id}
                             className="px-3 py-2 text-xs font-bold bg-red-50 text-red-600 rounded-xl hover:bg-red-100 disabled:opacity-50 transition-all"
                           >

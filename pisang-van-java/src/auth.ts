@@ -20,6 +20,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       credentials: {
         username: { label: "Email", type: "email", placeholder: "email@example.com" },
         password: { label: "Password", type: "password" },
+        otp: { label: "OTP", type: "text" },
       },
       async authorize(credentials) {
         console.log("Credentials received:", credentials);
@@ -31,7 +32,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           throw new Error("Kredensial tidak valid.");
         }
 
-        const { username, password } = parsedCredentials.data;
+        const { username, password, otp } = parsedCredentials.data;
         console.log("Zod parsed successfully. Email:", username);
 
         // 2. IP-BASED RATE LIMITING
@@ -79,6 +80,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         if (!isPasswordValid) {
           throw new Error("Email atau Sandi tidak valid.");
+        }
+
+        if (user.twoFactorEnabled) {
+          if (!otp) {
+            throw new Error("2FA_REQUIRED");
+          }
+          const { authenticator } = await import("otplib");
+          const isValidOTP = authenticator.check(otp, user.twoFactorSecret!);
+          if (!isValidOTP) throw new Error("INVALID_OTP");
         }
 
         return { 

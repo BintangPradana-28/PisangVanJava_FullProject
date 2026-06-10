@@ -9,13 +9,20 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 403 });
     }
 
+    const { searchParams } = new URL(req.url);
+    const filterDeleted = searchParams.get('deleted') === 'true';
+
     const users = await prisma.user.findMany({
-      where: { isDeleted: false },
+      where: filterDeleted ? { isDeleted: true } : { isDeleted: false },
       select: {
         id: true,
         name: true,
         email: true,
         role: true,
+        koinPisang: true,
+        referralCode: true,
+        referredBy: true,
+        isDeleted: true,
         createdAt: true,
       },
       orderBy: { createdAt: 'desc' }

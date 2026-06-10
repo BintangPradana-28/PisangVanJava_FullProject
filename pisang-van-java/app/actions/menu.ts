@@ -45,6 +45,44 @@ export async function toggleAvailability(id: string, isAvailable: boolean) {
   }
 }
 
+export async function updateMenuStock(id: string, newStock: number) {
+  try {
+    const session = await auth();
+    if (!session || !session.user) {
+      return { success: false, error: "Akses ditolak. Sesi tidak valid." };
+    }
+
+    if (newStock < 0) {
+      return { success: false, error: "Stok tidak boleh bernilai negatif." };
+    }
+
+    const updatedRecord = await prisma.menuVariant.update({
+      where: { id },
+      data: { stock: newStock },
+    });
+
+    // Revalidate customer-facing pages
+    revalidatePath("/");
+    revalidatePath("/menu-spesial");
+    revalidatePath("/(user)", "layout");
+    
+    // Audit Log
+    await logAudit("UPDATE_STOCK", "MenuVariant", updatedRecord.id, { newStock });
+
+    return {
+      success: true,
+      message: `Stok '${updatedRecord.flavorName}' diperbarui menjadi ${newStock}.`,
+      data: updatedRecord
+    };
+  } catch (error) {
+    console.error("[CRITICAL BACKEND ERROR]: Update stock failed", error);
+    return {
+      success: false,
+      error: "Terjadi kegagalan sistem internal. Operasi dibatalkan."
+    };
+  }
+}
+
 /**
  * 📦 1. MESIN PEMBACA (The Cache Engine)
  * Dioptimalkan dengan Zero-Trust Data Masking.

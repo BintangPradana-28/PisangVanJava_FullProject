@@ -19,7 +19,7 @@ const BASE_TABS = [
 // ── Kategori Rasa — shown as secondary swipeable chips ───────────────────────
 const FLAVOR_CHIPS = [
   { key: 'all', label: 'Semua Rasa' },
-  { key: 'Cokelat', label: '🍫 Cokelat' },
+  { key: 'Coklat', label: '🍫 Cokelat' },
   { key: 'Matcha', label: '🍵 Matcha' },
   { key: 'Tiramisu', label: '☕ Tiramisu' },
   { key: 'Strawberry', label: '🍓 Strawberry' },

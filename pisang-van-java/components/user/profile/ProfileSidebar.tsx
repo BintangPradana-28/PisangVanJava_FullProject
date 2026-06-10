@@ -15,6 +15,13 @@ const menuItems = [
   { name: 'Keamanan', href: '/profile/keamanan', icon: Shield },
 ]
 
+import { HelpCircle, Gift } from 'lucide-react'
+
+const actionItems = [
+  { name: 'Ajak Teman (Koin)', href: '/profile/referral', icon: Gift },
+  { name: 'Pusat Bantuan', href: '/profile/bantuan', icon: HelpCircle },
+]
+
 export default function ProfileSidebar() {
   const pathname = usePathname()
   const { data: session } = useSession()
@@ -59,6 +66,31 @@ export default function ProfileSidebar() {
           })}
 
           <div className="hidden md:block w-full h-px bg-zinc-100 dark:bg-zinc-800 my-4" />
+
+          {/* Aksi Akun */}
+          <div className="hidden md:block px-4 pb-2">
+            <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">Aksi Akun</p>
+          </div>
+
+          {actionItems.map((item) => {
+            const isActive = pathname === item.href || (item.href !== '/profile' && pathname.startsWith(item.href))
+            const Icon = item.icon
+            return (
+              <Link
+                key={item.name}
+                href={item.href}
+                className={`flex items-center gap-3 px-4 py-3.5 md:py-3 rounded-2xl whitespace-nowrap transition-all font-medium text-sm ${
+                  isActive
+                    ? 'bg-orange-50 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400'
+                    : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800/50'
+                }`}
+              >
+                <Icon className={`w-5 h-5 ${isActive ? 'text-orange-600 dark:text-orange-400' : 'text-zinc-400 dark:text-zinc-500'}`} />
+                <span className="flex-1">{item.name}</span>
+                {isActive && <ChevronRight className="w-4 h-4 hidden md:block opacity-70" />}
+              </Link>
+            )
+          })}
 
           <button
             onClick={() => {

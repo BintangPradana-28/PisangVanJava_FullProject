@@ -4,6 +4,7 @@ import { useSession } from 'next-auth/react'
 import { usePathname } from 'next/navigation'
 import { useCartStore, type CartItem } from '@/src/stores/cart.store'
 import { MergeConflictModal } from '@/components/user/MergeConflictModal'
+import { api } from '@/src/lib/api'
 
 export function CartSyncProvider({
   children,
@@ -44,9 +45,7 @@ export function CartSyncProvider({
     if (status === 'authenticated' && !isFirstSyncDone) {
       const fetchAndMergeCart = async () => {
         try {
-          const res = await fetch('/api/user/cart/sync')
-          if (!res.ok) return
-          const data = await res.json()
+          const data = await api<any>('/api/user/cart/sync')
           
           if (data.success && Array.isArray(data.data?.items)) {
             const dbItems: CartItem[] = data.data.items
@@ -63,8 +62,8 @@ export function CartSyncProvider({
               if (a.menuVariantId !== b.menuVariantId) return false;
               if (a.notes !== b.notes) return false;
               
-              const aToppings = Array.isArray(a.toppings) ? a.toppings : (a.topping ? [a.topping] : []);
-              const bToppings = Array.isArray(b.toppings) ? b.toppings : (b.topping ? [b.topping] : []);
+              const aToppings = Array.isArray(a.toppings) ? a.toppings : ((a as any).topping ? [(a as any).topping] : []);
+              const bToppings = Array.isArray(b.toppings) ? b.toppings : ((b as any).topping ? [(b as any).topping] : []);
               
               if (aToppings.length !== bToppings.length) return false;
               
@@ -93,7 +92,7 @@ export function CartSyncProvider({
               }
             })
 
-            const mergedTotal = merged.reduce((acc, item) => acc + ((item.basePrice + (item.topping?.priceAdd || 0)) * item.quantity), 0)
+            const mergedTotal = merged.reduce((acc, item) => acc + ((item.basePrice + (item.toppings?.reduce((s: number, t: any) => s + (t.priceAdd || 0), 0) || 0)) * item.quantity), 0)
 
             const shouldShowModal = 
               merged.length > CONFLICT_THRESHOLD.itemCount ||
@@ -128,12 +127,11 @@ export function CartSyncProvider({
     if (JSON.stringify(items) === JSON.stringify(previousItemsRef.current)) return
 
     try {
-      const res = await fetch('/api/user/cart/sync', {
+      const res = await api<any>('/api/user/cart/sync', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items }),
+        body: { items },
       })
-      if (res.ok) {
+      if (res.success) {
         previousItemsRef.current = [...items]
       }
     } catch (error) {

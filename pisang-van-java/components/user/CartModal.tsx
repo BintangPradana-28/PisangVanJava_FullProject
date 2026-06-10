@@ -48,7 +48,7 @@ interface AppliedVoucher {
 
 interface CheckoutPayloadItem {
   variantId: string
-  toppingId: string | null
+  toppingIds: string[]
   baseType: BaseType
   quantity: number
   notes: string | null

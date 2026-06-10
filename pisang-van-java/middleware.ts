@@ -127,6 +127,29 @@ const authMiddleware = auth(async (req) => {
       response.cookies.delete("__Secure-authjs.session-token");
       return response;
     }
+
+    // ── 3.6. Hybrid Session Check ────────────────────────────────────────────────
+    if (token.sessionId) {
+      try {
+        const sessionKey = `session:${token.id}:${token.sessionId}`;
+        const isActiveSession = await redis.exists(sessionKey);
+
+        if (!isActiveSession) {
+          console.warn(`[SECURITY] Revoked session access attempt for User: ${token.id}`);
+          const response = NextResponse.redirect(new URL("/member-login?error=session_revoked", req.url));
+          response.cookies.delete("authjs.session-token");
+          response.cookies.delete("__Secure-authjs.session-token");
+          return response;
+        }
+      } catch (err) {
+        console.error("[SECURITY] Redis session check failed. FAILING CLOSED.", err);
+        // ZERO-TRUST MANDATE: FAIL CLOSED. If we can't verify the session, deny access.
+        const response = NextResponse.redirect(new URL("/member-login?error=system_error", req.url));
+        response.cookies.delete("authjs.session-token");
+        response.cookies.delete("__Secure-authjs.session-token");
+        return response;
+      }
+    }
   }
 
   if (!requiredRoles) {
@@ -182,7 +205,7 @@ export default async function middleware(req: NextRequest, event: NextFetchEvent
   req.headers.set("x-nonce", nonce);
 
   // Execute auth middleware
-  const response = (await authMiddleware(req, event)) || NextResponse.next({
+  const response = (await authMiddleware(req, event as any)) || NextResponse.next({
     request: {
       headers: req.headers,
     }

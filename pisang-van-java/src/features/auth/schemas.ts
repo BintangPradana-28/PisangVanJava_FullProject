@@ -10,6 +10,7 @@ export const loginSchema = z.object({
   // Gunakan batas maksimal standar untuk mencegah serangan payload raksasa.
   username: z.string().trim().min(3).max(254).email(),
   password: z.string().min(8).max(128),
+  otp: z.string().optional(),
 }); // Removed .strict() to allow NextAuth internal fields
 
 export const registerSchema = z.object({
@@ -20,6 +21,7 @@ export const registerSchema = z.object({
     .string()
     .min(8, "Sandi minimal 8 karakter")
     .max(128, "Sandi maksimal 128 karakter"),
+  referralCode: z.string().trim().max(10).optional(),
   consent: z.boolean().refine((val) => val === true, {
     message: "Anda harus menyetujui Kebijakan Privasi",
   }),

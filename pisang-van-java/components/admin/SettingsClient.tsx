@@ -2,6 +2,9 @@
 // components/admin/SettingsClient.tsx
 import { useState } from 'react'
 import toast from 'react-hot-toast'
+import { useMutation } from '@tanstack/react-query'
+import { api } from '@/src/lib/api'
+import { FetchError } from 'ofetch'
 
 interface Setting { id: string; key: string; value: string; label: string | null; group: string }
 interface Props { settings: Setting[]; adminName: string }
@@ -17,59 +20,68 @@ export default function SettingsClient({ settings, adminName }: Props) {
   const [values, setValues] = useState<Record<string, string>>(
     Object.fromEntries(settings.map(s => [s.key, s.value]))
   )
-  const [saving,    setSaving]    = useState(false)
   const [pwForm,    setPwForm]    = useState({ current: '', newPw: '', confirm: '' })
-  const [savingPw,  setSavingPw]  = useState(false)
   const [activeTab, setActiveTab] = useState('general')
 
   const groups = [...new Set([...settings.map(s => s.group), 'home', 'about', 'contact'])]
 
-  const handleSave = async () => {
-    setSaving(true)
-    try {
+  const saveMutation = useMutation({
+    mutationFn: async () => {
       if (activeTab === 'about' || activeTab === 'home' || activeTab === 'contact' || activeTab === 'store') {
         const payload = Object.fromEntries(
-          Object.entries(values).filter(([key]) => key.startsWith(activeTab + '_') || (activeTab === 'contact' && ['nomor_wa', 'alamat', 'jam_operasional'].includes(key)))
+          Object.entries(values).filter(([key]) => key.startsWith(activeTab + '_') || (activeTab === 'contact' && ['nomor_wa', 'alamat', 'jam_operasional'].includes(key)) || (activeTab === 'store' && key === 'store_delivery_fee'))
         )
-        const res = await fetch('/api/admin/settings/bulk-update', {
+        const res = await api<{ success: boolean; error?: string }>('/api/admin/settings/bulk-update', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ group: activeTab, payload }),
+          body: { group: activeTab, payload },
         })
-        const data = await res.json()
-        if (res.ok) toast.success(`Data ${GROUP_LABELS[activeTab]} berhasil disimpan!`)
-        else toast.error(data.error || 'Gagal menyimpan data')
+        if (res.error) throw new Error(res.error)
+        return { type: 'bulk', group: activeTab }
       } else {
-        const res  = await fetch('/api/settings', {
+        const res = await api<{ success: boolean; error?: string }>('/api/settings', {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ settings: Object.entries(values).filter(([key]) => settings.find(s => s.key === key)?.group === activeTab).map(([key, value]) => ({ key, value })) }),
+          body: { settings: Object.entries(values).filter(([key]) => settings.find(s => s.key === key)?.group === activeTab).map(([key, value]) => ({ key, value })) },
         })
-        const data = await res.json()
-        if (data.success) toast.success('Pengaturan berhasil disimpan!')
-        else toast.error(data.error || 'Gagal menyimpan')
+        if (!res.success) throw new Error(res.error || 'Gagal menyimpan')
+        return { type: 'single' }
       }
-    } catch { toast.error('Koneksi bermasalah') }
-    finally { setSaving(false) }
-  }
+    },
+    onSuccess: (data) => {
+      if (data.type === 'bulk' && data.group) toast.success(`Data ${GROUP_LABELS[data.group] || data.group} berhasil disimpan!`)
+      else toast.success('Pengaturan berhasil disimpan!')
+    },
+    onError: (error: FetchError | Error) => {
+      const msg = error instanceof FetchError ? (error.data?.error || 'Gagal menyimpan data') : error.message
+      toast.error(msg)
+    }
+  })
 
-  const handlePasswordChange = async () => {
-    if (!pwForm.current || !pwForm.newPw) { toast.error('Isi semua field password'); return }
-    if (pwForm.newPw !== pwForm.confirm)  { toast.error('Konfirmasi password tidak cocok'); return }
-    if (pwForm.newPw.length < 6)          { toast.error('Password minimal 6 karakter'); return }
-    setSavingPw(true)
-    try {
-      const res  = await fetch('/api/settings/password', {
+  const handleSave = () => saveMutation.mutate()
+
+  const passwordMutation = useMutation({
+    mutationFn: async () => {
+      if (!pwForm.current || !pwForm.newPw) throw new Error('Isi semua field password')
+      if (pwForm.newPw !== pwForm.confirm) throw new Error('Konfirmasi password tidak cocok')
+      if (pwForm.newPw.length < 6) throw new Error('Password minimal 6 karakter')
+      
+      const res = await api<{ success: boolean; error?: string }>('/api/settings/password', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ currentPassword: pwForm.current, newPassword: pwForm.newPw }),
+        body: { currentPassword: pwForm.current, newPassword: pwForm.newPw },
       })
-      const data = await res.json()
-      if (data.success) { toast.success('Password berhasil diubah!'); setPwForm({ current: '', newPw: '', confirm: '' }) }
-      else toast.error(data.error || 'Gagal mengubah password')
-    } catch { toast.error('Koneksi bermasalah') }
-    finally { setSavingPw(false) }
-  }
+      if (!res.success) throw new Error(res.error || 'Gagal mengubah password')
+      return res
+    },
+    onSuccess: () => {
+      toast.success('Password berhasil diubah!')
+      setPwForm({ current: '', newPw: '', confirm: '' })
+    },
+    onError: (error: FetchError | Error) => {
+      const msg = error instanceof FetchError ? (error.data?.error || 'Gagal mengubah password') : error.message
+      toast.error(msg)
+    }
+  })
+
+  const handlePasswordChange = () => passwordMutation.mutate()
 
   const groupSettings = settings.filter(s => s.group === activeTab)
 
@@ -81,9 +93,9 @@ export default function SettingsClient({ settings, adminName }: Props) {
           <h1 className="font-serif text-2xl font-bold text-brown-700">⚙️ Pengaturan</h1>
           <p className="text-sm text-brown-400 mt-0.5">Kelola konfigurasi website dan akun admin</p>
         </div>
-        <button onClick={handleSave} disabled={saving}
+        <button onClick={handleSave} disabled={saveMutation.isPending}
           className="btn-brown disabled:opacity-60">
-          {saving ? 'Menyimpan...' : '💾 Simpan Semua'}
+          {saveMutation.isPending ? 'Menyimpan...' : '💾 Simpan Semua'}
         </button>
       </div>
 
@@ -126,9 +138,9 @@ export default function SettingsClient({ settings, adminName }: Props) {
                       placeholder={placeholder} className="form-input" />
                   </div>
                 ))}
-                <button onClick={handlePasswordChange} disabled={savingPw}
+                <button onClick={handlePasswordChange} disabled={passwordMutation.isPending}
                   className="w-full py-3 bg-brown-700 text-white font-semibold rounded-xl hover:bg-brown-600 transition-colors disabled:opacity-60">
-                  {savingPw ? 'Menyimpan...' : '🔐 Ubah Password'}
+                  {passwordMutation.isPending ? 'Menyimpan...' : '🔐 Ubah Password'}
                 </button>
               </div>
             </>

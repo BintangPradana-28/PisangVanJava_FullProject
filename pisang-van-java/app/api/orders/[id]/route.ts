@@ -101,6 +101,40 @@ export async function PATCH(req: NextRequest, { params }: OrderRouteContext) {
         }
       }
 
+      // If transitioning to COMPLETED, process referral bonus
+      if (parsedStatus.data === "COMPLETED") {
+        const orderInfo = await tx.order.findUnique({
+          where: { id: parsedParams.data.orderId },
+          select: { userId: true, status: true },
+        });
+
+        if (orderInfo && orderInfo.userId && orderInfo.status !== "COMPLETED") {
+          const userObj = await tx.user.findUnique({
+            where: { id: orderInfo.userId },
+            select: { hasOrdered: true, referredBy: true }
+          });
+
+          if (userObj && !userObj.hasOrdered) {
+             await tx.user.update({
+               where: { id: orderInfo.userId },
+               data: { hasOrdered: true }
+             });
+
+             if (userObj.referredBy) {
+               const referrer = await tx.user.findUnique({
+                 where: { referralCode: userObj.referredBy }
+               });
+               if (referrer) {
+                 await tx.user.update({
+                   where: { id: referrer.id },
+                   data: { koinPisang: { increment: 5000 } }
+                 });
+               }
+             }
+          }
+        }
+      }
+
       return tx.order.update({
         where: { id: parsedParams.data.orderId },
         data: { status: parsedStatus.data },
@@ -191,7 +225,7 @@ const orderDetailSelect = {
           flavorName: true,
         },
       },
-      topping: {
+      toppings: {
         select: {
           name: true,
           emoji: true,

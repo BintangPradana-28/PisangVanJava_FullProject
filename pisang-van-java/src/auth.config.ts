@@ -9,6 +9,7 @@ declare module "next-auth" {
       id: string;
       role: string;
       isBanned: boolean;
+      sessionId?: string;
     } & DefaultSession["user"]
   }
 }
@@ -27,6 +28,21 @@ export const authConfig = {
         token.id = user.id;
         token.role = (user as any).role;
         token.isBanned = (user as any).isBanned;
+        
+        // Inject sessionId
+        const { v4: uuidv4 } = await import("uuid");
+        const sessionId = uuidv4();
+        token.sessionId = sessionId;
+
+        // Register session to Redis
+        try {
+          const { redis } = await import("@/lib/redis");
+          const sessionKey = `session:${user.id}:${sessionId}`;
+          const userAgent = "Unknown Device"; // Could fetch from headers if passed, but this is server-side
+          await redis.setex(sessionKey, 60 * 60 * 24 * 30, JSON.stringify({ createdAt: Date.now(), device: userAgent }));
+        } catch (e) {
+          console.error("Failed to register session in Redis", e);
+        }
       }
       
       if (trigger === "update" && session) {
@@ -41,6 +57,7 @@ export const authConfig = {
         session.user.id = (token.id as string) || (token.sub as string);
         session.user.role = (token.role as any) || "CUSTOMER";
         session.user.isBanned = token.isBanned as boolean;
+        session.user.sessionId = token.sessionId as string;
         
         // ─── SUPABASE JOSE JWT BRIDGE ──────────────────────────────────────
         const signingSecret = process.env.SUPABASE_JWT_SECRET;

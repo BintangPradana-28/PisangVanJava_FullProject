@@ -199,8 +199,8 @@ const voucherSelect = {
 };
 
 async function requireAdminActor() {
-  const actor = await requireCheckoutActor();
-  if (actor === null || actor.role !== "ADMIN") {
+  const actor = await requireCheckoutActor() as any;
+  if (actor === null || (actor.role !== "ADMIN" && actor.role !== "SUPER_ADMIN")) {
     return null;
   }
 

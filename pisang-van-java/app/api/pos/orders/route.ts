@@ -87,7 +87,7 @@ export async function POST(req: NextRequest) {
           customerPhone: data.customerPhone,
           totalPrice: data.totalPrice,
           source: "walk-in", // Indicates POS
-          status: "paid",    // POS transactions are paid upfront
+          status: "COMPLETED",    // POS transactions are paid upfront
           deliveryMethod: "DINE_IN", // Or TAKEAWAY
           userId: user.id,   // Record the cashier/admin
           notes: data.notes,

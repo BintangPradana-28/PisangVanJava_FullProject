@@ -48,7 +48,7 @@ export async function submitCheckoutAction(rawPayload: unknown) {
         customerName: nama,
         customerPhone: whatsapp,
         notes: catatan !== undefined ? catatan : null,
-        status: "pending",
+        status: "PENDING_PAYMENT",
         totalPrice: 0, // Dalam implementasi nyata, hitung ini dari database server-side
         source: "online",
         deliveryMethod: "DELIVERY",

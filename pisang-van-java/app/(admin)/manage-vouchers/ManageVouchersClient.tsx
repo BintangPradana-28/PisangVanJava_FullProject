@@ -1,8 +1,11 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import toast from 'react-hot-toast'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { api } from '@/src/lib/api'
+import { FetchError } from 'ofetch'
 
 interface Voucher {
   id: string
@@ -30,8 +33,7 @@ function getDefaultEndDate() {
 }
 
 export default function ManageVouchersClient() {
-  const [vouchers, setVouchers] = useState<Voucher[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const queryClient = useQueryClient()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [formData, setFormData] = useState({
     code: '',
@@ -46,64 +48,65 @@ export default function ManageVouchersClient() {
     isActive: true
   })
 
-  useEffect(() => {
-    fetchVouchers()
-  }, [])
+  const { data: vouchers = [], isLoading } = useQuery({
+    queryKey: ['admin-vouchers'],
+    queryFn: async () => {
+      const data = await api<{ success: boolean; data: Voucher[] }>('/api/admin/vouchers')
+      if (!data.success) throw new Error('Gagal mengambil data voucher')
+      return data.data
+    },
+    staleTime: 0,
+  })
 
-  const fetchVouchers = async () => {
-    try {
-      const res = await fetch('/api/admin/vouchers')
-      const data = await res.json()
-      if (data.success) {
-        setVouchers(data.data)
-      }
-    } catch (err) {
-      toast.error('Gagal mengambil data voucher')
-    } finally {
-      setIsLoading(false)
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await api<{ success: boolean; message?: string }>(`/api/admin/vouchers?id=${id}`, { method: 'DELETE' })
+      if (!res.success && (res as any).error) throw new Error((res as any).error || 'Gagal menghapus voucher')
+      return res
+    },
+    onSuccess: () => {
+      toast.success('Voucher dihapus')
+      queryClient.invalidateQueries({ queryKey: ['admin-vouchers'] })
+    },
+    onError: (error: FetchError | Error) => {
+      const msg = error instanceof FetchError ? (error.data?.error || 'Gagal menghapus voucher') : error.message
+      toast.error(msg)
     }
-  }
+  })
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = (id: string) => {
     if (!confirm('Apakah Anda yakin ingin menghapus voucher ini?')) return
-    try {
-      const res = await fetch(`/api/admin/vouchers?id=${id}`, { method: 'DELETE' })
-      if (res.ok) {
-        toast.success('Voucher dihapus')
-        fetchVouchers()
-      } else {
-        toast.error('Gagal menghapus voucher')
-      }
-    } catch (err) {
-      toast.error('Gagal menghapus voucher')
-    }
+    deleteMutation.mutate(id)
   }
 
-  const handleToggleStatus = async (id: string, currentStatus: boolean) => {
-    try {
-      const res = await fetch('/api/admin/vouchers', {
+  const toggleMutation = useMutation({
+    mutationFn: async ({ id, currentStatus }: { id: string, currentStatus: boolean }) => {
+      const res = await api<{ success: boolean; message?: string }>('/api/admin/vouchers', {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id, isActive: !currentStatus })
+        body: { id, isActive: !currentStatus }
       })
-      if (res.ok) {
-        toast.success('Status diubah')
-        fetchVouchers()
-      } else {
-        toast.error('Gagal mengubah status')
-      }
-    } catch (err) {
-      toast.error('Gagal mengubah status')
+      if (!res.success && (res as any).error) throw new Error((res as any).error || 'Gagal mengubah status')
+      return res
+    },
+    onSuccess: () => {
+      toast.success('Status diubah')
+      queryClient.invalidateQueries({ queryKey: ['admin-vouchers'] })
+    },
+    onError: (error: FetchError | Error) => {
+      const msg = error instanceof FetchError ? (error.data?.error || 'Gagal mengubah status') : error.message
+      toast.error(msg)
     }
+  })
+
+  const handleToggleStatus = (id: string, currentStatus: boolean) => {
+    toggleMutation.mutate({ id, currentStatus })
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    try {
-      const res = await fetch('/api/admin/vouchers', {
+  const createMutation = useMutation({
+    mutationFn: async () => {
+      const res = await api<{ success: boolean; error?: string }>('/api/admin/vouchers', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+        body: {
           ...formData,
           discountValue: parseFloat(formData.discountValue),
           minPurchase: parseFloat(formData.minPurchase),
@@ -111,32 +114,37 @@ export default function ManageVouchersClient() {
           usageLimit: parseInt(formData.usageLimit),
           startDate: new Date(formData.startDate).toISOString(),
           endDate: new Date(formData.endDate).toISOString(),
-        })
+        }
       })
-      const data = await res.json()
-      if (res.ok && data.success) {
-        toast.success('Voucher berhasil ditambahkan')
-        setIsModalOpen(false)
-        fetchVouchers()
-        // Reset form
-        setFormData({
-          code: '',
-          discountType: 'PERCENTAGE',
-          discountValue: '',
-          minPurchase: '0',
-          maxDiscount: '',
-          startDate: toLocalDateTimeValue(new Date()),
-          endDate: getDefaultEndDate(),
-          usageLimit: '0',
-          applicableTo: 'ALL',
-          isActive: true
-        })
-      } else {
-        toast.error(data.error || 'Gagal menambahkan voucher')
-      }
-    } catch (err) {
-      toast.error('Gagal menambahkan voucher')
+      if (res.error) throw new Error(res.error)
+      return res
+    },
+    onSuccess: () => {
+      toast.success('Voucher berhasil ditambahkan')
+      setIsModalOpen(false)
+      queryClient.invalidateQueries({ queryKey: ['admin-vouchers'] })
+      setFormData({
+        code: '',
+        discountType: 'PERCENTAGE',
+        discountValue: '',
+        minPurchase: '0',
+        maxDiscount: '',
+        startDate: toLocalDateTimeValue(new Date()),
+        endDate: getDefaultEndDate(),
+        usageLimit: '0',
+        applicableTo: 'ALL',
+        isActive: true
+      })
+    },
+    onError: (error: FetchError | Error) => {
+      const msg = error instanceof FetchError ? (error.data?.error || 'Gagal menambahkan voucher') : error.message
+      toast.error(msg)
     }
+  })
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    createMutation.mutate()
   }
 
   return (
@@ -369,8 +377,8 @@ export default function ManageVouchersClient() {
                   <button type="button" onClick={() => setIsModalOpen(false)} className="px-5 py-2.5 text-zinc-600 font-medium hover:bg-zinc-100 rounded-xl transition-colors">
                     Batal
                   </button>
-                  <button type="submit" className="px-5 py-2.5 bg-brown text-white font-medium hover:bg-brown/90 rounded-xl transition-colors">
-                    Simpan Voucher
+                  <button type="submit" disabled={createMutation.isPending} className="px-5 py-2.5 bg-brown text-white font-medium hover:bg-brown/90 rounded-xl transition-colors disabled:opacity-50">
+                    {createMutation.isPending ? 'Menyimpan...' : 'Simpan Voucher'}
                   </button>
                 </div>
               </form>

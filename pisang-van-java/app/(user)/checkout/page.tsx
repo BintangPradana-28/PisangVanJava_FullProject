@@ -7,10 +7,13 @@ import { motion, AnimatePresence } from 'framer-motion'
 import toast from 'react-hot-toast'
 import Link from 'next/link'
 import { z } from 'zod'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { useCartStore, selectCartDisplayTotal } from '@/src/stores/cart.store'
 import { useSettings } from '@/context/SettingsContext'
 import { validateVoucher } from '@/src/features/checkout/actions'
 import { isStoreOpen } from '@/src/lib/time'
+import { api } from '@/src/lib/api'
+import { FetchError } from 'ofetch'
 
 // ── Response Schema ─────────────────────────────────────────────────────────
 const orderResponseSchema = z.discriminatedUnion('success', [
@@ -18,7 +21,7 @@ const orderResponseSchema = z.discriminatedUnion('success', [
     success: z.literal(true),
     data: z.object({
       orderId: z.string(),
-      redirectType: z.enum(['WHATSAPP', 'PAYMENT']),
+      redirectType: z.enum(['WHATSAPP', 'PAYMENT', 'CASHLESS_SUCCESS']),
       redirectUrl: z.string().min(1),
       totalPrice: z.number().finite().int().min(0),
     }),
@@ -77,9 +80,10 @@ export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod]   = useState<PaymentMethod>('WHATSAPP')
   const [voucherCode, setVoucherCode]       = useState('')
   const [appliedVoucher, setAppliedVoucher] = useState<AppliedVoucher | null>(null)
+  const [koinPisang, setKoinPisang]         = useState(0)
+  const [usePoints, setUsePoints]           = useState(false)
   const [isValidating, setIsValidating]     = useState(false)
   const [consent, setConsent]               = useState(false)
-  const [isSubmitting, setIsSubmitting]     = useState(false)
 
   // Address state
   const [addresses, setAddresses]           = useState<UserAddress[]>([])
@@ -90,35 +94,44 @@ export default function CheckoutPage() {
   const phoneError = customerPhone.trim() && !/^(\+62|62|0)8[1-9][0-9]{6,10}$/.test(customerPhone.trim()) 
     ? 'Format tidak valid (cth: 081234567890)' : ''
 
+  const { data: profileResponse } = useQuery({
+    queryKey: ['profile'],
+    queryFn: () => api<{ success: boolean; data?: any }>('/api/user/profile'),
+    enabled: authStatus === 'authenticated',
+    staleTime: 60 * 1000,
+  })
+
+  const { data: addressesResponse, isError: addressesError } = useQuery({
+    queryKey: ['addresses'],
+    queryFn: () => api<{ success: boolean; data?: UserAddress[] }>('/api/user/addresses'),
+    enabled: authStatus === 'authenticated',
+    staleTime: 60 * 1000,
+  })
+
   // Hydrate user data from session
-  // NOTE: Auth redirect is now handled by Edge Middleware (middleware.ts).
-  // This effect only fetches profile data to pre-fill the form.
   useEffect(() => {
     if (session?.user?.name) setCustomerName(session.user.name)
-    if (authStatus === 'authenticated') {
-      fetch('/api/user/profile', { credentials: 'include' })
-        .then(r => r.json())
-        .then(d => {
-          if (d.success && d.data?.phone) setCustomerPhone(d.data.phone)
-        })
-        .catch(() => {})
+    if (profileResponse?.success && profileResponse.data) {
+      if (profileResponse.data.phone) setCustomerPhone(profileResponse.data.phone)
+      if (profileResponse.data.koinPisang !== undefined) setKoinPisang(profileResponse.data.koinPisang)
+    }
+  }, [session, profileResponse])
 
-      fetch('/api/user/addresses', { credentials: 'include' })
-        .then(r => r.json())
-        .then(d => {
-          if (d.success && d.data) {
-            setAddresses(d.data)
-            const defaultAddr = d.data.find((a: UserAddress) => a.isDefault)
-            if (defaultAddr) setSelectedAddressId(defaultAddr.id)
-            else if (d.data.length > 0) setSelectedAddressId(d.data[0].id)
-            else setIsManualAddress(true)
-          }
-        })
-        .catch(() => setIsManualAddress(true))
-    } else {
+  useEffect(() => {
+    if (addressesResponse?.success && addressesResponse.data) {
+      setAddresses(addressesResponse.data)
+      const defaultAddr = addressesResponse.data.find(a => a.isDefault)
+      if (defaultAddr) setSelectedAddressId(defaultAddr.id)
+      else if (addressesResponse.data.length > 0) setSelectedAddressId(addressesResponse.data[0].id)
+      else setIsManualAddress(true)
+    }
+  }, [addressesResponse])
+
+  useEffect(() => {
+    if (authStatus === 'unauthenticated' || addressesError) {
       setIsManualAddress(true)
     }
-  }, [authStatus, session])
+  }, [authStatus, addressesError])
 
   // Reset voucher when cart changes
   useEffect(() => { setAppliedVoucher(null) }, [cartTotal])
@@ -131,12 +144,11 @@ export default function CheckoutPage() {
     }
   }, [cartItems.length, authStatus, router])
 
-  // ── Prices ────────────────────────────────────────────────────────────────
   const deliveryFeeSetting = getSetting('store_delivery_fee', '0')
   const deliveryFee        = /^[0-9]{1,9}$/.test(deliveryFeeSetting) ? Number(deliveryFeeSetting) : 0
-  const discount           = appliedVoucher?.discountAmount ?? 0
-  const subtotalAfterDisc  = Math.max(cartTotal - discount, 0)
-  const grandTotal         = delivery === 'DELIVERY' ? subtotalAfterDisc + deliveryFee : subtotalAfterDisc
+  const pointsToUse        = usePoints ? Math.min(koinPisang, cartTotal + (delivery === 'DELIVERY' ? deliveryFee : 0)) : 0
+  const discount           = usePoints ? pointsToUse : (appliedVoucher?.discountAmount ?? 0)
+  const grandTotal         = Math.max(cartTotal + (delivery === 'DELIVERY' ? deliveryFee : 0) - discount, 0)
 
   const jamOperasional = getSetting('jam_operasional', '10.00–21.00')
   const storeMode = getSetting('store_status', 'AUTO')
@@ -158,8 +170,6 @@ export default function CheckoutPage() {
   }
 
   // ── Step 1 → Step 2 Validated Transition (THE GATEKEEPER) ──────────────
-  // CPO Mandate: Form MUST be validated BEFORE the user sees the confirmation
-  // screen. Silent invalid data at Step 2 is "UX Malpractice".
   const handleNextToConfirm = () => {
     if (!customerName.trim()) {
       toast.error('Nama lengkap wajib diisi'); return
@@ -191,9 +201,48 @@ export default function CheckoutPage() {
     setStep(2)
   }
 
+  const checkoutMutation = useMutation({
+    mutationFn: async (payload: any) => {
+      const json = await api<unknown>('/api/orders', {
+        method: 'POST',
+        body: payload,
+      })
+
+      const parsed = orderResponseSchema.safeParse(json)
+      if (!parsed.success || !parsed.data.success) {
+        throw new Error(parsed.success && !parsed.data.success ? parsed.data.error : 'Checkout ditolak server')
+      }
+      return parsed.data.data
+    },
+    retry: 0,
+    onSuccess: (data) => {
+      const { redirectType, redirectUrl } = data
+      
+      if (redirectType === 'WHATSAPP') {
+        if (!redirectUrl.startsWith('https://wa.me/')) { toast.error('URL checkout tidak valid'); return }
+        clearCart()
+        toast.success('Pesanan berhasil! Lanjutkan di WhatsApp 💬')
+        window.open(redirectUrl, '_blank', 'noopener,noreferrer')
+        router.push('/track-order')
+      } else if (redirectType === 'CASHLESS_SUCCESS') {
+        clearCart()
+        toast.success('Pesanan berhasil dengan Koin Pisang! ✅')
+        router.push(redirectUrl)
+      } else {
+        if (!redirectUrl.startsWith('/payment/')) { toast.error('URL pembayaran tidak valid'); return }
+        clearCart()
+        router.push(redirectUrl)
+      }
+    },
+    onError: (error: FetchError | Error) => {
+      const msg = error instanceof FetchError ? (error.data?.error || 'Checkout ditolak server') : error.message
+      toast.error(msg)
+    }
+  })
+
   // ── Submit (Idempotent — locked after first press) ────────────────────────
-  const handleSubmit = async () => {
-    if (isSubmitting) return // IDEMPOTENCY GUARD: reject re-entry
+  const handleSubmit = () => {
+    if (checkoutMutation.isPending) return // IDEMPOTENCY GUARD: reject re-entry
     if (!consent) { toast.error('Setujui kebijakan privasi terlebih dahulu'); return }
 
     const items = cartItems.map(item => {
@@ -219,46 +268,16 @@ export default function CheckoutPage() {
         })())
       : [pickupTime ? `Waktu Ambil: ${pickupTime}` : null, notes.trim()].filter(Boolean).join(' | ') || null
 
-    setIsSubmitting(true)
-    try {
-      const res = await fetch('/api/orders', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({
-          customerName: customerName.trim(),
-          customerPhone: customerPhone.trim(),
-          deliveryMethod: delivery,
-          paymentMethod,
-          notes: finalAddress,
-          voucherCode: appliedVoucher?.code ?? null,
-          items,
-        }),
-      })
-
-      const json: unknown = await res.json()
-      const parsed = orderResponseSchema.safeParse(json)
-
-      if (!parsed.success || !parsed.data.success) {
-        const err = parsed.success && !parsed.data.success ? parsed.data.error : 'Checkout ditolak server'
-        toast.error(err); return
-      }
-
-      const { redirectType, redirectUrl } = parsed.data.data
-
-      if (redirectType === 'WHATSAPP') {
-        if (!redirectUrl.startsWith('https://wa.me/')) { toast.error('URL checkout tidak valid'); return }
-        clearCart()
-        toast.success('Pesanan berhasil! Lanjutkan di WhatsApp 💬')
-        window.open(redirectUrl, '_blank', 'noopener,noreferrer')
-        router.push('/track-order')
-      } else {
-        if (!redirectUrl.startsWith('/payment/')) { toast.error('URL pembayaran tidak valid'); return }
-        clearCart()
-        router.push(redirectUrl)
-      }
-    } catch { toast.error('Koneksi bermasalah. Coba beberapa saat lagi.') }
-    finally { setIsSubmitting(false) }
+    checkoutMutation.mutate({
+      customerName: customerName.trim(),
+      customerPhone: customerPhone.trim(),
+      deliveryMethod: delivery,
+      paymentMethod,
+      notes: finalAddress,
+      voucherCode: usePoints ? null : (appliedVoucher?.code ?? null),
+      usePoints,
+      items,
+    })
   }
 
   if (authStatus === 'loading') {
@@ -488,30 +507,56 @@ export default function CheckoutPage() {
                       </div>
                     )}
 
-                    {/* Voucher */}
-                    <div>
-                      <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-1.5">Kode Promo</label>
-                      <div className="flex gap-2">
-                        <input
-                          type="text" value={voucherCode}
-                          onChange={e => {
-                            const v = e.target.value.toUpperCase()
-                            setVoucherCode(v)
-                            if (appliedVoucher && v !== appliedVoucher.code) setAppliedVoucher(null)
-                          }}
-                          placeholder="KODE-PROMO"
-                          className="flex-1 px-4 py-3 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-100 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-amber-400 transition-all uppercase"
-                        />
-                        <button type="button" onClick={handleApplyVoucher} disabled={isValidating || cartTotal <= 0}
-                          className="px-5 py-3 rounded-2xl bg-amber-100 text-amber-800 font-bold text-sm hover:bg-amber-200 disabled:opacity-50 transition-all">
-                          {isValidating ? '...' : 'Pakai'}
-                        </button>
-                      </div>
-                      {appliedVoucher && (
-                        <p className="text-xs text-green-600 font-semibold mt-1.5">
-                          ✅ Voucher {appliedVoucher.code} hemat {formatPrice(appliedVoucher.discountAmount)}
-                        </p>
+                    {/* Voucher & Poin */}
+                    <div className="space-y-4">
+                      {/* Poin Toggle */}
+                      {koinPisang > 0 && (
+                        <div className="flex items-center justify-between p-3 rounded-2xl border border-amber-200 bg-amber-50 dark:bg-amber-900/20 dark:border-amber-700/50">
+                           <div className="flex items-center gap-3">
+                             <div className="text-2xl">🪙</div>
+                             <div>
+                               <p className="font-bold text-sm text-zinc-800 dark:text-zinc-100">Koin Pisang Anda</p>
+                               <p className="text-xs text-zinc-500">Saldo: {formatPrice(koinPisang)}</p>
+                             </div>
+                           </div>
+                           <label className="relative inline-flex items-center cursor-pointer">
+                             <input type="checkbox" className="sr-only peer" checked={usePoints} onChange={(e) => {
+                               setUsePoints(e.target.checked);
+                               if (e.target.checked) {
+                                 setAppliedVoucher(null);
+                                 setVoucherCode('');
+                               }
+                             }} />
+                             <div className="w-11 h-6 bg-zinc-200 peer-focus:outline-none rounded-full peer dark:bg-zinc-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-zinc-600 peer-checked:bg-amber-500"></div>
+                           </label>
+                        </div>
                       )}
+
+                      {/* Voucher Input */}
+                      <div className={usePoints ? 'opacity-50 pointer-events-none' : ''}>
+                        <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-1.5">Kode Promo</label>
+                        <div className="flex gap-2">
+                          <input
+                            type="text" value={voucherCode}
+                            onChange={e => {
+                              const v = e.target.value.toUpperCase()
+                              setVoucherCode(v)
+                              if (appliedVoucher && v !== appliedVoucher.code) setAppliedVoucher(null)
+                            }}
+                            placeholder="KODE-PROMO"
+                            className="flex-1 px-4 py-3 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-100 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-amber-400 transition-all uppercase"
+                          />
+                          <button type="button" onClick={handleApplyVoucher} disabled={isValidating || cartTotal <= 0}
+                            className="px-5 py-3 rounded-2xl bg-amber-100 text-amber-800 font-bold text-sm hover:bg-amber-200 disabled:opacity-50 transition-all">
+                            {isValidating ? '...' : 'Pakai'}
+                          </button>
+                        </div>
+                        {appliedVoucher && !usePoints && (
+                          <p className="text-xs text-green-600 font-semibold mt-1.5">
+                            ✅ Voucher {appliedVoucher.code} hemat {formatPrice(appliedVoucher.discountAmount)}
+                          </p>
+                        )}
+                      </div>
                     </div>
 
                     {/* Payment Method */}
@@ -574,9 +619,14 @@ export default function CheckoutPage() {
                       </div>
 
                       {/* Promo info */}
-                      {appliedVoucher && (
+                      {appliedVoucher && !usePoints && (
                         <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-900 rounded-2xl px-4 py-3 text-sm text-green-700 dark:text-green-400 font-semibold">
                           🏷️ Voucher {appliedVoucher.code} — Hemat {formatPrice(appliedVoucher.discountAmount)}
+                        </div>
+                      )}
+                      {usePoints && pointsToUse > 0 && (
+                        <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900 rounded-2xl px-4 py-3 text-sm text-amber-700 dark:text-amber-400 font-semibold">
+                          🪙 Tukar Koin — Hemat {formatPrice(pointsToUse)}
                         </div>
                       )}
                     </div>
@@ -598,14 +648,14 @@ export default function CheckoutPage() {
                       <button onClick={() => setStep(1)} className="text-sm text-zinc-400 font-semibold hover:text-zinc-600">← Edit</button>
                       <button
                         onClick={handleSubmit}
-                        disabled={isSubmitting || !consent}
+                        disabled={checkoutMutation.isPending || !consent}
                         className={`flex items-center gap-2 font-bold py-3.5 px-8 rounded-2xl transition-all active:scale-95 text-white shadow-lg disabled:opacity-50 disabled:cursor-not-allowed ${
                           paymentMethod === 'WHATSAPP'
                             ? 'bg-[#25D366] hover:bg-[#20b857] shadow-green-200'
                             : 'bg-blue-600 hover:bg-blue-700 shadow-blue-200'
                         }`}
                       >
-                        {isSubmitting ? (
+                        {checkoutMutation.isPending ? (
                           <><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Memproses...</>
                         ) : paymentMethod === 'WHATSAPP' ? (
                           <>💬 Kirim Pesanan via WA</>
@@ -648,7 +698,7 @@ export default function CheckoutPage() {
                 </div>
                 {discount > 0 && (
                   <div className="flex justify-between text-sm text-green-600 font-semibold">
-                    <span>Diskon</span>
+                    <span>{usePoints ? 'Tukar Koin' : 'Diskon'}</span>
                     <span>−{formatPrice(discount)}</span>
                   </div>
                 )}

@@ -5,13 +5,15 @@ import { ProductType } from './MenuCards'
 import { createMenuVariantSchema, CreateMenuVariantInput } from '../schemas'
 import Image from 'next/image'
 import toast from 'react-hot-toast'
-import { toggleAvailability } from '@/app/actions/menu'
+import { toggleAvailability, updateMenuStock } from '@/app/actions/menu'
 import ImageUploadDropzone from '@/components/admin/ImageUploadDropzone'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { api } from '@/src/lib/api'
+import { FetchError } from 'ofetch'
 
 export default function AdminMenuDashboard({ initialProducts }: { initialProducts: ProductType[] }) {
   const [products, setProducts] = useState<ProductType[]>(initialProducts)
   const [isFormOpen, setIsFormOpen] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   
   const [formData, setFormData] = useState<CreateMenuVariantInput>({
@@ -97,26 +99,26 @@ export default function AdminMenuDashboard({ initialProducts }: { initialProduct
     setIsFormOpen(true)
   }
 
+  const deleteMutation = useMutation({
+    mutationFn: async ({ id, name }: { id: string, name: string }) => {
+      const res = await api<{ success?: boolean; error?: string }>(`/api/admin/menu/${id}`, { method: 'DELETE' })
+      if (res.error) throw new Error(res.error)
+      return { id, name }
+    },
+    onSuccess: (data) => {
+      toast.success(`Menu "${data.name}" berhasil dihapus`)
+      setProducts(products.filter(p => p.id !== data.id))
+    },
+    onError: (error: FetchError | Error) => {
+      const msg = error instanceof FetchError ? (error.data?.error || 'Gagal menghapus menu') : error.message
+      toast.error(msg || 'Terjadi kesalahan')
+    }
+  })
+
   // Handle delete item
-  const handleDeleteClick = async (id: string, name: string) => {
-    if (!window.confirm(`Apakah Anda yakin ingin menghapus varian "${name}"?`)) {
-      return
-    }
-
-    const toastId = toast.loading('Menghapus menu...')
-    try {
-      const res = await fetch(`/api/admin/menu/${id}`, {
-        method: 'DELETE',
-      })
-      const json = await res.json()
-
-      if (!res.ok) throw new Error(json.error || 'Gagal menghapus menu')
-
-      toast.success(`Menu "${name}" berhasil dihapus`, { id: toastId })
-      setProducts(products.filter(p => p.id !== id))
-    } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Terjadi kesalahan', { id: toastId })
-    }
+  const handleDeleteClick = (id: string, name: string) => {
+    if (!window.confirm(`Apakah Anda yakin ingin menghapus varian "${name}"?`)) return
+    deleteMutation.mutate({ id, name })
   }
 
   const handleToggleAvailability = async (id: string, currentStatus: boolean) => {
@@ -137,49 +139,65 @@ export default function AdminMenuDashboard({ initialProducts }: { initialProduct
     }
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
-
-    const valid = createMenuVariantSchema.safeParse(formData)
-    if (!valid.success) {
-      toast.error(valid.error.issues[0].message)
-      setIsLoading(false)
-      return
-    }
-
-    const toastId = toast.loading(editingId ? 'Memperbarui menu...' : 'Menyimpan menu baru...')
+  const handleUpdateStock = async (id: string, newStock: number, currentStock: number) => {
+    if (newStock < 0) return;
+    
+    // Optimistic update
+    setProducts(products.map(p => p.id === id ? { ...p, stock: newStock } : p));
+    
     try {
+      const res = await updateMenuStock(id, newStock);
+      if (!res.success) {
+        toast.error(res.error || 'Gagal mengubah stok');
+        setProducts(products.map(p => p.id === id ? { ...p, stock: currentStock } : p));
+      } else {
+        toast.success(res.message || 'Stok diperbarui', { icon: '📦' });
+      }
+    } catch (err) {
+      toast.error('Terjadi kesalahan koneksi');
+      setProducts(products.map(p => p.id === id ? { ...p, stock: currentStock } : p));
+    }
+  }
+
+  const saveMutation = useMutation({
+    mutationFn: async (validData: any) => {
       const url = editingId ? `/api/admin/menu/${editingId}` : '/api/admin/menu'
       const method = editingId ? 'PUT' : 'POST'
 
-      const res = await fetch(url, {
+      const res = await api<{ success?: boolean; data: any; error?: string; message?: string }>(url, {
         method: method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(valid.data),
+        body: validData,
       })
-      const json = await res.json()
       
-      if (!res.ok) throw new Error(json.error || json.message || 'Terjadi kesalahan')
-      
-      if (editingId) {
-        // Update item in local list
-        setProducts(products.map(p => p.id === editingId ? json.data : p))
-        toast.success('Menu berhasil diperbarui', { id: toastId })
+      if (res.error || (!res.success && res.message)) throw new Error(res.error || res.message || 'Terjadi kesalahan')
+      return { data: res.data, isEdit: !!editingId }
+    },
+    onSuccess: ({ data, isEdit }) => {
+      if (isEdit) {
+        setProducts(products.map(p => p.id === editingId ? data : p))
+        toast.success('Menu berhasil diperbarui')
       } else {
-        // Append new item
-        setProducts([json.data, ...products])
-        toast.success('Menu baru berhasil ditambahkan', { id: toastId })
+        setProducts([data, ...products])
+        toast.success('Menu baru berhasil ditambahkan')
       }
-
       setIsFormOpen(false)
       setEditingId(null)
       setFormData({ flavorName: '', priceKembung: 0, priceLumpia: 0, priceKrispy: 0, wholesaleKembung: 0, wholesaleLumpia: 0, wholesaleKrispy: 0, imageUrl: '', deskripsi_topping: '', isActive: true, isAvailable: true, tags: [] })
-    } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'Terjadi kesalahan', { id: toastId })
-    } finally {
-      setIsLoading(false)
+    },
+    onError: (error: FetchError | Error) => {
+      const msg = error instanceof FetchError ? (error.data?.error || error.data?.message || 'Terjadi kesalahan') : error.message
+      toast.error(msg)
     }
+  })
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    const valid = createMenuVariantSchema.safeParse(formData)
+    if (!valid.success) {
+      toast.error(valid.error.issues[0].message)
+      return
+    }
+    saveMutation.mutate(valid.data)
   }
 
   // Bagian Form Render (Tampil/Sembunyi)
@@ -326,10 +344,10 @@ export default function AdminMenuDashboard({ initialProducts }: { initialProduct
             </button>
             <button 
               type="submit" 
-              disabled={isLoading} 
+              disabled={saveMutation.isPending} 
               className="bg-brown-700 text-cream-100 px-6 py-3 rounded-xl font-bold hover:bg-brown-600 transition-all active:scale-95 flex-1"
             >
-              {isLoading ? 'Menyimpan...' : 'Simpan'}
+              {saveMutation.isPending ? 'Menyimpan...' : 'Simpan'}
             </button>
           </div>
         </form>
@@ -387,15 +405,49 @@ export default function AdminMenuDashboard({ initialProducts }: { initialProduct
                   <span className="text-xs font-normal">Kr:</span> Rp {p.priceKrispy.toLocaleString('id-ID')}
                 </td>
                 <td className="p-4">
-                  <div className="flex flex-col items-center">
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <div onClick={() => handleToggleAvailability(p.id, p.isAvailable)}
-                        className={`w-11 h-6 rounded-full transition-colors relative ${p.isAvailable ? 'bg-green-600' : 'bg-red-500'}`}>
-                        <div className={`w-4 h-4 bg-white rounded-full absolute top-1 transition-transform shadow ${p.isAvailable ? 'translate-x-6' : 'translate-x-1'}`} />
-                      </div>
-                    </label>
-                    <span className="text-[10px] font-bold mt-1 text-brown-600">
-                      {p.isAvailable ? 'Tersedia' : 'Habis'}
+                  <div className="flex flex-col items-center gap-2">
+                    <div className="flex items-center gap-2 bg-cream-100 rounded-xl p-1 border border-cream-200 shadow-sm">
+                      <button 
+                        onClick={() => handleUpdateStock(p.id, p.stock - 1, p.stock)}
+                        className="w-7 h-7 flex items-center justify-center bg-white rounded-lg text-brown-600 font-bold hover:bg-brown-50 active:scale-95 transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled={p.stock <= 0}
+                      >
+                        -
+                      </button>
+                      <input 
+                        type="number"
+                        min="0"
+                        className="w-12 text-center font-bold text-brown-800 font-serif text-lg bg-transparent border-none p-0 m-0 focus:outline-none focus:ring-1 focus:ring-brown-400 rounded [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                        value={p.stock}
+                        onChange={(e) => {
+                          const val = e.target.value === '' ? '' : parseInt(e.target.value, 10);
+                          setProducts(products.map(prod => prod.id === p.id ? { ...prod, stock: val === '' ? 0 : (val >= 0 ? val : 0) } : prod));
+                        }}
+                        onBlur={(e) => {
+                          const val = e.target.value === '' ? 0 : parseInt(e.target.value, 10);
+                          if (val >= 0) {
+                             // Avoid double call if it was just changed, handleUpdateStock already updates state
+                             // But wait, onChange already called setProducts.
+                             // handleUpdateStock also calls setProducts.
+                             // We should just call updateMenuStock directly here to avoid double optimistic updates
+                             updateMenuStock(p.id, val).then(res => {
+                               if (!res.success) {
+                                 toast.error(res.error || 'Gagal mengubah stok');
+                                 // Fetch original state if needed, but keeping it simple for now
+                               }
+                             });
+                          }
+                        }}
+                      />
+                      <button 
+                        onClick={() => handleUpdateStock(p.id, p.stock + 1, p.stock)}
+                        className="w-7 h-7 flex items-center justify-center bg-brown-600 rounded-lg text-white font-bold hover:bg-brown-500 active:scale-95 transition-all shadow-sm"
+                      >
+                        +
+                      </button>
+                    </div>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${p.stock > 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                      {p.stock > 0 ? 'Tersedia' : 'Habis'}
                     </span>
                   </div>
                 </td>

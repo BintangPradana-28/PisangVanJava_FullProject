@@ -85,9 +85,7 @@ const getSalesMagnetTag = (flavorName: string): string => {
   if (lower.includes('original') || lower.includes('cokelat') || lower.includes('coklat')) {
     return '🔥 Terlaris';
   }
-  if (lower.includes('matcha') || lower.includes('tiramisu')) {
-    return '👑 Rekomendasi Chef';
-  }
+  // The user requested 'Rekomendasi Chef' to be changed to 'Baru' like the other cards
   return '⭐ Baru';
 }
 
@@ -111,13 +109,13 @@ export default function MenuCards({ products }: Props) {
   const { data: session } = useSession()
   const isReseller = (session?.user as { role?: string })?.role === 'RESELLER'
   const [selectedProduct, setSelectedProduct] = useState<ProductType | null>(null)
-  const [activeTag, setActiveTag] = useState<string>(t('menu_filter_all'))
+  const [activeTag, setActiveTag] = useState<string>('ALL')
 
   const baseTags = ['Kembung', 'Lumpia', 'Krispy']
   const dbTags = Array.from(new Set(products.flatMap(p => p.tags || [])))
-  const allTags = [t('menu_filter_all'), ...baseTags, ...dbTags].filter(Boolean)
+  const allTags = ['ALL', ...baseTags, ...dbTags].filter(Boolean)
   
-  const filteredProducts = activeTag === t('menu_filter_all') 
+  const filteredProducts = activeTag === 'ALL' 
     ? products 
     : baseTags.includes(activeTag)
       ? products.filter(p => {
@@ -162,13 +160,13 @@ export default function MenuCards({ products }: Props) {
               <button
                 key={tag}
                 onClick={() => setActiveTag(tag)}
-                className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${
+                className={`px-5 py-2 rounded-full text-sm font-medium transition-all active:scale-95 ${
                   activeTag === tag 
-                    ? 'bg-primary text-white shadow-md' 
+                    ? 'bg-amber-brand text-white shadow-sbx-card' 
                     : 'bg-surface-container hover:bg-surface-container-high text-on-surface-variant border border-outline-variant/30'
                 }`}
               >
-                {tag}
+                {tag === 'ALL' ? t('menu_filter_all') : tag}
               </button>
             ))}
           </motion.div>
@@ -178,12 +176,12 @@ export default function MenuCards({ products }: Props) {
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredProducts.length === 0 ? (
             <div className="col-span-full text-center py-12 text-zinc-500">
-              {t('menu_empty_tag')} "{activeTag}"
+              {t('menu_empty_tag')} "{activeTag === 'ALL' ? t('menu_filter_all') : activeTag}"
             </div>
           ) : (
             filteredProducts.map((product, i) => {
               const image = product.imageUrl || getFallbackImageUrl(product.flavorName)
-              const available = product.isAvailable;
+              const available = product.isAvailable && product.stock > 0;
               return (
                 <motion.div
                   key={product.id}
@@ -191,7 +189,7 @@ export default function MenuCards({ products }: Props) {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: i * 0.05 }}
-                  className={`bg-white dark:bg-zinc-900 rounded-3xl overflow-hidden border border-outline-variant/30 dark:border-zinc-800/60 hover:border-secondary/40 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col group ${!available ? 'opacity-80 grayscale-[50%]' : ''}`}
+                  className={`bg-white dark:bg-zinc-900 rounded-[12px] overflow-hidden border border-outline-variant/30 dark:border-zinc-800/60 hover:border-secondary/40 shadow-sbx-card hover:shadow-lg transition-all duration-300 flex flex-col group ${!available ? 'opacity-80 grayscale-[50%]' : ''}`}
                 >
                   {/* Image Container */}
                   <ProductImage src={image} alt={product.flavorName} available={available} />
@@ -203,26 +201,19 @@ export default function MenuCards({ products }: Props) {
                     </h3>
                     
                     {/* Stock Indicator */}
-                    <div className="flex items-center gap-1.5 mb-2 mt-1">
-                      {product.stock > 50 ? (
+                    <div className="flex items-center justify-center gap-1.5 mb-2 mt-1 w-full">
+                      {product.stock > 0 ? (
                         <>
                           <span className="w-2 h-2 rounded-full bg-green-500"></span>
                           <span className="text-xs font-semibold text-green-600 dark:text-green-400 tracking-wide">
-                            Tersedia
-                          </span>
-                        </>
-                      ) : product.stock >= 10 ? (
-                        <>
-                          <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
-                          <span className="text-xs font-semibold text-amber-600 dark:text-amber-400 tracking-wide">
-                            Stok Terbatas
+                            Tersedia: <span className="font-bold">{product.stock}</span> porsi
                           </span>
                         </>
                       ) : (
                         <>
-                          <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                          <span className="w-2 h-2 rounded-full bg-red-500"></span>
                           <span className="text-xs font-semibold text-red-600 dark:text-red-400 tracking-wide">
-                            Sisa <span className="font-bold">{product.stock}</span> porsi
+                            Habis Terjual
                           </span>
                         </>
                       )}
@@ -255,7 +246,7 @@ export default function MenuCards({ products }: Props) {
                     </p>
                     
                     {/* Action row */}
-                    <div className="flex flex-col items-center gap-3 pt-4 border-t border-outline-variant/20 dark:border-zinc-800 mt-auto w-full">
+                    <div className="flex flex-col items-center gap-3 pt-6 pb-8 border-t border-outline-variant/20 dark:border-zinc-800 mt-auto w-full">
                       <div className="text-center">
                         <div className="text-[10px] text-zinc-400 uppercase tracking-wider font-semibold mb-0.5">
                           {isReseller ? 'Harga Grosir (Mulai)' : t('menu_price')}
@@ -276,7 +267,7 @@ export default function MenuCards({ products }: Props) {
                         onClick={() => available && setSelectedProduct(product)}
                         disabled={!available}
                         className={available 
-                          ? "bg-secondary hover:bg-secondary/95 text-white font-bold text-sm px-8 py-3 rounded-full shadow-md hover:shadow-lg transition-all duration-200 focus:outline-none flex items-center justify-center gap-1.5 active:scale-95" 
+                          ? "bg-amber-brand hover:bg-amber-brand/90 text-white font-bold text-sm px-8 py-3 rounded-full shadow-sbx-card transition-all duration-200 focus:outline-none flex items-center justify-center gap-1.5 active:scale-95" 
                           : "bg-zinc-300 text-zinc-500 cursor-not-allowed font-bold text-sm px-8 py-3 rounded-full flex items-center justify-center gap-1.5 opacity-70"
                         }
                       >
@@ -300,8 +291,7 @@ export default function MenuCards({ products }: Props) {
         >
           <Link
             href="/menu-spesial"
-            className="inline-flex items-center gap-2 font-bold text-sm px-8 py-3.5 rounded-full transition-all active:scale-95 hover:-translate-y-0.5 hover:shadow-xl"
-            style={{ background: '#D4802A', color: 'white', boxShadow: '0 4px 18px rgba(212,128,42,0.28)' }}
+            className="inline-flex items-center gap-2 font-bold text-sm px-8 py-3.5 rounded-full transition-all active:scale-95 bg-amber-brand text-white shadow-sbx-card"
           >
             🍌 Lihat Semua Menu &amp; Varian →
           </Link>

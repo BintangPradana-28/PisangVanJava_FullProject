@@ -162,7 +162,7 @@ export default function MenuGrid({ products }: { products: ProductType[] }) {
               {products.map((product, i) => {
                 const img =
                   product.imageUrl || getFallbackImage(product.flavorName);
-                const available = product.isAvailable;
+                const available = product.isAvailable && product.stock > 0;
                 const isFav = favorites.includes(product.id);
 
                 return (
@@ -214,25 +214,18 @@ export default function MenuGrid({ products }: { products: ProductType[] }) {
 
                       {/* Stock Indicator */}
                       <div className="flex items-center gap-1.5 mb-2 mt-1">
-                        {product.stock > 50 ? (
+                        {product.stock > 0 ? (
                           <>
                             <span className="w-2 h-2 rounded-full bg-green-500"></span>
                             <span className="text-xs font-semibold text-green-600 dark:text-green-400 tracking-wide">
-                              Tersedia
-                            </span>
-                          </>
-                        ) : product.stock >= 10 ? (
-                          <>
-                            <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
-                            <span className="text-xs font-semibold text-amber-600 dark:text-amber-400 tracking-wide">
-                              Stok Terbatas
+                              Tersedia: <span className="font-bold">{product.stock}</span> porsi
                             </span>
                           </>
                         ) : (
                           <>
-                            <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                            <span className="w-2 h-2 rounded-full bg-red-500"></span>
                             <span className="text-xs font-semibold text-red-600 dark:text-red-400 tracking-wide">
-                              Sisa <span className="font-bold">{product.stock}</span> porsi
+                              Habis Terjual
                             </span>
                           </>
                         )}
@@ -264,7 +257,7 @@ export default function MenuGrid({ products }: { products: ProductType[] }) {
                         })()}
                       </p>
                       <div
-                        className="w-full border-t pt-4 flex flex-col items-center gap-3"
+                        className="w-full border-t pt-6 pb-8 flex flex-col items-center gap-3 mt-auto"
                         style={{ borderColor: "var(--border-custom)" }}
                       >
                         <div className="text-center">

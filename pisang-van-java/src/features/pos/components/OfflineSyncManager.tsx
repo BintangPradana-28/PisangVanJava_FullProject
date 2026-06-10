@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
+import { api } from '@/src/lib/api'
 
 export const OFFLINE_QUEUE_KEY = 'pisang_pos_offline_queue'
 
@@ -58,30 +59,27 @@ export default function OfflineSyncManager() {
     for (let i = 0; i < queue.length; i++) {
       const payload = queue[i]
       try {
-        const res = await fetch('/api/pos/orders', {
+        const res = await api<{ success: boolean }>('/api/pos/orders', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
+          body: payload
         })
 
-        // Safe Deletion Rule: ONLY remove if 200 or 201 (or known validation error that shouldn't be retried)
-        // If 500, it might be a server crash, we keep it in the queue.
-        if (res.ok) {
+        // Safe Deletion Rule: ONLY remove if success
+        if (res.success) {
           // Find and remove this exact payload from newQueue
           const indexToRemove = newQueue.findIndex(p => p.offlineId === payload.offlineId)
           if (indexToRemove !== -1) newQueue.splice(indexToRemove, 1)
           successCount++
         } else {
-          // If it's a 400 Bad Request (like stock empty), the offline transaction is invalid.
-          // We SHOULD remove it to prevent infinite loop of bad data, but record it as failed.
-          if (res.status === 400) {
-            const indexToRemove = newQueue.findIndex(p => p.offlineId === payload.offlineId)
-            if (indexToRemove !== -1) newQueue.splice(indexToRemove, 1)
-          }
           failedCount++
         }
-      } catch (error) {
-        // Network error (500 or fetch failed entirely). Do NOT remove from queue.
+      } catch (error: any) {
+        if (error.status === 400) {
+          // If it's a 400 Bad Request (like stock empty), the offline transaction is invalid.
+          // We SHOULD remove it to prevent infinite loop of bad data, but record it as failed.
+          const indexToRemove = newQueue.findIndex(p => p.offlineId === payload.offlineId)
+          if (indexToRemove !== -1) newQueue.splice(indexToRemove, 1)
+        }
         failedCount++
       }
     }

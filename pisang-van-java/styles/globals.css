@@ -46,6 +46,7 @@
     background-color: var(--background-custom);
     color: var(--text-custom);
     font-family: var(--font-sans), system-ui, sans-serif;
+    letter-spacing: -0.01em;
     transition: background-color 0.3s, color 0.3s;
   }
 

@@ -11,6 +11,22 @@ import { useSettings } from '@/context/SettingsContext'
 import { useCartStore, selectCartItemCount } from '@/src/stores/cart.store'
 import CartModal from './CartModal'
 
+const ShoppingBagIcon = () => (
+  <svg
+    className="w-6 h-6"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+    <line x1="3" y1="6" x2="21" y2="6"></line>
+    <path d="M16 10a4 4 0 0 1-8 0"></path>
+  </svg>
+)
+
 export default function Navbar() {
   const { data: session } = useSession()
   const { theme, toggleTheme, mounted } = useTheme()
@@ -111,7 +127,7 @@ export default function Navbar() {
         role="banner"
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           useSolidHeader
-            ? 'bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md border-b border-zinc-200/40 dark:border-zinc-800/40 shadow-sm py-3'
+            ? 'bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md border-b border-zinc-200/40 dark:border-zinc-800/40 shadow-sbx-nav py-3'
             : 'bg-transparent py-5'
         }`}
       >
@@ -224,8 +240,12 @@ export default function Navbar() {
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                   className="flex items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary rounded-full"
                 >
-                  <div className="w-9 h-9 rounded-full bg-secondary hover:bg-secondary/95 text-white flex items-center justify-center font-bold text-sm shadow-md transition-all">
-                    {session.user?.name ? session.user.name[0].toUpperCase() : 'A'}
+                  <div className="w-9 h-9 rounded-full bg-secondary hover:bg-secondary/95 text-white flex items-center justify-center font-bold text-sm shadow-md transition-all overflow-hidden">
+                    {session.user?.image ? (
+                      <img src={session.user.image} alt={session.user?.name || 'Profile'} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                    ) : (
+                      session.user?.name ? session.user.name[0].toUpperCase() : 'A'
+                    )}
                   </div>
                 </button>
 
@@ -366,6 +386,23 @@ export default function Navbar() {
           )}
         </AnimatePresence>
       </header>
+
+      {/* Floating Frap CTA Button */}
+      <button
+        onClick={() => setIsCartOpen(true)}
+        className="fixed bottom-6 right-6 z-[60] w-14 h-14 bg-amber-brand hover:bg-amber-brand/90 text-white rounded-full flex items-center justify-center shadow-sbx-frap transition-all duration-200 active:scale-95 active:shadow-sm focus:outline-none group"
+        aria-label="Buka Keranjang"
+      >
+        <ShoppingBagIcon />
+        {isHydrated && cartCount > 0 && (
+          <span
+            key={`frap-${cartPopKey}`}
+            className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-amber-brand cart-pop"
+          >
+            {cartCount}
+          </span>
+        )}
+      </button>
 
       {/* Cart Drawer component */}
       <CartModal isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />

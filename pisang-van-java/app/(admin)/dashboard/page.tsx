@@ -36,7 +36,7 @@ async function getDashboardData() {
       select: { totalPrice: true }
     }),
     prisma.order.count({
-      where: { status: 'pending' }
+      where: { status: 'PENDING_PAYMENT' }
     })
   ])
 
