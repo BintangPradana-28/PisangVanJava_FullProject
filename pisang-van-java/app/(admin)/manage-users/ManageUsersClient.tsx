@@ -15,6 +15,7 @@ interface UserType {
   referralCode: string | null;
   referredBy: string | null;
   isDeleted: boolean;
+  isBanned: boolean;
   createdAt: string;
 }
 
@@ -56,6 +57,31 @@ export default function ManageUsersClient() {
 
   const handleRoleChange = (userId: string, newRole: string) => {
     roleMutation.mutate({ userId, role: newRole })
+  }
+
+  const banMutation = useMutation({
+    mutationFn: async ({ userId, isBanned }: { userId: string, isBanned: boolean }) => {
+      const data = await api<{ success: boolean; message?: string }>(`/api/admin/users/${userId}/ban`, {
+        method: 'POST',
+        body: { isBanned }
+      })
+      if (!data.success && (data as any).message) throw new Error((data as any).message || 'Gagal mengubah status ban')
+      return data
+    },
+    onSuccess: () => {
+      toast.success('Berhasil mengubah status akun')
+      queryClient.invalidateQueries({ queryKey: ['admin-users'] })
+    },
+    onError: (error: FetchError | Error) => {
+      const msg = error instanceof FetchError ? (error.data?.message || 'Gagal memproses aksi') : error.message
+      toast.error(msg)
+    }
+  })
+
+  const handleBanToggle = (userId: string, currentBanStatus: boolean) => {
+    if (confirm(`Anda yakin ingin ${currentBanStatus ? 'mencabut ban' : 'memblokir'} pengguna ini?`)) {
+      banMutation.mutate({ userId, isBanned: !currentBanStatus })
+    }
   }
 
   const coinMutation = useMutation({
@@ -140,22 +166,42 @@ export default function ManageUsersClient() {
                 </td>
                 <td className="p-4 text-center">
                   <div className="flex flex-col items-center gap-2">
-                    <span className={`px-3 py-1 rounded-full text-[10px] font-bold ${
-                      user.role === 'ADMIN' ? 'bg-red-100 text-red-700' :
-                      user.role === 'RESELLER' ? 'bg-amber-100 text-amber-700' :
-                      'bg-green-100 text-green-700'
-                    }`}>
-                      {user.role}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className={`px-3 py-1 rounded-full text-[10px] font-bold ${
+                        user.role === 'ADMIN' ? 'bg-red-100 text-red-700' :
+                        user.role === 'RESELLER' ? 'bg-amber-100 text-amber-700' :
+                        'bg-green-100 text-green-700'
+                      }`}>
+                        {user.role}
+                      </span>
+                      {user.isBanned && (
+                        <span className="px-2 py-1 rounded-full text-[10px] font-bold bg-black text-white">
+                          BANNED
+                        </span>
+                      )}
+                    </div>
                     {user.role !== 'ADMIN' && (
-                      <select
-                        className="border border-cream-300 rounded-lg px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-brown-500 max-w-[120px]"
-                        value={user.role}
-                        onChange={(e) => handleRoleChange(user.id, e.target.value)}
-                      >
-                        <option value="CUSTOMER">Customer</option>
-                        <option value="RESELLER">Reseller</option>
-                      </select>
+                      <div className="flex items-center gap-2">
+                        <select
+                          className="border border-cream-300 rounded-lg px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-brown-500 max-w-[120px]"
+                          value={user.role}
+                          onChange={(e) => handleRoleChange(user.id, e.target.value)}
+                        >
+                          <option value="CUSTOMER">Customer</option>
+                          <option value="RESELLER">Reseller</option>
+                        </select>
+                        <button
+                          onClick={() => handleBanToggle(user.id, user.isBanned)}
+                          disabled={banMutation.isPending}
+                          className={`text-[10px] px-2 py-1.5 rounded font-bold transition-all ${
+                            user.isBanned 
+                              ? 'bg-gray-200 text-gray-700 hover:bg-gray-300' 
+                              : 'bg-red-50 text-red-600 border border-red-200 hover:bg-red-100'
+                          } disabled:opacity-50`}
+                        >
+                          {user.isBanned ? 'Cabut Ban' : 'Ban Akun'}
+                        </button>
+                      </div>
                     )}
                   </div>
                 </td>

@@ -13,7 +13,7 @@ export default async function ComplaintsPage() {
     orderBy: { createdAt: 'desc' },
     include: {
       user: { select: { name: true, email: true } },
-      order: { select: { id: true, invoiceNumber: true } }
+      order: { select: { id: true } }
     }
   })
 

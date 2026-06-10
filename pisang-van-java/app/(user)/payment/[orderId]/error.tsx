@@ -13,6 +13,14 @@ interface PaymentErrorProps {
 }
 
 export default function PaymentError({ error, reset }: PaymentErrorProps) {
+  // Graceful fallback mechanism to prevent infinite React Error loops
+  const handleRecover = () => {
+    reset()
+    // Fallback: If React reset fails to clear the cache/error state, force a hard document reload
+    setTimeout(() => {
+      window.location.reload()
+    }, 800)
+  }
   const params = useParams()
   const orderId = typeof params?.orderId === 'string' ? params.orderId : null
 
@@ -63,7 +71,7 @@ export default function PaymentError({ error, reset }: PaymentErrorProps) {
 
         <div className="flex flex-col gap-3">
           <Button
-            onClick={reset}
+            onClick={handleRecover}
             className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-full py-3 font-medium flex items-center justify-center gap-2"
           >
             <RefreshCw className="w-4 h-4" />

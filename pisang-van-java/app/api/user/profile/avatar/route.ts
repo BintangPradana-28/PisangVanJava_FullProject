@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/src/auth";
 import { prisma } from "@/lib/prisma";
 import { createSupabaseAuthClient } from "@/src/lib/supabase-auth-client";
-import { v4 as uuidv4 } from "uuid";
+import { nanoid } from "nanoid";
 
 export async function POST(req: NextRequest) {
   try {
@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
     }
 
     const ext = file.name.split(".").pop();
-    const fileName = `${userId}-${uuidv4()}.${ext}`;
+    const fileName = `${userId}-${nanoid()}.${ext}`;
 
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);

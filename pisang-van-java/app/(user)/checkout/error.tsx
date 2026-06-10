@@ -12,6 +12,14 @@ interface CheckoutErrorProps {
 }
 
 export default function CheckoutError({ error, reset }: CheckoutErrorProps) {
+  // Graceful fallback mechanism to prevent infinite React Error loops
+  const handleRecover = () => {
+    reset()
+    // Fallback: If React reset fails to clear the cache/error state, force a hard document reload
+    setTimeout(() => {
+      window.location.reload()
+    }, 800)
+  }
   useEffect(() => {
     Sentry.captureException(error, {
       tags: {
@@ -50,7 +58,7 @@ export default function CheckoutError({ error, reset }: CheckoutErrorProps) {
 
         <div className="flex flex-col gap-3">
           <Button
-            onClick={reset}
+            onClick={handleRecover}
             className="w-full bg-amber-500 hover:bg-amber-600 text-white rounded-full py-3 font-medium flex items-center justify-center gap-2"
           >
             <RefreshCw className="w-4 h-4" />

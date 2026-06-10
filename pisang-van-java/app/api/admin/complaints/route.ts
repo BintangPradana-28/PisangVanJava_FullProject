@@ -17,7 +17,7 @@ export async function GET(req: Request) {
     orderBy: { createdAt: 'desc' },
     include: {
       user: { select: { name: true, email: true } },
-      order: { select: { midtransOrderId: true } }
+      order: { select: { id: true } }
     }
   });
 

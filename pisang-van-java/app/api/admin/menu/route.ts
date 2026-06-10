@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { createMenuVariantSchema } from "@/src/features/menu/schemas";
 import { sseEmitter } from "@/lib/eventEmitter";
 import { revalidatePath, revalidateTag } from "next/cache";
-import xss from "xss";
+import DOMPurify from "isomorphic-dompurify";
 
 // GET /api/admin/menu
 export async function GET(req: NextRequest) {
@@ -52,15 +52,15 @@ export async function POST(req: NextRequest) {
 
     const newVariant = await prisma.menuVariant.create({
       data: {
-        flavorName: xss(flavorName),
+        flavorName: DOMPurify.sanitize(flavorName),
         priceKembung,
         priceLumpia,
         priceKrispy,
         wholesaleKembung,
         wholesaleLumpia,
         wholesaleKrispy,
-        imageUrl: imageUrl ? xss(imageUrl) : null,
-        deskripsi_topping: deskripsi_topping ? xss(deskripsi_topping) : null,
+        imageUrl: imageUrl ? DOMPurify.sanitize(imageUrl) : null,
+        deskripsi_topping: deskripsi_topping ? DOMPurify.sanitize(deskripsi_topping) : null,
         isActive: isActive !== undefined ? isActive : true,
         isAvailable: isAvailable !== undefined ? isAvailable : true,
         tags: tags || [],

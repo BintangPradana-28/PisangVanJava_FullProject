@@ -56,20 +56,20 @@ model User {
   koinPisang    Int       @default(0) // Gamification (Loyalty Points)
 
   // Sistem Referral
-  referralCode  String?   @unique // Kode unik milik user (misal: PVJ-BUDI123)
-  referredBy    String?   // ID user yang mengundang mereka
-  hasOrdered    Boolean   @default(false) // Penanda apakah user sudah pernah order
+  referralCode String? @unique // Kode unik milik user (misal: PVJ-BUDI123)
+  referredBy   String? // ID user yang mengundang mereka
+  hasOrdered   Boolean @default(false) // Penanda apakah user sudah pernah order
 
-  isBanned      Boolean   @default(false)
-  isDeleted     Boolean   @default(false)
-  deletedAt     DateTime?
-  
-  notificationPrefs Json?    @default("{\"email\":true,\"push\":false,\"promo\":true,\"order\":true}")
-  twoFactorEnabled  Boolean  @default(false)
+  isBanned  Boolean   @default(false)
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  notificationPrefs Json?   @default("{\"email\":true,\"push\":false,\"promo\":true,\"order\":true}")
+  twoFactorEnabled  Boolean @default(false)
   twoFactorSecret   String?
 
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   accounts    Account[]
   sessions    Session[]
@@ -158,7 +158,6 @@ model MenuVariant {
   favorites         Favorite[]
   reviews           Review[]
 
-
   @@index([flavorName]) // Database Indexing
   @@index([isDeleted])
   @@index([isActive])
@@ -196,25 +195,24 @@ model Topping {
   updatedAt  DateTime    @updatedAt
   orderItems OrderItem[]
 
-
   @@index([isActive])
 }
 
 model Order {
-  id             String   @id @default(cuid())
+  id             String      @id @default(cuid())
   userId         String?
   customerName   String
   customerPhone  String
   totalPrice     Float
   status         OrderStatus @default(PENDING_PAYMENT)
   notes          String?
-  source         String   @default("whatsapp") // whatsapp, online, walk-in
+  source         String      @default("whatsapp") // whatsapp, online, walk-in
   voucherCode    String? // Nullable, if they used a voucher
-  discountAmount Float    @default(0) // Total discount applied
-  deliveryMethod String   @default("DELIVERY")
-  deliveryFee    Float    @default(0)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  discountAmount Float       @default(0) // Total discount applied
+  deliveryMethod String      @default("DELIVERY")
+  deliveryFee    Float       @default(0)
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
 
   // -- Midtrans Integration --
   midtransToken         String?
@@ -222,9 +220,9 @@ model Order {
   payment               Payment?
   confirmedAt           DateTime?
 
-  user    User?       @relation(fields: [userId], references: [id], onDelete: Restrict)
-  items   OrderItem[]
-  reviews Review[]
+  user       User?       @relation(fields: [userId], references: [id], onDelete: Restrict)
+  items      OrderItem[]
+  reviews    Review[]
   complaints Complaint[]
 
   @@index([userId])
@@ -254,14 +252,14 @@ model Voucher {
 model OrderItem {
   id        String  @id @default(cuid())
   orderId   String
-  variantId String
+  variantId String?
   baseType  String
   quantity  Int
   unitPrice Float
   subtotal  Float
 
-  order   Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  variant MenuVariant @relation(fields: [variantId], references: [id])
+  order    Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  variant  MenuVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
   toppings Topping[]
 
   @@index([orderId])
@@ -286,18 +284,18 @@ model AuditLog {
 model Complaint {
   id               String          @id @default(cuid())
   userId           String
-  orderId          String?         
+  orderId          String?
   subject          String
   description      String          @db.Text
   adminResponse    String?         @db.Text
   compensationKoin Int             @default(0)
   status           ComplaintStatus @default(OPEN)
-  
-  createdAt        DateTime        @default(now())
-  updatedAt        DateTime        @updatedAt
 
-  user             User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  order            Order?          @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  order Order? @relation(fields: [orderId], references: [id], onDelete: SetNull)
 
   @@index([userId])
   @@index([status])
@@ -426,12 +424,12 @@ model B2BDeal {
 model AuthLog {
   id        String   @id @default(cuid())
   userId    String
-  event     String   // SIGN_IN, SIGN_OUT, MFA_VERIFY, BAN
+  event     String // SIGN_IN, SIGN_OUT, MFA_VERIFY, BAN
   ip        String?
   userAgent String?
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+
   @@index([userId, createdAt])
 }
 
@@ -442,8 +440,8 @@ model Payment {
   transactionId     String?       @unique // Midtrans transaction_id
   midtransOrderId   String        @unique // e.g. "PVJ-{orderId}-{timestamp}"
   status            PaymentStatus @default(PENDING)
-  paymentType       String?       // "qris", "bank_transfer", dll
-  paymentChannel    String?       // bank name or qris acquirer
+  paymentType       String? // "qris", "bank_transfer", dll
+  paymentChannel    String? // bank name or qris acquirer
   grossAmount       Decimal       @db.Decimal(15, 2)
   fraudStatus       String?
   settlementTime    DateTime?
@@ -456,4 +454,3 @@ model Payment {
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
 }
-

@@ -21,7 +21,7 @@ export default function MapEmbed({ address }: { address: string }) {
   }, [])
 
   return (
-    <div ref={ref} className="w-full h-full min-h-[300px] bg-zinc-100 dark:bg-zinc-800 animate-pulse rounded-2xl overflow-hidden">
+    <div ref={ref} className="relative w-full h-full min-h-[300px] bg-zinc-100 dark:bg-zinc-800 animate-pulse rounded-2xl overflow-hidden">
       {isVisible && (
         <iframe
           src={`https://maps.google.com/maps?q=${encodeURIComponent(address)}&t=&z=15&ie=UTF8&iwloc=&output=embed`}

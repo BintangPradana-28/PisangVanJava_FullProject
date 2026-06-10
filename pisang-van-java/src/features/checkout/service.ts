@@ -4,7 +4,7 @@ import { headers } from "next/headers";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { redis } from "@/lib/redis";
-import xss from "xss";
+import DOMPurify from "isomorphic-dompurify";
 import { generateSnapToken } from "@/src/features/payment/service";
 import { OrderStatus, Prisma } from "@prisma/client";
 import { createPendingPayment } from "@/src/features/payment/payment.service";
@@ -552,11 +552,11 @@ export async function createCheckoutOrder(
     const order = await tx.order.create({
       data: {
         userId: actor.userId,
-        customerName: xss(input.customerName),
+        customerName: DOMPurify.sanitize(input.customerName),
         customerPhone: input.customerPhone,
         totalPrice,
         status: OrderStatus.PENDING_PAYMENT,
-        notes: normalizeNullableText(input.notes) ? xss(normalizeNullableText(input.notes) as string) : null,
+        notes: normalizeNullableText(input.notes) ? DOMPurify.sanitize(normalizeNullableText(input.notes) as string) : null,
         source,
         voucherCode: voucherApplication?.code ?? null,
         discountAmount,

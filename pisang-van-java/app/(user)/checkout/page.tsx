@@ -7,8 +7,9 @@ import { motion, AnimatePresence } from 'framer-motion'
 import toast from 'react-hot-toast'
 import Link from 'next/link'
 import { z } from 'zod'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useQuery, useMutation } from '@tanstack/react-query'
-import { useCartStore, selectCartDisplayTotal } from '@/src/stores/cart.store'
 import { useSettings } from '@/context/SettingsContext'
 import { validateVoucher } from '@/src/features/checkout/actions'
 import { isStoreOpen } from '@/src/lib/time'
@@ -71,8 +72,22 @@ export default function CheckoutPage() {
 
   // Form state
   const [step, setStep]                     = useState(0)  // 0=review, 1=form, 2=confirm
-  const [customerName, setCustomerName]     = useState('')
-  const [customerPhone, setCustomerPhone]   = useState('')
+  const { register, trigger, watch, setValue, formState: { errors } } = useForm({
+    resolver: zodResolver(z.object({
+      customerName: z.string().trim().min(3, "Nama minimal 3 karakter").max(60, "Nama maksimal 60 karakter").regex(/^[A-Za-z\s]+$/, "Hanya huruf yang diperbolehkan"),
+      customerPhone: z.string().trim().regex(/^(\+62|62|0)8[1-9][0-9]{6,10}$/, "Format nomor tidak valid (contoh: 081234...)"),
+    })),
+    mode: 'onChange',
+    defaultValues: { customerName: '', customerPhone: '' }
+  })
+  const customerName = watch('customerName') || ''
+  const customerPhone = watch('customerPhone') || ''
+  
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Auto-Format: Remove non-digits except a leading +
+    const val = e.target.value.replace(/(?!^\+)[^\d]/g, '')
+    setValue('customerPhone', val, { shouldValidate: true })
+  }
   const [delivery, setDelivery]             = useState<DeliveryMethod>('PICKUP')
   const [address, setAddress]               = useState('')
   const [pickupTime, setPickupTime]         = useState('')
@@ -90,9 +105,7 @@ export default function CheckoutPage() {
   const [selectedAddressId, setSelectedAddressId] = useState<string>('')
   const [isManualAddress, setIsManualAddress] = useState(false)
 
-  // Real-time WA Validation
-  const phoneError = customerPhone.trim() && !/^(\+62|62|0)8[1-9][0-9]{6,10}$/.test(customerPhone.trim()) 
-    ? 'Format tidak valid (cth: 081234567890)' : ''
+  const [isManualAddress, setIsManualAddress] = useState(false)
 
   const { data: profileResponse } = useQuery({
     queryKey: ['profile'],
@@ -110,9 +123,9 @@ export default function CheckoutPage() {
 
   // Hydrate user data from session
   useEffect(() => {
-    if (session?.user?.name) setCustomerName(session.user.name)
+    if (session?.user?.name) setValue('customerName', session.user.name, { shouldValidate: true })
     if (profileResponse?.success && profileResponse.data) {
-      if (profileResponse.data.phone) setCustomerPhone(profileResponse.data.phone)
+      if (profileResponse.data.phone) setValue('customerPhone', profileResponse.data.phone, { shouldValidate: true })
       if (profileResponse.data.koinPisang !== undefined) setKoinPisang(profileResponse.data.koinPisang)
     }
   }, [session, profileResponse])
@@ -170,22 +183,13 @@ export default function CheckoutPage() {
   }
 
   // ── Step 1 → Step 2 Validated Transition (THE GATEKEEPER) ──────────────
-  const handleNextToConfirm = () => {
-    if (!customerName.trim()) {
-      toast.error('Nama lengkap wajib diisi'); return
+  const handleNextToConfirm = async () => {
+    const isRHFValid = await trigger()
+    if (!isRHFValid) {
+      toast.error('Periksa kembali isian form Anda')
+      return
     }
-    if (customerName.trim().length < 2 || customerName.trim().length > 60) {
-      toast.error('Nama harus antara 2–60 karakter'); return
-    }
-    if (!customerPhone.trim()) {
-      toast.error('Nomor WhatsApp wajib diisi'); return
-    }
-    if (!/^(\+62|62|0)8[1-9][0-9]{6,10}$/.test(customerPhone.trim())) {
-      toast.error('Format nomor WhatsApp tidak valid (cth: 081234567890)'); return
-    }
-    if (customerPhone.trim() && phoneError) {
-      toast.error(phoneError); return
-    }
+
     if (delivery === 'DELIVERY') {
       if (isManualAddress && !address.trim()) {
         toast.error('Alamat pengiriman wajib diisi'); return
@@ -377,27 +381,26 @@ export default function CheckoutPage() {
                   <div className="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-100 dark:border-zinc-800 shadow-sm p-6 space-y-5">
                     <h2 className="font-serif text-xl font-bold text-zinc-900 dark:text-zinc-100">👤 Data Pemesan</h2>
 
-                    {/* Nama */}
                     <div>
                       <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-1.5">Nama Lengkap *</label>
                       <input
-                        type="text" value={customerName}
-                        onChange={e => setCustomerName(e.target.value)}
+                        type="text"
+                        {...register('customerName')}
                         placeholder="Nama Anda..."
-                        className="w-full px-4 py-3 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 transition-all"
+                        className={`w-full px-4 py-3 rounded-2xl border ${errors.customerName ? 'border-red-400 focus:ring-red-400' : 'border-zinc-200 dark:border-zinc-700 focus:ring-amber-400'} bg-zinc-50 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-100 text-sm focus:outline-none focus:ring-2 transition-all`}
                       />
+                      {errors.customerName && <p className="text-xs text-red-500 font-semibold mt-1">{errors.customerName.message as string}</p>}
                     </div>
 
-                    {/* WhatsApp */}
                     <div>
                       <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-1.5">Nomor WhatsApp *</label>
                       <input
-                        type="tel" value={customerPhone}
-                        onChange={e => setCustomerPhone(e.target.value)}
+                        type="tel"
+                        {...register('customerPhone', { onChange: handlePhoneChange })}
                         placeholder="Contoh: 081234567890"
-                        className={`w-full px-4 py-3 rounded-2xl border ${phoneError ? 'border-red-400 focus:ring-red-400' : 'border-zinc-200 dark:border-zinc-700 focus:ring-amber-400'} bg-zinc-50 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-100 text-sm focus:outline-none focus:ring-2 transition-all`}
+                        className={`w-full px-4 py-3 rounded-2xl border ${errors.customerPhone ? 'border-red-400 focus:ring-red-400' : 'border-zinc-200 dark:border-zinc-700 focus:ring-amber-400'} bg-zinc-50 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-100 text-sm focus:outline-none focus:ring-2 transition-all`}
                       />
-                      {phoneError && <p className="text-xs text-red-500 font-semibold mt-1">{phoneError}</p>}
+                      {errors.customerPhone && <p className="text-xs text-red-500 font-semibold mt-1">{errors.customerPhone.message as string}</p>}
                     </div>
 
                     {/* Delivery Method */}

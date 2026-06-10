@@ -15,7 +15,7 @@ interface ComplaintType {
   status: 'OPEN' | 'INVESTIGATING' | 'RESOLVED' | 'REJECTED'
   createdAt: string
   user: { name: string; email: string }
-  order: { id: string; invoiceNumber: string } | null
+  order: { id: string } | null
 }
 
 export default function ManageComplaintsClient({ initialComplaints }: { initialComplaints: ComplaintType[] }) {
@@ -94,7 +94,7 @@ export default function ManageComplaintsClient({ initialComplaints }: { initialC
                   <h3 className="font-bold text-brown-900">{complaint.subject}</h3>
                   <p className="text-xs text-brown-500">
                     Dari: {complaint.user.name} ({complaint.user.email}) 
-                    {complaint.order && ` • Terkait Pesanan: ${complaint.order.invoiceNumber || complaint.order.id}`}
+                    {complaint.order && ` • Terkait Pesanan: ${complaint.order.id}`}
                   </p>
                 </div>
                 {complaint.status === 'OPEN' && (

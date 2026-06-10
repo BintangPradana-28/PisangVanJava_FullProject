@@ -23,6 +23,7 @@ export async function GET(req: NextRequest) {
         referralCode: true,
         referredBy: true,
         isDeleted: true,
+        isBanned: true,
         createdAt: true,
       },
       orderBy: { createdAt: 'desc' }

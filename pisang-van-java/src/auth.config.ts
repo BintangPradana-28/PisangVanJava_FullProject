@@ -30,8 +30,8 @@ export const authConfig = {
         token.isBanned = (user as any).isBanned;
         
         // Inject sessionId
-        const { v4: uuidv4 } = await import("uuid");
-        const sessionId = uuidv4();
+        const { nanoid } = await import("nanoid");
+        const sessionId = nanoid();
         token.sessionId = sessionId;
 
         // Register session to Redis

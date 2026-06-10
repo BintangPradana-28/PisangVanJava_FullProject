@@ -5,7 +5,7 @@ import { updateMenuVariantSchema } from "@/src/features/menu/schemas";
 import { sseEmitter } from "@/lib/eventEmitter";
 import { StockManager } from "@/src/lib/stock-manager";
 import { revalidatePath, revalidateTag } from "next/cache";
-import xss from "xss";
+import DOMPurify from "isomorphic-dompurify";
 // GET /api/admin/menu/[id]
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -67,9 +67,9 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     }
 
     const dataToUpdate = { ...parsedData.data };
-    if (dataToUpdate.flavorName) dataToUpdate.flavorName = xss(dataToUpdate.flavorName);
-    if (dataToUpdate.deskripsi_topping) dataToUpdate.deskripsi_topping = xss(dataToUpdate.deskripsi_topping);
-    if (dataToUpdate.imageUrl) dataToUpdate.imageUrl = xss(dataToUpdate.imageUrl);
+    if (dataToUpdate.flavorName) dataToUpdate.flavorName = DOMPurify.sanitize(dataToUpdate.flavorName);
+    if (dataToUpdate.deskripsi_topping) dataToUpdate.deskripsi_topping = DOMPurify.sanitize(dataToUpdate.deskripsi_topping);
+    if (dataToUpdate.imageUrl) dataToUpdate.imageUrl = DOMPurify.sanitize(dataToUpdate.imageUrl);
 
     const updatedVariant = await prisma.menuVariant.update({
       where: { id },
