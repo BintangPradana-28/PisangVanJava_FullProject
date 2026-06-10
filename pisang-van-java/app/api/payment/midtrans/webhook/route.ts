@@ -1,13 +1,13 @@
-import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import { verifyMidtransSignature } from "@/src/features/payment/service";
-import * as Sentry from "@sentry/nextjs";
-import { sendOrderConfirmationEmail } from "@/src/features/payment/email";
-import { redis } from "@/lib/redis";
+import * as Sentry from '@sentry/nextjs'
+import { type NextRequest, NextResponse } from 'next/server'
+import { prisma } from '@/lib/prisma'
+import { redis } from '@/lib/redis'
+import { sendOrderConfirmationEmail } from '@/src/features/payment/email'
+import { verifyMidtransSignature } from '@/src/features/payment/service'
 
 export async function POST(req: NextRequest) {
   try {
-    const payload = await req.json();
+    const payload = await req.json()
 
     // The Midtrans Webhook Payload contains:
     // order_id, status_code, gross_amount, signature_key, transaction_status, etc.
@@ -18,57 +18,74 @@ export async function POST(req: NextRequest) {
       signature_key,
       transaction_status,
       transaction_id
-    } = payload;
+    } = payload
 
     if (!order_id || !status_code || !gross_amount || !signature_key) {
-      return NextResponse.json({ success: false, error: "Invalid payload" }, { status: 400 });
+      return NextResponse.json({ success: false, error: 'Invalid payload' }, { status: 400 })
     }
 
     // Zero-Trust: Verify HMAC Signature Key
-    const isValid = verifyMidtransSignature(order_id, status_code, gross_amount, signature_key);
+    const isValid = verifyMidtransSignature(order_id, status_code, gross_amount, signature_key)
     if (!isValid) {
-      Sentry.captureMessage(`[SECURITY] Invalid Midtrans signature detected for order: ${order_id}`, "fatal");
-      return NextResponse.json({ success: false, error: "Forbidden: Signature mismatch" }, { status: 403 });
+      Sentry.captureMessage(
+        `[SECURITY] Invalid Midtrans signature detected for order: ${order_id}`,
+        'fatal'
+      )
+      return NextResponse.json(
+        { success: false, error: 'Forbidden: Signature mismatch' },
+        { status: 403 }
+      )
     }
 
     // Zero-Trust: Distributed Idempotency & Concurrency Guard via Redis NX
     // Prevents race conditions and duplicate processing from concurrent Midtrans webhooks
-    const lockKey = `midtrans:webhook:lock:${transaction_id}:${status_code}`;
-    const acquired = await redis.set(lockKey, "locked", { nx: true, ex: 300 }); // Lock for 5 minutes
-    
-    if (!acquired) {
-      console.warn(`[SECURITY] Duplicate webhook blocked by Redis NX Guard for transaction: ${transaction_id}`);
-      // Return 200 so Midtrans marks it as successfully delivered without us double-processing it
-      return NextResponse.json({ success: true, message: "Webhook already processed or currently processing" });
-    }
+    const lockKey = `midtrans:webhook:lock:${transaction_id}:${status_code}`
+    const acquired = await redis.set(lockKey, 'locked', { nx: true, ex: 300 }) // Lock for 5 minutes
 
+    if (!acquired) {
+      console.warn(
+        `[SECURITY] Duplicate webhook blocked by Redis NX Guard for transaction: ${transaction_id}`
+      )
+      // Return 200 so Midtrans marks it as successfully delivered without us double-processing it
+      return NextResponse.json({
+        success: true,
+        message: 'Webhook already processed or currently processing'
+      })
+    }
 
     // Verify order exists and amount matches
     const order = await prisma.order.findUnique({
       where: { id: order_id }
-    });
+    })
 
     if (!order) {
-      Sentry.captureMessage(`[SECURITY] Midtrans webhook order not found: ${order_id}`, "warning");
-      return NextResponse.json({ success: false, error: "Order not found" }, { status: 404 });
+      Sentry.captureMessage(`[SECURITY] Midtrans webhook order not found: ${order_id}`, 'warning')
+      return NextResponse.json({ success: false, error: 'Order not found' }, { status: 404 })
     }
 
     // Ensure gross_amount string from Midtrans matches our database value closely
     // Midtrans might send "15000.00", parseFloat handles this.
     if (Math.abs(parseFloat(gross_amount) - order.totalPrice) > 1) {
-      Sentry.captureMessage(`[SECURITY] Midtrans webhook amount mismatch: received ${gross_amount}, expected ${order.totalPrice}`, "error");
-      return NextResponse.json({ success: false, error: "Amount mismatch" }, { status: 400 });
+      Sentry.captureMessage(
+        `[SECURITY] Midtrans webhook amount mismatch: received ${gross_amount}, expected ${order.totalPrice}`,
+        'error'
+      )
+      return NextResponse.json({ success: false, error: 'Amount mismatch' }, { status: 400 })
     }
 
     // Determine target order status
-    let newStatus = order.status;
-    let paymentPaidAt = order.paymentPaidAt;
+    let newStatus = order.status
+    let paymentPaidAt = order.paymentPaidAt
 
     if (transaction_status === 'settlement' || transaction_status === 'capture') {
-      newStatus = 'processing';
-      paymentPaidAt = new Date();
-    } else if (transaction_status === 'cancel' || transaction_status === 'expire' || transaction_status === 'deny') {
-      newStatus = 'cancelled';
+      newStatus = 'processing'
+      paymentPaidAt = new Date()
+    } else if (
+      transaction_status === 'cancel' ||
+      transaction_status === 'expire' ||
+      transaction_status === 'deny'
+    ) {
+      newStatus = 'cancelled'
     }
 
     if (newStatus === 'processing' && order.status !== 'processing' && order.status !== 'paid') {
@@ -80,16 +97,16 @@ export async function POST(req: NextRequest) {
           midtransTransactionId: transaction_id,
           paymentPaidAt
         }
-      });
+      })
 
       // Trigger order confirmation email in the background
-      sendOrderConfirmationEmail(order_id).catch(console.error);
+      sendOrderConfirmationEmail(order_id).catch(console.error)
     } else if (newStatus === 'cancelled' && order.status !== 'cancelled') {
       const orderWithItems = await prisma.order.findUnique({
         where: { id: order_id },
         include: { items: true }
-      });
-      
+      })
+
       await prisma.$transaction(async (tx: any) => {
         const updateCount = await tx.order.updateMany({
           where: { id: order_id, status: { not: 'cancelled' } },
@@ -99,7 +116,7 @@ export async function POST(req: NextRequest) {
             midtransTransactionId: transaction_id,
             paymentPaidAt
           }
-        });
+        })
 
         // Zero-Trust: Only restore stock IF this exact transaction was the one to transition the order to cancelled.
         // Prevents ghost inventory inflation via concurrent webhook replays.
@@ -108,10 +125,10 @@ export async function POST(req: NextRequest) {
             await tx.menuVariant.updateMany({
               where: { id: item.variantId },
               data: { stock: { increment: item.quantity } }
-            });
+            })
           }
         }
-      });
+      })
     } else {
       await prisma.order.update({
         where: { id: order_id },
@@ -121,12 +138,12 @@ export async function POST(req: NextRequest) {
           midtransTransactionId: transaction_id,
           paymentPaidAt
         }
-      });
+      })
     }
 
-    return NextResponse.json({ success: true, message: "Webhook processed" });
+    return NextResponse.json({ success: true, message: 'Webhook processed' })
   } catch (error) {
-    Sentry.captureException(error);
-    return NextResponse.json({ success: false, error: "Internal Server Error" }, { status: 500 });
+    Sentry.captureException(error)
+    return NextResponse.json({ success: false, error: 'Internal Server Error' }, { status: 500 })
   }
 }

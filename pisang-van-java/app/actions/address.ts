@@ -1,8 +1,8 @@
 'use server'
 
-import { auth } from '@/src/auth'
-import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
+import { prisma } from '@/lib/prisma'
+import { auth } from '@/src/auth'
 
 // Validasi Zero-Trust
 const addressSchema = z.object({
@@ -11,7 +11,7 @@ const addressSchema = z.object({
   notes: z.string().optional(),
   latitude: z.number().nullable().optional(),
   longitude: z.number().nullable().optional(),
-  isDefault: z.boolean().default(false),
+  isDefault: z.boolean().default(false)
 })
 
 export async function getUserAddresses() {
@@ -84,7 +84,6 @@ export async function createAddress(data: z.infer<typeof addressSchema>) {
       })
       return { success: true, data: newAddress, message: 'Alamat berhasil ditambahkan.' }
     }
-
   } catch (error) {
     console.error('[CREATE_ADDRESS_ERROR]', error)
     return { success: false, error: 'Terjadi kesalahan saat menyimpan alamat.' }
@@ -130,7 +129,6 @@ export async function updateAddress(id: string, data: z.infer<typeof addressSche
     }
 
     return { success: true, message: 'Alamat berhasil diperbarui.' }
-
   } catch (error) {
     console.error('[UPDATE_ADDRESS_ERROR]', error)
     return { success: false, error: 'Terjadi kesalahan saat memperbarui alamat.' }
@@ -169,7 +167,6 @@ export async function deleteAddress(id: string) {
     }
 
     return { success: true, message: 'Alamat berhasil dihapus.' }
-
   } catch (error) {
     console.error('[DELETE_ADDRESS_ERROR]', error)
     return { success: false, error: 'Terjadi kesalahan saat menghapus alamat.' }
@@ -202,7 +199,6 @@ export async function setDefaultAddress(id: string) {
     ])
 
     return { success: true, message: 'Alamat utama berhasil diatur.' }
-
   } catch (error) {
     console.error('[SET_DEFAULT_ADDRESS_ERROR]', error)
     return { success: false, error: 'Terjadi kesalahan saat mengatur alamat utama.' }

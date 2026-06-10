@@ -1,9 +1,9 @@
 'use client'
+import Image from 'next/image'
 // components/admin/MenuTable.tsx
 import { useState } from 'react'
 import toast from 'react-hot-toast'
-import Image from 'next/image'
-import { MenuVariant } from '@/data/types'
+import type { MenuVariant } from '@/data/types'
 import { formatPriceShort } from '@/lib/utils'
 import AddEditMenuModal from './AddEditMenuModal'
 
@@ -12,18 +12,22 @@ interface Props {
 }
 
 export default function MenuTable({ initialVariants }: Props) {
-  const [variants,   setVariants]   = useState<MenuVariant[]>(initialVariants)
-  const [modalOpen,  setModalOpen]  = useState(false)
-  const [editItem,   setEditItem]   = useState<MenuVariant | null>(null)
+  const [variants, setVariants] = useState<MenuVariant[]>(initialVariants)
+  const [modalOpen, setModalOpen] = useState(false)
+  const [editItem, setEditItem] = useState<MenuVariant | null>(null)
   const [deletingId, setDeletingId] = useState<string | null>(null)
-  const [search,     setSearch]     = useState('')
+  const [search, setSearch] = useState('')
 
-  const filtered = variants.filter((v) =>
-    v.flavorName.toLowerCase().includes(search.toLowerCase())
-  )
+  const filtered = variants.filter((v) => v.flavorName.toLowerCase().includes(search.toLowerCase()))
 
-  const openAdd  = () => { setEditItem(null); setModalOpen(true) }
-  const openEdit = (v: MenuVariant) => { setEditItem(v); setModalOpen(true) }
+  const openAdd = () => {
+    setEditItem(null)
+    setModalOpen(true)
+  }
+  const openEdit = (v: MenuVariant) => {
+    setEditItem(v)
+    setModalOpen(true)
+  }
 
   const handleSaved = (saved: MenuVariant) => {
     setVariants((prev) => {
@@ -41,7 +45,7 @@ export default function MenuTable({ initialVariants }: Props) {
     if (!confirm(`Hapus menu "${name}"? Tindakan ini tidak bisa dibatalkan.`)) return
     setDeletingId(id)
     try {
-      const res  = await fetch(`/api/menu/${id}`, { method: 'DELETE' })
+      const res = await fetch(`/api/menu/${id}`, { method: 'DELETE' })
       const data = await res.json()
       if (data.success) {
         setVariants((prev) => prev.filter((v) => v.id !== id))
@@ -58,23 +62,23 @@ export default function MenuTable({ initialVariants }: Props) {
 
   const toggleActive = async (v: MenuVariant) => {
     try {
-      const res  = await fetch(`/api/menu/${v.id}`, {
+      const res = await fetch(`/api/menu/${v.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          flavorName:   v.flavorName,
+          flavorName: v.flavorName,
           priceKembung: v.prices.kembung,
-          priceLumpia:  v.prices.lumpia,
-          priceKrispy:  v.prices.krispy,
-          isActive:     !v.isActive,
-          sortOrder:    v.sortOrder,
-        }),
+          priceLumpia: v.prices.lumpia,
+          priceKrispy: v.prices.krispy,
+          isActive: !v.isActive,
+          sortOrder: v.sortOrder
+        })
       })
       const data = await res.json()
       if (data.success) {
-        setVariants((prev) => prev.map((item) =>
-          item.id === v.id ? { ...item, isActive: !item.isActive } : item
-        ))
+        setVariants((prev) =>
+          prev.map((item) => (item.id === v.id ? { ...item, isActive: !item.isActive } : item))
+        )
         toast.success(`Menu ${!v.isActive ? 'diaktifkan' : 'dinonaktifkan'}`)
       }
     } catch {
@@ -98,10 +102,7 @@ export default function MenuTable({ initialVariants }: Props) {
             placeholder="🔍 Cari varian..."
             className="form-input flex-1 sm:w-48"
           />
-          <button
-            onClick={openAdd}
-            className="btn-brown whitespace-nowrap"
-          >
+          <button onClick={openAdd} className="btn-brown whitespace-nowrap">
             + Tambah Menu
           </button>
         </div>
@@ -133,23 +134,39 @@ export default function MenuTable({ initialVariants }: Props) {
                 </tr>
               ) : (
                 filtered.map((v, i) => (
-                  <tr key={v.id} className="border-t border-cream-200 hover:bg-cream-100 transition-colors">
+                  <tr
+                    key={v.id}
+                    className="border-t border-cream-200 hover:bg-cream-100 transition-colors"
+                  >
                     <td className="px-4 py-3 text-brown-400">{i + 1}</td>
                     <td className="px-4 py-3">
                       {v.imageUrl ? (
-                        <Image src={v.imageUrl} alt={v.flavorName} width={40} height={40}
-                             className="w-10 h-10 rounded-lg object-cover" />
+                        <Image
+                          src={v.imageUrl}
+                          alt={v.flavorName}
+                          width={40}
+                          height={40}
+                          className="w-10 h-10 rounded-lg object-cover"
+                        />
                       ) : (
-                        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-600 to-brown-400
-                                        flex items-center justify-center text-xl">
+                        <div
+                          className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-600 to-brown-400
+                                        flex items-center justify-center text-xl"
+                        >
                           🍌
                         </div>
                       )}
                     </td>
                     <td className="px-4 py-3 font-semibold text-brown-700">{v.flavorName}</td>
-                    <td className="px-4 py-3 text-center text-brown-500">{formatPriceShort(v.prices.kembung)}</td>
-                    <td className="px-4 py-3 text-center text-brown-500">{formatPriceShort(v.prices.lumpia)}</td>
-                    <td className="px-4 py-3 text-center text-brown-500">{formatPriceShort(v.prices.krispy)}</td>
+                    <td className="px-4 py-3 text-center text-brown-500">
+                      {formatPriceShort(v.prices.kembung)}
+                    </td>
+                    <td className="px-4 py-3 text-center text-brown-500">
+                      {formatPriceShort(v.prices.lumpia)}
+                    </td>
+                    <td className="px-4 py-3 text-center text-brown-500">
+                      {formatPriceShort(v.prices.krispy)}
+                    </td>
                     <td className="px-4 py-3 text-center">
                       <button
                         onClick={() => toggleActive(v)}

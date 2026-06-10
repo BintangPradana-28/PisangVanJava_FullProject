@@ -1,9 +1,9 @@
 'use client'
 
-import { useEffect } from 'react'
 import * as Sentry from '@sentry/nextjs'
+import { ArrowLeft, RefreshCw, ShoppingCart } from 'lucide-react'
 import Link from 'next/link'
-import { ShoppingCart, RefreshCw, ArrowLeft } from 'lucide-react'
+import { useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 
 interface CheckoutErrorProps {
@@ -24,11 +24,11 @@ export default function CheckoutError({ error, reset }: CheckoutErrorProps) {
     Sentry.captureException(error, {
       tags: {
         boundary: 'checkout',
-        digest: error.digest ?? 'unknown',
+        digest: error.digest ?? 'unknown'
       },
       extra: {
-        hasDigest: !!error.digest,
-      },
+        hasDigest: !!error.digest
+      }
     })
   }, [error])
 
@@ -39,9 +39,7 @@ export default function CheckoutError({ error, reset }: CheckoutErrorProps) {
           <ShoppingCart className="w-8 h-8 text-amber-500" />
         </div>
 
-        <h1 className="text-xl font-semibold text-gray-900 mb-2">
-          Proses Checkout Terganggu
-        </h1>
+        <h1 className="text-xl font-semibold text-gray-900 mb-2">Proses Checkout Terganggu</h1>
 
         <p className="text-gray-500 text-sm leading-relaxed mb-2">
           Maaf, ada gangguan saat memproses pesanan Anda.
@@ -51,9 +49,7 @@ export default function CheckoutError({ error, reset }: CheckoutErrorProps) {
         </p>
 
         {error.digest && (
-          <p className="text-xs text-gray-400 font-mono mb-6">
-            Kode error: {error.digest}
-          </p>
+          <p className="text-xs text-gray-400 font-mono mb-6">Kode error: {error.digest}</p>
         )}
 
         <div className="flex flex-col gap-3">

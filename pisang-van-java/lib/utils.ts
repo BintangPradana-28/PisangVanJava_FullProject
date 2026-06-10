@@ -1,21 +1,19 @@
 // lib/utils.ts
-import { type ClassValue, clsx } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { type ClassValue, clsx } from 'clsx'
+import { twMerge } from 'tailwind-merge'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-
 export const formatPrice = (price: number): string =>
   new Intl.NumberFormat('id-ID', {
     style: 'currency',
     currency: 'IDR',
-    minimumFractionDigits: 0,
+    minimumFractionDigits: 0
   }).format(price)
 
-export const formatPriceShort = (price: number): string =>
-  `${price / 1000}K`
+export const formatPriceShort = (price: number): string => `${price / 1000}K`
 
 export function buildWhatsAppUrl(message: string): string {
   const waNumber = process.env.NEXT_PUBLIC_WA_NUMBER || '6281312167554'

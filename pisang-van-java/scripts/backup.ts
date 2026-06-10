@@ -1,9 +1,9 @@
 import { spawn } from 'child_process'
 import { createCipheriv, randomBytes } from 'crypto'
-import { createWriteStream, promises as fs } from 'fs'
-import { pipeline } from 'stream/promises'
-import * as path from 'path'
 import * as dotenv from 'dotenv'
+import { createWriteStream, promises as fs } from 'fs'
+import * as path from 'path'
+import { pipeline } from 'stream/promises'
 
 // Load environment variables for local runs
 dotenv.config({ path: path.join(__dirname, '../.env.local') })
@@ -14,9 +14,7 @@ const ENCRYPTION_KEY = process.env.BACKUP_ENCRYPTION_KEY
 
 if (!DB_URL) throw new Error('FATAL: DATABASE_URL is missing.')
 if (!ENCRYPTION_KEY || Buffer.from(ENCRYPTION_KEY, 'hex').length !== 32) {
-  throw new Error(
-    'FATAL: BACKUP_ENCRYPTION_KEY must be a valid 32-byte hex string.'
-  )
+  throw new Error('FATAL: BACKUP_ENCRYPTION_KEY must be a valid 32-byte hex string.')
 }
 
 const ALGORITHM = 'aes-256-gcm'
@@ -35,7 +33,7 @@ async function executeBackup() {
   console.info(`[INFO] Initiating Zero-Trust Backup: ${FILE_PATH}`)
 
   const pgDump = spawn('pg_dump', [DB_URL as string, '--clean', '--no-owner'], {
-    stdio: ['ignore', 'pipe', 'pipe'],
+    stdio: ['ignore', 'pipe', 'pipe']
   })
 
   // Capture pg_dump errors
@@ -58,10 +56,7 @@ async function executeBackup() {
 
     console.info(`[SUCCESS] Encrypted backup completed safely.`)
   } catch (error) {
-    console.error(
-      `[ERROR] Backup pipeline failed. Cleaning up corrupted file...`,
-      error
-    )
+    console.error(`[ERROR] Backup pipeline failed. Cleaning up corrupted file...`, error)
     await fs.unlink(FILE_PATH).catch(() => {}) // Graceful deletion
     process.exit(1)
   }

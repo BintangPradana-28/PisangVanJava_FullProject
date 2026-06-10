@@ -2,17 +2,17 @@
 import type { Metadata } from 'next'
 import { Be_Vietnam_Pro, Newsreader } from 'next/font/google'
 import '../styles/globals.css'
-import { Providers } from './providers'
 import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
-import Script from 'next/script'
 import { headers } from 'next/headers'
+import Script from 'next/script'
+import { Providers } from './providers'
 
 const beVietnamPro = Be_Vietnam_Pro({
   subsets: ['latin'],
   weight: ['400', '500', '600'],
   variable: '--font-sans',
-  display: 'swap',
+  display: 'swap'
 })
 
 const newsreader = Newsreader({
@@ -21,13 +21,13 @@ const newsreader = Newsreader({
   weight: ['600', '700'],
   variable: '--font-serif',
   display: 'swap',
-  adjustFontFallback: false,
+  adjustFontFallback: false
 })
 
 export const metadata: Metadata = {
   title: {
     default: 'Pisang Goreng Van Java',
-    template: '%s | Pisang Goreng Van Java',
+    template: '%s | Pisang Goreng Van Java'
   },
   description:
     'Pisang Goreng premium dengan resep autentik Jawa. 12+ varian rasa, 3 tipe — Kembung, Lumpia, Krispy. Pesan via WhatsApp!',
@@ -35,11 +35,9 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Pisang Goreng Van Java',
     description: 'Premium banana fritters with authentic Javanese recipes.',
-    type: 'website',
-  },
+    type: 'website'
+  }
 }
-
-
 
 const localBusinessJsonLd = {
   '@context': 'https://schema.org',
@@ -55,44 +53,37 @@ const localBusinessJsonLd = {
     addressLocality: 'Jakarta Timur',
     addressRegion: 'DKI Jakarta',
     postalCode: '13870',
-    addressCountry: 'ID',
+    addressCountry: 'ID'
   },
   geo: {
     '@type': 'GeoCoordinates',
     latitude: -7.7289873,
-    longitude: 110.2958252,
+    longitude: 110.2958252
   },
   openingHoursSpecification: {
     '@type': 'OpeningHoursSpecification',
-    dayOfWeek: [
-      'Monday',
-      'Tuesday',
-      'Wednesday',
-      'Thursday',
-      'Friday',
-      'Saturday',
-      'Sunday',
-    ],
+    dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
     opens: '10:00',
-    closes: '21:00',
+    closes: '21:00'
   },
   servesCuisine: 'Indonesian Fritters, Snacks',
-  priceRange: '$',
+  priceRange: '$'
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const headersList = await headers();
-  const nonce = headersList.get('x-nonce') || undefined;
+  const headersList = await headers()
+  const nonce = headersList.get('x-nonce') || undefined
 
   return (
-    <html lang="id" className={`${beVietnamPro.variable} ${newsreader.variable}`} suppressHydrationWarning>
-      <head>
-      </head>
+    <html
+      lang="id"
+      className={`${beVietnamPro.variable} ${newsreader.variable}`}
+      suppressHydrationWarning
+    >
+      <head></head>
       <body className="min-h-screen flex flex-col">
-        <Providers>
-          {children}
-        </Providers>
-        
+        <Providers>{children}</Providers>
+
         {/* [QUARANTINED] LocalBusiness JSON-LD removed due to XSS Gateway VETO (dangerouslySetInnerHTML prohibited) */}
         <Analytics />
         <SpeedInsights />

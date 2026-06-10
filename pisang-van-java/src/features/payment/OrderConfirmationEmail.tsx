@@ -1,15 +1,15 @@
 import {
   Body,
+  Column,
   Container,
   Head,
   Heading,
+  Hr,
   Html,
   Preview,
-  Section,
-  Text,
-  Hr,
   Row,
-  Column,
+  Section,
+  Text
 } from '@react-email/components'
 import * as React from 'react'
 
@@ -34,7 +34,7 @@ export const OrderConfirmationEmail = ({
   deliveryFee,
   discount,
   totalPrice,
-  deliveryMethod,
+  deliveryMethod
 }: OrderConfirmationEmailProps) => {
   return (
     <Html>
@@ -43,9 +43,12 @@ export const OrderConfirmationEmail = ({
       <Body style={main}>
         <Container style={container}>
           <Heading style={h1}>Pisang Van Java</Heading>
-          <Text style={text}>Halo <strong>{customerName}</strong>,</Text>
           <Text style={text}>
-            Terima kasih atas pesanan Anda. Pembayaran Anda telah kami terima dan pesanan Anda sedang <strong>diproses</strong>.
+            Halo <strong>{customerName}</strong>,
+          </Text>
+          <Text style={text}>
+            Terima kasih atas pesanan Anda. Pembayaran Anda telah kami terima dan pesanan Anda
+            sedang <strong>diproses</strong>.
           </Text>
 
           <Section style={section}>
@@ -53,7 +56,9 @@ export const OrderConfirmationEmail = ({
             {items.map((item, i) => (
               <Row key={i} style={itemRow}>
                 <Column style={itemColLeft}>
-                  <Text style={itemText}><strong>{item.name}</strong></Text>
+                  <Text style={itemText}>
+                    <strong>{item.name}</strong>
+                  </Text>
                   <Text style={itemQty}>Qty: {item.qty}</Text>
                 </Column>
                 <Column style={itemColRight}>
@@ -63,28 +68,43 @@ export const OrderConfirmationEmail = ({
             ))}
             <Hr style={hr} />
             <Row style={totalRow}>
-              <Column style={itemColLeft}><Text style={itemText}>Ongkir / Biaya</Text></Column>
-              <Column style={itemColRight}><Text style={itemText}>{deliveryFee}</Text></Column>
+              <Column style={itemColLeft}>
+                <Text style={itemText}>Ongkir / Biaya</Text>
+              </Column>
+              <Column style={itemColRight}>
+                <Text style={itemText}>{deliveryFee}</Text>
+              </Column>
             </Row>
             {discount && (
               <Row style={totalRow}>
-                <Column style={itemColLeft}><Text style={itemTextSuccess}>Diskon</Text></Column>
-                <Column style={itemColRight}><Text style={itemTextSuccess}>-{discount}</Text></Column>
+                <Column style={itemColLeft}>
+                  <Text style={itemTextSuccess}>Diskon</Text>
+                </Column>
+                <Column style={itemColRight}>
+                  <Text style={itemTextSuccess}>-{discount}</Text>
+                </Column>
               </Row>
             )}
             <Hr style={hr} />
             <Row style={totalRow}>
-              <Column style={itemColLeft}><Text style={totalText}>Total</Text></Column>
-              <Column style={itemColRight}><Text style={totalText}>{totalPrice}</Text></Column>
+              <Column style={itemColLeft}>
+                <Text style={totalText}>Total</Text>
+              </Column>
+              <Column style={itemColRight}>
+                <Text style={totalText}>{totalPrice}</Text>
+              </Column>
             </Row>
           </Section>
 
           <Text style={text}>
-            <strong>Pengiriman:</strong> {deliveryMethod === 'DELIVERY' ? 'Diantar ke alamat tujuan' : 'Ambil di toko (Pickup)'}
+            <strong>Pengiriman:</strong>{' '}
+            {deliveryMethod === 'DELIVERY' ? 'Diantar ke alamat tujuan' : 'Ambil di toko (Pickup)'}
           </Text>
           <Text style={footer}>
-            Anda dapat melacak pesanan Anda secara real-time melalui website kami.<br />
-            Salam hangat,<br />
+            Anda dapat melacak pesanan Anda secara real-time melalui website kami.
+            <br />
+            Salam hangat,
+            <br />
             <strong>Pisang Van Java</strong>
           </Text>
         </Container>
@@ -94,11 +114,26 @@ export const OrderConfirmationEmail = ({
 }
 
 // Styles
-const main = { backgroundColor: '#ffffff', fontFamily: '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif' }
+const main = {
+  backgroundColor: '#ffffff',
+  fontFamily:
+    '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif'
+}
 const container = { margin: '0 auto', padding: '20px 0 48px', width: '580px' }
-const h1 = { color: '#d97706', fontSize: '24px', fontWeight: 'bold', margin: '40px 0', padding: '0' }
+const h1 = {
+  color: '#d97706',
+  fontSize: '24px',
+  fontWeight: 'bold',
+  margin: '40px 0',
+  padding: '0'
+}
 const text = { color: '#333', fontSize: '16px', lineHeight: '24px' }
-const section = { backgroundColor: '#f8f9fa', borderRadius: '8px', padding: '24px', margin: '24px 0' }
+const section = {
+  backgroundColor: '#f8f9fa',
+  borderRadius: '8px',
+  padding: '24px',
+  margin: '24px 0'
+}
 const sectionTitle = { fontSize: '18px', fontWeight: 'bold', marginBottom: '16px' }
 const itemRow = { marginBottom: '12px' }
 const itemColLeft = { width: '70%' }

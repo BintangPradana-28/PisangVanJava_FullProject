@@ -24,7 +24,7 @@ export function saveToOfflineQueue(payload: any) {
     // Trigger custom event to update Queue Indicator in UI immediately
     window.dispatchEvent(new Event('offline_queue_updated'))
   } catch (error) {
-    console.error("Gagal menyimpan ke antrean offline:", error)
+    console.error('Gagal menyimpan ke antrean offline:', error)
   }
 }
 
@@ -33,10 +33,10 @@ export default function OfflineSyncManager() {
 
   const processQueue = async () => {
     if (isSyncing || !navigator.onLine) return
-    
+
     const queueStr = localStorage.getItem(OFFLINE_QUEUE_KEY)
     if (!queueStr) return
-    
+
     let queue: any[] = []
     try {
       queue = JSON.parse(queueStr)
@@ -49,10 +49,10 @@ export default function OfflineSyncManager() {
 
     setIsSyncing(true)
     const toastId = toast.loading(`Menyinkronkan ${queue.length} struk offline...`)
-    
+
     let successCount = 0
     let failedCount = 0
-    // We clone the queue to iterate, but we mutate the actual localStorage array 
+    // We clone the queue to iterate, but we mutate the actual localStorage array
     // safely ONLY upon success (Safe Deletion Rule)
     const newQueue = [...queue]
 
@@ -67,7 +67,7 @@ export default function OfflineSyncManager() {
         // Safe Deletion Rule: ONLY remove if success
         if (res.success) {
           // Find and remove this exact payload from newQueue
-          const indexToRemove = newQueue.findIndex(p => p.offlineId === payload.offlineId)
+          const indexToRemove = newQueue.findIndex((p) => p.offlineId === payload.offlineId)
           if (indexToRemove !== -1) newQueue.splice(indexToRemove, 1)
           successCount++
         } else {
@@ -77,7 +77,7 @@ export default function OfflineSyncManager() {
         if (error.status === 400) {
           // If it's a 400 Bad Request (like stock empty), the offline transaction is invalid.
           // We SHOULD remove it to prevent infinite loop of bad data, but record it as failed.
-          const indexToRemove = newQueue.findIndex(p => p.offlineId === payload.offlineId)
+          const indexToRemove = newQueue.findIndex((p) => p.offlineId === payload.offlineId)
           if (indexToRemove !== -1) newQueue.splice(indexToRemove, 1)
         }
         failedCount++
@@ -91,9 +91,15 @@ export default function OfflineSyncManager() {
     setIsSyncing(false)
 
     if (successCount > 0 && failedCount === 0) {
-      toast.success(`${successCount} Struk Offline berhasil dikirim.`, { id: toastId, duration: 4000 })
+      toast.success(`${successCount} Struk Offline berhasil dikirim.`, {
+        id: toastId,
+        duration: 4000
+      })
     } else if (successCount > 0 && failedCount > 0) {
-      toast.success(`${successCount} Struk terkirim. ${failedCount} struk tertunda (Server Error).`, { id: toastId, duration: 5000 })
+      toast.success(
+        `${successCount} Struk terkirim. ${failedCount} struk tertunda (Server Error).`,
+        { id: toastId, duration: 5000 }
+      )
     } else if (failedCount > 0) {
       toast.error(`Sinkronisasi gagal. Server tidak merespons.`, { id: toastId, duration: 4000 })
     } else {
@@ -112,7 +118,7 @@ export default function OfflineSyncManager() {
     }
 
     window.addEventListener('online', handleOnline)
-    
+
     // 3. Polling fallback every 60 seconds just in case 'online' event is missed
     const interval = setInterval(() => {
       if (navigator.onLine) processQueue()

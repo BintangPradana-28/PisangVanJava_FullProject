@@ -1,37 +1,45 @@
-"use client";
+'use client'
 
-import { useState, useEffect } from "react";
-import { AnimatePresence, motion } from 'framer-motion';
-import { isStoreOpen as checkStoreOpen } from '@/src/lib/time';
-import Image from "next/image";
-import { useRouter, useSearchParams } from "next/navigation";
-import Link from "next/link";
-import QuickViewModal from "@/components/user/QuickViewModal";
-import { useLanguage } from "@/context/LanguageContext";
-import { useSession } from "next-auth/react";
-import { useSettings } from "@/context/SettingsContext";
-import toast from "react-hot-toast";
-import { ProductType } from "@/src/features/menu/components/MenuCards";
+import { AnimatePresence, motion } from 'framer-motion'
+import Image from 'next/image'
+import Link from 'next/link'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useSession } from 'next-auth/react'
+import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
+import QuickViewModal from '@/components/user/QuickViewModal'
+import { useLanguage } from '@/context/LanguageContext'
+import { useSettings } from '@/context/SettingsContext'
+import type { ProductType } from '@/src/features/menu/components/MenuCards'
+import { isStoreOpen as checkStoreOpen } from '@/src/lib/time'
 
 const formatPrice = (price: number) =>
-  new Intl.NumberFormat("id-ID", {
-    style: "currency",
-    currency: "IDR",
-    minimumFractionDigits: 0,
-  }).format(price);
+  new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    minimumFractionDigits: 0
+  }).format(price)
 
 const getFallbackImage = (name: string) => {
-  const n = name.toLowerCase();
-  if (n.includes("matcha")) return "/images/flavors/matcha.png";
-  if (n.includes("taro")) return "/images/flavors/taro.png";
-  if (n.includes("blueberry") || n.includes("bluberi")) return "/images/flavors/blueberry.png";
-  if (n.includes("strawberry") || n.includes("stroberi")) return "/images/flavors/strawberry.png";
-  return "/kitchen.png"; // Default local fallback
-};
+  const n = name.toLowerCase()
+  if (n.includes('matcha')) return '/images/flavors/matcha.png'
+  if (n.includes('taro')) return '/images/flavors/taro.png'
+  if (n.includes('blueberry') || n.includes('bluberi')) return '/images/flavors/blueberry.png'
+  if (n.includes('strawberry') || n.includes('stroberi')) return '/images/flavors/strawberry.png'
+  return '/kitchen.png' // Default local fallback
+}
 
-const ProductImage = ({ src, alt, available }: { src: string; alt: string; available: boolean }) => {
-  const [imgSrc, setImgSrc] = useState(src);
-  const { t } = useLanguage();
+const ProductImage = ({
+  src,
+  alt,
+  available
+}: {
+  src: string
+  alt: string
+  available: boolean
+}) => {
+  const [imgSrc, setImgSrc] = useState(src)
+  const { t } = useLanguage()
 
   return (
     <div className="relative w-full aspect-[16/9] overflow-hidden bg-zinc-100 dark:bg-zinc-800">
@@ -41,13 +49,13 @@ const ProductImage = ({ src, alt, available }: { src: string; alt: string; avail
         fill
         sizes="(max-width: 640px) 360px, 360px"
         className="object-cover group-hover:scale-105 transition-transform duration-500"
-        onError={() => setImgSrc("/kitchen.png")}
+        onError={() => setImgSrc('/kitchen.png')}
         placeholder="blur"
         blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
       />
       {available ? (
         <div className="absolute top-4 left-1/2 -translate-x-1/2 rounded-full px-3 py-1 text-xs font-bold backdrop-blur-sm bg-white/90 dark:bg-zinc-900/90 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 shadow-sm">
-          {t("menu_fresh_badge")}
+          {t('menu_fresh_badge')}
         </div>
       ) : (
         <div className="absolute top-4 left-1/2 -translate-x-1/2 rounded-full px-3 py-1 text-xs font-bold backdrop-blur-sm bg-red-600 text-white shadow-md">
@@ -55,83 +63,79 @@ const ProductImage = ({ src, alt, available }: { src: string; alt: string; avail
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
 const getFlavorDescriptionKey = (flavorName: string): string | null => {
-  const lower = flavorName.toLowerCase();
-  if (lower.includes('cokelat') || lower.includes('coklat')) return 'menu_desc_cokelat';
-  if (lower.includes('matcha')) return 'menu_desc_matcha';
-  if (lower.includes('strawberry') || lower.includes('stroberi')) return 'menu_desc_strawberry';
-  if (lower.includes('blueberry') || lower.includes('bluberi')) return 'menu_desc_blueberry';
-  if (lower.includes('taro')) return 'menu_desc_taro';
-  if (lower.includes('tiramisu')) return 'menu_desc_tiramisu';
-  if (lower.includes('keju')) return 'menu_desc_keju';
-  if (lower.includes('susu')) return 'menu_desc_susu';
-  if (lower.includes('original')) return 'menu_desc_original';
-  if (lower.includes('milky')) return 'menu_desc_milky';
-  return null;
+  const lower = flavorName.toLowerCase()
+  if (lower.includes('cokelat') || lower.includes('coklat')) return 'menu_desc_cokelat'
+  if (lower.includes('matcha')) return 'menu_desc_matcha'
+  if (lower.includes('strawberry') || lower.includes('stroberi')) return 'menu_desc_strawberry'
+  if (lower.includes('blueberry') || lower.includes('bluberi')) return 'menu_desc_blueberry'
+  if (lower.includes('taro')) return 'menu_desc_taro'
+  if (lower.includes('tiramisu')) return 'menu_desc_tiramisu'
+  if (lower.includes('keju')) return 'menu_desc_keju'
+  if (lower.includes('susu')) return 'menu_desc_susu'
+  if (lower.includes('original')) return 'menu_desc_original'
+  if (lower.includes('milky')) return 'menu_desc_milky'
+  return null
 }
 
 export default function MenuGrid({ products }: { products: ProductType[] }) {
-  const { t } = useLanguage();
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const { getSetting } = useSettings();
-  const jamOperasional = getSetting("jam_operasional", "10.00–21.00");
-  const storeMode = getSetting("store_status", "AUTO");
-  const { isOpen: isStoreOpen } = checkStoreOpen(jamOperasional, storeMode);
-  const [selected, setSelected] = useState<ProductType | null>(null);
+  const { t } = useLanguage()
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const { getSetting } = useSettings()
+  const jamOperasional = getSetting('jam_operasional', '10.00–21.00')
+  const storeMode = getSetting('store_status', 'AUTO')
+  const { isOpen: isStoreOpen } = checkStoreOpen(jamOperasional, storeMode)
+  const [selected, setSelected] = useState<ProductType | null>(null)
 
-  const { data: session } = useSession();
-  const [favorites, setFavorites] = useState<string[]>([]);
+  const { data: session } = useSession()
+  const [favorites, setFavorites] = useState<string[]>([])
 
   useEffect(() => {
     if (session?.user) {
-      fetch("/api/favorites")
+      fetch('/api/favorites')
         .then(async (res) => {
           if (!res.ok) return { success: false, data: [] }
           return res.json().catch(() => ({ success: false, data: [] }))
         })
         .then((data) => {
-          if (data.success) setFavorites(data.data);
+          if (data.success) setFavorites(data.data)
         })
-        .catch((err) => console.error("Failed to fetch favorites", err));
+        .catch((err) => console.error('Failed to fetch favorites', err))
     }
-  }, [session]);
+  }, [session])
 
   const toggleFavorite = async (e: React.MouseEvent, variantId: string) => {
-    e.stopPropagation();
+    e.stopPropagation()
     if (!session?.user) {
-      toast.error("Silakan login untuk menyimpan favorit");
-      return;
+      toast.error('Silakan login untuk menyimpan favorit')
+      return
     }
 
-    const isFav = favorites.includes(variantId);
+    const isFav = favorites.includes(variantId)
     // Optimistic UI
-    setFavorites((prev) =>
-      isFav ? prev.filter((id) => id !== variantId) : [...prev, variantId],
-    );
+    setFavorites((prev) => (isFav ? prev.filter((id) => id !== variantId) : [...prev, variantId]))
 
     try {
-      const res = await fetch("/api/favorites", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ variantId }),
-      });
-      const data = await res.json();
-      if (!data.success) throw new Error(data.error);
-      toast.success(isFav ? "Dihapus dari favorit" : "Ditambahkan ke favorit", {
-        id: `fav-${variantId}`,
-      });
+      const res = await fetch('/api/favorites', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ variantId })
+      })
+      const data = await res.json()
+      if (!data.success) throw new Error(data.error)
+      toast.success(isFav ? 'Dihapus dari favorit' : 'Ditambahkan ke favorit', {
+        id: `fav-${variantId}`
+      })
     } catch (err) {
       // Revert optimistic UI
-      setFavorites((prev) =>
-        isFav ? [...prev, variantId] : prev.filter((id) => id !== variantId),
-      );
-      toast.error("Gagal memperbarui favorit", { id: `fav-err-${variantId}` });
+      setFavorites((prev) => (isFav ? [...prev, variantId] : prev.filter((id) => id !== variantId)))
+      toast.error('Gagal memperbarui favorit', { id: `fav-err-${variantId}` })
     }
-  };
+  }
 
   return (
     <section className="py-16">
@@ -141,29 +145,28 @@ export default function MenuGrid({ products }: { products: ProductType[] }) {
             <div className="text-6xl mb-4">🍌</div>
             <p
               className="text-lg font-serif font-bold mb-2"
-              style={{ color: "var(--text-custom)" }}
+              style={{ color: 'var(--text-custom)' }}
             >
-              {t("menu_empty_title")}
+              {t('menu_empty_title')}
             </p>
-            <p className="text-sm" style={{ color: "var(--text-custom)" }}>
-              {t("menu_empty_desc")}
+            <p className="text-sm" style={{ color: 'var(--text-custom)' }}>
+              {t('menu_empty_desc')}
             </p>
             <button
-              onClick={() => router.push("?", { scroll: false })}
+              onClick={() => router.push('?', { scroll: false })}
               className="mt-4 text-sm font-bold px-6 py-2.5 rounded-full transition-all"
-              style={{ background: "#D4802A", color: "white" }}
+              style={{ background: '#D4802A', color: 'white' }}
             >
-              {t("menu_reset_btn")}
+              {t('menu_reset_btn')}
             </button>
           </div>
         ) : (
           <AnimatePresence mode="popLayout">
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 items-start">
               {products.map((product, i) => {
-                const img =
-                  product.imageUrl || getFallbackImage(product.flavorName);
-                const available = product.isAvailable && product.stock > 0;
-                const isFav = favorites.includes(product.id);
+                const img = product.imageUrl || getFallbackImage(product.flavorName)
+                const available = product.isAvailable && product.stock > 0
+                const isFav = favorites.includes(product.id)
 
                 return (
                   <motion.div
@@ -173,10 +176,10 @@ export default function MenuGrid({ products }: { products: ProductType[] }) {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95 }}
                     transition={{ duration: 0.4, delay: i * 0.04 }}
-                    className={`relative rounded-3xl overflow-hidden flex flex-col group transition-all duration-300 ${available ? "hover:shadow-2xl hover:-translate-y-1" : "opacity-80 grayscale-[50%]"}`}
+                    className={`relative rounded-3xl overflow-hidden flex flex-col group transition-all duration-300 ${available ? 'hover:shadow-2xl hover:-translate-y-1' : 'opacity-80 grayscale-[50%]'}`}
                     style={{
-                      background: "var(--card-bg)",
-                      border: "1px solid var(--border-custom)",
+                      background: 'var(--card-bg)',
+                      border: '1px solid var(--border-custom)'
                     }}
                   >
                     {/* Favorite Button */}
@@ -186,8 +189,8 @@ export default function MenuGrid({ products }: { products: ProductType[] }) {
                       aria-label="Toggle Favorite"
                     >
                       <svg
-                        className={`w-5 h-5 transition-colors ${isFav ? "text-red-500 fill-current" : "text-zinc-500"}`}
-                        fill={isFav ? "currentColor" : "none"}
+                        className={`w-5 h-5 transition-colors ${isFav ? 'text-red-500 fill-current' : 'text-zinc-500'}`}
+                        fill={isFav ? 'currentColor' : 'none'}
                         viewBox="0 0 24 24"
                         stroke="currentColor"
                         strokeWidth={isFav ? 0 : 2}
@@ -206,8 +209,8 @@ export default function MenuGrid({ products }: { products: ProductType[] }) {
                     {/* Content */}
                     <div className="p-6 flex flex-col items-center text-center flex-grow">
                       <h3
-                        className={`font-serif text-2xl font-bold mb-1 ${!available ? "text-zinc-500" : ""}`}
-                        style={available ? { color: "var(--text-custom)" } : {}}
+                        className={`font-serif text-2xl font-bold mb-1 ${!available ? 'text-zinc-500' : ''}`}
+                        style={available ? { color: 'var(--text-custom)' } : {}}
                       >
                         {product.flavorName}
                       </h3>
@@ -238,53 +241,49 @@ export default function MenuGrid({ products }: { products: ProductType[] }) {
                       >
                         <span className="text-amber-400">⭐</span>
                         <span className="font-semibold text-zinc-700 dark:text-zinc-300">
-                          {product.rating ? product.rating : "Baru"}
+                          {product.rating ? product.rating : 'Baru'}
                         </span>
                         {product.reviewCount ? (
-                          <span className="text-xs">
-                            ({product.reviewCount}) &rarr;
-                          </span>
+                          <span className="text-xs">({product.reviewCount}) &rarr;</span>
                         ) : null}
                       </Link>
 
                       <p
                         className="text-sm leading-relaxed mb-6 flex-grow"
-                        style={{ color: "var(--text-custom)" }}
+                        style={{ color: 'var(--text-custom)' }}
                       >
-                        {product.deskripsi_topping || (() => {
-                          const key = getFlavorDescriptionKey(product.flavorName);
-                          return key ? t(key) : t('menu_default_desc');
-                        })()}
+                        {product.deskripsi_topping ||
+                          (() => {
+                            const key = getFlavorDescriptionKey(product.flavorName)
+                            return key ? t(key) : t('menu_default_desc')
+                          })()}
                       </p>
                       <div
                         className="w-full border-t pt-6 pb-8 flex flex-col items-center gap-3 mt-auto"
-                        style={{ borderColor: "var(--border-custom)" }}
+                        style={{ borderColor: 'var(--border-custom)' }}
                       >
                         <div className="text-center">
                           <div
                             className="text-[10px] uppercase tracking-wider font-semibold mb-0.5"
                             style={{
-                              color: "var(--text-custom)",
-                              opacity: 0.8,
+                              color: 'var(--text-custom)',
+                              opacity: 0.8
                             }}
                           >
-                            {session?.user.role === "RESELLER"
-                              ? "Harga Grosir (Mulai)"
-                              : t("menu_price_label")}
+                            {session?.user.role === 'RESELLER'
+                              ? 'Harga Grosir (Mulai)'
+                              : t('menu_price_label')}
                           </div>
                           <div
-                            className={`font-sans text-lg font-bold ${!available ? "text-zinc-500" : ""}`}
-                            style={available ? { color: "#D4802A" } : {}}
+                            className={`font-sans text-lg font-bold ${!available ? 'text-zinc-500' : ''}`}
+                            style={available ? { color: '#D4802A' } : {}}
                           >
-                            {session?.user.role === "RESELLER" &&
-                            product.wholesaleKembung > 0 ? (
+                            {session?.user.role === 'RESELLER' && product.wholesaleKembung > 0 ? (
                               <div className="flex flex-col items-center leading-tight">
                                 <span className="text-xs line-through text-zinc-400 font-normal">
                                   {formatPrice(product.priceKembung)}
                                 </span>
-                                <span>
-                                  {formatPrice(product.wholesaleKembung)}
-                                </span>
+                                <span>{formatPrice(product.wholesaleKembung)}</span>
                               </div>
                             ) : (
                               formatPrice(product.priceKembung)
@@ -292,42 +291,36 @@ export default function MenuGrid({ products }: { products: ProductType[] }) {
                           </div>
                         </div>
                         <button
-                          onClick={() =>
-                            available && isStoreOpen && setSelected(product)
-                          }
+                          onClick={() => available && isStoreOpen && setSelected(product)}
                           disabled={!available || !isStoreOpen}
                           className={
                             available && isStoreOpen
-                              ? "font-bold text-sm px-8 py-3 rounded-full shadow-md transition-all duration-200 active:scale-95 hover:shadow-lg"
-                              : "bg-zinc-300 text-zinc-500 cursor-not-allowed font-bold text-sm px-8 py-3 rounded-full flex items-center justify-center gap-1.5 opacity-70"
+                              ? 'font-bold text-sm px-8 py-3 rounded-full shadow-md transition-all duration-200 active:scale-95 hover:shadow-lg'
+                              : 'bg-zinc-300 text-zinc-500 cursor-not-allowed font-bold text-sm px-8 py-3 rounded-full flex items-center justify-center gap-1.5 opacity-70'
                           }
                           style={
                             available && isStoreOpen
-                              ? { background: "#D4802A", color: "white" }
+                              ? { background: '#D4802A', color: 'white' }
                               : {}
                           }
                         >
                           {!isStoreOpen
-                            ? "Toko Tutup"
+                            ? 'Toko Tutup'
                             : available
-                              ? t("menu_btn_order")
-                              : "Habis Terjual"}
+                              ? t('menu_btn_order')
+                              : 'Habis Terjual'}
                         </button>
                       </div>
                     </div>
                   </motion.div>
-                );
+                )
               })}
             </div>
           </AnimatePresence>
         )}
       </div>
 
-      <QuickViewModal
-        product={selected}
-        allProducts={products}
-        onClose={() => setSelected(null)}
-      />
+      <QuickViewModal product={selected} allProducts={products} onClose={() => setSelected(null)} />
     </section>
-  );
+  )
 }

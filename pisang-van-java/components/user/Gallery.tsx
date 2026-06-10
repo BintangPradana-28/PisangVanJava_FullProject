@@ -4,11 +4,11 @@ import { motion } from 'framer-motion'
 
 const GALLERY = [
   { emoji: '🍌', label: 'Kembung Original', bg: 'from-amber-600 to-brown-400' },
-  { emoji: '🌿', label: 'Matcha Milky',     bg: 'from-green-700 to-green-400' },
-  { emoji: '🍓', label: 'Strawberry Milky', bg: 'from-pink-700 to-pink-400'   },
-  { emoji: '🫐', label: 'Blueberry Lumpia', bg: 'from-blue-700 to-blue-400'   },
-  { emoji: '💜', label: 'Taro Krispy',      bg: 'from-purple-700 to-purple-400'},
-  { emoji: '🍫', label: 'Coklat Milky',     bg: 'from-orange-900 to-orange-600'},
+  { emoji: '🌿', label: 'Matcha Milky', bg: 'from-green-700 to-green-400' },
+  { emoji: '🍓', label: 'Strawberry Milky', bg: 'from-pink-700 to-pink-400' },
+  { emoji: '🫐', label: 'Blueberry Lumpia', bg: 'from-blue-700 to-blue-400' },
+  { emoji: '💜', label: 'Taro Krispy', bg: 'from-purple-700 to-purple-400' },
+  { emoji: '🍫', label: 'Coklat Milky', bg: 'from-orange-900 to-orange-600' }
 ]
 
 export default function Gallery() {
@@ -21,7 +21,9 @@ export default function Gallery() {
           viewport={{ once: true }}
           className="mb-10"
         >
-          <div className="text-amber-brand text-xs font-semibold tracking-[0.2em] uppercase mb-2">Galeri</div>
+          <div className="text-amber-brand text-xs font-semibold tracking-[0.2em] uppercase mb-2">
+            Galeri
+          </div>
           <h2 className="font-serif text-3xl sm:text-4xl font-bold text-brown-700">
             Foto <span className="text-amber-brand">Produk</span>
           </h2>
@@ -37,8 +39,10 @@ export default function Gallery() {
               transition={{ delay: i * 0.1 }}
               className="group relative aspect-square rounded-2xl overflow-hidden cursor-pointer"
             >
-              <div className={`w-full h-full bg-gradient-to-br ${bg} flex items-center justify-center
-                               transition-transform duration-300 group-hover:scale-105`}>
+              <div
+                className={`w-full h-full bg-gradient-to-br ${bg} flex items-center justify-center
+                               transition-transform duration-300 group-hover:scale-105`}
+              >
                 <span className="text-7xl sm:text-8xl filter drop-shadow-lg">{emoji}</span>
               </div>
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />

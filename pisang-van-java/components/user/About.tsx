@@ -1,9 +1,9 @@
 'use client'
 
-import { useRef, useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useEffect, useRef, useState } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 
 export default function About() {
@@ -27,7 +27,7 @@ export default function About() {
   const pillars = [
     { title: t('about_pillar_1_title'), desc: t('about_pillar_1_desc'), icon: '🌿' },
     { title: t('about_pillar_2_title'), desc: t('about_pillar_2_desc'), icon: '🏆' },
-    { title: t('about_pillar_3_title'), desc: t('about_pillar_3_desc'), icon: '✨' },
+    { title: t('about_pillar_3_title'), desc: t('about_pillar_3_desc'), icon: '✨' }
   ]
 
   return (
@@ -38,7 +38,6 @@ export default function About() {
     >
       <div className="max-w-[1200px] mx-auto px-6">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
-          
           {/* Image visual wrapper */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
@@ -56,7 +55,9 @@ export default function About() {
             />
             {/* Decal badge */}
             <div className="absolute bottom-6 right-6 bg-primary dark:bg-zinc-900 text-white rounded-2xl p-5 shadow-2xl border border-white/10 dark:border-zinc-800">
-              <div className="font-serif text-lg font-bold text-secondary-container">{t('about_since')}</div>
+              <div className="font-serif text-lg font-bold text-secondary-container">
+                {t('about_since')}
+              </div>
               <div className="text-xs text-cream-50/70 mt-0.5">{t('about_quality')}</div>
             </div>
           </motion.div>
@@ -70,16 +71,18 @@ export default function About() {
             <div className="inline-block bg-secondary/10 text-secondary text-xs font-bold tracking-[0.2em] uppercase px-4 py-1 rounded-full mb-4">
               {t('about_badge')}
             </div>
-            
+
             <h2 className="font-serif text-4xl sm:text-5xl font-bold text-primary dark:text-zinc-100 mb-6 leading-[1.15]">
               {t('about_title').split(',')[0]},<br />
-              <span className="text-secondary italic font-normal">{t('about_title').split(',')[1]}</span>
+              <span className="text-secondary italic font-normal">
+                {t('about_title').split(',')[1]}
+              </span>
             </h2>
-            
+
             <p className="text-on-surface-variant dark:text-zinc-400 text-base leading-relaxed mb-6 font-sans">
               {t('about_desc1')}
             </p>
-            
+
             <p className="text-on-surface-variant dark:text-zinc-400 text-base leading-relaxed mb-8 font-sans">
               {t('about_desc2')}
             </p>
@@ -95,8 +98,12 @@ export default function About() {
                   className="bg-surface-container-low dark:bg-zinc-900 border border-outline-variant/20 dark:border-zinc-850 rounded-2xl p-4.5 hover:shadow-md transition-all duration-200"
                 >
                   <div className="text-2xl mb-2">{icon}</div>
-                  <div className="font-serif text-lg font-bold text-primary dark:text-zinc-200 leading-tight mb-1">{title}</div>
-                  <div className="text-sm text-on-surface-variant dark:text-zinc-450 leading-relaxed">{desc}</div>
+                  <div className="font-serif text-lg font-bold text-primary dark:text-zinc-200 leading-tight mb-1">
+                    {title}
+                  </div>
+                  <div className="text-sm text-on-surface-variant dark:text-zinc-450 leading-relaxed">
+                    {desc}
+                  </div>
                 </motion.div>
               ))}
             </div>
@@ -110,13 +117,16 @@ export default function About() {
               <Link
                 href="/tentang-kami"
                 className="inline-flex items-center gap-2 font-bold text-sm px-6 py-3 rounded-full transition-all active:scale-95 hover:-translate-y-0.5 hover:shadow-lg"
-                style={{ background: '#D4802A', color: 'white', boxShadow: '0 4px 14px rgba(212,128,42,0.25)' }}
+                style={{
+                  background: '#D4802A',
+                  color: 'white',
+                  boxShadow: '0 4px 14px rgba(212,128,42,0.25)'
+                }}
               >
                 {t('about_read_more')} →
               </Link>
             </motion.div>
           </motion.div>
-
         </div>
       </div>
     </section>

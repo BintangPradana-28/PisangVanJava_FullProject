@@ -4,8 +4,8 @@
 // Global Error Boundary. Catches unexpected runtime errors across route segments.
 // MUST be a Client Component per Next.js 14 spec.
 
-import { useEffect } from 'react'
 import Link from 'next/link'
+import { useEffect } from 'react'
 
 interface ErrorPageProps {
   error: Error & { digest?: string }
@@ -64,8 +64,19 @@ export default function GlobalError({ error, reset }: ErrorPageProps) {
             onClick={reset}
             className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full font-semibold text-sm bg-amber-500 hover:bg-amber-600 text-white shadow-md hover:shadow-lg transition-all duration-200 active:scale-95"
           >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+              />
             </svg>
             Coba Lagi
           </button>

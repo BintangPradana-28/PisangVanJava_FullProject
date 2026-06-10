@@ -1,10 +1,10 @@
 'use client'
 
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { FetchError } from 'ofetch'
 import { useState } from 'react'
 import { toast } from 'react-hot-toast'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { api } from '@/src/lib/api'
-import { FetchError } from 'ofetch'
 
 interface ComplaintType {
   id: string
@@ -18,14 +18,18 @@ interface ComplaintType {
   order: { id: string } | null
 }
 
-export default function ManageComplaintsClient({ initialComplaints }: { initialComplaints: ComplaintType[] }) {
+export default function ManageComplaintsClient({
+  initialComplaints
+}: {
+  initialComplaints: ComplaintType[]
+}) {
   const queryClient = useQueryClient()
-  
+
   const { data: complaints = initialComplaints } = useQuery({
     queryKey: ['admin-complaints'],
     queryFn: () => api<ComplaintType[]>('/api/admin/complaints'),
     initialData: initialComplaints,
-    staleTime: 0,
+    staleTime: 0
   })
 
   const [resolvingId, setResolvingId] = useState<string | null>(null)
@@ -49,7 +53,10 @@ export default function ManageComplaintsClient({ initialComplaints }: { initialC
       setCompensationKoin(0)
     },
     onError: (error: FetchError | Error) => {
-      const msg = error instanceof FetchError ? (error.data?.error || 'Gagal mengubah status tiket') : error.message
+      const msg =
+        error instanceof FetchError
+          ? error.data?.error || 'Gagal mengubah status tiket'
+          : error.message
       toast.error(msg || 'Gagal memproses')
     }
   })
@@ -65,7 +72,9 @@ export default function ManageComplaintsClient({ initialComplaints }: { initialC
       <div className="flex justify-between items-end">
         <div>
           <h1 className="font-serif text-2xl font-bold text-brown-700">Pusat Bantuan & Tiket</h1>
-          <p className="text-sm text-brown-500">Kelola keluhan pelanggan dan berikan kompensasi Koin Pisang jika diperlukan.</p>
+          <p className="text-sm text-brown-500">
+            Kelola keluhan pelanggan dan berikan kompensasi Koin Pisang jika diperlukan.
+          </p>
         </div>
       </div>
 
@@ -76,15 +85,22 @@ export default function ManageComplaintsClient({ initialComplaints }: { initialC
           </div>
         ) : (
           complaints.map((complaint) => (
-            <div key={complaint.id} className="bg-white rounded-2xl p-5 shadow-sm border border-cream-200 hover:shadow-md transition-shadow">
+            <div
+              key={complaint.id}
+              className="bg-white rounded-2xl p-5 shadow-sm border border-cream-200 hover:shadow-md transition-shadow"
+            >
               <div className="flex justify-between items-start gap-4 mb-3">
                 <div>
                   <div className="flex items-center gap-3 mb-1">
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                      complaint.status === 'OPEN' ? 'bg-red-100 text-red-700' :
-                      complaint.status === 'RESOLVED' ? 'bg-green-100 text-green-700' :
-                      'bg-gray-100 text-gray-700'
-                    }`}>
+                    <span
+                      className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                        complaint.status === 'OPEN'
+                          ? 'bg-red-100 text-red-700'
+                          : complaint.status === 'RESOLVED'
+                            ? 'bg-green-100 text-green-700'
+                            : 'bg-gray-100 text-gray-700'
+                      }`}
+                    >
                       {complaint.status}
                     </span>
                     <span className="text-xs text-gray-500">
@@ -93,12 +109,12 @@ export default function ManageComplaintsClient({ initialComplaints }: { initialC
                   </div>
                   <h3 className="font-bold text-brown-900">{complaint.subject}</h3>
                   <p className="text-xs text-brown-500">
-                    Dari: {complaint.user.name} ({complaint.user.email}) 
+                    Dari: {complaint.user.name} ({complaint.user.email})
                     {complaint.order && ` • Terkait Pesanan: ${complaint.order.id}`}
                   </p>
                 </div>
                 {complaint.status === 'OPEN' && (
-                  <button 
+                  <button
                     onClick={() => setResolvingId(complaint.id)}
                     className="shrink-0 px-4 py-2 bg-brown-700 text-white text-xs font-bold rounded-xl hover:bg-brown-800"
                   >
@@ -106,7 +122,7 @@ export default function ManageComplaintsClient({ initialComplaints }: { initialC
                   </button>
                 )}
               </div>
-              
+
               <div className="bg-cream-50 p-3 rounded-xl text-sm text-brown-800 border border-cream-100 whitespace-pre-wrap">
                 {complaint.description}
               </div>
@@ -114,11 +130,16 @@ export default function ManageComplaintsClient({ initialComplaints }: { initialC
               {complaint.status === 'RESOLVED' && (
                 <div className="mt-4 border-t border-cream-200 pt-4">
                   <h4 className="text-xs font-bold text-green-700 mb-1">Tanggapan Admin:</h4>
-                  <p className="text-sm text-brown-800 whitespace-pre-wrap">{complaint.adminResponse}</p>
+                  <p className="text-sm text-brown-800 whitespace-pre-wrap">
+                    {complaint.adminResponse}
+                  </p>
                   {complaint.compensationKoin > 0 && (
                     <div className="mt-2 inline-flex items-center gap-2 bg-orange-50 px-3 py-1.5 rounded-lg border border-orange-100">
                       <span className="text-xl">🍌</span>
-                      <span className="text-xs font-bold text-orange-700">Kompensasi diberikan: {complaint.compensationKoin.toLocaleString('id-ID')} Koin Pisang</span>
+                      <span className="text-xs font-bold text-orange-700">
+                        Kompensasi diberikan: {complaint.compensationKoin.toLocaleString('id-ID')}{' '}
+                        Koin Pisang
+                      </span>
                     </div>
                   )}
                 </div>
@@ -133,11 +154,13 @@ export default function ManageComplaintsClient({ initialComplaints }: { initialC
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div className="bg-white rounded-3xl p-6 w-full max-w-lg shadow-2xl">
             <h3 className="font-bold text-xl mb-4 text-brown-900">Tanggapi Tiket Bantuan</h3>
-            
+
             <form onSubmit={handleResolve} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">Pesan Tanggapan (Terlihat oleh pelanggan)</label>
-                <textarea 
+                <label className="block text-xs font-bold text-gray-700 mb-1">
+                  Pesan Tanggapan (Terlihat oleh pelanggan)
+                </label>
+                <textarea
                   value={adminResponse}
                   onChange={(e) => setAdminResponse(e.target.value)}
                   className="w-full border rounded-xl px-4 py-3 focus:ring-2 focus:ring-brown-500 outline-none h-32 resize-none text-sm"
@@ -146,26 +169,31 @@ export default function ManageComplaintsClient({ initialComplaints }: { initialC
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">Kompensasi Koin Pisang (Opsional)</label>
-                <input 
-                  type="number" 
+                <label className="block text-xs font-bold text-gray-700 mb-1">
+                  Kompensasi Koin Pisang (Opsional)
+                </label>
+                <input
+                  type="number"
                   value={compensationKoin}
                   onChange={(e) => setCompensationKoin(Number(e.target.value))}
                   className="w-full border rounded-xl px-4 py-3 focus:ring-2 focus:ring-orange-500 outline-none"
                   min="0"
                 />
-                <p className="text-[10px] text-gray-500 mt-1">Kosongkan (0) jika tidak ada kompensasi. Koin akan otomatis ditambahkan ke saldo pelanggan.</p>
+                <p className="text-[10px] text-gray-500 mt-1">
+                  Kosongkan (0) jika tidak ada kompensasi. Koin akan otomatis ditambahkan ke saldo
+                  pelanggan.
+                </p>
               </div>
               <div className="flex gap-3 pt-4">
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   onClick={() => setResolvingId(null)}
                   className="flex-1 py-3 bg-gray-100 text-gray-700 font-bold rounded-xl"
                 >
                   Batal
                 </button>
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   disabled={resolveMutation.isPending}
                   className="flex-1 py-3 bg-brown-700 hover:bg-brown-800 text-white font-bold rounded-xl disabled:opacity-50"
                 >

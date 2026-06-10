@@ -1,6 +1,7 @@
 'use client'
 
-import React, { createContext, useContext, useEffect, useState } from 'react'
+import type React from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
 
 export interface SiteSetting {
   key: string
@@ -27,7 +28,7 @@ const DEFAULT_SETTINGS: Record<string, string> = {
   instagram: 'https://instagram.com/pisanggorengvanjava',
   tiktok: 'https://tiktok.com/@pisanggorengvanjava',
   store_open: 'true',
-  store_delivery_fee: '0',
+  store_delivery_fee: '0'
 }
 
 export function SettingsProvider({ children }: { children: React.ReactNode }) {

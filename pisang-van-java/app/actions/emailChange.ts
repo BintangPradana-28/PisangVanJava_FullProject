@@ -1,15 +1,14 @@
 'use server'
 
-import { auth } from '@/src/auth'
+import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
-import { redis, rateLimit } from '@/lib/redis'
+import { rateLimit, redis } from '@/lib/redis'
+import { auth } from '@/src/auth'
 import { resend } from '@/src/lib/resend'
 
-import { z } from 'zod'
-
 const emailChangeSchema = z.object({
-  otp: z.string().length(6, "OTP harus 6 digit"),
-  newEmail: z.string().email("Format email tidak valid")
+  otp: z.string().length(6, 'OTP harus 6 digit'),
+  newEmail: z.string().email('Format email tidak valid')
 })
 
 function generateOTP() {
@@ -28,9 +27,12 @@ export async function requestEmailOTP() {
     const oauthAccount = await prisma.account.findFirst({
       where: { userId: session.user.id }
     })
-    
+
     if (oauthAccount) {
-      return { success: false, error: 'Akun Anda terhubung dengan Google. Email tidak dapat diubah secara manual.' }
+      return {
+        success: false,
+        error: 'Akun Anda terhubung dengan Google. Email tidak dapat diubah secara manual.'
+      }
     }
 
     // Rate Limiting: Max 3 OTP requests per 15 minutes to prevent email bombing
@@ -41,12 +43,12 @@ export async function requestEmailOTP() {
 
     const otp = generateOTP()
     const redisKey = `email_change_otp:${session.user.id}`
-    
+
     // Simpan OTP di Redis dengan kedaluwarsa 5 menit (300 detik)
     await redis.set(redisKey, otp, { ex: 300 })
 
     if (!resend) {
-      console.warn("RESEND API KEY missing, fallback to console. OTP:", otp)
+      console.warn('RESEND API KEY missing, fallback to console. OTP:', otp)
       // Fallback for dev if no resend key
       return { success: true, message: 'OTP terkirim (Mode Dev: ' + otp + ')' }
     }
@@ -68,7 +70,6 @@ export async function requestEmailOTP() {
     })
 
     return { success: true, message: 'OTP berhasil dikirim ke email Anda.' }
-
   } catch (error) {
     console.error('[EMAIL_OTP_ERROR]', error)
     return { success: false, error: 'Terjadi kesalahan sistem saat mengirim OTP.' }
@@ -86,9 +87,12 @@ export async function verifyAndChangeEmail(otp: string, newEmail: string) {
     const oauthAccount = await prisma.account.findFirst({
       where: { userId: session.user.id }
     })
-    
+
     if (oauthAccount) {
-      return { success: false, error: 'Akun Anda terhubung dengan Google. Email tidak dapat diubah secara manual.' }
+      return {
+        success: false,
+        error: 'Akun Anda terhubung dengan Google. Email tidak dapat diubah secara manual.'
+      }
     }
 
     // Validasi input dengan Zod (Zero-Trust)
@@ -127,7 +131,6 @@ export async function verifyAndChangeEmail(otp: string, newEmail: string) {
     await redis.del(redisKey)
 
     return { success: true, message: 'Email berhasil diubah. Sesi mungkin perlu di-refresh.' }
-
   } catch (error) {
     console.error('[EMAIL_CHANGE_ERROR]', error)
     return { success: false, error: 'Terjadi kesalahan sistem saat mengganti email.' }

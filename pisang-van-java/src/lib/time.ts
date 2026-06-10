@@ -2,7 +2,6 @@ export function isStoreOpen(
   jamOperasional: string,
   storeMode: string = 'AUTO' // 'AUTO' | 'OPEN' | 'CLOSED'
 ): { isOpen: boolean; message: string } {
-  
   // [CISO MANDATE]: QA Testing Bypass via Environment Variable
   if (process.env.NEXT_PUBLIC_QA_BYPASS_STORE_OPEN === 'true') {
     return { isOpen: true, message: 'QA TESTING BYPASS: Kedai Buka.' }
@@ -15,50 +14,50 @@ export function isStoreOpen(
   if (storeMode === 'OPEN' || storeMode === 'true') {
     return { isOpen: true, message: 'Kedai buka (Manual Override).' }
   }
-  
+
   // Default 'AUTO': Follow operational hours
-  const timeRegex = /(\d{1,2})[.:](\d{2})\s*[-–]\s*(\d{1,2})[.:](\d{2})/;
-  const match = jamOperasional.match(timeRegex);
-  
-  let startHour = 10;
-  let startMin = 0;
-  let endHour = 21;
-  let endMin = 0;
-  
+  const timeRegex = /(\d{1,2})[.:](\d{2})\s*[-–]\s*(\d{1,2})[.:](\d{2})/
+  const match = jamOperasional.match(timeRegex)
+
+  let startHour = 10
+  let startMin = 0
+  let endHour = 21
+  let endMin = 0
+
   if (match) {
-    startHour = parseInt(match[1], 10);
-    startMin = parseInt(match[2], 10);
-    endHour = parseInt(match[3], 10);
-    endMin = parseInt(match[4], 10);
+    startHour = parseInt(match[1], 10)
+    startMin = parseInt(match[2], 10)
+    endHour = parseInt(match[3], 10)
+    endMin = parseInt(match[4], 10)
   }
 
   // Get current time in WIB (UTC+7)
-  const now = new Date();
-  
+  const now = new Date()
+
   const formatter = new Intl.DateTimeFormat('en-US', {
     timeZone: 'Asia/Jakarta',
     hour: 'numeric',
     minute: 'numeric',
     hourCycle: 'h23'
-  });
-  
-  const parts = formatter.formatToParts(now);
-  const currentHourStr = parts.find(p => p.type === 'hour')?.value || '0';
-  const currentMinStr = parts.find(p => p.type === 'minute')?.value || '0';
-  
-  const currentHour = parseInt(currentHourStr, 10);
-  const currentMin = parseInt(currentMinStr, 10);
-  
-  const currentTotalMins = currentHour * 60 + currentMin;
-  const startTotalMins = startHour * 60 + startMin;
-  const endTotalMins = endHour * 60 + endMin;
-  
+  })
+
+  const parts = formatter.formatToParts(now)
+  const currentHourStr = parts.find((p) => p.type === 'hour')?.value || '0'
+  const currentMinStr = parts.find((p) => p.type === 'minute')?.value || '0'
+
+  const currentHour = parseInt(currentHourStr, 10)
+  const currentMin = parseInt(currentMinStr, 10)
+
+  const currentTotalMins = currentHour * 60 + currentMin
+  const startTotalMins = startHour * 60 + startMin
+  const endTotalMins = endHour * 60 + endMin
+
   if (currentTotalMins >= startTotalMins && currentTotalMins <= endTotalMins) {
-    return { isOpen: true, message: '' };
+    return { isOpen: true, message: '' }
   } else {
-    return { 
-      isOpen: false, 
-      message: `Kedai tutup. Buka kembali pukul ${startHour.toString().padStart(2, '0')}:${startMin.toString().padStart(2, '0')} WIB.` 
-    };
+    return {
+      isOpen: false,
+      message: `Kedai tutup. Buka kembali pukul ${startHour.toString().padStart(2, '0')}:${startMin.toString().padStart(2, '0')} WIB.`
+    }
   }
 }

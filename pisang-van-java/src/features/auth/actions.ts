@@ -1,11 +1,11 @@
 'use server'
 
-import { prisma } from '@/lib/prisma'
-import { registerSchema, forgotPasswordSchema } from './schemas'
-import { hashPassword } from '@/src/lib/password'
-import { redis, rateLimit } from '@/lib/redis'
 import crypto from 'crypto'
 import { headers } from 'next/headers'
+import { prisma } from '@/lib/prisma'
+import { rateLimit, redis } from '@/lib/redis'
+import { hashPassword } from '@/src/lib/password'
+import { forgotPasswordSchema, registerSchema } from './schemas'
 
 export async function registerUser(formData: FormData) {
   try {
@@ -16,13 +16,16 @@ export async function registerUser(formData: FormData) {
       whatsapp: formData.get('whatsapp'),
       password: formData.get('password'),
       referralCode: formData.get('referralCode') || undefined,
-      consent: formData.get('consent') === 'on' || formData.get('consent') === 'true',
+      consent: formData.get('consent') === 'on' || formData.get('consent') === 'true'
     }
 
     // 2. THE ABSOLUTE QUARANTINE
     const parsed = registerSchema.safeParse(payload)
     if (!parsed.success) {
-      return { success: false, error: 'Validasi gagal. Pastikan semua data diisi dengan format yang benar.' }
+      return {
+        success: false,
+        error: 'Validasi gagal. Pastikan semua data diisi dengan format yang benar.'
+      }
     }
 
     const { name, email, password, whatsapp, referralCode } = parsed.data
@@ -30,32 +33,35 @@ export async function registerUser(formData: FormData) {
     // 3. THE IRON GATE: IP RATE LIMITING
     const headerStore = await headers()
     const ip = headerStore.get('x-forwarded-for')?.split(',')[0] || 'unknown-ip'
-    
+
     const { success: rateLimitSuccess } = await rateLimit.limit(`register_ip_${ip}`)
     if (!rateLimitSuccess) {
       return { success: false, error: 'Terlalu banyak aktivitas. Silakan coba lagi nanti.' }
     }
 
     // 4. ANTI-USER ENUMERATION & DUPLICATE CHECK
-    const existingUser = await prisma.user.findUnique({ 
+    const existingUser = await prisma.user.findUnique({
       where: { email },
-      select: { id: true } 
+      select: { id: true }
     })
-    
+
     if (existingUser) {
       // OPAQUE ERROR: Menolak pendaftaran tanpa membocorkan eksistensi data secara terang-terangan
-      return { success: false, error: 'Pendaftaran ditolak. Jika Anda sudah memiliki akun, silakan masuk.' }
+      return {
+        success: false,
+        error: 'Pendaftaran ditolak. Jika Anda sudah memiliki akun, silakan masuk.'
+      }
     }
 
     const passwordHash = await hashPassword(password)
 
-    let validReferralCode = null;
+    let validReferralCode = null
     if (referralCode) {
       const referrer = await prisma.user.findUnique({
         where: { referralCode }
-      });
+      })
       if (referrer) {
-        validReferralCode = referrer.referralCode;
+        validReferralCode = referrer.referralCode
       }
     }
 
@@ -67,7 +73,7 @@ export async function registerUser(formData: FormData) {
         phone: whatsapp,
         passwordHash,
         role: 'CUSTOMER', // Default absolut, anti-mass assignment
-        referredBy: validReferralCode,
+        referredBy: validReferralCode
       },
       select: { id: true }
     })
@@ -84,9 +90,9 @@ export async function generateResetToken(formData: FormData) {
   try {
     // 1. EXTRACT PAYLOAD SECURELY
     const payload = {
-      email: formData.get('email'),
+      email: formData.get('email')
     }
-    
+
     // 2. THE ABSOLUTE QUARANTINE
     const parsed = forgotPasswordSchema.safeParse(payload)
     if (!parsed.success) {
@@ -105,14 +111,14 @@ export async function generateResetToken(formData: FormData) {
     }
 
     const user = await prisma.user.findUnique({ where: { email } })
-    
+
     // 4. CONSTANT-TIME BLIND RESPONSE (ANTI-USER ENUMERATION)
     // Jangan pernah biarkan eksekusi gagal atau melambat jika user tidak ditemukan
     if (user) {
       // 5. THE CRYPTO UUID MANDATE
       // Menghasilkan token acak 32-byte yang mustahil ditebak
       const token = crypto.randomBytes(32).toString('hex')
-      
+
       // 6. HUKUM TOKEN SEKALI PAKAI (HARD EXPIRE 15 MENIT)
       // Waktu 1 jam (3600s) terlalu berisiko. Diubah ke 900s (15 menit).
       await redis.set(`reset-token:${token}`, user.id, { ex: 900 })
@@ -122,13 +128,16 @@ export async function generateResetToken(formData: FormData) {
     }
 
     // OPAQUE MESSAGE: Selalu kembalikan respons yang sama
-    return { 
-      success: true, 
-      message: 'Jika email terdaftar di sistem kami, tautan pemulihan sandi telah dikirim.' 
+    return {
+      success: true,
+      message: 'Jika email terdaftar di sistem kami, tautan pemulihan sandi telah dikirim.'
     }
   } catch (error) {
     // 7. BLIND LOGGING
-    console.error('[SECURITY] Reset Password Error:', error instanceof Error ? error.message : 'Unknown')
+    console.error(
+      '[SECURITY] Reset Password Error:',
+      error instanceof Error ? error.message : 'Unknown'
+    )
     return { success: false, error: 'Terjadi kesalahan sistem.' }
   }
 }

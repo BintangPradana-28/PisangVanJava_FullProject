@@ -1,24 +1,24 @@
-import pino from "pino";
+import pino from 'pino'
 
 // Define structured logging based on environment
-const isProduction = process.env.NODE_ENV === "production";
+const isProduction = process.env.NODE_ENV === 'production'
 
 export const logger = pino({
-  level: process.env.LOG_LEVEL || "info",
+  level: process.env.LOG_LEVEL || 'info',
   transport: isProduction
     ? undefined
     : {
-        target: "pino-pretty",
+        target: 'pino-pretty',
         options: {
           colorize: true,
-          ignore: "pid,hostname",
-          translateTime: "SYS:standard",
-        },
+          ignore: 'pid,hostname',
+          translateTime: 'SYS:standard'
+        }
       },
   formatters: {
     level: (label) => {
-      return { level: label.toUpperCase() };
-    },
+      return { level: label.toUpperCase() }
+    }
   },
-  timestamp: pino.stdTimeFunctions.isoTime,
-});
+  timestamp: pino.stdTimeFunctions.isoTime
+})

@@ -1,7 +1,7 @@
 'use client'
+import { AnimatePresence, motion } from 'framer-motion'
 // components/admin/OrdersClient.tsx — COMMAND CENTER v2 (Real-time + Bulk + CSV)
-import { useState, useEffect, useCallback, useRef } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
 import { formatPrice } from '@/lib/utils'
 import { supabaseBrowserClient } from '@/src/lib/supabase-client'
@@ -32,16 +32,35 @@ interface Order {
   items: OrderItem[]
 }
 
-const STATUS_CONFIG: Record<OrderStatus, { label: string; color: string; bg: string; next?: OrderStatus }> = {
-  PENDING_PAYMENT: { label: 'Pending', color: 'text-yellow-700', bg: 'bg-yellow-100', next: 'PROCESSING' },
-  PROCESSING:      { label: 'Diproses', color: 'text-blue-700', bg: 'bg-blue-100', next: 'READY' },
-  READY:           { label: 'Siap Antar', color: 'text-purple-700', bg: 'bg-purple-100', next: 'COMPLETED' },
-  COMPLETED:       { label: 'Selesai', color: 'text-green-700', bg: 'bg-green-100' },
-  CANCELED:        { label: 'Dibatalkan', color: 'text-red-700', bg: 'bg-red-100' },
+const STATUS_CONFIG: Record<
+  OrderStatus,
+  { label: string; color: string; bg: string; next?: OrderStatus }
+> = {
+  PENDING_PAYMENT: {
+    label: 'Pending',
+    color: 'text-yellow-700',
+    bg: 'bg-yellow-100',
+    next: 'PROCESSING'
+  },
+  PROCESSING: { label: 'Diproses', color: 'text-blue-700', bg: 'bg-blue-100', next: 'READY' },
+  READY: { label: 'Siap Antar', color: 'text-purple-700', bg: 'bg-purple-100', next: 'COMPLETED' },
+  COMPLETED: { label: 'Selesai', color: 'text-green-700', bg: 'bg-green-100' },
+  CANCELED: { label: 'Dibatalkan', color: 'text-red-700', bg: 'bg-red-100' }
 }
 
-const STATUS_ORDER: OrderStatus[] = ['PENDING_PAYMENT', 'PROCESSING', 'READY', 'COMPLETED', 'CANCELED']
-const SOURCE_ICON: Record<string, string> = { whatsapp: '💬', online: '💳', 'walk-in': '🚶', phone: '📞' }
+const STATUS_ORDER: OrderStatus[] = [
+  'PENDING_PAYMENT',
+  'PROCESSING',
+  'READY',
+  'COMPLETED',
+  'CANCELED'
+]
+const SOURCE_ICON: Record<string, string> = {
+  whatsapp: '💬',
+  online: '💳',
+  'walk-in': '🚶',
+  phone: '📞'
+}
 
 type DateFilter = 'today' | 'week' | 'month' | 'all'
 
@@ -51,15 +70,27 @@ function isOrderStatus(v: string): v is OrderStatus {
 
 function getDateRange(filter: DateFilter): Date | null {
   const now = new Date()
-  if (filter === 'today') { const d = new Date(now); d.setHours(0,0,0,0); return d }
-  if (filter === 'week')  { const d = new Date(now); d.setDate(now.getDate() - 7); return d }
-  if (filter === 'month') { const d = new Date(now); d.setDate(now.getDate() - 30); return d }
+  if (filter === 'today') {
+    const d = new Date(now)
+    d.setHours(0, 0, 0, 0)
+    return d
+  }
+  if (filter === 'week') {
+    const d = new Date(now)
+    d.setDate(now.getDate() - 7)
+    return d
+  }
+  if (filter === 'month') {
+    const d = new Date(now)
+    d.setDate(now.getDate() - 30)
+    return d
+  }
   return null
 }
 
 function exportToCSV(orders: Order[]) {
   const header = ['ID', 'Nama', 'Phone', 'Total', 'Status', 'Sumber', 'Metode', 'Tanggal']
-  const rows = orders.map(o => [
+  const rows = orders.map((o) => [
     o.id.slice(-8),
     o.customerName,
     o.customerPhone,
@@ -67,14 +98,16 @@ function exportToCSV(orders: Order[]) {
     o.status,
     o.source,
     o.deliveryMethod,
-    new Date(o.createdAt).toLocaleString('id-ID'),
+    new Date(o.createdAt).toLocaleString('id-ID')
   ])
-  const csv = [header, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n')
+  const csv = [header, ...rows]
+    .map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(','))
+    .join('\n')
   const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' })
   const url = URL.createObjectURL(blob)
   const link = document.createElement('a')
   link.href = url
-  link.download = `pesanan_${new Date().toISOString().slice(0,10)}.csv`
+  link.download = `pesanan_${new Date().toISOString().slice(0, 10)}.csv`
   document.body.appendChild(link)
   link.click()
   document.body.removeChild(link)
@@ -83,18 +116,20 @@ function exportToCSV(orders: Order[]) {
 }
 
 export default function OrdersClient({ initialOrders }: { initialOrders: Order[] }) {
-  const [orders, setOrders]           = useState<Order[]>(initialOrders)
+  const [orders, setOrders] = useState<Order[]>(initialOrders)
   const [statusFilter, setStatusFilter] = useState<'all' | OrderStatus>('all')
-  const [dateFilter, setDateFilter]   = useState<DateFilter>('all')
-  const [search, setSearch]           = useState('')
-  const [expandedId, setExpandedId]   = useState<string | null>(null)
-  const [updating, setUpdating]       = useState<string | null>(null)
+  const [dateFilter, setDateFilter] = useState<DateFilter>('all')
+  const [search, setSearch] = useState('')
+  const [expandedId, setExpandedId] = useState<string | null>(null)
+  const [updating, setUpdating] = useState<string | null>(null)
   const [bulkSelected, setBulkSelected] = useState<Set<string>>(new Set())
-  const [bulkStatus, setBulkStatus]   = useState<OrderStatus>('PROCESSING')
+  const [bulkStatus, setBulkStatus] = useState<OrderStatus>('PROCESSING')
   const [isBulkUpdating, setIsBulkUpdating] = useState(false)
   const [lastRefresh, setLastRefresh] = useState(new Date())
   const [hasNewOrder, setHasNewOrder] = useState(false)
-  const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'disconnected'>('disconnected')
+  const [connectionStatus, setConnectionStatus] = useState<
+    'connecting' | 'connected' | 'disconnected'
+  >('disconnected')
   const prevCountRef = useRef(initialOrders.length)
 
   const playNotificationSound = () => {
@@ -118,7 +153,10 @@ export default function OrdersClient({ initialOrders }: { initialOrders: Order[]
   // ── Real-time polling ────────────────────────────────────────────────────
   const fetchOrders = useCallback(async (silent = false) => {
     try {
-      const res = await fetch('/api/orders?limit=100', { cache: 'no-store', credentials: 'include' })
+      const res = await fetch('/api/orders?limit=100', {
+        cache: 'no-store',
+        credentials: 'include'
+      })
       const data = await res.json()
       if (data.success && Array.isArray(data.data?.orders)) {
         const fresh: Order[] = data.data.orders
@@ -139,33 +177,28 @@ export default function OrdersClient({ initialOrders }: { initialOrders: Order[]
     if (!supabaseBrowserClient) return
 
     setConnectionStatus('connecting')
-    
+
     const channel = supabaseBrowserClient
       .channel('public:Order')
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'Order' },
-        (payload) => {
-          playNotificationSound()
-          fetchOrders(true)
-          toast.success(`🔔 Pesanan baru masuk!`, { duration: 5000, icon: '🎉' })
-        }
-      )
-      .on(
-        'postgres_changes',
-        { event: 'UPDATE', schema: 'public', table: 'Order' },
-        (payload) => {
-          const updatedOrder = payload.new as { id: string; status: string }
-          setOrders(prev => prev.map(o => 
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'Order' }, (payload) => {
+        playNotificationSound()
+        fetchOrders(true)
+        toast.success(`🔔 Pesanan baru masuk!`, { duration: 5000, icon: '🎉' })
+      })
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'Order' }, (payload) => {
+        const updatedOrder = payload.new as { id: string; status: string }
+        setOrders((prev) =>
+          prev.map((o) =>
             o.id === updatedOrder.id && isOrderStatus(updatedOrder.status)
-              ? { ...o, status: updatedOrder.status as OrderStatus } 
+              ? { ...o, status: updatedOrder.status as OrderStatus }
               : o
-          ))
-        }
-      )
+          )
+        )
+      })
       .subscribe((status) => {
         if (status === 'SUBSCRIBED') setConnectionStatus('connected')
-        else if (status === 'CLOSED' || status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') setConnectionStatus('disconnected')
+        else if (status === 'CLOSED' || status === 'CHANNEL_ERROR' || status === 'TIMED_OUT')
+          setConnectionStatus('disconnected')
       })
 
     return () => {
@@ -183,9 +216,10 @@ export default function OrdersClient({ initialOrders }: { initialOrders: Order[]
   }, [connectionStatus, fetchOrders])
 
   // ── Derived: filtered orders ─────────────────────────────────────────────
-  const filtered = orders.filter(o => {
+  const filtered = orders.filter((o) => {
     const byStatus = statusFilter === 'all' || o.status === statusFilter
-    const bySearch = search === '' ||
+    const bySearch =
+      search === '' ||
       o.customerName.toLowerCase().includes(search.toLowerCase()) ||
       o.customerPhone.includes(search) ||
       o.id.toLowerCase().includes(search.toLowerCase())
@@ -201,15 +235,18 @@ export default function OrdersClient({ initialOrders }: { initialOrders: Order[]
       const res = await fetch(`/api/orders/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status }),
+        body: JSON.stringify({ status })
       })
       const data = await res.json()
       if (data.success) {
-        setOrders(prev => prev.map(o => o.id === id ? { ...o, status } : o))
+        setOrders((prev) => prev.map((o) => (o.id === id ? { ...o, status } : o)))
         toast.success(`✅ Status → ${STATUS_CONFIG[status].label}`)
       } else toast.error(data.error || 'Gagal update')
-    } catch { toast.error('Koneksi bermasalah') }
-    finally { setUpdating(null) }
+    } catch {
+      toast.error('Koneksi bermasalah')
+    } finally {
+      setUpdating(null)
+    }
   }
 
   const deleteOrder = async (id: string) => {
@@ -217,9 +254,13 @@ export default function OrdersClient({ initialOrders }: { initialOrders: Order[]
     try {
       const res = await fetch(`/api/orders/${id}`, { method: 'DELETE' })
       const data = await res.json()
-      if (data.success) { setOrders(prev => prev.filter(o => o.id !== id)); toast.success('Pesanan dihapus') }
-      else toast.error(data.error)
-    } catch { toast.error('Gagal menghapus') }
+      if (data.success) {
+        setOrders((prev) => prev.filter((o) => o.id !== id))
+        toast.success('Pesanan dihapus')
+      } else toast.error(data.error)
+    } catch {
+      toast.error('Gagal menghapus')
+    }
   }
 
   const handleBulkUpdate = async () => {
@@ -229,12 +270,18 @@ export default function OrdersClient({ initialOrders }: { initialOrders: Order[]
     for (const id of Array.from(bulkSelected)) {
       try {
         const res = await fetch(`/api/orders/${id}`, {
-          method: 'PATCH', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ status: bulkStatus }),
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: bulkStatus })
         })
         const d = await res.json()
-        if (d.success) { setOrders(prev => prev.map(o => o.id === id ? { ...o, status: bulkStatus } : o)); success++ }
-      } catch { /* silent */ }
+        if (d.success) {
+          setOrders((prev) => prev.map((o) => (o.id === id ? { ...o, status: bulkStatus } : o)))
+          success++
+        }
+      } catch {
+        /* silent */
+      }
     }
     toast.success(`${success} pesanan diupdate ke ${STATUS_CONFIG[bulkStatus].label}`)
     setBulkSelected(new Set())
@@ -242,47 +289,58 @@ export default function OrdersClient({ initialOrders }: { initialOrders: Order[]
   }
 
   const openWhatsApp = (order: Order) => {
-    const items = order.items.map(i =>
-      `• ${i.variant.flavorName} (${i.baseType})${i.toppings && i.toppings.length > 0 ? ` + ${i.toppings.map((t: any) => `${t.emoji || ''} ${t.name}`).join(', ')}` : ''} ×${i.quantity} = ${formatPrice(i.subtotal)}`
-    ).join('\n')
-    const msg = encodeURIComponent(`Halo ${order.customerName}! 🍌\n\nKonfirmasi pesanan Anda:\n${items}\n\nTotal: ${formatPrice(order.totalPrice)}\n\nTerima kasih telah memesan di Pisang Van Java!`)
+    const items = order.items
+      .map(
+        (i) =>
+          `• ${i.variant.flavorName} (${i.baseType})${i.toppings && i.toppings.length > 0 ? ` + ${i.toppings.map((t: any) => `${t.emoji || ''} ${t.name}`).join(', ')}` : ''} ×${i.quantity} = ${formatPrice(i.subtotal)}`
+      )
+      .join('\n')
+    const msg = encodeURIComponent(
+      `Halo ${order.customerName}! 🍌\n\nKonfirmasi pesanan Anda:\n${items}\n\nTotal: ${formatPrice(order.totalPrice)}\n\nTerima kasih telah memesan di Pisang Van Java!`
+    )
     window.open(`https://wa.me/${order.customerPhone}?text=${msg}`, '_blank')
   }
 
   const toggleBulkSelect = (id: string) => {
-    setBulkSelected(prev => {
+    setBulkSelected((prev) => {
       const next = new Set(prev)
       next.has(id) ? next.delete(id) : next.add(id)
       return next
     })
   }
 
-  const selectAll = () => setBulkSelected(new Set(filtered.map(o => o.id)))
+  const selectAll = () => setBulkSelected(new Set(filtered.map((o) => o.id)))
   const clearSelection = () => setBulkSelected(new Set())
 
   // ── Summary stats ────────────────────────────────────────────────────────
   const stats = {
     total: orders.length,
-    revenue: orders.filter(o => o.status === 'COMPLETED').reduce((s, o) => s + o.totalPrice, 0),
-    active: orders.filter(o => ['PENDING_PAYMENT','PROCESSING','READY'].includes(o.status)).length,
-    done: orders.filter(o => o.status === 'COMPLETED').length,
-    pending: orders.filter(o => o.status === 'PENDING_PAYMENT').length,
+    revenue: orders.filter((o) => o.status === 'COMPLETED').reduce((s, o) => s + o.totalPrice, 0),
+    active: orders.filter((o) => ['PENDING_PAYMENT', 'PROCESSING', 'READY'].includes(o.status))
+      .length,
+    done: orders.filter((o) => o.status === 'COMPLETED').length,
+    pending: orders.filter((o) => o.status === 'PENDING_PAYMENT').length
   }
 
   return (
     <div className="space-y-6">
-
       {/* ── Header ── */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="font-serif text-2xl font-bold text-brown-700">Pusat Komando Pesanan</h1>
           <div className="flex items-center gap-2 mt-0.5">
-            <span className="text-xs text-brown-400">{stats.total} total • Diperbarui {lastRefresh.toLocaleTimeString('id-ID')}</span>
+            <span className="text-xs text-brown-400">
+              {stats.total} total • Diperbarui {lastRefresh.toLocaleTimeString('id-ID')}
+            </span>
             {hasNewOrder && (
               <motion.span
-                initial={{ scale: 0 }} animate={{ scale: 1 }}
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
                 className="text-[10px] font-bold bg-red-500 text-white px-2 py-0.5 rounded-full cursor-pointer"
-                onClick={() => { setHasNewOrder(false); setStatusFilter('PENDING_PAYMENT') }}
+                onClick={() => {
+                  setHasNewOrder(false)
+                  setStatusFilter('PENDING_PAYMENT')
+                }}
               >
                 PESANAN BARU!
               </motion.span>
@@ -292,17 +350,26 @@ export default function OrdersClient({ initialOrders }: { initialOrders: Order[]
                 <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" /> LIVE
               </span>
             ) : (
-              <span className="flex items-center gap-1 text-[10px] font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full" title="Real-time terputus. Beralih ke fallback polling tiap 30 detik.">
+              <span
+                className="flex items-center gap-1 text-[10px] font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full"
+                title="Real-time terputus. Beralih ke fallback polling tiap 30 detik."
+              >
                 <span className="w-2 h-2 bg-amber-500 rounded-full" /> FALLBACK
               </span>
             )}
           </div>
         </div>
         <div className="flex gap-2 flex-wrap">
-          <button onClick={() => fetchOrders(false)} className="text-xs px-3 py-2 rounded-lg font-semibold bg-white border border-cream-200 text-brown-600 hover:bg-cream-50">
+          <button
+            onClick={() => fetchOrders(false)}
+            className="text-xs px-3 py-2 rounded-lg font-semibold bg-white border border-cream-200 text-brown-600 hover:bg-cream-50"
+          >
             🔄 Refresh
           </button>
-          <button onClick={() => exportToCSV(filtered)} className="text-xs px-3 py-2 rounded-lg font-semibold bg-white border border-cream-200 text-brown-600 hover:bg-cream-50">
+          <button
+            onClick={() => exportToCSV(filtered)}
+            className="text-xs px-3 py-2 rounded-lg font-semibold bg-white border border-cream-200 text-brown-600 hover:bg-cream-50"
+          >
             ⬇ CSV
           </button>
         </div>
@@ -311,14 +378,25 @@ export default function OrdersClient({ initialOrders }: { initialOrders: Order[]
       {/* ── Summary Cards ── */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
-          { label: 'Pendapatan Selesai', value: formatPrice(stats.revenue),   icon: '💰', color: 'text-green-700' },
-          { label: 'Pesanan Selesai',    value: stats.done,                   icon: '✅', color: 'text-brown-700' },
-          { label: 'Pesanan Aktif',      value: stats.active,                 icon: '🔥', color: 'text-amber-700' },
-          { label: 'Menunggu Konfirmasi',value: stats.pending,                icon: '⏳', color: 'text-yellow-700' },
+          {
+            label: 'Pendapatan Selesai',
+            value: formatPrice(stats.revenue),
+            icon: '💰',
+            color: 'text-green-700'
+          },
+          { label: 'Pesanan Selesai', value: stats.done, icon: '✅', color: 'text-brown-700' },
+          { label: 'Pesanan Aktif', value: stats.active, icon: '🔥', color: 'text-amber-700' },
+          {
+            label: 'Menunggu Konfirmasi',
+            value: stats.pending,
+            icon: '⏳',
+            color: 'text-yellow-700'
+          }
         ].map(({ label, value, icon, color }) => (
           <motion.div
             key={label}
-            initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
             className="bg-white rounded-2xl p-4 border border-cream-200 shadow-sm hover:shadow-md transition-shadow"
           >
             <div className="text-2xl mb-1">{icon}</div>
@@ -333,7 +411,9 @@ export default function OrdersClient({ initialOrders }: { initialOrders: Order[]
         {/* Search */}
         <div className="flex gap-2">
           <input
-            type="text" value={search} onChange={e => setSearch(e.target.value)}
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
             placeholder="🔍 Cari nama, nomor, atau ID pesanan..."
             className="flex-1 px-3 py-2 text-sm rounded-xl border border-cream-200 text-brown-700 focus:outline-none focus:ring-2 focus:ring-amber-300"
           />
@@ -341,24 +421,38 @@ export default function OrdersClient({ initialOrders }: { initialOrders: Order[]
 
         {/* Status Tabs */}
         <div className="flex gap-2 flex-wrap">
-          <button onClick={() => setStatusFilter('all')}
-            className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all border ${statusFilter === 'all' ? 'bg-brown-700 text-white border-brown-700' : 'bg-white text-brown-500 border-cream-200 hover:border-brown-300'}`}>
+          <button
+            onClick={() => setStatusFilter('all')}
+            className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all border ${statusFilter === 'all' ? 'bg-brown-700 text-white border-brown-700' : 'bg-white text-brown-500 border-cream-200 hover:border-brown-300'}`}
+          >
             Semua ({orders.length})
           </button>
-          {STATUS_ORDER.map(s => (
-            <button key={s} onClick={() => setStatusFilter(s)}
-              className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all border ${statusFilter === s ? `${STATUS_CONFIG[s].bg} ${STATUS_CONFIG[s].color} border-current` : 'bg-white text-brown-500 border-cream-200 hover:border-brown-300'}`}>
-              {STATUS_CONFIG[s].label} ({orders.filter(o => o.status === s).length})
+          {STATUS_ORDER.map((s) => (
+            <button
+              key={s}
+              onClick={() => setStatusFilter(s)}
+              className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all border ${statusFilter === s ? `${STATUS_CONFIG[s].bg} ${STATUS_CONFIG[s].color} border-current` : 'bg-white text-brown-500 border-cream-200 hover:border-brown-300'}`}
+            >
+              {STATUS_CONFIG[s].label} ({orders.filter((o) => o.status === s).length})
             </button>
           ))}
         </div>
 
         {/* Date Filter */}
         <div className="flex gap-2 flex-wrap">
-          {(['today','week','month','all'] as DateFilter[]).map(d => (
-            <button key={d} onClick={() => setDateFilter(d)}
-              className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all border ${dateFilter === d ? 'bg-amber-100 text-amber-800 border-amber-300' : 'bg-white text-brown-400 border-cream-200'}`}>
-              {d === 'today' ? 'Hari ini' : d === 'week' ? '7 Hari' : d === 'month' ? '30 Hari' : 'Semua Waktu'}
+          {(['today', 'week', 'month', 'all'] as DateFilter[]).map((d) => (
+            <button
+              key={d}
+              onClick={() => setDateFilter(d)}
+              className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all border ${dateFilter === d ? 'bg-amber-100 text-amber-800 border-amber-300' : 'bg-white text-brown-400 border-cream-200'}`}
+            >
+              {d === 'today'
+                ? 'Hari ini'
+                : d === 'week'
+                  ? '7 Hari'
+                  : d === 'month'
+                    ? '30 Hari'
+                    : 'Semua Waktu'}
             </button>
           ))}
         </div>
@@ -367,21 +461,43 @@ export default function OrdersClient({ initialOrders }: { initialOrders: Order[]
       {/* ── Bulk Actions ── */}
       <AnimatePresence>
         {bulkSelected.size > 0 && (
-          <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}
-            className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex flex-wrap items-center gap-3">
-            <span className="text-sm font-bold text-amber-800">{bulkSelected.size} pesanan dipilih</span>
-            <select value={bulkStatus} onChange={e => setBulkStatus(e.target.value as OrderStatus)}
-              className="text-xs px-3 py-2 rounded-xl border border-amber-300 bg-white text-brown-700 focus:outline-none">
-              {STATUS_ORDER.map(s => <option key={s} value={s}>{STATUS_CONFIG[s].label}</option>)}
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex flex-wrap items-center gap-3"
+          >
+            <span className="text-sm font-bold text-amber-800">
+              {bulkSelected.size} pesanan dipilih
+            </span>
+            <select
+              value={bulkStatus}
+              onChange={(e) => setBulkStatus(e.target.value as OrderStatus)}
+              className="text-xs px-3 py-2 rounded-xl border border-amber-300 bg-white text-brown-700 focus:outline-none"
+            >
+              {STATUS_ORDER.map((s) => (
+                <option key={s} value={s}>
+                  {STATUS_CONFIG[s].label}
+                </option>
+              ))}
             </select>
-            <button onClick={handleBulkUpdate} disabled={isBulkUpdating}
-              className="text-xs px-4 py-2 rounded-xl bg-amber-600 text-white font-bold hover:bg-amber-700 disabled:opacity-50">
+            <button
+              onClick={handleBulkUpdate}
+              disabled={isBulkUpdating}
+              className="text-xs px-4 py-2 rounded-xl bg-amber-600 text-white font-bold hover:bg-amber-700 disabled:opacity-50"
+            >
               {isBulkUpdating ? 'Memproses...' : 'Update Semua'}
             </button>
-            <button onClick={selectAll} className="text-xs px-3 py-2 rounded-xl border border-amber-300 text-amber-700 font-medium hover:bg-amber-100">
+            <button
+              onClick={selectAll}
+              className="text-xs px-3 py-2 rounded-xl border border-amber-300 text-amber-700 font-medium hover:bg-amber-100"
+            >
               Pilih Semua ({filtered.length})
             </button>
-            <button onClick={clearSelection} className="text-xs px-3 py-2 rounded-xl border border-amber-300 text-amber-700 font-medium hover:bg-amber-100">
+            <button
+              onClick={clearSelection}
+              className="text-xs px-3 py-2 rounded-xl border border-amber-300 text-amber-700 font-medium hover:bg-amber-100"
+            >
               Batalkan Pilihan
             </button>
           </motion.div>
@@ -396,165 +512,211 @@ export default function OrdersClient({ initialOrders }: { initialOrders: Order[]
             <div className="font-semibold text-base">Tidak ada pesanan ditemukan</div>
             <p className="text-xs mt-1">Coba ubah filter atau kata kunci pencarian</p>
           </div>
-        ) : filtered.map(order => {
-          const cfg = isOrderStatus(order.status) ? STATUS_CONFIG[order.status] : null
-          const isEx = expandedId === order.id
-          const nextStatus = cfg?.next ?? null
-          const isSelected = bulkSelected.has(order.id)
+        ) : (
+          filtered.map((order) => {
+            const cfg = isOrderStatus(order.status) ? STATUS_CONFIG[order.status] : null
+            const isEx = expandedId === order.id
+            const nextStatus = cfg?.next ?? null
+            const isSelected = bulkSelected.has(order.id)
 
-          return (
-            <motion.div
-              key={order.id}
-              layout
-              initial={{ opacity: 0, y: 4 }}
-              animate={{ opacity: 1, y: 0 }}
-              className={`bg-white rounded-2xl border overflow-hidden shadow-sm transition-all duration-200 ${isSelected ? 'border-amber-400 shadow-amber-100' : 'border-cream-200 hover:border-cream-300 hover:shadow-md'}`}
-            >
-              {/* Card Header (always visible) */}
-              <div className="flex items-center gap-3 p-4">
-                {/* Checkbox */}
-                <input
-                  type="checkbox" checked={isSelected}
-                  onChange={() => toggleBulkSelect(order.id)}
-                  className="w-4 h-4 accent-amber-600 shrink-0 cursor-pointer"
-                  onClick={e => e.stopPropagation()}
-                />
+            return (
+              <motion.div
+                key={order.id}
+                layout
+                initial={{ opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                className={`bg-white rounded-2xl border overflow-hidden shadow-sm transition-all duration-200 ${isSelected ? 'border-amber-400 shadow-amber-100' : 'border-cream-200 hover:border-cream-300 hover:shadow-md'}`}
+              >
+                {/* Card Header (always visible) */}
+                <div className="flex items-center gap-3 p-4">
+                  {/* Checkbox */}
+                  <input
+                    type="checkbox"
+                    checked={isSelected}
+                    onChange={() => toggleBulkSelect(order.id)}
+                    className="w-4 h-4 accent-amber-600 shrink-0 cursor-pointer"
+                    onClick={(e) => e.stopPropagation()}
+                  />
 
-                {/* Main info — click to expand */}
-                <div className="flex-1 min-w-0 cursor-pointer" onClick={() => setExpandedId(isEx ? null : order.id)}>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-semibold text-brown-700 text-sm">{order.customerName}</span>
-                    <span className="text-xs text-brown-400">{order.customerPhone}</span>
-                    <span title={order.source} className="text-sm">{SOURCE_ICON[order.source] || '📦'}</span>
-                  </div>
-                  <div className="text-xs text-brown-400 mt-0.5 flex items-center gap-2 flex-wrap">
-                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${order.deliveryMethod === 'DELIVERY' ? 'bg-amber-100 text-amber-800' : 'bg-zinc-100 text-zinc-600'}`}>
-                      {order.deliveryMethod === 'DELIVERY' ? '🛵 DELIVERY' : '🏪 PICKUP'}
-                    </span>
-                    <span>#{order.id.slice(-6)} • {order.items.length} item • {formatPrice(order.totalPrice)}</span>
-                    <span className="text-zinc-400">
-                      {new Date(order.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Status badge + expand chevron */}
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${cfg?.bg ?? 'bg-zinc-100'} ${cfg?.color ?? 'text-zinc-600'}`}>
-                    {cfg?.label ?? 'Unknown'}
-                  </span>
-                  <button
+                  {/* Main info — click to expand */}
+                  <div
+                    className="flex-1 min-w-0 cursor-pointer"
                     onClick={() => setExpandedId(isEx ? null : order.id)}
-                    className="text-brown-300 text-sm p-1 hover:text-brown-500 transition-colors"
                   >
-                    {isEx ? '▲' : '▼'}
-                  </button>
-                </div>
-              </div>
-
-              {/* Expanded Detail */}
-              <AnimatePresence>
-                {isEx && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: 'auto', opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.25, ease: 'easeInOut' }}
-                    className="overflow-hidden"
-                  >
-                    <div className="border-t border-cream-200 px-4 pb-4 pt-3 space-y-4">
-
-                      {/* Items breakdown */}
-                      <div className="bg-cream-50 rounded-xl p-3 space-y-2">
-                        {order.items.map(item => (
-                          <div key={item.id} className="flex justify-between text-sm">
-                            <span className="text-brown-600">
-                              {item.variant.flavorName}
-                              <span className="text-xs text-brown-400 ml-1">({item.baseType})</span>
-                              {item.toppings && item.toppings.length > 0 && <span className="text-zinc-400 font-normal"> + {item.toppings.map((t: any) => `${t.emoji || ''} ${t.name}`).join(', ')}</span>}
-                              {item.quantity > 1 && <span className="text-xs text-brown-400 ml-1">×{item.quantity}</span>}
-                            </span>
-                            <span className="font-semibold text-brown-700 shrink-0 ml-2">{formatPrice(item.subtotal)}</span>
-                          </div>
-                        ))}
-                        {order.deliveryMethod === 'DELIVERY' && order.deliveryFee > 0 && (
-                          <div className="flex justify-between text-sm text-brown-500 border-t border-cream-200 pt-2">
-                            <span>🛵 Ongkir</span>
-                            <span>{formatPrice(order.deliveryFee)}</span>
-                          </div>
-                        )}
-                        <div className="flex justify-between font-bold text-brown-700 border-t border-cream-200 pt-2">
-                          <span>Total</span>
-                          <span>{formatPrice(order.totalPrice)}</span>
-                        </div>
-                      </div>
-
-                      {/* Catatan */}
-                      {order.notes && (
-                        <p className="text-xs text-brown-400 bg-cream-100 rounded-lg px-3 py-2">
-                          📝 {order.notes}
-                        </p>
-                      )}
-
-                      {/* Action Buttons */}
-                      <div className="flex gap-2 flex-wrap pt-1">
-                        {nextStatus && (
-                          <button
-                            onClick={() => updateStatus(order.id, nextStatus)}
-                            disabled={updating === order.id}
-                            className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold bg-brown-700 text-white rounded-xl hover:bg-brown-800 disabled:opacity-50 transition-all"
-                          >
-                            {updating === order.id ? (
-                              <span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                            ) : '→'}
-                            {STATUS_CONFIG[nextStatus].label}
-                          </button>
-                        )}
-
-                        {order.status !== 'CANCELED' && order.status !== 'COMPLETED' && (
-                          <button
-                            onClick={() => updateStatus(order.id, 'CANCELED')}
-                            disabled={updating === order.id}
-                            className="px-3 py-2 text-xs font-bold bg-red-50 text-red-600 rounded-xl hover:bg-red-100 disabled:opacity-50 transition-all"
-                          >
-                            ✕ Batalkan
-                          </button>
-                        )}
-
-                        <button
-                          onClick={() => openWhatsApp(order)}
-                          className="flex items-center gap-1 px-3 py-2 text-xs font-bold bg-green-50 text-green-700 rounded-xl hover:bg-green-100 transition-all"
-                        >
-                          💬 WhatsApp
-                        </button>
-
-                        {/* Status Override Dropdown */}
-                        <div className="flex items-center gap-1 ml-auto">
-                          <select
-                            defaultValue={order.status}
-                            onChange={e => isOrderStatus(e.target.value) && updateStatus(order.id, e.target.value as OrderStatus)}
-                            className="text-xs px-2 py-2 rounded-xl border border-cream-200 text-brown-600 bg-white focus:outline-none"
-                            onClick={e => e.stopPropagation()}
-                          >
-                            {STATUS_ORDER.map(s => <option key={s} value={s}>{STATUS_CONFIG[s].label}</option>)}
-                          </select>
-
-                          <button
-                            onClick={() => deleteOrder(order.id)}
-                            className="p-2 text-xs text-red-400 rounded-xl hover:bg-red-50 transition-all"
-                            title="Hapus pesanan"
-                          >
-                            🗑️
-                          </button>
-                        </div>
-                      </div>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-semibold text-brown-700 text-sm">
+                        {order.customerName}
+                      </span>
+                      <span className="text-xs text-brown-400">{order.customerPhone}</span>
+                      <span title={order.source} className="text-sm">
+                        {SOURCE_ICON[order.source] || '📦'}
+                      </span>
                     </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.div>
-          )
-        })}
+                    <div className="text-xs text-brown-400 mt-0.5 flex items-center gap-2 flex-wrap">
+                      <span
+                        className={`px-2 py-0.5 rounded text-[10px] font-bold ${order.deliveryMethod === 'DELIVERY' ? 'bg-amber-100 text-amber-800' : 'bg-zinc-100 text-zinc-600'}`}
+                      >
+                        {order.deliveryMethod === 'DELIVERY' ? '🛵 DELIVERY' : '🏪 PICKUP'}
+                      </span>
+                      <span>
+                        #{order.id.slice(-6)} • {order.items.length} item •{' '}
+                        {formatPrice(order.totalPrice)}
+                      </span>
+                      <span className="text-zinc-400">
+                        {new Date(order.createdAt).toLocaleDateString('id-ID', {
+                          day: 'numeric',
+                          month: 'short',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Status badge + expand chevron */}
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <span
+                      className={`text-xs font-bold px-2.5 py-1 rounded-full ${cfg?.bg ?? 'bg-zinc-100'} ${cfg?.color ?? 'text-zinc-600'}`}
+                    >
+                      {cfg?.label ?? 'Unknown'}
+                    </span>
+                    <button
+                      onClick={() => setExpandedId(isEx ? null : order.id)}
+                      className="text-brown-300 text-sm p-1 hover:text-brown-500 transition-colors"
+                    >
+                      {isEx ? '▲' : '▼'}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Expanded Detail */}
+                <AnimatePresence>
+                  {isEx && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.25, ease: 'easeInOut' }}
+                      className="overflow-hidden"
+                    >
+                      <div className="border-t border-cream-200 px-4 pb-4 pt-3 space-y-4">
+                        {/* Items breakdown */}
+                        <div className="bg-cream-50 rounded-xl p-3 space-y-2">
+                          {order.items.map((item) => (
+                            <div key={item.id} className="flex justify-between text-sm">
+                              <span className="text-brown-600">
+                                {item.variant.flavorName}
+                                <span className="text-xs text-brown-400 ml-1">
+                                  ({item.baseType})
+                                </span>
+                                {item.toppings && item.toppings.length > 0 && (
+                                  <span className="text-zinc-400 font-normal">
+                                    {' '}
+                                    +{' '}
+                                    {item.toppings
+                                      .map((t: any) => `${t.emoji || ''} ${t.name}`)
+                                      .join(', ')}
+                                  </span>
+                                )}
+                                {item.quantity > 1 && (
+                                  <span className="text-xs text-brown-400 ml-1">
+                                    ×{item.quantity}
+                                  </span>
+                                )}
+                              </span>
+                              <span className="font-semibold text-brown-700 shrink-0 ml-2">
+                                {formatPrice(item.subtotal)}
+                              </span>
+                            </div>
+                          ))}
+                          {order.deliveryMethod === 'DELIVERY' && order.deliveryFee > 0 && (
+                            <div className="flex justify-between text-sm text-brown-500 border-t border-cream-200 pt-2">
+                              <span>🛵 Ongkir</span>
+                              <span>{formatPrice(order.deliveryFee)}</span>
+                            </div>
+                          )}
+                          <div className="flex justify-between font-bold text-brown-700 border-t border-cream-200 pt-2">
+                            <span>Total</span>
+                            <span>{formatPrice(order.totalPrice)}</span>
+                          </div>
+                        </div>
+
+                        {/* Catatan */}
+                        {order.notes && (
+                          <p className="text-xs text-brown-400 bg-cream-100 rounded-lg px-3 py-2">
+                            📝 {order.notes}
+                          </p>
+                        )}
+
+                        {/* Action Buttons */}
+                        <div className="flex gap-2 flex-wrap pt-1">
+                          {nextStatus && (
+                            <button
+                              onClick={() => updateStatus(order.id, nextStatus)}
+                              disabled={updating === order.id}
+                              className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold bg-brown-700 text-white rounded-xl hover:bg-brown-800 disabled:opacity-50 transition-all"
+                            >
+                              {updating === order.id ? (
+                                <span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                              ) : (
+                                '→'
+                              )}
+                              {STATUS_CONFIG[nextStatus].label}
+                            </button>
+                          )}
+
+                          {order.status !== 'CANCELED' && order.status !== 'COMPLETED' && (
+                            <button
+                              onClick={() => updateStatus(order.id, 'CANCELED')}
+                              disabled={updating === order.id}
+                              className="px-3 py-2 text-xs font-bold bg-red-50 text-red-600 rounded-xl hover:bg-red-100 disabled:opacity-50 transition-all"
+                            >
+                              ✕ Batalkan
+                            </button>
+                          )}
+
+                          <button
+                            onClick={() => openWhatsApp(order)}
+                            className="flex items-center gap-1 px-3 py-2 text-xs font-bold bg-green-50 text-green-700 rounded-xl hover:bg-green-100 transition-all"
+                          >
+                            💬 WhatsApp
+                          </button>
+
+                          {/* Status Override Dropdown */}
+                          <div className="flex items-center gap-1 ml-auto">
+                            <select
+                              defaultValue={order.status}
+                              onChange={(e) =>
+                                isOrderStatus(e.target.value) &&
+                                updateStatus(order.id, e.target.value as OrderStatus)
+                              }
+                              className="text-xs px-2 py-2 rounded-xl border border-cream-200 text-brown-600 bg-white focus:outline-none"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              {STATUS_ORDER.map((s) => (
+                                <option key={s} value={s}>
+                                  {STATUS_CONFIG[s].label}
+                                </option>
+                              ))}
+                            </select>
+
+                            <button
+                              onClick={() => deleteOrder(order.id)}
+                              className="p-2 text-xs text-red-400 rounded-xl hover:bg-red-50 transition-all"
+                              title="Hapus pesanan"
+                            >
+                              🗑️
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            )
+          })
+        )}
       </div>
 
       {/* Results count */}

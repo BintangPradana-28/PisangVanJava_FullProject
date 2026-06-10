@@ -10,7 +10,12 @@ interface ManagerPinModalProps {
   actionLabel: string
 }
 
-export default function ManagerPinModal({ isOpen, onClose, onSuccess, actionLabel }: ManagerPinModalProps) {
+export default function ManagerPinModal({
+  isOpen,
+  onClose,
+  onSuccess,
+  actionLabel
+}: ManagerPinModalProps) {
   const [pin, setPin] = useState('')
   const [isProcessing, setIsProcessing] = useState(false)
 
@@ -18,12 +23,12 @@ export default function ManagerPinModal({ isOpen, onClose, onSuccess, actionLabe
 
   const handleNumpadClick = (num: string) => {
     if (pin.length < 4) {
-      setPin(prev => prev + num)
+      setPin((prev) => prev + num)
     }
   }
 
   const handleDelete = () => {
-    setPin(prev => prev.slice(0, -1))
+    setPin((prev) => prev.slice(0, -1))
   }
 
   const handleClear = () => {
@@ -66,7 +71,6 @@ export default function ManagerPinModal({ isOpen, onClose, onSuccess, actionLabe
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
       <div className="bg-white rounded-3xl w-full max-w-sm shadow-2xl overflow-hidden flex flex-col relative">
-        
         {/* Loader Overlay */}
         {isProcessing && (
           <div className="absolute inset-0 bg-white/50 z-10 flex items-center justify-center">
@@ -82,9 +86,9 @@ export default function ManagerPinModal({ isOpen, onClose, onSuccess, actionLabe
 
         {/* PIN Dots */}
         <div className="p-8 flex justify-center gap-4">
-          {[0, 1, 2, 3].map(index => (
-            <div 
-              key={index} 
+          {[0, 1, 2, 3].map((index) => (
+            <div
+              key={index}
               className={`w-5 h-5 rounded-full transition-all duration-200 ${
                 index < pin.length ? 'bg-orange-500 scale-110 shadow-md' : 'bg-gray-200'
               }`}
@@ -94,7 +98,7 @@ export default function ManagerPinModal({ isOpen, onClose, onSuccess, actionLabe
 
         {/* Numpad */}
         <div className="px-6 pb-6 grid grid-cols-3 gap-4">
-          {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map(num => (
+          {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map((num) => (
             <button
               key={num}
               onClick={() => handleNumpadClick(num)}
@@ -125,13 +129,13 @@ export default function ManagerPinModal({ isOpen, onClose, onSuccess, actionLabe
 
         {/* Footer Actions */}
         <div className="p-4 bg-gray-50 flex gap-3 border-t border-gray-100">
-          <button 
+          <button
             onClick={onClose}
             className="flex-1 py-3 rounded-xl bg-white border border-gray-200 text-gray-600 font-bold hover:bg-gray-100 active:scale-95"
           >
             Batal
           </button>
-          <button 
+          <button
             onClick={handleSubmit}
             disabled={pin.length !== 4 || isProcessing}
             className="flex-1 py-3 rounded-xl bg-orange-500 text-white font-bold disabled:opacity-50 hover:bg-orange-600 active:scale-95 shadow-md shadow-orange-500/20"

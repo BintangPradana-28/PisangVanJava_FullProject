@@ -1,8 +1,8 @@
-import { resend } from '@/src/lib/resend'
-import { prisma } from '@/lib/prisma'
 import { render } from '@react-email/components'
-import OrderConfirmationEmail from './OrderConfirmationEmail'
 import React from 'react'
+import { prisma } from '@/lib/prisma'
+import { resend } from '@/src/lib/resend'
+import OrderConfirmationEmail from './OrderConfirmationEmail'
 
 export async function sendOrderConfirmationEmail(orderId: string): Promise<boolean> {
   if (!resend) {
@@ -17,10 +17,10 @@ export async function sendOrderConfirmationEmail(orderId: string): Promise<boole
         items: {
           include: {
             variant: true,
-            topping: true,
+            topping: true
           }
         },
-        user: true,
+        user: true
       }
     })
 
@@ -35,12 +35,17 @@ export async function sendOrderConfirmationEmail(orderId: string): Promise<boole
       return false
     }
 
-    const formatPrice = (n: number) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(n)
+    const formatPrice = (n: number) =>
+      new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
+        minimumFractionDigits: 0
+      }).format(n)
 
     const mappedItems = order.items.map((item: any) => ({
       name: `${item.variant.flavorName} (${item.baseType})${item.topping ? ` + ${item.topping.name}` : ''}`,
       qty: item.quantity,
-      subtotal: formatPrice(item.subtotal),
+      subtotal: formatPrice(item.subtotal)
     }))
 
     const htmlContent = await render(
@@ -51,7 +56,7 @@ export async function sendOrderConfirmationEmail(orderId: string): Promise<boole
         deliveryFee: formatPrice(order.deliveryFee),
         discount: order.discountAmount > 0 ? formatPrice(order.discountAmount) : null,
         totalPrice: formatPrice(order.totalPrice),
-        deliveryMethod: order.deliveryMethod,
+        deliveryMethod: order.deliveryMethod
       })
     )
 
@@ -59,7 +64,7 @@ export async function sendOrderConfirmationEmail(orderId: string): Promise<boole
       from: 'Pisang Van Java <noreply@pisangvanjava.com>',
       to: customerEmail,
       subject: `Pesanan Diproses: #${order.id.slice(-6).toUpperCase()} - Pisang Van Java`,
-      html: htmlContent,
+      html: htmlContent
     })
 
     if (error) {
@@ -74,4 +79,3 @@ export async function sendOrderConfirmationEmail(orderId: string): Promise<boole
     return false
   }
 }
-

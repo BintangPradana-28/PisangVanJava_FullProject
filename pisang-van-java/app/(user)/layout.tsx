@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 import Navbar from '@/components/user/Navbar'
 
 export const metadata: Metadata = {
-  title: 'Pisang Goreng Van Java',
+  title: 'Pisang Goreng Van Java'
 }
 
 export default function UserLayout({ children }: { children: React.ReactNode }) {

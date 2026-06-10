@@ -1,45 +1,45 @@
 'use client'
+import { AnimatePresence, motion } from 'framer-motion'
 // components/admin/AddEditMenuModal.tsx
-import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
-import { MenuVariant, MenuVariantFormData } from '@/data/types'
+import type { MenuVariant, MenuVariantFormData } from '@/data/types'
 
 interface Props {
-  open:       boolean
-  editItem:   MenuVariant | null
-  onClose:    () => void
-  onSaved:    (variant: MenuVariant) => void
+  open: boolean
+  editItem: MenuVariant | null
+  onClose: () => void
+  onSaved: (variant: MenuVariant) => void
 }
 
 const EMPTY_FORM: MenuVariantFormData = {
-  flavorName:   '',
+  flavorName: '',
   priceKembung: 10000,
-  priceLumpia:  10000,
-  priceKrispy:  10000,
-  description:  '',
-  imageUrl:     '',
-  isActive:     true,
-  isAvailable:  true,
-  sortOrder:    0,
+  priceLumpia: 10000,
+  priceKrispy: 10000,
+  description: '',
+  imageUrl: '',
+  isActive: true,
+  isAvailable: true,
+  sortOrder: 0
 }
 
 export default function AddEditMenuModal({ open, editItem, onClose, onSaved }: Props) {
-  const [form,    setForm]    = useState<MenuVariantFormData>(EMPTY_FORM)
+  const [form, setForm] = useState<MenuVariantFormData>(EMPTY_FORM)
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     if (editItem) {
       setForm({
-        flavorName:   editItem.flavorName,
+        flavorName: editItem.flavorName,
         priceKembung: editItem.prices.kembung,
-        priceLumpia:  editItem.prices.lumpia,
-        priceKrispy:  editItem.prices.krispy,
-        description:  editItem.description  ?? '',
-        imageUrl:     editItem.imageUrl     ?? '',
-        isActive:     editItem.isActive,
-        isAvailable:  true, // Default to true or if editItem has it. Wait, editItem is MenuVariant which might not have isAvailable yet?
-        sortOrder:    editItem.sortOrder,
+        priceLumpia: editItem.prices.lumpia,
+        priceKrispy: editItem.prices.krispy,
+        description: editItem.description ?? '',
+        imageUrl: editItem.imageUrl ?? '',
+        isActive: editItem.isActive,
+        isAvailable: true, // Default to true or if editItem has it. Wait, editItem is MenuVariant which might not have isAvailable yet?
+        sortOrder: editItem.sortOrder
       })
     } else {
       setForm(EMPTY_FORM)
@@ -51,29 +51,33 @@ export default function AddEditMenuModal({ open, editItem, onClose, onSaved }: P
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!form.flavorName) { toast.error('Nama varian wajib diisi'); return }
+    if (!form.flavorName) {
+      toast.error('Nama varian wajib diisi')
+      return
+    }
     if (!form.priceKembung || !form.priceLumpia || !form.priceKrispy) {
-      toast.error('Semua harga wajib diisi'); return
+      toast.error('Semua harga wajib diisi')
+      return
     }
 
     setLoading(true)
     try {
-      const url    = editItem ? `/api/menu/${editItem.id}` : '/api/menu'
+      const url = editItem ? `/api/menu/${editItem.id}` : '/api/menu'
       const method = editItem ? 'PUT' : 'POST'
 
-      const res  = await fetch(url, {
+      const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          flavorName:   form.flavorName,
+          flavorName: form.flavorName,
           priceKembung: Number(form.priceKembung),
-          priceLumpia:  Number(form.priceLumpia),
-          priceKrispy:  Number(form.priceKrispy),
-          description:  form.description  || null,
-          imageUrl:     form.imageUrl     || null,
-          isActive:     form.isActive,
-          sortOrder:    Number(form.sortOrder),
-        }),
+          priceLumpia: Number(form.priceLumpia),
+          priceKrispy: Number(form.priceKrispy),
+          description: form.description || null,
+          imageUrl: form.imageUrl || null,
+          isActive: form.isActive,
+          sortOrder: Number(form.sortOrder)
+        })
       })
       const data = await res.json()
 
@@ -82,18 +86,18 @@ export default function AddEditMenuModal({ open, editItem, onClose, onSaved }: P
         // Map DB shape → MenuVariant
         const raw = data.data
         const saved: MenuVariant = {
-          id:          raw.id,
-          flavorName:  raw.flavorName,
+          id: raw.id,
+          flavorName: raw.flavorName,
           prices: {
             kembung: raw.priceKembung,
-            lumpia:  raw.priceLumpia,
-            krispy:  raw.priceKrispy,
+            lumpia: raw.priceLumpia,
+            krispy: raw.priceKrispy
           },
-          imageUrl:    raw.imageUrl,
+          imageUrl: raw.imageUrl,
           description: raw.description,
-          isActive:    raw.isActive,
+          isActive: raw.isActive,
           isAvailable: raw.isAvailable,
-          sortOrder:   raw.sortOrder,
+          sortOrder: raw.sortOrder
         }
         onSaved(saved)
         onClose()
@@ -156,15 +160,17 @@ export default function AddEditMenuModal({ open, editItem, onClose, onSaved }: P
                 <div className="grid grid-cols-3 gap-3">
                   {[
                     { key: 'priceKembung', label: 'Kembung (Isi 15)' },
-                    { key: 'priceLumpia',  label: 'Lumpia (Isi 6)'   },
-                    { key: 'priceKrispy',  label: 'Krispy (Isi 5)'   },
+                    { key: 'priceLumpia', label: 'Lumpia (Isi 6)' },
+                    { key: 'priceKrispy', label: 'Krispy (Isi 5)' }
                   ].map(({ key, label }) => (
                     <div key={key}>
                       <label className="block text-xs text-brown-400 mb-1">{label}</label>
                       <input
                         type="number"
                         value={form[key as keyof MenuVariantFormData] as number}
-                        onChange={(e) => setForm((prev) => ({ ...prev, [key]: Number(e.target.value) }))}
+                        onChange={(e) =>
+                          setForm((prev) => ({ ...prev, [key]: Number(e.target.value) }))
+                        }
                         min={5000}
                         step={1000}
                         className="form-input"
@@ -202,9 +208,11 @@ export default function AddEditMenuModal({ open, editItem, onClose, onSaved }: P
                   className="form-input"
                 />
                 {/* Upload placeholder box */}
-                <div className="mt-2 w-full h-24 border-2 border-dashed border-cream-200 rounded-xl
+                <div
+                  className="mt-2 w-full h-24 border-2 border-dashed border-cream-200 rounded-xl
                                 flex flex-col items-center justify-center text-brown-300 cursor-pointer
-                                hover:border-amber-brand hover:text-amber-brand transition-colors text-sm">
+                                hover:border-amber-brand hover:text-amber-brand transition-colors text-sm"
+                >
                   <span className="text-2xl mb-1">📷</span>
                   <span>Upload Gambar (coming soon)</span>
                 </div>
@@ -219,9 +227,11 @@ export default function AddEditMenuModal({ open, editItem, onClose, onSaved }: P
                       form.isActive ? 'bg-green-wa' : 'bg-cream-200'
                     }`}
                   >
-                    <div className={`w-4 h-4 bg-white rounded-full absolute top-1 transition-transform shadow ${
-                      form.isActive ? 'translate-x-6' : 'translate-x-1'
-                    }`} />
+                    <div
+                      className={`w-4 h-4 bg-white rounded-full absolute top-1 transition-transform shadow ${
+                        form.isActive ? 'translate-x-6' : 'translate-x-1'
+                      }`}
+                    />
                   </div>
                   <span className="text-sm font-medium text-brown-600">
                     {form.isActive ? 'Aktif' : 'Nonaktif'}
@@ -229,7 +239,9 @@ export default function AddEditMenuModal({ open, editItem, onClose, onSaved }: P
                 </label>
 
                 <div className="flex items-center gap-2">
-                  <label className="text-xs font-semibold text-brown-400 uppercase tracking-wider">Urutan</label>
+                  <label className="text-xs font-semibold text-brown-400 uppercase tracking-wider">
+                    Urutan
+                  </label>
                   <input
                     type="number"
                     value={form.sortOrder}

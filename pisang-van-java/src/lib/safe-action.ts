@@ -1,6 +1,6 @@
-import { createSafeActionClient, DEFAULT_SERVER_ERROR_MESSAGE } from 'next-safe-action'
-import { auth } from "@/src/auth";
 import * as Sentry from '@sentry/nextjs'
+import { createSafeActionClient, DEFAULT_SERVER_ERROR_MESSAGE } from 'next-safe-action'
+import { auth } from '@/src/auth'
 
 class ActionError extends Error {}
 
@@ -12,7 +12,7 @@ export const actionClient = createSafeActionClient({
     // Track unhandled errors to Sentry
     Sentry.captureException(e)
     return DEFAULT_SERVER_ERROR_MESSAGE
-  },
+  }
 })
 
 // Client requiring authentication
@@ -27,7 +27,7 @@ export const authActionClient = actionClient.use(async ({ next }) => {
   return next({
     ctx: {
       userId: session.user.id,
-      userRole: session.user.role,
+      userRole: session.user.role
     }
   })
 })

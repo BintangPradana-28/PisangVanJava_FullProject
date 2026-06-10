@@ -1,17 +1,17 @@
-import { auth } from "@/src/auth";
-import { prisma } from "@/lib/prisma";
-import { redirect } from "next/navigation";
-import SecurityClient from "./SecurityClient";
-import { getActiveSessions } from "@/app/actions/security";
+import { redirect } from 'next/navigation'
+import { getActiveSessions } from '@/app/actions/security'
+import { prisma } from '@/lib/prisma'
+import { auth } from '@/src/auth'
+import SecurityClient from './SecurityClient'
 
 export const metadata = {
-  title: "Notifikasi & Keamanan | Pisang Goreng Van Java",
-};
+  title: 'Notifikasi & Keamanan | Pisang Goreng Van Java'
+}
 
 export default async function KeamananPage() {
-  const session = await auth();
+  const session = await auth()
   if (!session?.user?.id) {
-    redirect("/member-login");
+    redirect('/member-login')
   }
 
   const user = await prisma.user.findUnique({
@@ -19,27 +19,27 @@ export default async function KeamananPage() {
     select: {
       notificationPrefs: true,
       twoFactorEnabled: true,
-      passwordHash: true, // Untuk mengecek apakah user punya password (bukan Oauth only)
-    },
-  });
+      passwordHash: true // Untuk mengecek apakah user punya password (bukan Oauth only)
+    }
+  })
 
-  if (!user) redirect("/member-login");
+  if (!user) redirect('/member-login')
 
-  let activeSessions: any[] = [];
+  let activeSessions: any[] = []
   try {
-    activeSessions = await getActiveSessions();
+    activeSessions = await getActiveSessions()
   } catch (err) {
-    console.error("Gagal mengambil active sessions", err);
+    console.error('Gagal mengambil active sessions', err)
   }
 
   // Parse notification prefs
-  let notificationPrefs = { email: true, push: false, promo: true, order: true };
+  let notificationPrefs = { email: true, push: false, promo: true, order: true }
   if (user.notificationPrefs) {
     try {
-      if (typeof user.notificationPrefs === "string") {
-        notificationPrefs = JSON.parse(user.notificationPrefs);
+      if (typeof user.notificationPrefs === 'string') {
+        notificationPrefs = JSON.parse(user.notificationPrefs)
       } else {
-        notificationPrefs = user.notificationPrefs as any;
+        notificationPrefs = user.notificationPrefs as any
       }
     } catch (e) {}
   }
@@ -60,5 +60,5 @@ export default async function KeamananPage() {
         hasPassword={!!user.passwordHash}
       />
     </div>
-  );
+  )
 }

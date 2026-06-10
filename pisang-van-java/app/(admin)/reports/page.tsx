@@ -1,9 +1,10 @@
 // app/(admin)/reports/page.tsx
-import { prisma } from '@/lib/prisma'
+
 import { redirect } from 'next/navigation'
-import { auth } from "@/src/auth";
 import AdminSidebar from '@/components/admin/AdminSidebar'
 import ReportsClient from '@/components/admin/ReportsClient'
+import { prisma } from '@/lib/prisma'
+import { auth } from '@/src/auth'
 
 export default async function ReportsPage(props: { searchParams: Promise<{ range?: string }> }) {
   const searchParams = await props.searchParams
@@ -11,7 +12,7 @@ export default async function ReportsPage(props: { searchParams: Promise<{ range
   if (!session) redirect('/login')
 
   const range = searchParams.range || '30'
-  const now   = new Date()
+  const now = new Date()
   let start: Date | undefined
   if (range !== 'all') {
     start = new Date(now)
@@ -19,12 +20,12 @@ export default async function ReportsPage(props: { searchParams: Promise<{ range
   }
 
   const [orders, totalVariants, totalToppings] = await Promise.all([
-    prisma.order.findMany({ 
+    prisma.order.findMany({
       where: start ? { createdAt: { gte: start } } : undefined,
-      include: { items: { include: { variant: true } } } 
+      include: { items: { include: { variant: true } } }
     }),
     prisma.menuVariant.count({ where: { isDeleted: false } }),
-    prisma.topping.count({ where: { isActive: true } }),
+    prisma.topping.count({ where: { isActive: true } })
   ])
 
   const formattedOrders = orders.map((o: any) => ({
@@ -41,9 +42,9 @@ export default async function ReportsPage(props: { searchParams: Promise<{ range
     <div className="flex min-h-screen">
       <AdminSidebar />
       <main className="flex-1 p-6 sm:p-8 bg-cream-100 overflow-y-auto">
-        <ReportsClient 
-          orders={JSON.parse(JSON.stringify(formattedOrders))} 
-          totalVariants={totalVariants} 
+        <ReportsClient
+          orders={JSON.parse(JSON.stringify(formattedOrders))}
+          totalVariants={totalVariants}
           totalToppings={totalToppings}
           currentRange={range}
         />

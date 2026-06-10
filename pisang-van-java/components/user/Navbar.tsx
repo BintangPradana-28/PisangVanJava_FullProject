@@ -1,14 +1,14 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { motion, AnimatePresence } from 'framer-motion'
-import { useSession, signOut } from 'next-auth/react'
-import { useTheme } from '@/context/ThemeContext'
+import { signOut, useSession } from 'next-auth/react'
+import { useEffect, useRef, useState } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSettings } from '@/context/SettingsContext'
-import { useCartStore, selectCartItemCount } from '@/src/stores/cart.store'
+import { useTheme } from '@/context/ThemeContext'
+import { selectCartItemCount, useCartStore } from '@/src/stores/cart.store'
 import CartModal from './CartModal'
 
 const ShoppingBagIcon = () => (
@@ -61,7 +61,7 @@ export default function Navbar() {
       }
     }
     window.addEventListener('scroll', handleScroll, { passive: true })
-    
+
     // Sprint 4: Rehydrate zustand store manually to avoid hydration mismatch
     useCartStore.persist.rehydrate()
 
@@ -71,10 +71,12 @@ export default function Navbar() {
   // Sprint 3: Trigger cart-pop animation when cartCount increases
   useEffect(() => {
     if (cartCount > prevCartCountRef.current) {
-      setCartPopKey(k => k + 1)
+      setCartPopKey((k) => k + 1)
       // Haptic feedback on mobile (8ms = tactile, not annoying)
       if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
-        try { navigator.vibrate(8) } catch {}
+        try {
+          navigator.vibrate(8)
+        } catch {}
       }
     }
     prevCartCountRef.current = cartCount
@@ -85,13 +87,13 @@ export default function Navbar() {
   const useSolidHeader = scrolled || !isHome || isOpen
 
   const links = [
-    { id: 'hero',    href: '/',               label: t('nav_home')     },
-    { id: 'tentang', href: '/tentang-kami',   label: t('nav_about')    },
-    { id: 'menu',    href: '/menu-spesial',   label: t('nav_menu')     },
-    { id: 'lokasi',  href: '/lokasi-kontak',  label: t('nav_location') },
+    { id: 'hero', href: '/', label: t('nav_home') },
+    { id: 'tentang', href: '/tentang-kami', label: t('nav_about') },
+    { id: 'menu', href: '/menu-spesial', label: t('nav_menu') },
+    { id: 'lokasi', href: '/lokasi-kontak', label: t('nav_location') }
   ]
 
-  const isLinkActive = (link: typeof links[0]) => {
+  const isLinkActive = (link: (typeof links)[0]) => {
     return pathname === link.href
   }
 
@@ -100,6 +102,7 @@ export default function Navbar() {
   }
 
   const handleSignOut = () => {
+    useCartStore.getState().setIsLoggingOut(true)
     useCartStore.getState().clearCart()
     signOut({ callbackUrl: '/' })
   }
@@ -112,14 +115,17 @@ export default function Navbar() {
       {/* Global Store Closed Banner */}
       {getSetting('store_open', 'true') === 'false' && (
         <div className="bg-red-600 text-white text-center py-2 px-4 text-sm font-semibold z-[60] relative">
-          Mohon maaf, Pisang Van Java sedang tutup sementara. Pesanan baru tidak dapat diproses saat ini.
+          Mohon maaf, Pisang Van Java sedang tutup sementara. Pesanan baru tidak dapat diproses saat
+          ini.
         </div>
       )}
 
       {/* Promo Marquee */}
       {getSetting('promo_marquee_active', 'false') === 'true' && (
         <div className="bg-gradient-to-r from-[#D4802A] via-[#E6933D] to-[#D4802A] text-white text-center py-1.5 px-4 text-xs sm:text-sm font-bold z-[60] relative shadow-sm">
-          <span className="inline-block animate-pulse">✨</span> {getSetting('promo_marquee_text', 'Promo Spesial!')} <span className="inline-block animate-pulse">✨</span>
+          <span className="inline-block animate-pulse">✨</span>{' '}
+          {getSetting('promo_marquee_text', 'Promo Spesial!')}{' '}
+          <span className="inline-block animate-pulse">✨</span>
         </div>
       )}
 
@@ -174,8 +180,12 @@ export default function Navbar() {
                     onClick={(e) => handleLinkClick(e, link.id)}
                     className={`font-sans text-sm font-semibold tracking-wide transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary rounded py-1 relative ${
                       useSolidHeader
-                        ? isActive ? 'text-secondary' : 'text-zinc-700 dark:text-zinc-200 hover:text-secondary'
-                        : isActive ? 'text-secondary-container' : 'text-white/90 hover:text-secondary-container'
+                        ? isActive
+                          ? 'text-secondary'
+                          : 'text-zinc-700 dark:text-zinc-200 hover:text-secondary'
+                        : isActive
+                          ? 'text-secondary-container'
+                          : 'text-white/90 hover:text-secondary-container'
                     }`}
                   >
                     {link.label}
@@ -190,7 +200,6 @@ export default function Navbar() {
 
           {/* Action Controls */}
           <div className="flex items-center gap-4">
-            
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
@@ -242,9 +251,16 @@ export default function Navbar() {
                 >
                   <div className="w-9 h-9 rounded-full bg-secondary hover:bg-secondary/95 text-white flex items-center justify-center font-bold text-sm shadow-md transition-all overflow-hidden">
                     {session.user?.image ? (
-                      <img src={session.user.image} alt={session.user?.name || 'Profile'} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                      <img
+                        src={session.user.image}
+                        alt={session.user?.name || 'Profile'}
+                        className="w-full h-full object-cover"
+                        referrerPolicy="no-referrer"
+                      />
+                    ) : session.user?.name ? (
+                      session.user.name[0].toUpperCase()
                     ) : (
-                      session.user?.name ? session.user.name[0].toUpperCase() : 'A'
+                      'A'
                     )}
                   </div>
                 </button>
@@ -252,7 +268,10 @@ export default function Navbar() {
                 <AnimatePresence>
                   {isDropdownOpen && (
                     <>
-                      <div className="fixed inset-0 z-10" onClick={() => setIsDropdownOpen(false)} />
+                      <div
+                        className="fixed inset-0 z-10"
+                        onClick={() => setIsDropdownOpen(false)}
+                      />
                       <motion.div
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -260,12 +279,14 @@ export default function Navbar() {
                         className="absolute right-0 mt-2.5 w-48 bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800 rounded-2xl shadow-xl py-2 z-20"
                       >
                         <div className="px-4 py-2 border-b border-zinc-100 dark:border-zinc-800">
-                          <p className="text-xs text-zinc-400 uppercase tracking-wider font-semibold">User</p>
+                          <p className="text-xs text-zinc-400 uppercase tracking-wider font-semibold">
+                            User
+                          </p>
                           <p className="text-sm font-bold text-zinc-800 dark:text-zinc-200 truncate">
                             {session.user?.name || session.user?.email || 'Admin'}
                           </p>
                         </div>
-                        
+
                         <Link
                           href="/profile"
                           className="flex items-center gap-2 px-4 py-2.5 text-sm text-zinc-700 dark:text-zinc-350 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors"
@@ -283,7 +304,7 @@ export default function Navbar() {
                             ⚙️ {t('nav_admin')}
                           </Link>
                         )}
-                        
+
                         <button
                           onClick={() => {
                             setIsDropdownOpen(false)
@@ -365,7 +386,9 @@ export default function Navbar() {
                         setIsOpen(false)
                       }}
                       className={`text-base font-semibold py-1 border-b border-zinc-100 dark:border-zinc-800 transition-colors ${
-                        isActive ? 'text-secondary' : 'text-zinc-700 dark:text-zinc-200 hover:text-secondary'
+                        isActive
+                          ? 'text-secondary'
+                          : 'text-zinc-700 dark:text-zinc-200 hover:text-secondary'
                       }`}
                     >
                       {link.label}

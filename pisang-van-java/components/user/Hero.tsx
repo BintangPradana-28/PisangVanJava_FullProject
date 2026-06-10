@@ -1,10 +1,10 @@
-"use client";
+'use client'
 
-import Image from "next/image";
-import Link from "next/link";
-import { preload } from "react-dom";
-import { useLanguage } from "@/context/LanguageContext";
-import { Star, Clock, ChevronRight } from "lucide-react";
+import { ChevronRight, Clock, Star } from 'lucide-react'
+import Image from 'next/image'
+import Link from 'next/link'
+import { preload } from 'react-dom'
+import { useLanguage } from '@/context/LanguageContext'
 
 const ShoppingBagIcon = () => (
   <svg
@@ -20,42 +20,40 @@ const ShoppingBagIcon = () => (
     <line x1="3" y1="6" x2="21" y2="6"></line>
     <path d="M16 10a4 4 0 0 1-8 0"></path>
   </svg>
-);
+)
 
 export default function Hero({
   banner,
   averageRating = 0,
-  totalReviews = 0,
+  totalReviews = 0
 }: {
-  banner?: { imageUrl?: string | null; linkUrl?: string | null } | null;
-  averageRating?: number;
-  totalReviews?: number;
+  banner?: { imageUrl?: string | null; linkUrl?: string | null } | null
+  averageRating?: number
+  totalReviews?: number
 }) {
-  const { t } = useLanguage();
+  const { t } = useLanguage()
 
-  const title = t("hero_title");
-  const subtitle = t("hero_desc");
-  const badge = t("hero_badge");
-  const bgImage =
-    banner?.imageUrl ||
-    "/kitchen.png"; // Fix 400 Bad Request caused by expired external aida-public images
-  const ctaLink = banner?.linkUrl || "/menu-spesial";
+  const title = t('hero_title')
+  const subtitle = t('hero_desc')
+  const badge = t('hero_badge')
+  const bgImage = banner?.imageUrl || '/kitchen.png' // Fix 400 Bad Request caused by expired external aida-public images
+  const ctaLink = banner?.linkUrl || '/menu-spesial'
 
   // REMOVED LEAK 2: Manual preload(bgImage) removed because it forces a direct download of unoptimized external assets (bypassing /_next/image). Next.js <Image priority /> handles this automatically.
 
   const renderTitle = () => {
-    if (title.includes("Van Java")) {
-      const parts = title.split("Van Java");
+    if (title.includes('Van Java')) {
+      const parts = title.split('Van Java')
       return (
         <>
           {parts[0]} <br className="hidden sm:block" />
           <span className="text-amber-500 italic font-normal">Van Java</span>
           {parts[1]}
         </>
-      );
+      )
     }
-    return title;
-  };
+    return title
+  }
 
   return (
     <section
@@ -105,7 +103,7 @@ export default function Hero({
                       {Array.from({ length: 5 }).map((_, i) => (
                         <Star
                           key={i}
-                          className={`w-3.5 h-3.5 ${i < Math.round(averageRating) ? "fill-amber-400 text-amber-400" : "text-amber-400/30"}`}
+                          className={`w-3.5 h-3.5 ${i < Math.round(averageRating) ? 'fill-amber-400 text-amber-400' : 'text-amber-400/30'}`}
                         />
                       ))}
                     </div>
@@ -114,9 +112,7 @@ export default function Hero({
                     </span>
                     <span className="text-sm text-gray-300 font-medium">
                       (
-                      {totalReviews > 1000
-                        ? `${(totalReviews / 1000).toFixed(1)}RB`
-                        : totalReviews}{" "}
+                      {totalReviews > 1000 ? `${(totalReviews / 1000).toFixed(1)}RB` : totalReviews}{' '}
                       Penilaian)
                     </span>
                     <ChevronRight className="w-4 h-4 text-gray-400 ml-1 group-hover:text-amber-400 transition-colors" />
@@ -131,12 +127,10 @@ export default function Hero({
               <span>10.00 - 21.00 WIB</span>
             </div>
 
-            <span className="text-gray-500 text-lg leading-none hidden sm:block">
-              •
-            </span>
+            <span className="text-gray-500 text-lg leading-none hidden sm:block">•</span>
 
             <div className="hidden sm:flex items-center gap-1 text-gray-300 text-sm font-medium">
-              <span>{t("hero_location")}</span>
+              <span>{t('hero_location')}</span>
             </div>
           </div>
 
@@ -150,20 +144,18 @@ export default function Hero({
               className="inline-flex items-center gap-3 bg-amber-brand hover:bg-amber-brand/90 text-[#1a0f0a] font-bold text-base px-10 py-4 rounded-full shadow-sbx-card hover:shadow-lg transition-all duration-200 active:scale-95 group focus:outline-none focus:ring-4 focus:ring-amber-brand/40"
             >
               <ShoppingBagIcon />
-              <span>{t("hero_order_btn")}</span>
+              <span>{t('hero_order_btn')}</span>
             </Link>
           </div>
 
           <div className="grid grid-cols-3 gap-6 max-w-sm mt-12 pt-8 border-t border-white/10">
             {[
-              { num: "12+", label: t("hero_stat_topping") },
-              { num: "3", label: t("hero_stat_type") },
-              { num: "100%", label: t("hero_stat_local") },
+              { num: '12+', label: t('hero_stat_topping') },
+              { num: '3', label: t('hero_stat_type') },
+              { num: '100%', label: t('hero_stat_local') }
             ].map(({ num, label }) => (
               <div key={label}>
-                <div className="font-serif text-3xl font-bold text-amber-500">
-                  {num}
-                </div>
+                <div className="font-serif text-3xl font-bold text-amber-500">{num}</div>
                 <div className="text-xs text-gray-400 tracking-wider uppercase mt-1 font-medium">
                   {label}
                 </div>
@@ -176,7 +168,7 @@ export default function Hero({
         <div className="hidden lg:flex justify-end">
           <div className="relative w-full aspect-[4/3] rounded-[12px] overflow-hidden shadow-sbx-card border-8 border-white/10 bg-black/50">
             <Image
-              src={banner?.imageUrl || "/kitchen.png"}
+              src={banner?.imageUrl || '/kitchen.png'}
               alt="Visual Promosi"
               fill
               priority
@@ -202,5 +194,5 @@ export default function Hero({
         </div>
       </div>
     </section>
-  );
+  )
 }

@@ -1,9 +1,10 @@
 // app/(admin)/kontak-leads/page.tsx
-import { prisma } from '@/lib/prisma'
-import { redirect } from 'next/navigation'
-import { auth } from "@/src/auth";
-import AdminSidebar from '@/components/admin/AdminSidebar'
+
 import type { Metadata } from 'next'
+import { redirect } from 'next/navigation'
+import AdminSidebar from '@/components/admin/AdminSidebar'
+import { prisma } from '@/lib/prisma'
+import { auth } from '@/src/auth'
 
 export const metadata: Metadata = { title: 'Prospek Kontak | Admin' }
 
@@ -33,7 +34,9 @@ export default async function KontakLeadsPage() {
       <AdminSidebar />
       <main className="flex-1 p-6 sm:p-8 overflow-y-auto bg-cream-100">
         <h1 className="font-serif text-3xl font-bold text-brown-800 mb-2">PROSPEK KONTAK</h1>
-        <p className="text-sm text-brown-600 mb-8">Daftar pesan pelanggan dari halaman Lokasi & Kontak (Terenkripsi & Compliant PDP).</p>
+        <p className="text-sm text-brown-600 mb-8">
+          Daftar pesan pelanggan dari halaman Lokasi & Kontak (Terenkripsi & Compliant PDP).
+        </p>
 
         <div className="bg-white rounded-2xl shadow-sm border border-brown-200 overflow-hidden">
           <div className="overflow-x-auto">
@@ -59,10 +62,17 @@ export default async function KontakLeadsPage() {
                     <tr key={lead.id} className="hover:bg-cream-50 transition-colors">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="font-medium text-brown-800">
-                          {lead.createdAt.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })}
+                          {lead.createdAt.toLocaleDateString('id-ID', {
+                            day: '2-digit',
+                            month: 'short',
+                            year: 'numeric'
+                          })}
                         </div>
                         <div className="text-xs text-brown-500">
-                          {lead.createdAt.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
+                          {lead.createdAt.toLocaleTimeString('id-ID', {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap font-bold text-brown-900">
@@ -72,8 +82,13 @@ export default async function KontakLeadsPage() {
                         {lead.message}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-xs text-brown-600">{lead.ipAddress || 'Unknown IP'}</div>
-                        <div className="text-[10px] text-brown-400 max-w-[120px] truncate" title={lead.userAgent || ''}>
+                        <div className="text-xs text-brown-600">
+                          {lead.ipAddress || 'Unknown IP'}
+                        </div>
+                        <div
+                          className="text-[10px] text-brown-400 max-w-[120px] truncate"
+                          title={lead.userAgent || ''}
+                        >
                           {lead.userAgent || 'Unknown OS'}
                         </div>
                       </td>

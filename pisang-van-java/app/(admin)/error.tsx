@@ -5,15 +5,15 @@ import AdminSidebar from '@/components/admin/AdminSidebar'
 
 export default function AdminError({
   error,
-  reset,
+  reset
 }: {
   error: Error & { digest?: string }
   reset: () => void
 }) {
   useEffect(() => {
-    // Log the error to an error reporting service in production, 
+    // Log the error to an error reporting service in production,
     // but avoid spamming the console with raw DB errors.
-    console.error("Admin Boundary Error:", error.message)
+    console.error('Admin Boundary Error:', error.message)
   }, [error])
 
   return (

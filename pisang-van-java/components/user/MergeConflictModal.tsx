@@ -1,16 +1,16 @@
 'use client'
 
 import React from 'react'
-import { useCartStore, type CartItem } from '@/src/stores/cart.store'
+import { type CartItem, useCartStore } from '@/src/stores/cart.store'
 
 const formatRupiah = (value: number) => {
-  return new Intl.NumberFormat("id-ID", {
-    style: "currency",
-    currency: "IDR",
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
     minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(value);
-};
+    maximumFractionDigits: 0
+  }).format(value)
+}
 
 export function MergeConflictModal() {
   const conflictState = useCartStore((s) => s.conflictState)
@@ -21,7 +21,13 @@ export function MergeConflictModal() {
   const { local, db } = conflictState
 
   const calcTotal = (items: CartItem[]) => {
-    return items.reduce((acc, item) => acc + ((item.basePrice + (item.toppings?.reduce((sum, t) => sum + t.priceAdd, 0) || 0)) * item.quantity), 0)
+    return items.reduce(
+      (acc, item) =>
+        acc +
+        (item.basePrice + (item.toppings?.reduce((sum, t) => sum + t.priceAdd, 0) || 0)) *
+          item.quantity,
+      0
+    )
   }
 
   const localTotal = calcTotal(local)
@@ -29,11 +35,13 @@ export function MergeConflictModal() {
 
   // Hitung merged preview
   const merged = [...db]
-  local.forEach(localItem => {
-    const existingIndex = merged.findIndex(i => 
-      i.menuVariantId === localItem.menuVariantId &&
-      i.notes === localItem.notes &&
-      i.toppings?.length === localItem.toppings?.length && i.toppings?.every((t, idx) => t.toppingId === localItem.toppings?.[idx]?.toppingId)
+  local.forEach((localItem) => {
+    const existingIndex = merged.findIndex(
+      (i) =>
+        i.menuVariantId === localItem.menuVariantId &&
+        i.notes === localItem.notes &&
+        i.toppings?.length === localItem.toppings?.length &&
+        i.toppings?.every((t, idx) => t.toppingId === localItem.toppings?.[idx]?.toppingId)
     )
     if (existingIndex !== -1) {
       merged[existingIndex].quantity += localItem.quantity
@@ -43,7 +51,15 @@ export function MergeConflictModal() {
   })
   const mergedTotal = calcTotal(merged)
 
-  const ItemListPreview = ({ items, title, total }: { items: CartItem[], title: string, total: number }) => (
+  const ItemListPreview = ({
+    items,
+    title,
+    total
+  }: {
+    items: CartItem[]
+    title: string
+    total: number
+  }) => (
     <div className="bg-neutral-50 rounded-xl p-4 border border-neutral-200">
       <h3 className="font-semibold text-neutral-800 mb-3">{title}</h3>
       <div className="space-y-2 max-h-32 overflow-y-auto pr-2">
@@ -53,8 +69,14 @@ export function MergeConflictModal() {
           items.map((item, idx) => (
             <div key={idx} className="flex justify-between items-start text-sm">
               <div className="flex-1">
-                <span className="text-neutral-700">{item.variantName} x{item.quantity}</span>
-                {item.toppings && item.toppings.length > 0 && <div className="text-xs text-neutral-500">+ {item.toppings.map((t: any) => t.name).join(', ')}</div>}
+                <span className="text-neutral-700">
+                  {item.variantName} x{item.quantity}
+                </span>
+                {item.toppings && item.toppings.length > 0 && (
+                  <div className="text-xs text-neutral-500">
+                    + {item.toppings.map((t: any) => t.name).join(', ')}
+                  </div>
+                )}
               </div>
             </div>
           ))
@@ -70,12 +92,12 @@ export function MergeConflictModal() {
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden animate-in zoom-in-95 duration-200">
-        
         {/* Header */}
         <div className="bg-amber-50 px-6 py-5 border-b border-amber-100">
           <h2 className="text-xl font-bold text-amber-900">Gabungkan Keranjang?</h2>
           <p className="text-sm text-amber-700 mt-1">
-            Kami menemukan keranjang lama Anda yang tersimpan di server. Pilih keranjang mana yang ingin Anda gunakan.
+            Kami menemukan keranjang lama Anda yang tersimpan di server. Pilih keranjang mana yang
+            ingin Anda gunakan.
           </p>
         </div>
 
@@ -95,7 +117,7 @@ export function MergeConflictModal() {
               <span>Gabungkan Keduanya (Rekomendasi)</span>
               <span>Total: {formatRupiah(mergedTotal)}</span>
             </button>
-            
+
             <div className="grid grid-cols-2 gap-3">
               <button
                 onClick={() => resolveConflict('LOCAL')}
@@ -112,7 +134,6 @@ export function MergeConflictModal() {
             </div>
           </div>
         </div>
-
       </div>
     </div>
   )

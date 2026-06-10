@@ -10,12 +10,12 @@ export const api = ofetch.create({
   baseURL: '/',
   headers: {
     Accept: 'application/json',
-    'Content-Type': 'application/json',
+    'Content-Type': 'application/json'
   },
   async onRequest({ request, options }) {
     // console.log('[API Request]', request, options)
   },
   async onResponseError({ request, response, options }) {
     console.error('[API Error]', request, response.status, response._data)
-  },
+  }
 })

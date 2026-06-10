@@ -13,41 +13,41 @@
  *    TIDAK dikirim ke klien agar tidak bocor struktur DB internal.
  */
 
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import type { MenuVariant, Topping } from "@prisma/client";
+import type { MenuVariant, Topping } from '@prisma/client'
+import { NextResponse } from 'next/server'
+import { prisma } from '@/lib/prisma'
 
-export const revalidate = 60;
+export const revalidate = 60
 
 // ── DTO types — hanya field yang boleh terlihat publik ────────────────────────
 
 type VariantPublicDTO = {
-  id: string;
-  flavorName: string;
-  priceKembung: number;
-  priceLumpia: number;
-  priceKrispy: number;
-  isAvailable: boolean;
-  imageUrl: string | null;
-  rating?: number;
-  reviewCount?: number;
-};
+  id: string
+  flavorName: string
+  priceKembung: number
+  priceLumpia: number
+  priceKrispy: number
+  isAvailable: boolean
+  imageUrl: string | null
+  rating?: number
+  reviewCount?: number
+}
 
 type ToppingPublicDTO = {
-  id: string;
-  name: string;
-  price: number;
-  emoji: string | null;
-};
+  id: string
+  name: string
+  price: number
+  emoji: string | null
+}
 
 function toVariantDTO(v: MenuVariant & { reviews?: { rating: number }[] }): VariantPublicDTO {
-  let rating = 0;
-  let reviewCount = 0;
-  
+  let rating = 0
+  let reviewCount = 0
+
   if (v.reviews && v.reviews.length > 0) {
-    reviewCount = v.reviews.length;
-    const sum = v.reviews.reduce((acc, curr) => acc + curr.rating, 0);
-    rating = Number((sum / reviewCount).toFixed(1));
+    reviewCount = v.reviews.length
+    const sum = v.reviews.reduce((acc, curr) => acc + curr.rating, 0)
+    rating = Number((sum / reviewCount).toFixed(1))
   }
 
   return {
@@ -60,7 +60,7 @@ function toVariantDTO(v: MenuVariant & { reviews?: { rating: number }[] }): Vari
     imageUrl: v.imageUrl ?? null,
     rating,
     reviewCount
-  };
+  }
 }
 
 function toToppingDTO(t: Topping): ToppingPublicDTO {
@@ -68,8 +68,8 @@ function toToppingDTO(t: Topping): ToppingPublicDTO {
     id: t.id,
     name: t.name,
     price: t.price,
-    emoji: t.emoji ?? null,
-  };
+    emoji: t.emoji ?? null
+  }
 }
 
 // ── Handler ────────────────────────────────────────────────────────────────────
@@ -79,30 +79,30 @@ export async function GET() {
     const [variants, toppings] = await Promise.all([
       prisma.menuVariant.findMany({
         where: { isDeleted: false, isActive: true },
-        orderBy: { flavorName: "asc" },
+        orderBy: { flavorName: 'asc' },
         include: { reviews: { select: { rating: true } } },
         cacheStrategy: { ttl: 60, swr: 60 } // Prisma Accelerate Edge Cache
       }),
       prisma.topping.findMany({
         where: { isActive: true },
-        orderBy: { name: "asc" },
+        orderBy: { name: 'asc' },
         cacheStrategy: { ttl: 60, swr: 60 } // Prisma Accelerate Edge Cache
-      }),
-    ]);
+      })
+    ])
 
     return NextResponse.json({
       success: true,
       data: {
         variants: variants.map(toVariantDTO),
-        toppings: toppings.map(toToppingDTO),
-      },
-    });
+        toppings: toppings.map(toToppingDTO)
+      }
+    })
   } catch (error) {
     // Defensive: hanya log secara internal, JANGAN bocorkan detail ke klien
-    console.error("[GET /api/menu]", error);
+    console.error('[GET /api/menu]', error)
     return NextResponse.json(
-      { success: false, message: "Terjadi kesalahan pada server" },
+      { success: false, message: 'Terjadi kesalahan pada server' },
       { status: 500 }
-    );
+    )
   }
 }

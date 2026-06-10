@@ -4,10 +4,10 @@ const prisma = new PrismaClient()
 
 async function main() {
   console.log('🍌 Pisang Van Java - Integration Test: Referral & Koin')
-  
+
   // 1. Setup Data Uji
   console.log('[1] Menyiapkan data uji...')
-  
+
   // Hapus data lama jika ada
   await prisma.user.deleteMany({
     where: {
@@ -21,7 +21,7 @@ async function main() {
       email: 'referrer@test.com',
       name: 'Referrer User',
       koinPisang: 0,
-      referralCode: 'REF-123',
+      referralCode: 'REF-123'
     }
   })
   console.log('✅ Referrer dibuat:', referrer.email, 'Saldo Koin:', referrer.koinPisang)
@@ -32,7 +32,7 @@ async function main() {
       email: 'referred@test.com',
       name: 'Referred User',
       referredBy: 'REF-123', // Menyambungkan ke referrer
-      hasOrdered: false,
+      hasOrdered: false
     }
   })
   console.log('✅ Referred dibuat:', referred.email, 'Invited By:', referred.referredBy)
@@ -48,7 +48,7 @@ async function main() {
       totalPrice: 25000,
       source: 'online',
       deliveryMethod: 'PICKUP',
-      deliveryFee: 0,
+      deliveryFee: 0
     }
   })
 
@@ -105,7 +105,7 @@ async function main() {
       totalPrice: 30000,
       source: 'online',
       deliveryMethod: 'PICKUP',
-      deliveryFee: 0,
+      deliveryFee: 0
     }
   })
 
@@ -146,13 +146,14 @@ async function main() {
   console.log(`✅ Transaksi #2 Selesai.`)
   console.log(`   - Saldo Referrer: ${referrerAfter2?.koinPisang} (Expected: 5000)`)
 
-  if (referrerAfter2?.koinPisang !== 5000) throw new Error('FAILED: Koin bertambah padahal sudah hasOrdered.')
+  if (referrerAfter2?.koinPisang !== 5000)
+    throw new Error('FAILED: Koin bertambah padahal sudah hasOrdered.')
 
   console.log('\n🎉 SEMUA TEST LULUS (Idempotency & Anti-Abuse Protected)')
 }
 
 main()
-  .catch(e => {
+  .catch((e) => {
     console.error(e)
     process.exit(1)
   })

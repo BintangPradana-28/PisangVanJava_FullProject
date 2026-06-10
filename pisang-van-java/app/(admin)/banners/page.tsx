@@ -1,6 +1,6 @@
 import AdminSidebar from '@/components/admin/AdminSidebar'
-import { prisma } from '@/lib/prisma'
 import BannersClient from '@/components/admin/BannersClient'
+import { prisma } from '@/lib/prisma'
 
 export const dynamic = 'force-dynamic'
 

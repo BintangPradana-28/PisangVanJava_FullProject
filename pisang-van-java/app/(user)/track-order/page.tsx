@@ -3,79 +3,100 @@
 // app/(user)/track-order/page.tsx
 // Upgraded: Added "Pesan Lagi" (Reorder) button that pushes all items to cart.
 
-import { useState, useEffect } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { AnimatePresence, motion } from 'framer-motion'
 import Link from 'next/link'
-import { motion, AnimatePresence } from 'framer-motion'
-import { formatPrice } from '@/lib/utils'
-import { useLanguage } from '@/context/LanguageContext'
-import { useCartStore } from '@/src/stores/cart.store'
+import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { z } from 'zod'
-import { supabaseBrowserClient } from '@/src/lib/supabase-client'
-import { useQuery } from '@tanstack/react-query'
+import { useLanguage } from '@/context/LanguageContext'
+import { formatPrice } from '@/lib/utils'
 import { api } from '@/src/lib/api'
+import { supabaseBrowserClient } from '@/src/lib/supabase-client'
+import { useCartStore } from '@/src/stores/cart.store'
 
 const STATUS_STEPS = ['pending', 'paid', 'processing', 'ready', 'done']
 const STATUS_ICONS: Record<string, string> = {
-  pending:   '⏳',
-  paid:      '💳',
-  processing:'🧑‍🍳',
-  ready:     '🍌',
-  done:      '🎉',
-  cancelled: '❌',
+  pending: '⏳',
+  paid: '💳',
+  processing: '🧑‍🍳',
+  ready: '🍌',
+  done: '🎉',
+  cancelled: '❌'
 }
 
-const orderItemSchema = z.object({
-  id: z.string().min(1),
-  baseType: z.string().min(1),
-  quantity: z.number().int().min(1),
-  subtotal: z.number().finite().min(0),
-  variant: z.object({
-    flavorName: z.string().optional(),
-    nama_varian: z.string().optional(),
-  }).strict(),
-  toppings: z.array(z.object({
-    id: z.string().optional(),
-    name: z.string(),
-    emoji: z.string().nullable().optional(),
-  })).optional().nullable(),
-}).strict()
+const orderItemSchema = z
+  .object({
+    id: z.string().min(1),
+    baseType: z.string().min(1),
+    quantity: z.number().int().min(1),
+    subtotal: z.number().finite().min(0),
+    variant: z
+      .object({
+        flavorName: z.string().optional(),
+        nama_varian: z.string().optional()
+      })
+      .strict(),
+    toppings: z
+      .array(
+        z.object({
+          id: z.string().optional(),
+          name: z.string(),
+          emoji: z.string().nullable().optional()
+        })
+      )
+      .optional()
+      .nullable()
+  })
+  .strict()
 
-const orderSchema = z.object({
-  id: z.string().min(1),
-  customerName: z.string().min(1),
-  status: z.string().min(1),
-  totalPrice: z.number().finite().min(0),
-  createdAt: z.string().min(1),
-  items: z.array(orderItemSchema),
-}).strict()
+const orderSchema = z
+  .object({
+    id: z.string().min(1),
+    customerName: z.string().min(1),
+    status: z.string().min(1),
+    totalPrice: z.number().finite().min(0),
+    createdAt: z.string().min(1),
+    items: z.array(orderItemSchema)
+  })
+  .strict()
 
 const trackOrdersResponseSchema = z.discriminatedUnion('success', [
-  z.object({
-    success: z.literal(true),
-    data: z.array(orderSchema),
-  }).strict(),
-  z.object({
-    success: z.literal(false),
-    error: z.string().min(1),
-  }).strict(),
+  z
+    .object({
+      success: z.literal(true),
+      data: z.array(orderSchema)
+    })
+    .strict(),
+  z
+    .object({
+      success: z.literal(false),
+      error: z.string().min(1)
+    })
+    .strict()
 ])
 
-const liveProductSchema = z.object({
-  id: z.string().min(1),
-  flavorName: z.string().min(1),
-  priceKembung: z.number().finite().min(0),
-  priceLumpia: z.number().finite().min(0),
-  priceKrispy: z.number().finite().min(0),
-  isAvailable: z.boolean(),
-}).strict()
+const liveProductSchema = z
+  .object({
+    id: z.string().min(1),
+    flavorName: z.string().min(1),
+    priceKembung: z.number().finite().min(0),
+    priceLumpia: z.number().finite().min(0),
+    priceKrispy: z.number().finite().min(0),
+    isAvailable: z.boolean()
+  })
+  .strict()
 
-const menuResponseSchema = z.object({
-  success: z.literal(true),
-  data: z.object({
-    variants: z.array(liveProductSchema),
-  }).strict(),
-}).strict()
+const menuResponseSchema = z
+  .object({
+    success: z.literal(true),
+    data: z
+      .object({
+        variants: z.array(liveProductSchema)
+      })
+      .strict()
+  })
+  .strict()
 
 type OrderItem = z.infer<typeof orderItemSchema>
 type Order = z.infer<typeof orderSchema>
@@ -105,7 +126,7 @@ function ReorderButton({ order }: { order: Order }) {
       }
       const liveProducts = parsedMenu.data.data.variants
 
-      let addedCount  = 0
+      let addedCount = 0
       let skippedCount = 0
 
       for (const item of order.items) {
@@ -123,11 +144,17 @@ function ReorderButton({ order }: { order: Order }) {
 
         addToCart({
           menuVariantId: live.id,
-          variantName:   `${variantName} (${item.baseType})`,
+          variantName: `${variantName} (${item.baseType})`,
           basePrice,
-          toppings:      item.toppings ? item.toppings.map((t: any) => ({ toppingId: t.id || 'unknown', name: t.name, priceAdd: 2000 })) : [],
-          quantity:      item.quantity,
-          notes:         '',
+          toppings: item.toppings
+            ? item.toppings.map((t: any) => ({
+                toppingId: t.id || 'unknown',
+                name: t.name,
+                priceAdd: 2000
+              }))
+            : [],
+          quantity: item.quantity,
+          notes: ''
         })
         addedCount++
       }
@@ -135,7 +162,10 @@ function ReorderButton({ order }: { order: Order }) {
       if (addedCount > 0 && skippedCount === 0) {
         toast.success(`🛒 ${addedCount} item ditambahkan ke keranjang!`)
       } else if (addedCount > 0 && skippedCount > 0) {
-        toast.success(`🛒 ${addedCount} item ditambahkan. ${skippedCount} item habis/tidak tersedia.`, { duration: 4000 })
+        toast.success(
+          `🛒 ${addedCount} item ditambahkan. ${skippedCount} item habis/tidak tersedia.`,
+          { duration: 4000 }
+        )
       } else {
         toast.error('Semua item dalam pesanan ini sedang tidak tersedia.')
       }
@@ -150,17 +180,30 @@ function ReorderButton({ order }: { order: Order }) {
     <button
       onClick={handleReorder}
       disabled={loading || order.status === 'CANCELED'}
-      title={order.status === 'CANCELED' ? 'Pesanan dibatalkan' : 'Tambahkan semua item ke keranjang'}
+      title={
+        order.status === 'CANCELED' ? 'Pesanan dibatalkan' : 'Tambahkan semua item ke keranjang'
+      }
       className="flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-full transition-all duration-200 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
       style={{
         background: order.status === 'CANCELED' ? 'var(--surface-custom)' : '#D4802A',
-        color:      order.status === 'CANCELED' ? 'var(--text-custom)'    : 'white',
+        color: order.status === 'CANCELED' ? 'var(--text-custom)' : 'white'
       }}
     >
       {loading ? (
         <svg className="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
-          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+          <circle
+            className="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            strokeWidth="4"
+          />
+          <path
+            className="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+          />
         </svg>
       ) : (
         '🛒'
@@ -172,22 +215,29 @@ function ReorderButton({ order }: { order: Order }) {
 
 // ── Main Page ──────────────────────────────────────────────────────────────────
 export default function TrackOrderPage() {
-  const { t, locale }                        = useLanguage()
-  const [phone,   setPhone]                  = useState('')
-  const [orders,  setOrders]                 = useState<Order[] | null>(null)
-  const [errorLocal, setErrorLocal]          = useState('')
-  const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'disconnected'>('disconnected')
+  const { t, locale } = useLanguage()
+  const [phone, setPhone] = useState('')
+  const [orders, setOrders] = useState<Order[] | null>(null)
+  const [errorLocal, setErrorLocal] = useState('')
+  const [connectionStatus, setConnectionStatus] = useState<
+    'connecting' | 'connected' | 'disconnected'
+  >('disconnected')
 
   const STATUS_LABELS: Record<string, string> = {
-    pending:   t('status_pending'),
-    paid:      t('status_paid'),
-    processing:'Sedang Diproses',
-    ready:     t('status_ready'),
-    done:      t('status_done'),
-    cancelled: t('status_cancelled'),
+    pending: t('status_pending'),
+    paid: t('status_paid'),
+    processing: 'Sedang Diproses',
+    ready: t('status_ready'),
+    done: t('status_done'),
+    cancelled: t('status_cancelled')
   }
 
-  const { data: fetchedOrders, isFetching: loading, error: queryError, refetch } = useQuery({
+  const {
+    data: fetchedOrders,
+    isFetching: loading,
+    error: queryError,
+    refetch
+  } = useQuery({
     queryKey: ['trackOrder', phone],
     queryFn: async () => {
       const data = await api(`/api/orders/track?phone=${encodeURIComponent(phone.trim())}`)
@@ -202,7 +252,7 @@ export default function TrackOrderPage() {
       }
     },
     enabled: false,
-    retry: 0,
+    retry: 0
   })
 
   // Sync react-query data to local state for Supabase real-time optimistic updates
@@ -211,7 +261,10 @@ export default function TrackOrderPage() {
   }, [fetchedOrders])
 
   const handleSearch = () => {
-    if (!phone.trim()) { setErrorLocal(t('track_toast_invalid_phone')); return }
+    if (!phone.trim()) {
+      setErrorLocal(t('track_toast_invalid_phone'))
+      return
+    }
     setErrorLocal('')
     setOrders(null)
     refetch()
@@ -223,38 +276,38 @@ export default function TrackOrderPage() {
   useEffect(() => {
     if (!orders || orders.length === 0 || !supabaseBrowserClient) return
 
-    const orderIds = orders.map(o => o.id)
+    const orderIds = orders.map((o) => o.id)
     setConnectionStatus('connecting')
-    
+
     // Subscribe to changes on the "Order" table for these specific order IDs
     const channel = supabaseBrowserClient
       .channel('public:Order')
-      .on(
-        'postgres_changes',
-        { event: 'UPDATE', schema: 'public', table: 'Order' },
-        (payload) => {
-          const updatedOrder = payload.new as { id: string; status: string }
-          if (orderIds.includes(updatedOrder.id)) {
-            setOrders(prev => {
-              if (!prev) return prev
-              return prev.map(o => 
-                o.id === updatedOrder.id ? { ...o, status: updatedOrder.status } : o
-              )
-            })
-            toast.success(`Status pesanan diperbarui menjadi: ${STATUS_LABELS[updatedOrder.status] || updatedOrder.status}`, { icon: '🔄' })
-          }
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'Order' }, (payload) => {
+        const updatedOrder = payload.new as { id: string; status: string }
+        if (orderIds.includes(updatedOrder.id)) {
+          setOrders((prev) => {
+            if (!prev) return prev
+            return prev.map((o) =>
+              o.id === updatedOrder.id ? { ...o, status: updatedOrder.status } : o
+            )
+          })
+          toast.success(
+            `Status pesanan diperbarui menjadi: ${STATUS_LABELS[updatedOrder.status] || updatedOrder.status}`,
+            { icon: '🔄' }
+          )
         }
-      )
+      })
       .subscribe((status) => {
         if (status === 'SUBSCRIBED') setConnectionStatus('connected')
-        else if (status === 'CLOSED' || status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') setConnectionStatus('disconnected')
+        else if (status === 'CLOSED' || status === 'CHANNEL_ERROR' || status === 'TIMED_OUT')
+          setConnectionStatus('disconnected')
       })
 
     return () => {
       setConnectionStatus('disconnected')
       supabaseBrowserClient?.removeChannel(channel)
     }
-  }, [orders?.map(o => o.id).join(',')])
+  }, [orders?.map((o) => o.id).join(',')])
 
   return (
     <section className="min-h-screen py-16 px-4" style={{ background: 'var(--background-custom)' }}>
@@ -297,26 +350,39 @@ export default function TrackOrderPage() {
         {/* Results */}
         <AnimatePresence>
           {orders && (
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
-              
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="space-y-4"
+            >
               {/* Connection Status & Refresh */}
               {orders.length > 0 && (
                 <div className="flex items-center justify-between px-2 mb-2">
                   <div className="flex items-center gap-2 text-xs">
                     <span className="relative flex h-2.5 w-2.5">
-                      {connectionStatus === 'connected' && <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>}
-                      <span className={`relative inline-flex rounded-full h-2.5 w-2.5 ${
-                        connectionStatus === 'connected' ? 'bg-green-500' :
-                        connectionStatus === 'connecting' ? 'bg-amber-400' : 'bg-red-500'
-                      }`}></span>
+                      {connectionStatus === 'connected' && (
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                      )}
+                      <span
+                        className={`relative inline-flex rounded-full h-2.5 w-2.5 ${
+                          connectionStatus === 'connected'
+                            ? 'bg-green-500'
+                            : connectionStatus === 'connecting'
+                              ? 'bg-amber-400'
+                              : 'bg-red-500'
+                        }`}
+                      ></span>
                     </span>
                     <span className="text-zinc-500 font-medium">
-                      {connectionStatus === 'connected' ? 'Live Tracker Aktif' :
-                       connectionStatus === 'connecting' ? 'Menghubungkan...' : 'Live Tracker Terputus'}
+                      {connectionStatus === 'connected'
+                        ? 'Live Tracker Aktif'
+                        : connectionStatus === 'connecting'
+                          ? 'Menghubungkan...'
+                          : 'Live Tracker Terputus'}
                     </span>
                   </div>
                   {connectionStatus !== 'connected' && (
-                    <button 
+                    <button
                       onClick={handleSearch}
                       disabled={loading}
                       className="text-xs font-bold text-amber-600 hover:text-amber-700 disabled:opacity-50"
@@ -328,13 +394,16 @@ export default function TrackOrderPage() {
               )}
 
               {orders.length === 0 ? (
-                <div className="text-center py-12" style={{ color: 'var(--text-custom)', opacity: 0.5 }}>
+                <div
+                  className="text-center py-12"
+                  style={{ color: 'var(--text-custom)', opacity: 0.5 }}
+                >
                   <div className="text-4xl mb-2">🔍</div>
                   <p>{t('track_empty')}</p>
                 </div>
               ) : (
                 orders.map((order) => {
-                  const stepIdx   = STATUS_STEPS.indexOf(order.status)
+                  const stepIdx = STATUS_STEPS.indexOf(order.status)
                   const cancelled = order.status === 'CANCELED'
                   return (
                     <div
@@ -344,10 +413,16 @@ export default function TrackOrderPage() {
                       {/* Order header */}
                       <div className="flex justify-between items-start mb-4">
                         <div>
-                          <div className="font-semibold text-sm" style={{ color: 'var(--text-custom)' }}>
+                          <div
+                            className="font-semibold text-sm"
+                            style={{ color: 'var(--text-custom)' }}
+                          >
                             {order.customerName}
                           </div>
-                          <div className="text-xs mt-0.5" style={{ color: 'var(--text-custom)', opacity: 0.5 }}>
+                          <div
+                            className="text-xs mt-0.5"
+                            style={{ color: 'var(--text-custom)', opacity: 0.5 }}
+                          >
                             {new Date(order.createdAt).toLocaleDateString(
                               locale === 'id' ? 'id-ID' : 'en-US',
                               { day: 'numeric', month: 'long', year: 'numeric' }
@@ -362,11 +437,15 @@ export default function TrackOrderPage() {
                         <div className="flex items-center gap-1 mb-4">
                           {STATUS_STEPS.map((step, i) => (
                             <div key={step} className="flex items-center flex-1 last:flex-none">
-                              <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 transition-colors ${i <= stepIdx ? 'bg-amber-500 text-white' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-400'}`}>
+                              <div
+                                className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 transition-colors ${i <= stepIdx ? 'bg-amber-500 text-white' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-400'}`}
+                              >
                                 {i + 1}
                               </div>
                               {i < STATUS_STEPS.length - 1 && (
-                                <div className={`flex-1 h-1 mx-1 rounded transition-colors ${i < stepIdx ? 'bg-amber-500' : 'bg-zinc-100 dark:bg-zinc-800'}`} />
+                                <div
+                                  className={`flex-1 h-1 mx-1 rounded transition-colors ${i < stepIdx ? 'bg-amber-500' : 'bg-zinc-100 dark:bg-zinc-800'}`}
+                                />
                               )}
                             </div>
                           ))}
@@ -378,7 +457,9 @@ export default function TrackOrderPage() {
                         <div className="text-sm font-semibold" style={{ color: '#D4802A' }}>
                           {STATUS_LABELS[order.status]}
                         </div>
-                        {(order.status === 'PROCESSING' || order.status === 'READY' || order.status === 'PENDING_PAYMENT') && (
+                        {(order.status === 'PROCESSING' ||
+                          order.status === 'READY' ||
+                          order.status === 'PENDING_PAYMENT') && (
                           <div className="text-xs font-medium text-amber-700 bg-amber-50 dark:bg-amber-950/20 px-2 py-1 rounded-md inline-flex items-center gap-1 mt-1.5 border border-amber-200/50">
                             ⏱️ Estimasi tiba: 30-45 menit
                           </div>
@@ -390,13 +471,18 @@ export default function TrackOrderPage() {
                         {order.items.map((item) => (
                           <div key={item.id} className="flex justify-between text-sm">
                             <span style={{ color: 'var(--text-custom)', opacity: 0.8 }}>
-                              {item.variant.flavorName ?? item.variant.nama_varian} ({item.baseType})
+                              {item.variant.flavorName ?? item.variant.nama_varian} ({item.baseType}
+                              )
                               {item.toppings && item.toppings.length > 0 && (
                                 <p className="mt-1 text-xs text-amber-600 dark:text-amber-400 font-medium">
-                                  {' '}+ {item.toppings.map((t: any) => `${t.emoji || ''} ${t.name}`).join(', ')}
+                                  {' '}
+                                  +{' '}
+                                  {item.toppings
+                                    .map((t: any) => `${t.emoji || ''} ${t.name}`)
+                                    .join(', ')}
                                 </p>
-                              )}
-                              {' '}×{item.quantity}
+                              )}{' '}
+                              ×{item.quantity}
                             </span>
                             <span className="font-medium" style={{ color: 'var(--text-custom)' }}>
                               {formatPrice(item.subtotal)}

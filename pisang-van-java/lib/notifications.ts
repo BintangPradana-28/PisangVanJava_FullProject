@@ -1,9 +1,9 @@
 /**
  * lib/notifications.ts
- * 
+ *
  * Abstraksi untuk mengirim notifikasi ke pelanggan via WhatsApp.
- * Karena ini adalah bisnis yang baru merintis dari 0, merekomendasikan provider berbayar 
- * berisiko (biaya bulanan). Untuk MVP, kita membuat abstraksi webhook ini agar siap 
+ * Karena ini adalah bisnis yang baru merintis dari 0, merekomendasikan provider berbayar
+ * berisiko (biaya bulanan). Untuk MVP, kita membuat abstraksi webhook ini agar siap
  * disambungkan ke API gratis/freemium (seperti Fonnte versi free atau Watzap) di masa depan.
  */
 
@@ -46,7 +46,7 @@ export async function sendWhatsAppNotification(
       })
     }
     */
-    
+
     return { success: true }
   } catch (error) {
     console.error('[WEBHOOK ERROR] Gagal mengirim notifikasi WA:', error)

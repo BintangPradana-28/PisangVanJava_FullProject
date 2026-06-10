@@ -1,10 +1,11 @@
 // app/(admin)/orders/page.tsx
-import { prisma } from '@/lib/prisma'
+
 import { redirect } from 'next/navigation'
-import { auth } from "@/src/auth";
+import { Toaster } from 'react-hot-toast'
 import AdminSidebar from '@/components/admin/AdminSidebar'
 import OrdersClient from '@/components/admin/OrdersClient'
-import { Toaster } from 'react-hot-toast'
+import { prisma } from '@/lib/prisma'
+import { auth } from '@/src/auth'
 
 export default async function OrdersPage() {
   const session = await auth()
@@ -32,18 +33,18 @@ export default async function OrdersPage() {
           subtotal: true,
           variant: {
             select: {
-              flavorName: true,
-            },
+              flavorName: true
+            }
           },
           toppings: {
             select: {
               name: true,
-              emoji: true,
-            },
-          },
-        },
-      },
-    },
+              emoji: true
+            }
+          }
+        }
+      }
+    }
   })
 
   const formattedOrders = orders.map((o: any) => ({
@@ -64,12 +65,14 @@ export default async function OrdersPage() {
       unitPrice: item.unitPrice,
       subtotal: item.subtotal,
       variant: {
-        flavorName: item.variant.flavorName,
+        flavorName: item.variant.flavorName
       },
-      toppings: item.toppings ? item.toppings.map((t: any) => ({
-        name: t.name,
-        emoji: t.emoji,
-      })) : [],
+      toppings: item.toppings
+        ? item.toppings.map((t: any) => ({
+            name: t.name,
+            emoji: t.emoji
+          }))
+        : []
     }))
   }))
 

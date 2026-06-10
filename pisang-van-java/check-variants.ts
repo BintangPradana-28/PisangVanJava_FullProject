@@ -1,18 +1,23 @@
-import { PrismaClient } from '@prisma/client';
+import { prisma } from './lib/prisma.ts'
 
-const prisma = new PrismaClient();
-
-async function main() {
+async function checkVariants() {
   try {
-    const count = await prisma.menuVariant.count();
-    console.log(`Total MenuVariant count: ${count}`);
-    const activeCount = await prisma.menuVariant.count({ where: { isActive: true, isDeleted: false } });
-    console.log(`Active MenuVariant count: ${activeCount}`);
-  } catch (e: any) {
-    console.error('ERROR connecting to DB:', e.message);
-  } finally {
-    await prisma.$disconnect();
+    console.log('Querying menu variants...')
+    const variants = await prisma.menuVariant.findMany({
+      where: { isDeleted: false },
+      select: {
+        id: true,
+        flavorName: true,
+        priceKembung: true,
+        isActive: true,
+        isAvailable: true,
+        stock: true
+      }
+    })
+    console.log('Menu Variants:', JSON.stringify(variants, null, 2))
+  } catch (error) {
+    console.error('Failed to query variants:', error)
   }
 }
 
-main();
+checkVariants()

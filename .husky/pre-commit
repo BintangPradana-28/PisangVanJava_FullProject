@@ -1,4 +1,4 @@
 #!/bin/sh
-cd pisang-goreng-van-java
+cd pisang-van-java
 npx lint-staged
 npx secretlint "**/*"

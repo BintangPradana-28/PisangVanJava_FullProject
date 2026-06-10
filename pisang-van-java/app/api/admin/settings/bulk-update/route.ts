@@ -1,12 +1,13 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { auth } from "@/src/auth";
-import { prisma } from '@/lib/prisma'
-import { z } from 'zod'
 import { revalidatePath } from 'next/cache'
+import { type NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
+import { prisma } from '@/lib/prisma'
+import { auth } from '@/src/auth'
 
 // ABSOLUTE QUARANTINE: Zod Schema to strictly validate inputs
 // Strips out script tags or highly suspicious HTML payloads as a basic XSS defense mechanism
-const sanitizeHtml = (val: string) => val.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+const sanitizeHtml = (val: string) =>
+  val.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
 
 const GenericSettingsSchema = z.record(z.string(), z.string().transform(sanitizeHtml))
 
@@ -22,15 +23,21 @@ export async function POST(req: NextRequest) {
     const { group, payload } = body
 
     if (!['home', 'about', 'contact', 'store'].includes(group)) {
-       return NextResponse.json({ error: 'Invalid group' }, { status: 400 })
+      return NextResponse.json({ error: 'Invalid group' }, { status: 400 })
     }
 
     // QUARANTINE VALIDATION: Validate payload as string record
     const validationResult = GenericSettingsSchema.safeParse(payload)
-    
+
     if (!validationResult.success) {
-      console.warn(`[SECURITY] Invalid payload shape detected at /api/admin/settings/bulk-update:`, validationResult.error.format())
-      return NextResponse.json({ error: 'Bad Request: Data integrity validation failed' }, { status: 400 })
+      console.warn(
+        `[SECURITY] Invalid payload shape detected at /api/admin/settings/bulk-update:`,
+        validationResult.error.format()
+      )
+      return NextResponse.json(
+        { error: 'Bad Request: Data integrity validation failed' },
+        { status: 400 }
+      )
     }
 
     const safeData = validationResult.data
@@ -54,7 +61,7 @@ export async function POST(req: NextRequest) {
         resource: 'SiteSetting',
         resourceId: `${group}-group`,
         userId: session.user.id,
-        details: JSON.stringify(Object.keys(safeData)),
+        details: JSON.stringify(Object.keys(safeData))
       }
     })
 
@@ -62,8 +69,10 @@ export async function POST(req: NextRequest) {
     revalidatePath('/', 'layout')
 
     // DATA MASKING: Return generic success without leaking database structure
-    return NextResponse.json({ message: 'Settings secured and updated successfully.' }, { status: 200 })
-
+    return NextResponse.json(
+      { message: 'Settings secured and updated successfully.' },
+      { status: 200 }
+    )
   } catch (error) {
     // OPAQUE ERRORS: Log actual error to internal console, return generic to client
     console.error('[CRITICAL] Exception in /api/admin/settings/about:', error)

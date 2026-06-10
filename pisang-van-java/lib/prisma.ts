@@ -4,13 +4,13 @@ import { withAccelerate } from '@prisma/extension-accelerate'
 
 const prismaClientSingleton = () => {
   return new PrismaClient({
-    log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+    log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error']
   }).$extends(withAccelerate())
 }
 
 declare const globalThis: {
-  prismaGlobal: ReturnType<typeof prismaClientSingleton>;
-} & typeof global;
+  prismaGlobal: ReturnType<typeof prismaClientSingleton>
+} & typeof global
 
 export const prisma = globalThis.prismaGlobal ?? prismaClientSingleton()
 

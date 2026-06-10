@@ -1,12 +1,12 @@
 'use client'
-// components/admin/AdminShell.tsx
-// Wraps all admin pages — provides responsive sidebar + mobile hamburger
-import { useState, useEffect } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { motion, AnimatePresence } from 'framer-motion'
-import toast from 'react-hot-toast'
 import { signOut } from 'next-auth/react'
+// components/admin/AdminShell.tsx
+// Wraps all admin pages — provides responsive sidebar + mobile hamburger
+import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 
 const navItems = [
   { href: '/dashboard', icon: '📊', label: 'Dashboard' },
@@ -14,8 +14,7 @@ const navItems = [
   { href: '/manage-menu', icon: '🍌', label: 'Kelola Menu' },
   { href: '/toppings', icon: '✨', label: 'Topping' },
   { href: '/reports', icon: '📈', label: 'Laporan' },
-  { href: '/settings', icon: '⚙️', label: 'Pengaturan' },
-
+  { href: '/settings', icon: '⚙️', label: 'Pengaturan' }
 ]
 
 function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
@@ -90,15 +89,19 @@ export default function AdminShell({ children, adminName }: AdminShellProps) {
   const pathname = usePathname()
 
   // Close drawer on route change
-  useEffect(() => { setMobileOpen(false) }, [pathname])
+  useEffect(() => {
+    setMobileOpen(false)
+  }, [pathname])
 
   // Lock body scroll when mobile menu is open
   useEffect(() => {
     document.body.style.overflow = mobileOpen ? 'hidden' : ''
-    return () => { document.body.style.overflow = '' }
+    return () => {
+      document.body.style.overflow = ''
+    }
   }, [mobileOpen])
 
-  const pageTitle = navItems.find(n => pathname.startsWith(n.href))?.label ?? 'Admin'
+  const pageTitle = navItems.find((n) => pathname.startsWith(n.href))?.label ?? 'Admin'
 
   return (
     <div className="flex min-h-screen bg-cream-100">
@@ -151,18 +154,16 @@ export default function AdminShell({ children, adminName }: AdminShellProps) {
             <span className="w-4 h-0.5 bg-white rounded" />
           </button>
           <span className="text-xl">🍌</span>
-          <span className="font-serif text-white text-sm font-bold flex-1 truncate">{pageTitle}</span>
+          <span className="font-serif text-white text-sm font-bold flex-1 truncate">
+            {pageTitle}
+          </span>
           {adminName && (
-            <span className="text-cream-200/60 text-xs hidden sm:block">
-              👤 {adminName}
-            </span>
+            <span className="text-cream-200/60 text-xs hidden sm:block">👤 {adminName}</span>
           )}
         </header>
 
         {/* Page content */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
-          {children}
-        </main>
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">{children}</main>
       </div>
     </div>
   )

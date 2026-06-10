@@ -1,15 +1,15 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { auth } from "@/src/auth";
-import { prisma } from '@/lib/prisma'
-import { z } from 'zod'
 import type { Prisma } from '@prisma/client'
+import { type NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
+import { prisma } from '@/lib/prisma'
+import { auth } from '@/src/auth'
 
 const reviewSchema = z.object({
-  orderId:   z.string().min(1),
+  orderId: z.string().min(1),
   variantId: z.string().min(1).optional(),
-  rating:    z.number().int().min(1).max(5),
-  comment:   z.string().max(1000).optional(),
-  imageUrl:  z.string().url().optional().or(z.literal('')),
+  rating: z.number().int().min(1).max(5),
+  comment: z.string().max(1000).optional(),
+  imageUrl: z.string().url().optional().or(z.literal(''))
 })
 
 // GET /api/reviews
@@ -31,10 +31,10 @@ export async function GET(req: NextRequest) {
     const reviews = await prisma.review.findMany({
       where,
       orderBy: { createdAt: 'desc' },
-      include: { 
+      include: {
         user: { select: { name: true } },
         variant: { select: { flavorName: true } }
-      },
+      }
     })
 
     const data = reviews.map((r: any) => {
@@ -45,15 +45,15 @@ export async function GET(req: NextRequest) {
         return name[0] + '*'.repeat(name.length - 2) + name[name.length - 1]
       }
       return {
-        id:        r.id,
-        userId:    r.userId,
-        userName:  maskName(r.user?.name),
+        id: r.id,
+        userId: r.userId,
+        userName: maskName(r.user?.name),
         variantName: r.variant?.flavorName || 'Pesanan Umum',
-        rating:    r.rating,
-        comment:   r.comment,
-        imageUrl:  r.imageUrl,
+        rating: r.rating,
+        comment: r.comment,
+        imageUrl: r.imageUrl,
         isVerifiedBuyer: r.isVerifiedBuyer,
-        createdAt: r.createdAt.toISOString(),
+        createdAt: r.createdAt.toISOString()
       }
     })
 
@@ -66,7 +66,7 @@ export async function GET(req: NextRequest) {
 
     let average = 0
     const starCounts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
-    
+
     if (allReviews.length > 0) {
       let sum = 0
       allReviews.forEach((r: any) => {
@@ -78,9 +78,9 @@ export async function GET(req: NextRequest) {
       average = Number((sum / allReviews.length).toFixed(1))
     }
 
-    return NextResponse.json({ 
-      success: true, 
-      data, 
+    return NextResponse.json({
+      success: true,
+      data,
       aggregates: {
         average,
         total: allReviews.length,
@@ -89,7 +89,10 @@ export async function GET(req: NextRequest) {
     })
   } catch (err) {
     console.error('[GET /api/reviews]', err)
-    return NextResponse.json({ success: false, error: 'Gagal mengambil data ulasan.' }, { status: 500 })
+    return NextResponse.json(
+      { success: false, error: 'Gagal mengambil data ulasan.' },
+      { status: 500 }
+    )
   }
 }
 
@@ -97,13 +100,19 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const session = await auth()
   if (!session?.user?.id) {
-    return NextResponse.json({ success: false, error: 'Login terlebih dahulu untuk memberikan ulasan.' }, { status: 401 })
+    return NextResponse.json(
+      { success: false, error: 'Login terlebih dahulu untuk memberikan ulasan.' },
+      { status: 401 }
+    )
   }
 
   const body = await req.json()
   const parsed = reviewSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json({ success: false, error: parsed.error.issues[0].message }, { status: 400 })
+    return NextResponse.json(
+      { success: false, error: parsed.error.issues[0].message },
+      { status: 400 }
+    )
   }
 
   const { orderId, variantId, rating, comment, imageUrl } = parsed.data
@@ -114,21 +123,21 @@ export async function POST(req: NextRequest) {
     const isVerifiedBuyer = order !== null
 
     const review = await prisma.review.upsert({
-      where:  { userId_orderId: { userId: session.user.id, orderId } },
-      create: { 
-        userId: session.user.id, 
+      where: { userId_orderId: { userId: session.user.id, orderId } },
+      create: {
+        userId: session.user.id,
         orderId,
-        variantId: variantId ?? null, 
-        rating, 
+        variantId: variantId ?? null,
+        rating,
         comment: comment ?? null,
         imageUrl: imageUrl ?? null,
         isVerifiedBuyer
       },
-      update: { 
-        rating, 
+      update: {
+        rating,
         comment: comment ?? null,
-        imageUrl: imageUrl ?? null,
-      },
+        imageUrl: imageUrl ?? null
+      }
     })
     return NextResponse.json({ success: true, data: review }, { status: 201 })
   } catch (err) {

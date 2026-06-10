@@ -1,6 +1,6 @@
 'use client'
 
-import { useAdminRealtimeSync } from "@/src/hooks/admin/use-admin-realtime"
+import { useAdminRealtimeSync } from '@/src/hooks/admin/use-admin-realtime'
 
 export default function AdminSyncWrapper() {
   useAdminRealtimeSync()

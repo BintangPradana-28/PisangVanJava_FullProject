@@ -1,12 +1,12 @@
-import { useState, useEffect } from 'react'
-import { ProductType } from '@/src/features/menu/components/MenuCards'
-import { Topping } from './PosModifierModal'
-import { saveToOfflineQueue, getOfflineQueueCount } from './OfflineSyncManager'
-import toast from 'react-hot-toast'
-import PosReceiptModal, { ReceiptData } from './PosReceiptModal'
 import { useMutation } from '@tanstack/react-query'
-import { api } from '@/src/lib/api'
 import { FetchError } from 'ofetch'
+import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
+import type { ProductType } from '@/src/features/menu/components/MenuCards'
+import { api } from '@/src/lib/api'
+import { getOfflineQueueCount, saveToOfflineQueue } from './OfflineSyncManager'
+import type { Topping } from './PosModifierModal'
+import PosReceiptModal, { type ReceiptData } from './PosReceiptModal'
 
 export interface CartItem {
   id: string // temporary client-side id
@@ -24,7 +24,12 @@ interface PosCartProps {
   onClearCart: () => void
 }
 
-export default function PosCart({ items, onUpdateQuantity, onRemoveItem, onClearCart }: PosCartProps) {
+export default function PosCart({
+  items,
+  onUpdateQuantity,
+  onRemoveItem,
+  onClearCart
+}: PosCartProps) {
   const [isOnline, setIsOnline] = useState(true)
   const [queueCount, setQueueCount] = useState(0)
   const [receiptData, setReceiptData] = useState<ReceiptData | null>(null)
@@ -48,21 +53,27 @@ export default function PosCart({ items, onUpdateQuantity, onRemoveItem, onClear
       window.removeEventListener('offline_queue_updated', updateQueue)
     }
   }, [])
-  
+
   const totalPrice = items.reduce((sum, item) => sum + item.subtotal, 0)
 
   // Formatting utility
   const formatRupiah = (num: number) => `Rp ${num.toLocaleString('id-ID')}`
 
   const checkoutMutation = useMutation({
-    mutationFn: async ({ payload, paymentMethod }: { payload: any, paymentMethod: 'CASH' | 'QRIS' }) => {
+    mutationFn: async ({
+      payload,
+      paymentMethod
+    }: {
+      payload: any
+      paymentMethod: 'CASH' | 'QRIS'
+    }) => {
       if (!isOnline) {
         saveToOfflineQueue(payload)
         return { offline: true, payload, paymentMethod }
       }
       const data = await api<{ success: boolean; data?: any; error?: string }>('/api/pos/orders', {
         method: 'POST',
-        body: payload,
+        body: payload
       })
       if (!data.success) throw new Error(data.error || 'Gagal memproses transaksi')
       return { offline: false, data, payload, paymentMethod }
@@ -77,7 +88,7 @@ export default function PosCart({ items, onUpdateQuantity, onRemoveItem, onClear
           items: [...items],
           totalPrice,
           paymentMethod: res.paymentMethod,
-          cashierName: "Kasir POS (Offline)"
+          cashierName: 'Kasir POS (Offline)'
         })
       } else {
         toast.success('Transaksi Berhasil! Pesanan dikirim ke dapur.')
@@ -87,12 +98,16 @@ export default function PosCart({ items, onUpdateQuantity, onRemoveItem, onClear
           items: [...items],
           totalPrice,
           paymentMethod: res.paymentMethod,
-          cashierName: "Kasir POS"
+          cashierName: 'Kasir POS'
         })
       }
     },
     onError: (error: FetchError | Error, variables) => {
-      if (error instanceof TypeError || error.message.includes('Failed to fetch') || error.message.includes('fetch failed')) {
+      if (
+        error instanceof TypeError ||
+        error.message.includes('Failed to fetch') ||
+        error.message.includes('fetch failed')
+      ) {
         saveToOfflineQueue(variables.payload)
         toast.error('Koneksi terputus. Pesanan Masuk Antrean.')
         setReceiptData({
@@ -101,10 +116,13 @@ export default function PosCart({ items, onUpdateQuantity, onRemoveItem, onClear
           items: [...items],
           totalPrice,
           paymentMethod: variables.paymentMethod,
-          cashierName: "Kasir POS (Offline)"
+          cashierName: 'Kasir POS (Offline)'
         })
       } else {
-        const msg = error instanceof FetchError ? (error.data?.error || 'Gagal memproses transaksi') : error.message
+        const msg =
+          error instanceof FetchError
+            ? error.data?.error || 'Gagal memproses transaksi'
+            : error.message
         toast.error(msg, { duration: 5000 })
       }
     }
@@ -116,11 +134,11 @@ export default function PosCart({ items, onUpdateQuantity, onRemoveItem, onClear
     // Mapping Client Cart to API Schema
     const payload = {
       offlineId: crypto.randomUUID(), // Idempotency key for Phase 4
-      customerName: "Pelanggan Kasir", // Can be dynamic if we add a field
-      customerPhone: "-",
+      customerName: 'Pelanggan Kasir', // Can be dynamic if we add a field
+      customerPhone: '-',
       paymentMethod,
       totalPrice,
-      items: items.map(item => ({
+      items: items.map((item) => ({
         variantId: item.product.id,
         toppingId: item.topping?.id || null,
         baseType: item.baseType,
@@ -148,7 +166,10 @@ export default function PosCart({ items, onUpdateQuantity, onRemoveItem, onClear
           <h2 className="text-xl font-bold text-gray-800">Keranjang Kasir</h2>
           {/* Queue Indicator Rule */}
           {queueCount > 0 && (
-            <div className="relative flex items-center justify-center cursor-help" title={`${queueCount} transaksi menunggu sinkronisasi`}>
+            <div
+              className="relative flex items-center justify-center cursor-help"
+              title={`${queueCount} transaksi menunggu sinkronisasi`}
+            >
               <span className="text-2xl text-gray-400">☁️</span>
               <span className="absolute -top-1 -right-2 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full border-2 border-gray-50">
                 {queueCount}
@@ -169,35 +190,48 @@ export default function PosCart({ items, onUpdateQuantity, onRemoveItem, onClear
             <p className="font-semibold">Keranjang kosong</p>
           </div>
         ) : (
-          items.map(item => (
-            <div key={item.id} className="flex flex-col p-4 bg-gray-50 rounded-2xl border border-gray-100 relative">
+          items.map((item) => (
+            <div
+              key={item.id}
+              className="flex flex-col p-4 bg-gray-50 rounded-2xl border border-gray-100 relative"
+            >
               <div className="flex justify-between items-start mb-2">
                 <div className="pr-6">
-                  <h3 className="font-bold text-gray-800 leading-tight">{item.product.flavorName}</h3>
+                  <h3 className="font-bold text-gray-800 leading-tight">
+                    {item.product.flavorName}
+                  </h3>
                   <div className="text-sm text-gray-500 mt-1">
                     Dasar: <span className="font-semibold">{item.baseType}</span>
                     {item.topping && <span> • + {item.topping.name}</span>}
                   </div>
                 </div>
-                <button 
+                <button
                   onClick={() => onRemoveItem(item.id)}
                   className="absolute top-4 right-4 text-gray-400 hover:text-red-500 font-bold"
-                >&times;</button>
+                >
+                  &times;
+                </button>
               </div>
 
               <div className="flex justify-between items-end mt-2">
                 <div className="flex items-center gap-3 bg-white p-1 rounded-xl shadow-sm border border-gray-100">
-                  <button 
+                  <button
                     onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
                     className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-orange-100 text-orange-600 font-bold active:scale-95"
-                  >-</button>
+                  >
+                    -
+                  </button>
                   <span className="font-bold w-4 text-center">{item.quantity}</span>
-                  <button 
+                  <button
                     onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
                     className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-orange-100 text-orange-600 font-bold active:scale-95"
-                  >+</button>
+                  >
+                    +
+                  </button>
                 </div>
-                <span className="font-bold text-lg text-gray-800">{formatRupiah(item.subtotal)}</span>
+                <span className="font-bold text-lg text-gray-800">
+                  {formatRupiah(item.subtotal)}
+                </span>
               </div>
             </div>
           ))
@@ -210,7 +244,7 @@ export default function PosCart({ items, onUpdateQuantity, onRemoveItem, onClear
           <span className="text-gray-500 font-bold">Total Penjualan</span>
           <span className="text-3xl font-black text-gray-800">{formatRupiah(totalPrice)}</span>
         </div>
-        
+
         <div className="grid grid-cols-2 gap-3">
           <button
             onClick={() => handleCheckout('CASH')}
@@ -226,18 +260,22 @@ export default function PosCart({ items, onUpdateQuantity, onRemoveItem, onClear
             className="w-full bg-blue-500 text-white font-bold py-4 rounded-2xl text-lg flex flex-col justify-center items-center active:scale-[0.98] transition-transform shadow-lg shadow-blue-500/30 disabled:opacity-50 disabled:shadow-none disabled:bg-gray-400"
           >
             <span>QRIS</span>
-            {!isOnline && <span className="text-[10px] uppercase font-bold text-gray-200 tracking-wider">Terkunci (Offline)</span>}
+            {!isOnline && (
+              <span className="text-[10px] uppercase font-bold text-gray-200 tracking-wider">
+                Terkunci (Offline)
+              </span>
+            )}
           </button>
         </div>
       </div>
 
-      <PosReceiptModal 
-        isOpen={!!receiptData} 
-        data={receiptData} 
+      <PosReceiptModal
+        isOpen={!!receiptData}
+        data={receiptData}
         onClose={() => {
           setReceiptData(null)
           onClearCart()
-        }} 
+        }}
       />
     </div>
   )

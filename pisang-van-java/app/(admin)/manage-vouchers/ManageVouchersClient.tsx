@@ -1,11 +1,12 @@
 'use client'
 
-import React, { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import toast from 'react-hot-toast'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { api } from '@/src/lib/api'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { AnimatePresence, motion } from 'framer-motion'
 import { FetchError } from 'ofetch'
+import type React from 'react'
+import { useState } from 'react'
+import toast from 'react-hot-toast'
+import { api } from '@/src/lib/api'
 
 interface Voucher {
   id: string
@@ -55,13 +56,17 @@ export default function ManageVouchersClient() {
       if (!data.success) throw new Error('Gagal mengambil data voucher')
       return data.data
     },
-    staleTime: 0,
+    staleTime: 0
   })
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const res = await api<{ success: boolean; message?: string }>(`/api/admin/vouchers?id=${id}`, { method: 'DELETE' })
-      if (!res.success && (res as any).error) throw new Error((res as any).error || 'Gagal menghapus voucher')
+      const res = await api<{ success: boolean; message?: string }>(
+        `/api/admin/vouchers?id=${id}`,
+        { method: 'DELETE' }
+      )
+      if (!res.success && (res as any).error)
+        throw new Error((res as any).error || 'Gagal menghapus voucher')
       return res
     },
     onSuccess: () => {
@@ -69,7 +74,8 @@ export default function ManageVouchersClient() {
       queryClient.invalidateQueries({ queryKey: ['admin-vouchers'] })
     },
     onError: (error: FetchError | Error) => {
-      const msg = error instanceof FetchError ? (error.data?.error || 'Gagal menghapus voucher') : error.message
+      const msg =
+        error instanceof FetchError ? error.data?.error || 'Gagal menghapus voucher' : error.message
       toast.error(msg)
     }
   })
@@ -80,12 +86,13 @@ export default function ManageVouchersClient() {
   }
 
   const toggleMutation = useMutation({
-    mutationFn: async ({ id, currentStatus }: { id: string, currentStatus: boolean }) => {
+    mutationFn: async ({ id, currentStatus }: { id: string; currentStatus: boolean }) => {
       const res = await api<{ success: boolean; message?: string }>('/api/admin/vouchers', {
         method: 'PATCH',
         body: { id, isActive: !currentStatus }
       })
-      if (!res.success && (res as any).error) throw new Error((res as any).error || 'Gagal mengubah status')
+      if (!res.success && (res as any).error)
+        throw new Error((res as any).error || 'Gagal mengubah status')
       return res
     },
     onSuccess: () => {
@@ -93,7 +100,8 @@ export default function ManageVouchersClient() {
       queryClient.invalidateQueries({ queryKey: ['admin-vouchers'] })
     },
     onError: (error: FetchError | Error) => {
-      const msg = error instanceof FetchError ? (error.data?.error || 'Gagal mengubah status') : error.message
+      const msg =
+        error instanceof FetchError ? error.data?.error || 'Gagal mengubah status' : error.message
       toast.error(msg)
     }
   })
@@ -113,7 +121,7 @@ export default function ManageVouchersClient() {
           maxDiscount: formData.maxDiscount ? parseFloat(formData.maxDiscount) : null,
           usageLimit: parseInt(formData.usageLimit),
           startDate: new Date(formData.startDate).toISOString(),
-          endDate: new Date(formData.endDate).toISOString(),
+          endDate: new Date(formData.endDate).toISOString()
         }
       })
       if (res.error) throw new Error(res.error)
@@ -137,7 +145,10 @@ export default function ManageVouchersClient() {
       })
     },
     onError: (error: FetchError | Error) => {
-      const msg = error instanceof FetchError ? (error.data?.error || 'Gagal menambahkan voucher') : error.message
+      const msg =
+        error instanceof FetchError
+          ? error.data?.error || 'Gagal menambahkan voucher'
+          : error.message
       toast.error(msg)
     }
   })
@@ -152,7 +163,9 @@ export default function ManageVouchersClient() {
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold font-serif text-brown">Manajemen Voucher</h1>
-          <p className="text-zinc-500 text-sm mt-1">Kelola kupon diskon untuk pelanggan dan reseller.</p>
+          <p className="text-zinc-500 text-sm mt-1">
+            Kelola kupon diskon untuk pelanggan dan reseller.
+          </p>
         </div>
         <button
           onClick={() => setIsModalOpen(true)}
@@ -181,13 +194,27 @@ export default function ManageVouchersClient() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-zinc-50 border-b border-zinc-200">
-                <th className="p-4 text-xs font-semibold text-zinc-500 uppercase tracking-wider">Kode & Tipe</th>
-                <th className="p-4 text-xs font-semibold text-zinc-500 uppercase tracking-wider">Diskon</th>
-                <th className="p-4 text-xs font-semibold text-zinc-500 uppercase tracking-wider">Syarat & Target</th>
-                <th className="p-4 text-xs font-semibold text-zinc-500 uppercase tracking-wider">Masa Berlaku</th>
-                <th className="p-4 text-xs font-semibold text-zinc-500 uppercase tracking-wider">Terpakai</th>
-                <th className="p-4 text-xs font-semibold text-zinc-500 uppercase tracking-wider">Status</th>
-                <th className="p-4 text-xs font-semibold text-zinc-500 uppercase tracking-wider text-right">Aksi</th>
+                <th className="p-4 text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+                  Kode & Tipe
+                </th>
+                <th className="p-4 text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+                  Diskon
+                </th>
+                <th className="p-4 text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+                  Syarat & Target
+                </th>
+                <th className="p-4 text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+                  Masa Berlaku
+                </th>
+                <th className="p-4 text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+                  Terpakai
+                </th>
+                <th className="p-4 text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+                  Status
+                </th>
+                <th className="p-4 text-xs font-semibold text-zinc-500 uppercase tracking-wider text-right">
+                  Aksi
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-200">
@@ -200,7 +227,9 @@ export default function ManageVouchersClient() {
                     </span>
                   </td>
                   <td className="p-4 text-sm font-medium">
-                    {v.discountType === 'PERCENTAGE' ? `${v.discountValue}%` : `Rp ${v.discountValue.toLocaleString('id-ID')}`}
+                    {v.discountType === 'PERCENTAGE'
+                      ? `${v.discountValue}%`
+                      : `Rp ${v.discountValue.toLocaleString('id-ID')}`}
                     {v.maxDiscount && (
                       <div className="text-xs text-zinc-500 font-normal mt-1">
                         Max: Rp {v.maxDiscount.toLocaleString('id-ID')}
@@ -209,23 +238,37 @@ export default function ManageVouchersClient() {
                   </td>
                   <td className="p-4">
                     <div className="text-xs mb-1">
-                      <span className="text-zinc-500">Min. Trx:</span> Rp {v.minPurchase.toLocaleString('id-ID')}
+                      <span className="text-zinc-500">Min. Trx:</span> Rp{' '}
+                      {v.minPurchase.toLocaleString('id-ID')}
                     </div>
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
-                      v.applicableTo === 'ALL' ? 'bg-blue-100 text-blue-800' :
-                      v.applicableTo === 'RESELLER' ? 'bg-purple-100 text-purple-800' :
-                      'bg-green-100 text-green-800'
-                    }`}>
+                    <span
+                      className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                        v.applicableTo === 'ALL'
+                          ? 'bg-blue-100 text-blue-800'
+                          : v.applicableTo === 'RESELLER'
+                            ? 'bg-purple-100 text-purple-800'
+                            : 'bg-green-100 text-green-800'
+                      }`}
+                    >
                       Target: {v.applicableTo}
                     </span>
                   </td>
                   <td className="p-4">
-                    <div className="text-xs mb-1"><span className="text-zinc-500">Mulai:</span> {new Date(v.startDate).toLocaleDateString('id-ID')}</div>
-                    <div className="text-xs"><span className="text-zinc-500">Akhir:</span> {new Date(v.endDate).toLocaleDateString('id-ID')}</div>
+                    <div className="text-xs mb-1">
+                      <span className="text-zinc-500">Mulai:</span>{' '}
+                      {new Date(v.startDate).toLocaleDateString('id-ID')}
+                    </div>
+                    <div className="text-xs">
+                      <span className="text-zinc-500">Akhir:</span>{' '}
+                      {new Date(v.endDate).toLocaleDateString('id-ID')}
+                    </div>
                   </td>
                   <td className="p-4">
                     <div className="text-sm font-medium">
-                      {v.usedCount} <span className="text-zinc-400 font-normal">/ {v.usageLimit === 0 ? '?' : v.usageLimit}</span>
+                      {v.usedCount}{' '}
+                      <span className="text-zinc-400 font-normal">
+                        / {v.usageLimit === 0 ? '?' : v.usageLimit}
+                      </span>
                     </div>
                   </td>
                   <td className="p-4">
@@ -262,25 +305,40 @@ export default function ManageVouchersClient() {
         {isModalOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <motion.div
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
               onClick={() => setIsModalOpen(false)}
               className="fixed inset-0 bg-black/50 backdrop-blur-sm"
             />
             <motion.div
-              initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
               className="bg-white rounded-2xl shadow-xl max-w-lg w-full relative z-10 max-h-[90vh] overflow-y-auto"
             >
               <div className="p-6 border-b border-zinc-100 flex justify-between items-center sticky top-0 bg-white z-20">
                 <h3 className="text-lg font-bold font-serif text-brown">Buat Voucher Baru</h3>
-                <button onClick={() => setIsModalOpen(false)} className="text-zinc-400 hover:text-zinc-600">✕</button>
+                <button
+                  onClick={() => setIsModalOpen(false)}
+                  className="text-zinc-400 hover:text-zinc-600"
+                >
+                  ✕
+                </button>
               </div>
 
               <form onSubmit={handleSubmit} className="p-6 space-y-4">
                 <div>
-                  <label className="block text-xs font-bold uppercase text-zinc-500 mb-1">Kode Voucher</label>
+                  <label className="block text-xs font-bold uppercase text-zinc-500 mb-1">
+                    Kode Voucher
+                  </label>
                   <input
-                    type="text" required value={formData.code}
-                    onChange={(e) => setFormData({...formData, code: e.target.value.toUpperCase()})}
+                    type="text"
+                    required
+                    value={formData.code}
+                    onChange={(e) =>
+                      setFormData({ ...formData, code: e.target.value.toUpperCase() })
+                    }
                     placeholder="Contoh: PROMO50"
                     className="w-full p-3 border border-zinc-200 rounded-xl font-mono uppercase"
                   />
@@ -288,10 +346,12 @@ export default function ManageVouchersClient() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-bold uppercase text-zinc-500 mb-1">Tipe Diskon</label>
+                    <label className="block text-xs font-bold uppercase text-zinc-500 mb-1">
+                      Tipe Diskon
+                    </label>
                     <select
                       value={formData.discountType}
-                      onChange={(e) => setFormData({...formData, discountType: e.target.value})}
+                      onChange={(e) => setFormData({ ...formData, discountType: e.target.value })}
                       className="w-full p-3 border border-zinc-200 rounded-xl"
                     >
                       <option value="PERCENTAGE">Persentase (%)</option>
@@ -299,11 +359,18 @@ export default function ManageVouchersClient() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-bold uppercase text-zinc-500 mb-1">Nilai Diskon</label>
+                    <label className="block text-xs font-bold uppercase text-zinc-500 mb-1">
+                      Nilai Diskon
+                    </label>
                     <input
-                      type="number" required min="1" value={formData.discountValue}
-                      onChange={(e) => setFormData({...formData, discountValue: e.target.value})}
-                      placeholder={formData.discountType === 'PERCENTAGE' ? "Contoh: 10" : "Contoh: 15000"}
+                      type="number"
+                      required
+                      min="1"
+                      value={formData.discountValue}
+                      onChange={(e) => setFormData({ ...formData, discountValue: e.target.value })}
+                      placeholder={
+                        formData.discountType === 'PERCENTAGE' ? 'Contoh: 10' : 'Contoh: 15000'
+                      }
                       className="w-full p-3 border border-zinc-200 rounded-xl"
                     />
                   </div>
@@ -311,18 +378,26 @@ export default function ManageVouchersClient() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-bold uppercase text-zinc-500 mb-1">Minimal Transaksi (Rp)</label>
+                    <label className="block text-xs font-bold uppercase text-zinc-500 mb-1">
+                      Minimal Transaksi (Rp)
+                    </label>
                     <input
-                      type="number" min="0" value={formData.minPurchase}
-                      onChange={(e) => setFormData({...formData, minPurchase: e.target.value})}
+                      type="number"
+                      min="0"
+                      value={formData.minPurchase}
+                      onChange={(e) => setFormData({ ...formData, minPurchase: e.target.value })}
                       className="w-full p-3 border border-zinc-200 rounded-xl"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold uppercase text-zinc-500 mb-1">Maksimal Diskon (Rp)</label>
+                    <label className="block text-xs font-bold uppercase text-zinc-500 mb-1">
+                      Maksimal Diskon (Rp)
+                    </label>
                     <input
-                      type="number" min="0" value={formData.maxDiscount}
-                      onChange={(e) => setFormData({...formData, maxDiscount: e.target.value})}
+                      type="number"
+                      min="0"
+                      value={formData.maxDiscount}
+                      onChange={(e) => setFormData({ ...formData, maxDiscount: e.target.value })}
                       placeholder="Kosongkan jika tak terbatas"
                       className="w-full p-3 border border-zinc-200 rounded-xl"
                       disabled={formData.discountType === 'FIXED'}
@@ -332,18 +407,26 @@ export default function ManageVouchersClient() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-bold uppercase text-zinc-500 mb-1">Berlaku Dari</label>
+                    <label className="block text-xs font-bold uppercase text-zinc-500 mb-1">
+                      Berlaku Dari
+                    </label>
                     <input
-                      type="datetime-local" required value={formData.startDate}
-                      onChange={(e) => setFormData({...formData, startDate: e.target.value})}
+                      type="datetime-local"
+                      required
+                      value={formData.startDate}
+                      onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
                       className="w-full p-3 border border-zinc-200 rounded-xl"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold uppercase text-zinc-500 mb-1">Berlaku Sampai</label>
+                    <label className="block text-xs font-bold uppercase text-zinc-500 mb-1">
+                      Berlaku Sampai
+                    </label>
                     <input
-                      type="datetime-local" required value={formData.endDate}
-                      onChange={(e) => setFormData({...formData, endDate: e.target.value})}
+                      type="datetime-local"
+                      required
+                      value={formData.endDate}
+                      onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
                       className="w-full p-3 border border-zinc-200 rounded-xl"
                     />
                   </div>
@@ -351,19 +434,25 @@ export default function ManageVouchersClient() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-bold uppercase text-zinc-500 mb-1">Limit Pemakaian</label>
+                    <label className="block text-xs font-bold uppercase text-zinc-500 mb-1">
+                      Limit Pemakaian
+                    </label>
                     <input
-                      type="number" min="0" value={formData.usageLimit}
-                      onChange={(e) => setFormData({...formData, usageLimit: e.target.value})}
+                      type="number"
+                      min="0"
+                      value={formData.usageLimit}
+                      onChange={(e) => setFormData({ ...formData, usageLimit: e.target.value })}
                       placeholder="0 = Tak terbatas"
                       className="w-full p-3 border border-zinc-200 rounded-xl"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold uppercase text-zinc-500 mb-1">Target Pengguna</label>
+                    <label className="block text-xs font-bold uppercase text-zinc-500 mb-1">
+                      Target Pengguna
+                    </label>
                     <select
                       value={formData.applicableTo}
-                      onChange={(e) => setFormData({...formData, applicableTo: e.target.value})}
+                      onChange={(e) => setFormData({ ...formData, applicableTo: e.target.value })}
                       className="w-full p-3 border border-zinc-200 rounded-xl"
                     >
                       <option value="ALL">Semua Pelanggan</option>
@@ -374,10 +463,18 @@ export default function ManageVouchersClient() {
                 </div>
 
                 <div className="pt-4 mt-4 border-t border-zinc-100 flex justify-end gap-3">
-                  <button type="button" onClick={() => setIsModalOpen(false)} className="px-5 py-2.5 text-zinc-600 font-medium hover:bg-zinc-100 rounded-xl transition-colors">
+                  <button
+                    type="button"
+                    onClick={() => setIsModalOpen(false)}
+                    className="px-5 py-2.5 text-zinc-600 font-medium hover:bg-zinc-100 rounded-xl transition-colors"
+                  >
                     Batal
                   </button>
-                  <button type="submit" disabled={createMutation.isPending} className="px-5 py-2.5 bg-brown text-white font-medium hover:bg-brown/90 rounded-xl transition-colors disabled:opacity-50">
+                  <button
+                    type="submit"
+                    disabled={createMutation.isPending}
+                    className="px-5 py-2.5 bg-brown text-white font-medium hover:bg-brown/90 rounded-xl transition-colors disabled:opacity-50"
+                  >
                     {createMutation.isPending ? 'Menyimpan...' : 'Simpan Voucher'}
                   </button>
                 </div>

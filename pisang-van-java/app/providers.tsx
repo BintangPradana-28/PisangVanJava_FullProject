@@ -2,9 +2,9 @@
 
 import { SessionProvider } from 'next-auth/react'
 import { Toaster } from 'react-hot-toast'
-import { ThemeProvider } from '@/context/ThemeContext'
 import { LanguageProvider } from '@/context/LanguageContext'
 import { SettingsProvider } from '@/context/SettingsContext'
+import { ThemeProvider } from '@/context/ThemeContext'
 import { PostHogProvider } from '@/src/providers/PostHogProvider'
 
 import { QueryProvider } from '@/src/providers/query-provider'
@@ -27,4 +27,3 @@ export function Providers({ children }: { children: React.ReactNode }) {
     </QueryProvider>
   )
 }
-

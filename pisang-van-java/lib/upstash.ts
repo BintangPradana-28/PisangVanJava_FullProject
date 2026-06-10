@@ -1,7 +1,8 @@
 // src/lib/upstash.ts
-import { Redis } from "@upstash/redis";
+import { Redis } from '@upstash/redis'
 
-// Initialize Upstash Redis client
-// Note: UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN
-// must be set in your .env or .env.local file
-export const redis = Redis.fromEnv();
+// Initialize Upstash Redis client safely to prevent import-time crashes on Vercel
+export const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL || '',
+  token: process.env.UPSTASH_REDIS_REST_TOKEN || ''
+})

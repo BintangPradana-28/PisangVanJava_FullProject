@@ -1,13 +1,13 @@
 'use client'
 
-import { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import PosMenuGrid from '@/src/features/pos/components/PosMenuGrid'
-import PosCart, { CartItem } from '@/src/features/pos/components/PosCart'
-import OfflineSyncManager from '@/src/features/pos/components/OfflineSyncManager'
-import { ProductType } from '@/src/features/menu/components/MenuCards'
-import { Topping } from '@/src/features/pos/components/PosModifierModal'
+import { useCallback, useState } from 'react'
 import toast from 'react-hot-toast'
+import type { ProductType } from '@/src/features/menu/components/MenuCards'
+import OfflineSyncManager from '@/src/features/pos/components/OfflineSyncManager'
+import PosCart, { type CartItem } from '@/src/features/pos/components/PosCart'
+import PosMenuGrid from '@/src/features/pos/components/PosMenuGrid'
+import type { Topping } from '@/src/features/pos/components/PosModifierModal'
 
 interface PosClientProps {
   products: ProductType[]
@@ -27,7 +27,7 @@ export default function PosClient({ products, toppings }: PosClientProps) {
     try {
       router.refresh()
       // Give it a small delay for better UX
-      await new Promise(res => setTimeout(res, 800))
+      await new Promise((res) => setTimeout(res, 800))
       toast.success('Menu berhasil diperbarui!', { id: toastId })
     } catch (err) {
       toast.error('Gagal memperbarui menu', { id: toastId })
@@ -38,12 +38,13 @@ export default function PosClient({ products, toppings }: PosClientProps) {
 
   // Cart Functions
   const handleAddToCart = useCallback((orderItem: any) => {
-    setCartItems(prev => {
+    setCartItems((prev) => {
       // Check if exact same item exists (same product, base, and topping)
       const existingItemIndex = prev.findIndex(
-        i => i.product.id === orderItem.product.id && 
-             i.baseType === orderItem.baseType && 
-             i.topping?.id === orderItem.topping?.id
+        (i) =>
+          i.product.id === orderItem.product.id &&
+          i.baseType === orderItem.baseType &&
+          i.topping?.id === orderItem.topping?.id
       )
 
       if (existingItemIndex > -1) {
@@ -66,17 +67,19 @@ export default function PosClient({ products, toppings }: PosClientProps) {
 
   const handleUpdateQuantity = useCallback((id: string, newQuantity: number) => {
     if (newQuantity < 1) return
-    setCartItems(prev => prev.map(item => {
-      if (item.id === id) {
-        const unitPrice = item.subtotal / item.quantity
-        return { ...item, quantity: newQuantity, subtotal: newQuantity * unitPrice }
-      }
-      return item
-    }))
+    setCartItems((prev) =>
+      prev.map((item) => {
+        if (item.id === id) {
+          const unitPrice = item.subtotal / item.quantity
+          return { ...item, quantity: newQuantity, subtotal: newQuantity * unitPrice }
+        }
+        return item
+      })
+    )
   }, [])
 
   const handleRemoveItem = useCallback((id: string) => {
-    setCartItems(prev => prev.filter(item => item.id !== id))
+    setCartItems((prev) => prev.filter((item) => item.id !== id))
   }, [])
 
   const handleClearCart = useCallback(() => {
@@ -97,11 +100,13 @@ export default function PosClient({ products, toppings }: PosClientProps) {
         <div className="bg-white p-4 shadow-sm z-10 flex justify-between items-center shrink-0">
           <div>
             <h1 className="text-2xl font-black text-gray-800 tracking-tight">PISANG VAN JAVA</h1>
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Point of Sale</p>
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+              Point of Sale
+            </p>
           </div>
-          
+
           <div className="flex items-center gap-3">
-            <button 
+            <button
               onClick={handleRefreshMenu}
               disabled={isRefreshing}
               className="flex items-center gap-2 bg-gray-50 hover:bg-orange-50 text-gray-600 hover:text-orange-600 px-4 py-2 rounded-xl font-bold text-sm transition-colors border border-gray-200"
@@ -109,9 +114,9 @@ export default function PosClient({ products, toppings }: PosClientProps) {
               <span className={isRefreshing ? 'animate-spin' : ''}>🔄</span>
               <span className="hidden sm:inline">Sync Menu</span>
             </button>
-            
+
             {/* Mobile Cart Toggle Button */}
-            <button 
+            <button
               onClick={() => setIsCartOpenOnMobile(true)}
               className="lg:hidden relative bg-[#D4802A] text-white p-3 rounded-xl shadow-md active:scale-95"
             >
@@ -127,32 +132,28 @@ export default function PosClient({ products, toppings }: PosClientProps) {
 
         {/* Menu Grid Scrollable Area */}
         <div className="flex-1 overflow-y-auto pb-24 lg:pb-4">
-          <PosMenuGrid 
-            products={products} 
-            toppings={toppings} 
-            onAddToCart={handleAddToCart} 
-          />
+          <PosMenuGrid products={products} toppings={toppings} onAddToCart={handleAddToCart} />
         </div>
       </div>
 
       {/* RIGHT PANE: Cart (30% on lg) + MOBILE FALLBACK DRAWER */}
       {/* Responsivitas Ekstrem (Mobile Fallback Rule): Hidden on small screens unless toggled, fixed 380px on large screens */}
-      <div 
+      <div
         className={`fixed inset-0 z-50 lg:static lg:w-[380px] xl:w-[420px] shrink-0 transition-transform duration-300 ${
           isCartOpenOnMobile ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'
         }`}
       >
         {/* Mobile Backdrop */}
-        <div 
-          className="absolute inset-0 bg-black/60 lg:hidden backdrop-blur-sm" 
+        <div
+          className="absolute inset-0 bg-black/60 lg:hidden backdrop-blur-sm"
           onClick={() => setIsCartOpenOnMobile(false)}
         />
-        
+
         {/* Cart Container */}
         <div className="absolute right-0 top-0 bottom-0 w-[90%] sm:w-[400px] lg:w-full lg:static h-full bg-white shadow-2xl lg:shadow-none flex flex-col">
           {/* Mobile Close Button inside Cart */}
           <div className="lg:hidden bg-gray-50 p-4 border-b border-gray-100 flex justify-end">
-            <button 
+            <button
               onClick={() => setIsCartOpenOnMobile(false)}
               className="text-gray-500 font-bold bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-xl"
             >
@@ -160,7 +161,7 @@ export default function PosClient({ products, toppings }: PosClientProps) {
             </button>
           </div>
 
-          <PosCart 
+          <PosCart
             items={cartItems}
             onUpdateQuantity={handleUpdateQuantity}
             onRemoveItem={handleRemoveItem}

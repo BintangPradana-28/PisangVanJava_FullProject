@@ -1,14 +1,14 @@
-import { Metadata } from 'next'
+import type { Metadata } from 'next'
 import ManageVouchersClient from './ManageVouchersClient'
 
 export const metadata: Metadata = {
   title: 'Manajemen Voucher - Admin Panel',
-  description: 'Kelola kode promo dan diskon untuk pelanggan dan reseller',
+  description: 'Kelola kode promo dan diskon untuk pelanggan dan reseller'
 }
 
 import { redirect } from 'next/navigation'
-import { auth } from "@/src/auth"
 import AdminSidebar from '@/components/admin/AdminSidebar'
+import { auth } from '@/src/auth'
 
 export default async function ManageVouchersPage() {
   const session = await auth()

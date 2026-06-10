@@ -4,10 +4,10 @@ export default function AdminLoading() {
       <div className="flex flex-col items-center">
         {/* Animated Loading Spinner */}
         <div className="w-16 h-16 border-4 border-brown-700/20 border-t-brown-700 rounded-full animate-spin mb-6"></div>
-        
+
         <h2 className="font-serif text-2xl font-bold text-brown-700 mb-2">Memuat Data...</h2>
         <p className="text-brown-500/70 text-sm">Harap tunggu sebentar</p>
       </div>
     </div>
-  );
+  )
 }

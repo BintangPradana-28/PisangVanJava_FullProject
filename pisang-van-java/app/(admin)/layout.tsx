@@ -1,9 +1,9 @@
 // app/(admin)/layout.tsx
 import type { Metadata } from 'next'
-import AdminSyncWrapper from "./AdminSyncWrapper"
+import AdminSyncWrapper from './AdminSyncWrapper'
 
 export const metadata: Metadata = {
-  title: { default: 'Admin Panel', template: '%s | Admin Van Java' },
+  title: { default: 'Admin Panel', template: '%s | Admin Van Java' }
 }
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

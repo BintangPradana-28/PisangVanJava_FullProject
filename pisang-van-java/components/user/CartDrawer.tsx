@@ -1,15 +1,21 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { useRouter } from 'next/navigation'
+import { AnimatePresence, motion } from 'framer-motion'
 import { CreditCard, MessageCircle, TicketPercent } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import React, { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 import { z } from 'zod'
-import { useCartStore, selectCartItems, selectCartDisplayTotal, selectItemSubtotal, type CartItem } from '@/src/stores/cart.store'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSettings } from '@/context/SettingsContext'
 import { validateVoucher } from '@/src/features/checkout/actions'
-import toast from 'react-hot-toast'
+import {
+  type CartItem,
+  selectCartDisplayTotal,
+  selectCartItems,
+  selectItemSubtotal,
+  useCartStore
+} from '@/src/stores/cart.store'
 
 interface CartDrawerProps {
   isOpen: boolean
@@ -41,22 +47,26 @@ function resolveBaseType(name: string): BaseType | null {
 }
 
 const createOrderResponseSchema = z.discriminatedUnion('success', [
-  z.object({
-    success: z.literal(true),
-    data: z.object({
-      orderId: z.string().min(8).max(64),
-      redirectType: z.enum(['WHATSAPP', 'PAYMENT']),
-      redirectUrl: z.string().min(1).max(3000),
-      totalPrice: z.number().finite().int().min(0),
-    }).strict(),
-  }).strict(),
-  z.object({
-    success: z.literal(false),
-    error: z.string().min(1),
-  }).strict(),
+  z
+    .object({
+      success: z.literal(true),
+      data: z
+        .object({
+          orderId: z.string().min(8).max(64),
+          redirectType: z.enum(['WHATSAPP', 'PAYMENT', 'CASHLESS_SUCCESS']),
+          redirectUrl: z.string().min(1).max(3000),
+          totalPrice: z.number().finite().int().min(0)
+        })
+        .strict()
+    })
+    .strict(),
+  z
+    .object({
+      success: z.literal(false),
+      error: z.string().min(1)
+    })
+    .strict()
 ])
-
-
 
 export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
   const router = useRouter()
@@ -82,7 +92,8 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
   const deliveryFee = /^[0-9]{1,9}$/.test(deliveryFeeSetting) ? Number(deliveryFeeSetting) : 0
   const discountAmount = appliedVoucher?.discountAmount ?? 0
   const discountedSubtotal = Math.max(cartTotal - discountAmount, 0)
-  const finalTotal = deliveryMethod === 'DELIVERY' ? discountedSubtotal + deliveryFee : discountedSubtotal
+  const finalTotal =
+    deliveryMethod === 'DELIVERY' ? discountedSubtotal + deliveryFee : discountedSubtotal
 
   useEffect(() => {
     setAppliedVoucher(null)
@@ -92,7 +103,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
     return new Intl.NumberFormat('id-ID', {
       style: 'currency',
       currency: 'IDR',
-      minimumFractionDigits: 0,
+      minimumFractionDigits: 0
     }).format(amount)
   }
 
@@ -119,7 +130,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
 
       setAppliedVoucher({
         code: result.data.code,
-        discountAmount: result.data.discountAmount,
+        discountAmount: result.data.discountAmount
       })
       setVoucherCode(result.data.code)
       toast.success(result.data.message)
@@ -163,7 +174,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
         toppingIds: item.toppings ? item.toppings.map((t: any) => t.toppingId) : [],
         baseType,
         quantity: item.quantity,
-        notes: notes.length > 0 ? notes : null,
+        notes: notes.length > 0 ? notes : null
       }
     })
 
@@ -174,7 +185,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
     }
 
     setIsSubmitting(true)
-    
+
     try {
       const orderPayload = {
         customerName: customerName.trim(),
@@ -183,14 +194,14 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
         deliveryMethod,
         paymentMethod,
         voucherCode: appliedVoucher?.code ?? null,
-        items: safeItems,
+        items: safeItems
       }
 
       const res = await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify(orderPayload),
+        body: JSON.stringify(orderPayload)
       })
 
       const responseJson: unknown = await res.json()
@@ -220,12 +231,17 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
         }
         router.push(redirectUrl)
       }
-      
+
       clearCart()
-      toast.success(paymentMethod === 'ONLINE' ? 'Pesanan dibuat. Lanjutkan pembayaran.' : 'Pesanan berhasil dibuat! Silakan lanjutkan di WhatsApp.')
+      toast.success(
+        paymentMethod === 'ONLINE'
+          ? 'Pesanan dibuat. Lanjutkan pembayaran.'
+          : 'Pesanan berhasil dibuat! Silakan lanjutkan di WhatsApp.'
+      )
       onClose()
-    } catch (error: unknown) {
-      toast.error('Terjadi kesalahan saat memproses pesanan.')
+    } catch (error: any) {
+      const errMsg = error instanceof Error ? error.message : String(error)
+      toast.error(`Terjadi kesalahan saat memproses pesanan: ${errMsg}`)
       console.error('[CHECKOUT_ERROR]', error)
     } finally {
       setIsSubmitting(false)
@@ -290,7 +306,8 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                         </h4>
                         {item.toppings && item.toppings.length > 0 && (
                           <div className="text-xs text-[#D4802A] font-medium">
-                            + {t('cart_topping')}: {item.toppings.map((t: any) => t.name).join(', ')}
+                            + {t('cart_topping')}:{' '}
+                            {item.toppings.map((t: any) => t.name).join(', ')}
                           </div>
                         )}
                         {item.notes && (
@@ -299,7 +316,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                           </p>
                         )}
                       </div>
-                      
+
                       <button
                         onClick={() => removeFromCart(item.cartItemId)}
                         className="text-zinc-400 hover:text-red-500 transition-colors text-xs"
@@ -312,9 +329,11 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                     <div className="flex items-center justify-between mt-2 pt-2 border-t border-zinc-100/50 dark:border-zinc-800/30">
                       <div className="flex items-center gap-2">
                         <button
-                          onClick={() => item.quantity === 1 
-                                ? removeFromCart(item.cartItemId)
-                                : updateQuantity(item.cartItemId, item.quantity - 1)}
+                          onClick={() =>
+                            item.quantity === 1
+                              ? removeFromCart(item.cartItemId)
+                              : updateQuantity(item.cartItemId, item.quantity - 1)
+                          }
                           className="w-6 h-6 rounded-full border border-zinc-300 dark:border-zinc-700 flex items-center justify-center text-xs text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors"
                         >
                           -
@@ -376,25 +395,34 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                     Metode Pengiriman
                   </label>
                   <div className="flex gap-2 mb-4">
-                    <button 
+                    <button
                       onClick={() => setDeliveryMethod('DELIVERY')}
-                      className={`flex-1 py-2.5 text-xs font-bold rounded-xl transition-all border ${deliveryMethod === 'DELIVERY' ? 'bg-amber-100/50 text-amber-800 border-amber-300' : 'bg-white dark:bg-zinc-800 text-zinc-500 border-zinc-200 dark:border-zinc-700'}`}>
+                      className={`flex-1 py-2.5 text-xs font-bold rounded-xl transition-all border ${deliveryMethod === 'DELIVERY' ? 'bg-amber-100/50 text-amber-800 border-amber-300' : 'bg-white dark:bg-zinc-800 text-zinc-500 border-zinc-200 dark:border-zinc-700'}`}
+                    >
                       🛵 Pesan Antar
                     </button>
-                    <button 
+                    <button
                       onClick={() => setDeliveryMethod('PICKUP')}
-                      className={`flex-1 py-2.5 text-xs font-bold rounded-xl transition-all border ${deliveryMethod === 'PICKUP' ? 'bg-amber-100/50 text-amber-800 border-amber-300' : 'bg-white dark:bg-zinc-800 text-zinc-500 border-zinc-200 dark:border-zinc-700'}`}>
+                      className={`flex-1 py-2.5 text-xs font-bold rounded-xl transition-all border ${deliveryMethod === 'PICKUP' ? 'bg-amber-100/50 text-amber-800 border-amber-300' : 'bg-white dark:bg-zinc-800 text-zinc-500 border-zinc-200 dark:border-zinc-700'}`}
+                    >
                       🏪 Ambil Sendiri
                     </button>
                   </div>
 
                   <label className="block text-xs font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 mb-2">
-                    Catatan {deliveryMethod === 'DELIVERY' ? 'Pengiriman / Alamat Lengkap *' : 'Tambahan (Opsional)'}
+                    Catatan{' '}
+                    {deliveryMethod === 'DELIVERY'
+                      ? 'Pengiriman / Alamat Lengkap *'
+                      : 'Tambahan (Opsional)'}
                   </label>
                   <textarea
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
-                    placeholder={deliveryMethod === 'DELIVERY' ? "Masukkan alamat pengiriman lengkap Anda..." : "Catatan untuk penjual..."}
+                    placeholder={
+                      deliveryMethod === 'DELIVERY'
+                        ? 'Masukkan alamat pengiriman lengkap Anda...'
+                        : 'Catatan untuk penjual...'
+                    }
                     className="w-full p-3 border border-zinc-200 dark:border-zinc-800 bg-transparent rounded-xl text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-secondary/40 min-h-[60px]"
                   />
                 </div>
@@ -405,7 +433,10 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                   </label>
                   <div className="flex gap-2">
                     <div className="relative flex-1">
-                      <TicketPercent className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" aria-hidden="true" />
+                      <TicketPercent
+                        className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400"
+                        aria-hidden="true"
+                      />
                       <input
                         type="text"
                         value={voucherCode}
@@ -442,7 +473,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                       className={`flex items-center justify-center gap-2 py-2.5 text-xs font-bold rounded-xl transition-all border ${paymentMethod === 'WHATSAPP' ? 'bg-green-100/70 text-green-800 border-green-300' : 'bg-white dark:bg-zinc-800 text-zinc-500 border-zinc-200 dark:border-zinc-700'}`}
                     >
                       <MessageCircle className="h-4 w-4" aria-hidden="true" />
-                      WhatsApp
+                      COD
                     </button>
                     <button
                       type="button"
@@ -461,18 +492,26 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                 <div className="space-y-1">
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-zinc-500 dark:text-zinc-400">Subtotal</span>
-                    <span className="text-sm font-medium text-zinc-800 dark:text-zinc-200">{formatPrice(cartTotal)}</span>
+                    <span className="text-sm font-medium text-zinc-800 dark:text-zinc-200">
+                      {formatPrice(cartTotal)}
+                    </span>
                   </div>
                   {discountAmount > 0 && (
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-zinc-500 dark:text-zinc-400">Diskon {appliedVoucher?.code}</span>
-                      <span className="text-sm font-semibold text-green-700 dark:text-green-400">-{formatPrice(discountAmount)}</span>
+                      <span className="text-sm text-zinc-500 dark:text-zinc-400">
+                        Diskon {appliedVoucher?.code}
+                      </span>
+                      <span className="text-sm font-semibold text-green-700 dark:text-green-400">
+                        -{formatPrice(discountAmount)}
+                      </span>
                     </div>
                   )}
                   {deliveryMethod === 'DELIVERY' && deliveryFee > 0 && (
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-zinc-500 dark:text-zinc-400">Ongkos Kirim</span>
-                      <span className="text-sm font-medium text-zinc-800 dark:text-zinc-200">{formatPrice(deliveryFee)}</span>
+                      <span className="text-sm font-medium text-zinc-800 dark:text-zinc-200">
+                        {formatPrice(deliveryFee)}
+                      </span>
                     </div>
                   )}
                   <div className="flex items-center justify-between pt-2 border-t border-zinc-200 dark:border-zinc-800">
@@ -493,8 +532,12 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                     onChange={(e) => setConsent(e.target.checked)}
                     className="mt-1 shrink-0 accent-brown w-4 h-4 rounded cursor-pointer"
                   />
-                  <label htmlFor="privacy-consent" className="text-[10px] text-zinc-500 cursor-pointer">
-                    Saya menyetujui data saya disimpan sesuai Kebijakan Privasi perusahaan untuk keperluan pemesanan.
+                  <label
+                    htmlFor="privacy-consent"
+                    className="text-[10px] text-zinc-500 cursor-pointer"
+                  >
+                    Saya menyetujui data saya disimpan sesuai Kebijakan Privasi perusahaan untuk
+                    keperluan pemesanan.
                   </label>
                 </div>
 
@@ -503,9 +546,15 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                   disabled={isSubmitting}
                   className="w-full flex items-center justify-center gap-2 bg-[#2E7D32] hover:bg-[#236026] text-white font-semibold py-3.5 px-4 rounded-xl transition-all duration-200 shadow-md active:scale-95 text-center text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {isSubmitting ? 'Memproses...' : (
+                  {isSubmitting ? (
+                    'Memproses...'
+                  ) : (
                     <>
-                      {paymentMethod === 'ONLINE' ? <CreditCard className="h-4 w-4" aria-hidden="true" /> : <MessageCircle className="h-4 w-4" aria-hidden="true" />}
+                      {paymentMethod === 'ONLINE' ? (
+                        <CreditCard className="h-4 w-4" aria-hidden="true" />
+                      ) : (
+                        <MessageCircle className="h-4 w-4" aria-hidden="true" />
+                      )}
                       {paymentMethod === 'ONLINE' ? 'Bayar Online' : t('cart_checkout')}
                     </>
                   )}
@@ -519,7 +568,13 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
   )
 }
 
-function CartItemSubtotal({ cartItemId, formatPrice }: { cartItemId: string, formatPrice: (n: number) => string }) {
+function CartItemSubtotal({
+  cartItemId,
+  formatPrice
+}: {
+  cartItemId: string
+  formatPrice: (n: number) => string
+}) {
   const subtotal = useCartStore(selectItemSubtotal(cartItemId))
   return <>{formatPrice(subtotal)}</>
 }

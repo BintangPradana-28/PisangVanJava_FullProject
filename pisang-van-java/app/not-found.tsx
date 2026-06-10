@@ -15,7 +15,6 @@ export default function NotFound() {
       />
 
       <div className="relative z-10 w-full max-w-lg text-center space-y-8">
-
         {/* Animated Banana */}
         <div
           className="text-8xl select-none"
@@ -37,7 +36,8 @@ export default function NotFound() {
             Pisangnya Sudah Habis 🙁
           </h2>
           <p className="text-amber-200/60 text-sm max-w-xs mx-auto leading-relaxed">
-            Halaman yang kamu cari mungkin sudah dipindahkan, dihapus, atau memang tidak pernah ada. Tapi jangan khawatir, masih banyak pisang goreng lezat yang menunggumu!
+            Halaman yang kamu cari mungkin sudah dipindahkan, dihapus, atau memang tidak pernah ada.
+            Tapi jangan khawatir, masih banyak pisang goreng lezat yang menunggumu!
           </p>
         </div>
 

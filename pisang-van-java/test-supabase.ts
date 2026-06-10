@@ -50,7 +50,6 @@ async function testUpload() {
     }
 
     console.log('Semua test Supabase berjalan lancar! 🎉')
-
   } catch (err) {
     console.error('Terjadi kesalahan fatal:', err)
   }

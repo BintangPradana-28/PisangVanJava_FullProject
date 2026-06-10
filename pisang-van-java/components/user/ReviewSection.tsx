@@ -4,24 +4,24 @@
 // Orchestrator: fetches reviews and shows StarRating + ReviewList on the same page.
 // Drop this into a page that receives a `variantId`.
 
-import { useEffect, useState } from 'react'
-import { useSession }          from 'next-auth/react'
-import StarRating              from './StarRating'
-import ReviewList, { ReviewItem } from './ReviewList'
 import Link from 'next/link'
+import { useSession } from 'next-auth/react'
+import { useEffect, useState } from 'react'
+import ReviewList, { type ReviewItem } from './ReviewList'
+import StarRating from './StarRating'
 
 interface ReviewSectionProps {
   variantId: string
 }
 
 export default function ReviewSection({ variantId }: ReviewSectionProps) {
-  const { status }                    = useSession()
-  const [reviews, setReviews]         = useState<ReviewItem[]>([])
-  const [average, setAverage]         = useState<number | null>(null)
-  const [myRating, setMyRating]       = useState<number | null>(null)
-  const [loading, setLoading]         = useState(true)
+  const { status } = useSession()
+  const [reviews, setReviews] = useState<ReviewItem[]>([])
+  const [average, setAverage] = useState<number | null>(null)
+  const [myRating, setMyRating] = useState<number | null>(null)
+  const [loading, setLoading] = useState(true)
   const [filterRating, setFilterRating] = useState<number | null>(null)
-  const [filterPhoto, setFilterPhoto]   = useState(false)
+  const [filterPhoto, setFilterPhoto] = useState(false)
 
   useEffect(() => {
     if (!variantId) return
@@ -50,13 +50,17 @@ export default function ReviewSection({ variantId }: ReviewSectionProps) {
     comment: string,
     imageUrl?: string
   ): Promise<string | null> => {
-    const payload: { variantId: string; rating: number; comment: string; imageUrl?: string } = { variantId: id, rating, comment }
+    const payload: { variantId: string; rating: number; comment: string; imageUrl?: string } = {
+      variantId: id,
+      rating,
+      comment
+    }
     if (imageUrl) payload.imageUrl = imageUrl
 
     const res = await fetch('/api/reviews', {
-      method:  'POST',
+      method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify(payload),
+      body: JSON.stringify(payload)
     })
     const data = await res.json()
     if (!data.success) return data.error ?? 'Gagal mengirim ulasan.'
@@ -82,11 +86,7 @@ export default function ReviewSection({ variantId }: ReviewSectionProps) {
 
       {/* Star Rating form — only for logged-in customers */}
       {status === 'authenticated' && (
-        <StarRating
-          variantId={variantId}
-          existingRating={myRating}
-          onSubmit={handleSubmit}
-        />
+        <StarRating variantId={variantId} existingRating={myRating} onSubmit={handleSubmit} />
       )}
       {status === 'unauthenticated' && (
         <div className="bg-orange-50 border border-amber-100 rounded-2xl p-4 text-sm text-neutral-600 text-center">
@@ -101,22 +101,31 @@ export default function ReviewSection({ variantId }: ReviewSectionProps) {
       <div className="space-y-4">
         {/* Filters */}
         <div className="flex flex-wrap items-center gap-2">
-          <button 
-            onClick={() => { setFilterRating(null); setFilterPhoto(false) }}
+          <button
+            onClick={() => {
+              setFilterRating(null)
+              setFilterPhoto(false)
+            }}
             className={`px-4 py-1.5 rounded-full text-sm font-semibold border transition-colors ${!filterRating && !filterPhoto ? 'bg-amber-100 border-amber-300 text-amber-800' : 'bg-white border-zinc-200 text-neutral-600 hover:bg-neutral-50'}`}
           >
             Semua
           </button>
-          <button 
-            onClick={() => { setFilterRating(null); setFilterPhoto(true) }}
+          <button
+            onClick={() => {
+              setFilterRating(null)
+              setFilterPhoto(true)
+            }}
             className={`px-4 py-1.5 rounded-full text-sm font-semibold border transition-colors ${filterPhoto ? 'bg-amber-100 border-amber-300 text-amber-800' : 'bg-white border-zinc-200 text-neutral-600 hover:bg-neutral-50'}`}
           >
             📸 Dengan Foto
           </button>
-          {[5, 4, 3, 2, 1].map(star => (
-            <button 
+          {[5, 4, 3, 2, 1].map((star) => (
+            <button
               key={star}
-              onClick={() => { setFilterRating(star); setFilterPhoto(false) }}
+              onClick={() => {
+                setFilterRating(star)
+                setFilterPhoto(false)
+              }}
               className={`px-4 py-1.5 rounded-full text-sm font-semibold border transition-colors flex items-center gap-1 ${filterRating === star ? 'bg-amber-100 border-amber-300 text-amber-800' : 'bg-white border-zinc-200 text-neutral-600 hover:bg-neutral-50'}`}
             >
               ⭐ {star}

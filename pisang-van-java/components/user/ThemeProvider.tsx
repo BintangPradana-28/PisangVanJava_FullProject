@@ -1,17 +1,17 @@
 'use client'
 // components/user/ThemeProvider.tsx
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
+import { createContext, type ReactNode, useContext, useEffect, useState } from 'react'
 
 type Theme = 'light' | 'dark'
 
 interface ThemeContextValue {
-  theme:       Theme
+  theme: Theme
   toggleTheme: () => void
 }
 
 const ThemeContext = createContext<ThemeContextValue>({
-  theme:       'light',
-  toggleTheme: () => {},
+  theme: 'light',
+  toggleTheme: () => {}
 })
 
 export function useTheme() {
@@ -25,8 +25,8 @@ export default function ThemeProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     // Read persisted theme from localStorage
     const stored = localStorage.getItem('vanjava_theme') as Theme | null
-    const preferred = stored
-      ?? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+    const preferred =
+      stored ?? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
     setTheme(preferred)
     document.documentElement.classList.toggle('dark', preferred === 'dark')
     setMounted(true)
@@ -42,9 +42,5 @@ export default function ThemeProvider({ children }: { children: ReactNode }) {
   // Prevent flash of unstyled content
   if (!mounted) return <div style={{ visibility: 'hidden' }}>{children}</div>
 
-  return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
-      {children}
-    </ThemeContext.Provider>
-  )
+  return <ThemeContext.Provider value={{ theme, toggleTheme }}>{children}</ThemeContext.Provider>
 }

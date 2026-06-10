@@ -59,25 +59,17 @@ declare module 'midtrans-client' {
 
   class Snap {
     constructor(config: MidtransClientConfig)
-    createTransaction(
-      parameter: SnapTransactionParameter
-    ): Promise<SnapCreateTransactionResponse>
+    createTransaction(parameter: SnapTransactionParameter): Promise<SnapCreateTransactionResponse>
     createTransactionToken(parameter: SnapTransactionParameter): Promise<string>
-    createTransactionRedirectUrl(
-      parameter: SnapTransactionParameter
-    ): Promise<string>
+    createTransactionRedirectUrl(parameter: SnapTransactionParameter): Promise<string>
   }
 
   class CoreApi {
     constructor(config: MidtransClientConfig)
     charge(parameter: Record<string, unknown>): Promise<Record<string, unknown>>
     capture(parameter: Record<string, unknown>): Promise<Record<string, unknown>>
-    cardRegister(
-      parameter: Record<string, unknown>
-    ): Promise<Record<string, unknown>>
-    cardToken(
-      parameter: Record<string, unknown>
-    ): Promise<Record<string, unknown>>
+    cardRegister(parameter: Record<string, unknown>): Promise<Record<string, unknown>>
+    cardToken(parameter: Record<string, unknown>): Promise<Record<string, unknown>>
     cardPointInquiry(tokenId: string): Promise<Record<string, unknown>>
     transaction: {
       status(transactionId: string): Promise<TransactionStatusResponse>
@@ -94,9 +86,7 @@ declare module 'midtrans-client' {
         transactionId: string,
         parameter?: Record<string, unknown>
       ): Promise<Record<string, unknown>>
-      notification(
-        notificationJson: Record<string, unknown>
-      ): Promise<TransactionStatusResponse>
+      notification(notificationJson: Record<string, unknown>): Promise<TransactionStatusResponse>
     }
   }
 

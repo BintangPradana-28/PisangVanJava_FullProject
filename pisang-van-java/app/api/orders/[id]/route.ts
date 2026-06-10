@@ -1,136 +1,135 @@
-import { NextRequest, NextResponse } from "next/server";
-
-import { prisma } from "@/lib/prisma";
-import { logAudit } from "@/lib/audit";
-import { sendWhatsAppNotification } from "@/lib/notifications";
+import { type NextRequest, NextResponse } from 'next/server'
+import { logAudit } from '@/lib/audit'
+import { sendWhatsAppNotification } from '@/lib/notifications'
+import { prisma } from '@/lib/prisma'
 import {
   hasValidSameOriginHeaders,
   orderStatusInputSchema,
   paymentFormInputSchema,
-  requireCheckoutActor,
-} from "@/src/features/checkout/service";
+  requireCheckoutActor
+} from '@/src/features/checkout/service'
 
 interface OrderRouteContext {
   params: Promise<{
-    id: string;
-  }>;
+    id: string
+  }>
 }
 
-const updateOrderStatusSchema = orderStatusInputSchema;
+const updateOrderStatusSchema = orderStatusInputSchema
 
 export async function GET(_: NextRequest, { params }: OrderRouteContext) {
-  const { id } = await params;
-  const actor = await requireCheckoutActor();
+  const { id } = await params
+  const actor = await requireCheckoutActor()
   if (actor === null) {
-    return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
   }
 
-  if (actor.role !== "ADMIN") {
-    return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
+  if (actor.role !== 'ADMIN') {
+    return NextResponse.json({ success: false, error: 'Forbidden' }, { status: 403 })
   }
 
-  const parsedParams = paymentFormInputSchema.safeParse({ orderId: id });
+  const parsedParams = paymentFormInputSchema.safeParse({ orderId: id })
   if (!parsedParams.success) {
-    return NextResponse.json({ success: false, error: "Invalid order" }, { status: 400 });
+    return NextResponse.json({ success: false, error: 'Invalid order' }, { status: 400 })
   }
 
   try {
     const order = await prisma.order.findUnique({
       where: { id: parsedParams.data.orderId },
-      select: orderDetailSelect,
-    });
+      select: orderDetailSelect
+    })
 
     if (order === null) {
-      return NextResponse.json({ success: false, error: "Order not found" }, { status: 404 });
+      return NextResponse.json({ success: false, error: 'Order not found' }, { status: 404 })
     }
 
-    return NextResponse.json({ success: true, data: order });
+    return NextResponse.json({ success: true, data: order })
   } catch (error) {
-    console.error("[SECURITY] Failed to read order.", error);
-    return NextResponse.json({ success: false, error: "Server error" }, { status: 500 });
+    console.error('[SECURITY] Failed to read order.', error)
+    return NextResponse.json({ success: false, error: 'Server error' }, { status: 500 })
   }
 }
 
 export async function PATCH(req: NextRequest, { params }: OrderRouteContext) {
-  const { id } = await params;
-  const actor = await requireCheckoutActor();
+  const { id } = await params
+  const actor = await requireCheckoutActor()
   if (actor === null) {
-    return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
   }
 
-  if (actor.role !== "ADMIN") {
-    return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
+  if (actor.role !== 'ADMIN') {
+    return NextResponse.json({ success: false, error: 'Forbidden' }, { status: 403 })
   }
 
   if (!(await hasValidSameOriginHeaders())) {
-    return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
+    return NextResponse.json({ success: false, error: 'Forbidden' }, { status: 403 })
   }
 
-  const parsedParams = paymentFormInputSchema.safeParse({ orderId: id });
+  const parsedParams = paymentFormInputSchema.safeParse({ orderId: id })
   if (!parsedParams.success) {
-    return NextResponse.json({ success: false, error: "Invalid order" }, { status: 400 });
+    return NextResponse.json({ success: false, error: 'Invalid order' }, { status: 400 })
   }
 
-  const payload = await readRequestJson(req);
-  if (payload === null || typeof payload !== "object" || Array.isArray(payload)) {
-    return NextResponse.json({ success: false, error: "Invalid request" }, { status: 400 });
+  const payload = await readRequestJson(req)
+  if (payload === null || typeof payload !== 'object' || Array.isArray(payload)) {
+    return NextResponse.json({ success: false, error: 'Invalid request' }, { status: 400 })
   }
 
-  const statusCandidate = "status" in payload ? payload.status : undefined;
-  const parsedStatus = updateOrderStatusSchema.safeParse(statusCandidate);
+  const statusCandidate = 'status' in payload ? payload.status : undefined
+  const parsedStatus = updateOrderStatusSchema.safeParse(statusCandidate)
   if (!parsedStatus.success) {
-    return NextResponse.json({ success: false, error: "Invalid status" }, { status: 400 });
+    return NextResponse.json({ success: false, error: 'Invalid status' }, { status: 400 })
   }
 
   try {
     const order = await prisma.$transaction(async (tx: any) => {
       // If transitioning to cancelled, we must restore stock exactly once.
-      if (parsedStatus.data === "CANCELED") {
+      if (parsedStatus.data === 'CANCELED') {
         const orderWithItems = await tx.order.findUnique({
           where: { id: parsedParams.data.orderId },
-          include: { items: true },
-        });
+          include: { items: true }
+        })
 
-        if (orderWithItems && orderWithItems.status !== "CANCELED") {
+        if (orderWithItems && orderWithItems.status !== 'CANCELED') {
           for (const item of orderWithItems.items) {
             await tx.menuVariant.updateMany({
               where: { id: item.variantId },
-              data: { stock: { increment: item.quantity } },
-            });
+              data: { stock: { increment: item.quantity } }
+            })
           }
         }
       }
 
       // If transitioning to COMPLETED, process referral bonus
-      if (parsedStatus.data === "COMPLETED") {
+      if (parsedStatus.data === 'COMPLETED') {
         const orderInfo = await tx.order.findUnique({
           where: { id: parsedParams.data.orderId },
-          select: { userId: true, status: true },
-        });
+          select: { userId: true, status: true }
+        })
 
-        if (orderInfo && orderInfo.userId && orderInfo.status !== "COMPLETED") {
+        if (orderInfo && orderInfo.userId && orderInfo.status !== 'COMPLETED') {
           const userObj = await tx.user.findUnique({
             where: { id: orderInfo.userId },
             select: { hasOrdered: true, referredBy: true }
-          });
+          })
 
           if (userObj && !userObj.hasOrdered) {
-             await tx.user.update({
-               where: { id: orderInfo.userId },
-               data: { hasOrdered: true }
-             });
+            await tx.user.update({
+              where: { id: orderInfo.userId },
+              data: { hasOrdered: true }
+            })
 
-             if (userObj.referredBy) {
-               const referrer = await tx.user.findUnique({
-                 where: { referralCode: userObj.referredBy }
-               });
-               if (referrer) {
-                 await tx.user.update({
-                   where: { id: referrer.id },
-                   data: { koinPisang: { increment: 5000 } }
-                 });
-               }
-             }
+            if (userObj.referredBy) {
+              const referrer = await tx.user.findUnique({
+                where: { referralCode: userObj.referredBy }
+              })
+              if (referrer) {
+                await tx.user.update({
+                  where: { id: referrer.id },
+                  data: { koinPisang: { increment: 5000 } }
+                })
+              }
+            }
           }
         }
       }
@@ -142,61 +141,70 @@ export async function PATCH(req: NextRequest, { params }: OrderRouteContext) {
           id: true,
           customerName: true,
           customerPhone: true,
-          status: true,
-        },
-      });
-    });
+          status: true
+        }
+      })
+    })
 
-    await logAudit("UPDATE_ORDER_STATUS", "Order", order.id, { newStatus: parsedStatus.data });
+    await logAudit('UPDATE_ORDER_STATUS', 'Order', order.id, { newStatus: parsedStatus.data })
 
-    if (parsedStatus.data === "PROCESSING" || parsedStatus.data === "READY" || parsedStatus.data === "CANCELED") {
-      await sendWhatsAppNotification(order.customerPhone, order.customerName, parsedStatus.data, order.id);
+    if (
+      parsedStatus.data === 'PROCESSING' ||
+      parsedStatus.data === 'READY' ||
+      parsedStatus.data === 'CANCELED'
+    ) {
+      await sendWhatsAppNotification(
+        order.customerPhone,
+        order.customerName,
+        parsedStatus.data,
+        order.id
+      )
     }
 
     return NextResponse.json({
       success: true,
       data: {
         id: order.id,
-        status: order.status,
-      },
-    });
+        status: order.status
+      }
+    })
   } catch (error) {
-    console.error("[SECURITY] Failed to update order.", error);
-    return NextResponse.json({ success: false, error: "Server error" }, { status: 500 });
+    console.error('[SECURITY] Failed to update order.', error)
+    return NextResponse.json({ success: false, error: 'Server error' }, { status: 500 })
   }
 }
 
 export async function DELETE(_: NextRequest, { params }: OrderRouteContext) {
-  const { id } = await params;
-  const actor = await requireCheckoutActor();
+  const { id } = await params
+  const actor = await requireCheckoutActor()
   if (actor === null) {
-    return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
   }
 
-  if (actor.role !== "ADMIN") {
-    return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
+  if (actor.role !== 'ADMIN') {
+    return NextResponse.json({ success: false, error: 'Forbidden' }, { status: 403 })
   }
 
   if (!(await hasValidSameOriginHeaders())) {
-    return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
+    return NextResponse.json({ success: false, error: 'Forbidden' }, { status: 403 })
   }
 
-  const parsedParams = paymentFormInputSchema.safeParse({ orderId: id });
+  const parsedParams = paymentFormInputSchema.safeParse({ orderId: id })
   if (!parsedParams.success) {
-    return NextResponse.json({ success: false, error: "Invalid order" }, { status: 400 });
+    return NextResponse.json({ success: false, error: 'Invalid order' }, { status: 400 })
   }
 
   try {
     await prisma.order.delete({
-      where: { id: parsedParams.data.orderId },
-    });
+      where: { id: parsedParams.data.orderId }
+    })
 
-    await logAudit("DELETE_ORDER", "Order", parsedParams.data.orderId);
+    await logAudit('DELETE_ORDER', 'Order', parsedParams.data.orderId)
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true })
   } catch (error) {
-    console.error("[SECURITY] Failed to delete order.", error);
-    return NextResponse.json({ success: false, error: "Server error" }, { status: 500 });
+    console.error('[SECURITY] Failed to delete order.', error)
+    return NextResponse.json({ success: false, error: 'Server error' }, { status: 500 })
   }
 }
 
@@ -222,23 +230,23 @@ const orderDetailSelect = {
       subtotal: true,
       variant: {
         select: {
-          flavorName: true,
-        },
+          flavorName: true
+        }
       },
       toppings: {
         select: {
           name: true,
-          emoji: true,
-        },
-      },
-    },
-  },
-};
+          emoji: true
+        }
+      }
+    }
+  }
+}
 
 async function readRequestJson(req: NextRequest): Promise<unknown | null> {
   try {
-    return await req.json();
+    return await req.json()
   } catch {
-    return null;
+    return null
   }
 }

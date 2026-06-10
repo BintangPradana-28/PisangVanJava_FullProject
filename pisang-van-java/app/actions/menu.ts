@@ -1,9 +1,9 @@
 'use server'
 
-import { auth } from "@/src/auth";
-import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
-import { prisma } from "@/lib/prisma";
-import { logAudit } from "@/lib/audit";
+import { revalidatePath, revalidateTag, unstable_cache } from 'next/cache'
+import { logAudit } from '@/lib/audit'
+import { prisma } from '@/lib/prisma'
+import { auth } from '@/src/auth'
 
 // ── Dead Code Eliminasi ───────────────────────────────────────────────────────
 // Fungsi usang (updateMenuVariant & mockDb) telah dihapus dari sistem ini.
@@ -12,74 +12,74 @@ import { logAudit } from "@/lib/audit";
 
 export async function toggleAvailability(id: string, isAvailable: boolean) {
   try {
-    const session = await auth();
+    const session = await auth()
     if (!session || !session.user) {
-      return { success: false, error: "Akses ditolak. Sesi tidak valid." };
+      return { success: false, error: 'Akses ditolak. Sesi tidak valid.' }
     }
 
     const updatedRecord = await prisma.menuVariant.update({
       where: { id },
-      data: { isAvailable },
-    });
+      data: { isAvailable }
+    })
 
     // Revalidate customer-facing pages
-    revalidatePath("/");
-    revalidatePath("/menu-spesial");
-    revalidatePath("/(user)", "layout");
+    revalidatePath('/')
+    revalidatePath('/menu-spesial')
+    revalidatePath('/(user)', 'layout')
     // revalidateTag("menu-data");
 
     // Audit Log
-    await logAudit("TOGGLE_AVAILABILITY", "MenuVariant", updatedRecord.id, { isAvailable });
+    await logAudit('TOGGLE_AVAILABILITY', 'MenuVariant', updatedRecord.id, { isAvailable })
 
     return {
       success: true,
       message: `Status ketersediaan '${updatedRecord.flavorName}' diperbarui.`,
       data: updatedRecord
-    };
+    }
   } catch (error) {
-    console.error("[CRITICAL BACKEND ERROR]: Toggle availability failed", error);
+    console.error('[CRITICAL BACKEND ERROR]: Toggle availability failed', error)
     return {
       success: false,
-      error: "Terjadi kegagalan sistem internal. Operasi dibatalkan."
-    };
+      error: 'Terjadi kegagalan sistem internal. Operasi dibatalkan.'
+    }
   }
 }
 
 export async function updateMenuStock(id: string, newStock: number) {
   try {
-    const session = await auth();
+    const session = await auth()
     if (!session || !session.user) {
-      return { success: false, error: "Akses ditolak. Sesi tidak valid." };
+      return { success: false, error: 'Akses ditolak. Sesi tidak valid.' }
     }
 
     if (newStock < 0) {
-      return { success: false, error: "Stok tidak boleh bernilai negatif." };
+      return { success: false, error: 'Stok tidak boleh bernilai negatif.' }
     }
 
     const updatedRecord = await prisma.menuVariant.update({
       where: { id },
-      data: { stock: newStock },
-    });
+      data: { stock: newStock }
+    })
 
     // Revalidate customer-facing pages
-    revalidatePath("/");
-    revalidatePath("/menu-spesial");
-    revalidatePath("/(user)", "layout");
-    
+    revalidatePath('/')
+    revalidatePath('/menu-spesial')
+    revalidatePath('/(user)', 'layout')
+
     // Audit Log
-    await logAudit("UPDATE_STOCK", "MenuVariant", updatedRecord.id, { newStock });
+    await logAudit('UPDATE_STOCK', 'MenuVariant', updatedRecord.id, { newStock })
 
     return {
       success: true,
       message: `Stok '${updatedRecord.flavorName}' diperbarui menjadi ${newStock}.`,
       data: updatedRecord
-    };
+    }
   } catch (error) {
-    console.error("[CRITICAL BACKEND ERROR]: Update stock failed", error);
+    console.error('[CRITICAL BACKEND ERROR]: Update stock failed', error)
     return {
       success: false,
-      error: "Terjadi kegagalan sistem internal. Operasi dibatalkan."
-    };
+      error: 'Terjadi kegagalan sistem internal. Operasi dibatalkan.'
+    }
   }
 }
 
@@ -89,7 +89,7 @@ export async function updateMenuStock(id: string, newStock: number) {
  */
 export const getCachedMenu = unstable_cache(
   async () => {
-    console.log("[CACHE MISS] Menghubungi database Prisma Supabase...");
+    console.log('[CACHE MISS] Menghubungi database Prisma Supabase...')
 
     // CISO Rule: Select explicit DB fields; NEVER return whole objects.
     const menu = await prisma.menuVariant.findMany({
@@ -106,14 +106,14 @@ export const getCachedMenu = unstable_cache(
         priceKrispy: true,
         imageUrl: true,
         tags: true
-      },
-    });
+      }
+    })
 
-    return menu;
+    return menu
   },
   ['daftar-menu-pisang'], // Kunci Cache
   {
     tags: ['menu-data'], // Tag untuk revalidasi spesifik (Sniper)
     revalidate: 3600 // TTL 1 jam
   }
-);
+)

@@ -1,15 +1,18 @@
 // app/(admin)/settings/page.tsx
-import { prisma } from '@/lib/prisma'
+
 import { redirect } from 'next/navigation'
-import { auth } from "@/src/auth";
+import { Toaster } from 'react-hot-toast'
 import AdminSidebar from '@/components/admin/AdminSidebar'
 import SettingsClient from '@/components/admin/SettingsClient'
-import { Toaster } from 'react-hot-toast'
+import { prisma } from '@/lib/prisma'
+import { auth } from '@/src/auth'
 
 export default async function SettingsPage() {
   const session = await auth()
   if (!session) redirect('/login')
-  const settings = await prisma.siteSetting.findMany({ orderBy: [{ group: 'asc' }, { key: 'asc' }] })
+  const settings = await prisma.siteSetting.findMany({
+    orderBy: [{ group: 'asc' }, { key: 'asc' }]
+  })
   return (
     <div className="flex min-h-screen">
       <AdminSidebar />

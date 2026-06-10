@@ -1,21 +1,21 @@
-import { render, screen, fireEvent } from '@testing-library/react'
-import { vi, describe, it, expect } from 'vitest'
+import { fireEvent, render, screen } from '@testing-library/react'
+import { describe, expect, it, vi } from 'vitest'
 import CheckoutError from '@/app/(user)/checkout/error'
 import PaymentError from '@/app/(user)/payment/[orderId]/error'
 
 // Mock Sentry
 vi.mock('@sentry/nextjs', () => ({
-  captureException: vi.fn(),
+  captureException: vi.fn()
 }))
 
 // Mock next/navigation
 vi.mock('next/navigation', () => ({
-  useParams: () => ({ orderId: 'test-order-123' }),
+  useParams: () => ({ orderId: 'test-order-123' })
 }))
 
 const mockReset = vi.fn()
 const mockError = Object.assign(new Error('Test error'), {
-  digest: 'abc123def456',
+  digest: 'abc123def456'
 })
 
 describe('CheckoutError boundary', () => {

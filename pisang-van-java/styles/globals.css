@@ -5,36 +5,38 @@
 
 @layer base {
   :root {
-    --cream:       #FDF6E3;
-    --cream-dark:  #F5E6C8;
-    --brown:       #3D1C02;
-    --amber-brand: #D4802A;
-    --green-wa:    #2E7D32;
+    --cream: #fdf6e3;
+    --cream-dark: #f5e6c8;
+    --brown: #3d1c02;
+    --amber-brand: #d4802a;
+    --green-wa: #2e7d32;
 
     /* Heritage Warm Earthy Mode (Light) */
-    --background-custom: #FAF6F0;
-    --text-custom: #4A3525;
+    --background-custom: #faf6f0;
+    --text-custom: #4a3525;
     --on-surface-variant: #504440;
-    --surface-custom: #FAF6F0;
-    --primary-custom: #3D1C02;
-    --secondary-custom: #D4802A;
-    --card-bg: #FFFFFF;
-    --border-custom: #E6CBB3;
+    --surface-custom: #faf6f0;
+    --primary-custom: #3d1c02;
+    --secondary-custom: #d4802a;
+    --card-bg: #ffffff;
+    --border-custom: #e6cbb3;
   }
 
   .dark {
     /* Premium Deep Gray & Banana Leaf Green / Gold Mode (Dark) */
     --background-custom: #121212;
-    --text-custom: #F4F4F5;
-    --on-surface-variant: #D4D4D8;
-    --surface-custom: #18181B;
-    --primary-custom: #D4A373; /* Gold accent */
-    --secondary-custom: #10B981; /* Banana green accent */
-    --card-bg: #1F1F23;
-    --border-custom: #27272A;
+    --text-custom: #f4f4f5;
+    --on-surface-variant: #d4d4d8;
+    --surface-custom: #18181b;
+    --primary-custom: #d4a373; /* Gold accent */
+    --secondary-custom: #10b981; /* Banana green accent */
+    --card-bg: #1f1f23;
+    --border-custom: #27272a;
   }
 
-  * { box-sizing: border-box; }
+  * {
+    box-sizing: border-box;
+  }
 
   html {
     scroll-behavior: smooth;
@@ -47,7 +49,9 @@
     color: var(--text-custom);
     font-family: var(--font-sans), system-ui, sans-serif;
     letter-spacing: -0.01em;
-    transition: background-color 0.3s, color 0.3s;
+    transition:
+      background-color 0.3s,
+      color 0.3s;
   }
 
   .dark body {
@@ -55,7 +59,11 @@
     color: var(--text-custom);
   }
 
-  h1, h2, h3 { @apply font-serif; }
+  h1,
+  h2,
+  h3 {
+    @apply font-serif;
+  }
 }
 
 /* Scroll Progress Bar */
@@ -128,7 +136,9 @@
   .reveal {
     opacity: 0;
     transform: translateY(24px);
-    transition: opacity 0.6s ease, transform 0.6s ease;
+    transition:
+      opacity 0.6s ease,
+      transform 0.6s ease;
   }
   .reveal.visible {
     opacity: 1;
@@ -186,22 +196,46 @@
 }
 
 /* Custom scrollbar */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: var(--background-custom); }
-::-webkit-scrollbar-thumb { background: var(--secondary-custom); border-radius: 3px; }
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--background-custom);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--secondary-custom);
+  border-radius: 3px;
+}
 
 /* Animation delay utilities */
-.delay-100 { animation-delay: 100ms; }
-.delay-200 { animation-delay: 200ms; }
-.delay-300 { animation-delay: 300ms; }
-.delay-400 { animation-delay: 400ms; }
-.delay-500 { animation-delay: 500ms; }
+.delay-100 {
+  animation-delay: 100ms;
+}
+.delay-200 {
+  animation-delay: 200ms;
+}
+.delay-300 {
+  animation-delay: 300ms;
+}
+.delay-400 {
+  animation-delay: 400ms;
+}
+.delay-500 {
+  animation-delay: 500ms;
+}
 
 /* Cart badge pop animation — dopamine feedback loop */
 @keyframes cart-pop {
-  0%   { transform: scale(1); }
-  50%  { transform: scale(1.4); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.4);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 .cart-pop {
   animation: cart-pop 200ms ease-out;
@@ -209,8 +243,14 @@
 
 /* Bottom sheet slide-up animation */
 @keyframes slide-up {
-  from { transform: translateY(100%); opacity: 0; }
-  to   { transform: translateY(0);    opacity: 1; }
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 .animate-slide-up {
   animation: slide-up 300ms cubic-bezier(0.16, 1, 0.3, 1);
@@ -218,8 +258,12 @@
 
 /* Fade-in animation */
 @keyframes fade-in {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 .animate-fade-in {
   animation: fade-in 200ms ease-out;

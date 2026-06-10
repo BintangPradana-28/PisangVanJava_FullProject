@@ -1,9 +1,9 @@
 import { spawn } from 'child_process'
 import { createDecipheriv } from 'crypto'
-import { createReadStream, promises as fs } from 'fs'
-import { pipeline } from 'stream/promises'
-import * as path from 'path'
 import * as dotenv from 'dotenv'
+import { createReadStream, promises as fs } from 'fs'
+import * as path from 'path'
+import { pipeline } from 'stream/promises'
 
 // Load environment variables for local runs
 dotenv.config({ path: path.join(__dirname, '../.env.local') })
@@ -13,9 +13,7 @@ const ENCRYPTION_KEY = process.env.BACKUP_ENCRYPTION_KEY
 const TARGET_FILE = process.argv[2] // Pass file path via CLI args
 
 if (!DB_URL || !ENCRYPTION_KEY || !TARGET_FILE) {
-  throw new Error(
-    'FATAL: Missing DB_URL, ENCRYPTION_KEY, or target file argument.'
-  )
+  throw new Error('FATAL: Missing DB_URL, ENCRYPTION_KEY, or target file argument.')
 }
 
 const ALGORITHM = 'aes-256-gcm'
@@ -27,8 +25,7 @@ async function executeRestore() {
   const fileSize = fileStats.size
 
   // A valid AES-256-GCM file must have at least 16 bytes IV + 16 bytes Auth Tag
-  if (fileSize <= 32)
-    throw new Error('FATAL: Backup file is too small or corrupted.')
+  if (fileSize <= 32) throw new Error('FATAL: Backup file is too small or corrupted.')
 
   // Extract IV (first 16 bytes) and Auth Tag (last 16 bytes)
   const fileHandle = await fs.open(TARGET_FILE, 'r')
@@ -48,11 +45,11 @@ async function executeRestore() {
   // Read the ciphertext only (skipping IV at start and AuthTag at end)
   const readStream = createReadStream(TARGET_FILE, {
     start: 16,
-    end: fileSize - 17,
+    end: fileSize - 17
   })
 
   const psql = spawn('psql', [DB_URL as string], {
-    stdio: ['pipe', 'inherit', 'inherit'],
+    stdio: ['pipe', 'inherit', 'inherit']
   })
 
   try {

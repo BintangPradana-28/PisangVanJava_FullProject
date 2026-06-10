@@ -1,16 +1,17 @@
 // app/(admin)/manage-menu/page.tsx
-import { prisma } from '@/lib/prisma'
-import { redirect } from 'next/navigation'
-import { auth } from "@/src/auth";
-import AdminSidebar from '@/components/admin/AdminSidebar'
-import AdminMenuDashboard from '@/src/features/menu/components/AdminMenuDashboard'
+
 import type { Metadata } from 'next'
+import { redirect } from 'next/navigation'
+import AdminSidebar from '@/components/admin/AdminSidebar'
+import { prisma } from '@/lib/prisma'
+import { auth } from '@/src/auth'
+import AdminMenuDashboard from '@/src/features/menu/components/AdminMenuDashboard'
 
 export const metadata: Metadata = { title: 'Kelola Menu | Admin' }
 
 export default async function ManageMenuPage() {
   // Zero Trust: Pastikan pengguna benar-benar memiliki sesi dari NextAuth
-  const session = await auth();
+  const session = await auth()
   if (!session) {
     redirect('/login')
   }
@@ -18,7 +19,7 @@ export default async function ManageMenuPage() {
   // Mengambil data produk aktif
   const dbProducts = await prisma.menuVariant.findMany({
     where: { isDeleted: false },
-    orderBy: { createdAt: 'desc' },
+    orderBy: { createdAt: 'desc' }
   })
 
   // Data yang dikirim ke Client Component
@@ -36,8 +37,8 @@ export default async function ManageMenuPage() {
     isAvailable: p.isAvailable,
     stock: p.stock,
     tags: p.tags || [],
-    isActive: p.isActive,
-  }));
+    isActive: p.isActive
+  }))
 
   return (
     <div className="flex min-h-screen">

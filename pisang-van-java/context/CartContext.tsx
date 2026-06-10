@@ -1,7 +1,8 @@
 'use client'
 
-import React, { createContext, useContext, useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
+import type React from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
 
 export interface CartItem {
   productId: string
@@ -20,7 +21,12 @@ interface CartContextType {
   cartItems: CartItem[]
   addToCart: (item: Omit<CartItem, 'totalPrice'>) => void
   removeFromCart: (productId: string, toppingName: string | null, notes: string) => void
-  updateQuantity: (productId: string, toppingName: string | null, notes: string, quantity: number) => void
+  updateQuantity: (
+    productId: string,
+    toppingName: string | null,
+    notes: string,
+    quantity: number
+  ) => void
   clearCart: () => void
   cartCount: number
   cartTotal: number
@@ -60,7 +66,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
               const merged = mergeCarts(data.data, initialLocalCart)
               setCartItems(merged)
               localStorage.removeItem('cart') // Clear local after merge
-              
+
               // We delay setting isDBLoaded to true so the next render can sync
               setTimeout(() => {
                 setIsDBLoaded(true)
@@ -71,12 +77,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
               setTimeout(() => setIsDBLoaded(true), 100)
             }
           } else {
-            console.error("GET /api/cart returned false success")
+            console.error('GET /api/cart returned false success')
             // Jangan wipe DB jika gagal fetch!
           }
         })
         .catch((e) => {
-          console.error("GET /api/cart throw error", e)
+          console.error('GET /api/cart throw error', e)
         })
     } else if (status === 'unauthenticated') {
       setCartItems(initialLocalCart)
@@ -93,7 +99,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       name: item.name,
       quantity: item.quantity,
       notes: item.notes,
-      baseType: item.baseType ?? null,
+      baseType: item.baseType ?? null
     }))
 
     fetch('/api/cart', {
@@ -101,13 +107,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ items: payloadItems }),
       credentials: 'include'
-    }).catch(err => console.error("Failed to sync cart", err))
+    }).catch((err) => console.error('Failed to sync cart', err))
   }
 
   // 2. Auto-save side effect
   useEffect(() => {
     if (!mounted) return
-    
+
     if (status === 'unauthenticated') {
       localStorage.setItem('cart', JSON.stringify(cartItems))
     } else if (status === 'authenticated' && isDBLoaded) {
@@ -118,7 +124,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const mergeCarts = (dbCart: CartItem[], localCart: CartItem[]) => {
     let merged = [...dbCart]
-    localCart.forEach(localItem => {
+    localCart.forEach((localItem) => {
       const existingIndex = merged.findIndex(
         (item) =>
           item.productId === localItem.productId &&
@@ -127,7 +133,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       )
       if (existingIndex > -1) {
         merged[existingIndex].quantity += localItem.quantity
-        merged[existingIndex].totalPrice = (merged[existingIndex].basePrice + merged[existingIndex].toppingPrice) * merged[existingIndex].quantity
+        merged[existingIndex].totalPrice =
+          (merged[existingIndex].basePrice + merged[existingIndex].toppingPrice) *
+          merged[existingIndex].quantity
       } else {
         merged = [...merged, localItem]
       }
@@ -153,7 +161,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         updated[existingIndex] = {
           ...existing,
           quantity: newQty,
-          totalPrice: (existing.basePrice + existing.toppingPrice) * newQty,
+          totalPrice: (existing.basePrice + existing.toppingPrice) * newQty
         }
         return updated
       }
@@ -163,22 +171,38 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const removeFromCart = (productId: string, toppingName: string | null, notes: string) => {
     setCartItems((prev) =>
-      prev.filter((item) => !(item.productId === productId && item.toppingName === toppingName && item.notes === notes))
+      prev.filter(
+        (item) =>
+          !(
+            item.productId === productId &&
+            item.toppingName === toppingName &&
+            item.notes === notes
+          )
+      )
     )
   }
 
-  const updateQuantity = (productId: string, toppingName: string | null, notes: string, quantity: number) => {
+  const updateQuantity = (
+    productId: string,
+    toppingName: string | null,
+    notes: string,
+    quantity: number
+  ) => {
     if (quantity <= 0) {
       removeFromCart(productId, toppingName, notes)
       return
     }
     setCartItems((prev) =>
       prev.map((item) => {
-        if (item.productId === productId && item.toppingName === toppingName && item.notes === notes) {
+        if (
+          item.productId === productId &&
+          item.toppingName === toppingName &&
+          item.notes === notes
+        ) {
           return {
             ...item,
             quantity,
-            totalPrice: (item.basePrice + item.toppingPrice) * quantity,
+            totalPrice: (item.basePrice + item.toppingPrice) * quantity
           }
         }
         return item
@@ -202,7 +226,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         updateQuantity,
         clearCart,
         cartCount,
-        cartTotal,
+        cartTotal
       }}
     >
       {children}

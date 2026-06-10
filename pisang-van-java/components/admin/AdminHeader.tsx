@@ -1,9 +1,9 @@
 'use client'
 // components/admin/AdminHeader.tsx
 interface Props {
-  title:    string
+  title: string
   subtitle?: string
-  action?:  React.ReactNode
+  action?: React.ReactNode
 }
 
 export default function AdminHeader({ title, subtitle, action }: Props) {

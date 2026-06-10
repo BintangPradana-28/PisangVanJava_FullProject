@@ -1,13 +1,11 @@
 import { createCipheriv, createDecipheriv, randomBytes } from 'crypto'
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
 describe('Compliance: AES-256-GCM Backup Encryption Integrity', () => {
   it('should perfectly encrypt and decrypt financial payloads without data loss', () => {
     const secretKey = randomBytes(32)
     const iv = randomBytes(16)
-    const payload = Buffer.from(
-      'INSERT INTO payments (id, amount) VALUES (1, 500000);'
-    )
+    const payload = Buffer.from('INSERT INTO payments (id, amount) VALUES (1, 500000);')
 
     // 1. Encrypt
     const cipher = createCipheriv('aes-256-gcm', secretKey, iv)
@@ -17,10 +15,7 @@ describe('Compliance: AES-256-GCM Backup Encryption Integrity', () => {
     // 2. Decrypt
     const decipher = createDecipheriv('aes-256-gcm', secretKey, iv, { authTagLength: 16 })
     decipher.setAuthTag(authTag)
-    const decrypted = Buffer.concat([
-      decipher.update(encrypted),
-      decipher.final(),
-    ])
+    const decrypted = Buffer.concat([decipher.update(encrypted), decipher.final()])
 
     // 3. Assert
     expect(decrypted.toString()).toBe(payload.toString())

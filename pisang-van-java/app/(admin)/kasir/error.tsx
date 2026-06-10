@@ -4,13 +4,13 @@ import { useEffect } from 'react'
 
 export default function ErrorKasir({
   error,
-  reset,
+  reset
 }: {
   error: Error & { digest?: string }
   reset: () => void
 }) {
   useEffect(() => {
-    console.error("Kasir Page Error:", error)
+    console.error('Kasir Page Error:', error)
   }, [error])
 
   return (
@@ -19,7 +19,8 @@ export default function ErrorKasir({
         <div className="text-5xl mb-4">🔌</div>
         <h2 className="text-2xl font-bold text-gray-800 mb-2">Sistem Terputus</h2>
         <p className="text-gray-500 mb-8 text-sm">
-          Gagal terhubung ke database utama. Pastikan koneksi internet Anda stabil, atau hubungi administrator jika masalah berlanjut.
+          Gagal terhubung ke database utama. Pastikan koneksi internet Anda stabil, atau hubungi
+          administrator jika masalah berlanjut.
         </p>
         <button
           onClick={() => reset()}

@@ -1,20 +1,22 @@
 import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
+import { prisma } from '@/lib/prisma'
 
 // STRICT VALIDATION (C-Level Standard)
-const ContactSchema = z.object({
-  nama: z.string().min(2, "Nama terlalu pendek").max(100, "Nama terlalu panjang"),
-  pesan: z.string().min(5, "Pesan terlalu pendek").max(2000, "Pesan terlalu panjang"),
-  consent: z.boolean().refine((val) => val === true, {
-    message: "Anda harus menyetujui Kebijakan Privasi"
+const ContactSchema = z
+  .object({
+    nama: z.string().min(2, 'Nama terlalu pendek').max(100, 'Nama terlalu panjang'),
+    pesan: z.string().min(5, 'Pesan terlalu pendek').max(2000, 'Pesan terlalu panjang'),
+    consent: z.boolean().refine((val) => val === true, {
+      message: 'Anda harus menyetujui Kebijakan Privasi'
+    })
   })
-}).strict()
+  .strict()
 
 export async function POST(req: Request) {
   try {
     const rawBody = await req.json()
-    
+
     // 1. ABSOLUTE QUARANTINE (Zod Validation)
     const parsed = ContactSchema.safeParse(rawBody)
     if (!parsed.success) {

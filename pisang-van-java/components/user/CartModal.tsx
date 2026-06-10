@@ -1,32 +1,49 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { useRouter } from 'next/navigation'
-import { CreditCard, MessageCircle, TicketPercent, ShoppingCart, X, Minus, Plus, Trash2 } from 'lucide-react'
-import { z } from 'zod'
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useCartStore, selectCartItems, selectCartDisplayTotal, selectItemSubtotal, type CartItem } from '@/src/stores/cart.store'
+import { AnimatePresence, motion } from 'framer-motion'
+import {
+  CreditCard,
+  MessageCircle,
+  Minus,
+  Plus,
+  ShoppingCart,
+  TicketPercent,
+  Trash2,
+  X
+} from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import React, { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import toast from 'react-hot-toast'
+import { z } from 'zod'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSettings } from '@/context/SettingsContext'
 import { validateVoucher } from '@/src/features/checkout/actions'
-import toast from 'react-hot-toast'
 import { isStoreOpen } from '@/src/lib/time'
+import {
+  type CartItem,
+  selectCartDisplayTotal,
+  selectCartItems,
+  selectItemSubtotal,
+  useCartStore
+} from '@/src/stores/cart.store'
 
 // ============================================================
 // ZOD SCHEMA — Client-side Quarantine (VP Engineering mandate)
 // ============================================================
-const customerInfoSchema = z.object({
-  customerName: z
-    .string()
-    .min(3, { message: 'Nama minimal 3 karakter.' })
-    .max(60, { message: 'Nama maksimal 60 karakter.' })
-    .regex(/^[A-Za-z\s]+$/, { message: 'Nama hanya boleh berisi huruf dan spasi.' }),
-  customerPhone: z
-    .string()
-    .regex(/^(\+62|62|0)8[1-9][0-9]{6,10}$/, { message: 'Format WA tidak valid. Contoh: 08123456789' }),
-}).strict()
+const customerInfoSchema = z
+  .object({
+    customerName: z
+      .string()
+      .min(3, { message: 'Nama minimal 3 karakter.' })
+      .max(60, { message: 'Nama maksimal 60 karakter.' })
+      .regex(/^[A-Za-z\s]+$/, { message: 'Nama hanya boleh berisi huruf dan spasi.' }),
+    customerPhone: z.string().regex(/^(\+62|62|0)8[1-9][0-9]{6,10}$/, {
+      message: 'Format WA tidak valid. Contoh: 08123456789'
+    })
+  })
+  .strict()
 
 type CustomerInfoValues = z.infer<typeof customerInfoSchema>
 
@@ -63,25 +80,33 @@ function resolveBaseType(name: string): BaseType | null {
 }
 
 const createOrderResponseSchema = z.discriminatedUnion('success', [
-  z.object({
-    success: z.literal(true),
-    data: z.object({
-      orderId: z.string().min(8).max(64),
-      redirectType: z.enum(['WHATSAPP', 'PAYMENT']),
-      redirectUrl: z.string().min(1).max(3000),
-      totalPrice: z.number().finite().int().min(0),
-    }).strict(),
-  }).strict(),
-  z.object({
-    success: z.literal(false),
-    error: z.string().min(1),
-  }).strict(),
+  z
+    .object({
+      success: z.literal(true),
+      data: z
+        .object({
+          orderId: z.string().min(8).max(64),
+          redirectType: z.enum(['WHATSAPP', 'PAYMENT', 'CASHLESS_SUCCESS']),
+          redirectUrl: z.string().min(1).max(3000),
+          totalPrice: z.number().finite().int().min(0)
+        })
+        .strict()
+    })
+    .strict(),
+  z
+    .object({
+      success: z.literal(false),
+      error: z.string().min(1)
+    })
+    .strict()
 ])
 
-
-
 const formatPrice = (amount: number) =>
-  new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount)
+  new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    minimumFractionDigits: 0
+  }).format(amount)
 
 // ============================================================
 // MAIN COMPONENT
@@ -113,17 +138,18 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors }
   } = useForm<CustomerInfoValues>({
     resolver: zodResolver(customerInfoSchema),
-    defaultValues: { customerName: '', customerPhone: '' },
+    defaultValues: { customerName: '', customerPhone: '' }
   })
 
   const deliveryFeeSetting = getSetting('store_delivery_fee', '0')
   const deliveryFee = /^[0-9]{1,9}$/.test(deliveryFeeSetting) ? Number(deliveryFeeSetting) : 0
   const discountAmount = appliedVoucher?.discountAmount ?? 0
   const discountedSubtotal = Math.max(cartTotal - discountAmount, 0)
-  const finalTotal = deliveryMethod === 'DELIVERY' ? discountedSubtotal + deliveryFee : discountedSubtotal
+  const finalTotal =
+    deliveryMethod === 'DELIVERY' ? discountedSubtotal + deliveryFee : discountedSubtotal
 
   const jamOperasional = getSetting('jam_operasional', '10.00–21.00')
   const storeMode = getSetting('store_status', 'AUTO')
@@ -144,7 +170,9 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
   // Tutup modal dengan Escape
   useEffect(() => {
     if (!isOpen) return
-    const handleEsc = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
     document.addEventListener('keydown', handleEsc)
     return () => document.removeEventListener('keydown', handleEsc)
   }, [isOpen, onClose])
@@ -156,7 +184,9 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
     } else {
       document.body.style.overflow = ''
     }
-    return () => { document.body.style.overflow = '' }
+    return () => {
+      document.body.style.overflow = ''
+    }
   }, [isOpen])
 
   // ============================================================
@@ -212,7 +242,7 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
         toppingIds: item.toppings ? item.toppings.map((t: any) => t.toppingId) : [],
         baseType,
         quantity: item.quantity,
-        notes: notes.length > 0 ? notes : null,
+        notes: notes.length > 0 ? notes : null
       }
     })
 
@@ -231,14 +261,14 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
         deliveryMethod,
         paymentMethod,
         voucherCode: appliedVoucher?.code ?? null,
-        items: safeItems,
+        items: safeItems
       }
 
       const res = await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify(orderPayload),
+        body: JSON.stringify(orderPayload)
       })
 
       const responseJson: unknown = await res.json()
@@ -269,10 +299,15 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
       }
 
       clearCart()
-      toast.success(paymentMethod === 'ONLINE' ? 'Pesanan dibuat. Lanjutkan pembayaran.' : 'Pesanan berhasil dibuat! Silakan lanjutkan di WhatsApp.')
+      toast.success(
+        paymentMethod === 'ONLINE'
+          ? 'Pesanan dibuat. Lanjutkan pembayaran.'
+          : 'Pesanan berhasil dibuat! Silakan lanjutkan di WhatsApp.'
+      )
       onClose()
-    } catch (error: unknown) {
-      toast.error('Terjadi kesalahan saat memproses pesanan.')
+    } catch (error: any) {
+      const errMsg = error instanceof Error ? error.message : String(error)
+      toast.error(`Terjadi kesalahan saat memproses pesanan: ${errMsg}`)
       console.error('[CHECKOUT_ERROR]', error)
     } finally {
       setIsSubmitting(false)
@@ -307,7 +342,6 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
               onClick={(e) => e.stopPropagation()}
               className="pointer-events-auto w-full max-w-2xl max-h-[90vh] flex flex-col bg-white dark:bg-zinc-900 rounded-3xl shadow-2xl overflow-hidden border border-zinc-200/60 dark:border-zinc-800"
             >
-
               {/* ── HEADER ── */}
               <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-100 dark:border-zinc-800 bg-gradient-to-r from-[#D4802A]/5 to-transparent shrink-0">
                 <div className="flex items-center gap-3">
@@ -319,7 +353,9 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
                       {t('cart_title')}
                     </h2>
                     <p className="text-xs text-zinc-400 dark:text-zinc-500">
-                      {cartItems.length === 0 ? 'Keranjang kosong' : `${cartItems.reduce((s, i) => s + i.quantity, 0)} item • ${formatPrice(cartTotal)}`}
+                      {cartItems.length === 0
+                        ? 'Keranjang kosong'
+                        : `${cartItems.reduce((s, i) => s + i.quantity, 0)} item • ${formatPrice(cartTotal)}`}
                     </p>
                   </div>
                 </div>
@@ -366,14 +402,17 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
 
               {/* ── BODY (Scrollable) ── */}
               <div className="flex-1 overflow-y-auto min-h-0">
-
                 {/* ===== EMPTY STATE ===== */}
                 {cartItems.length === 0 && (
                   <div className="flex flex-col items-center justify-center h-64 text-zinc-400 dark:text-zinc-500 gap-4">
                     <div className="text-6xl">🛍️</div>
                     <div className="text-center">
-                      <p className="font-semibold text-zinc-500 dark:text-zinc-400">{t('cart_empty')}</p>
-                      <p className="text-sm text-zinc-400 dark:text-zinc-500 mt-1">Belum ada produk di keranjang Anda</p>
+                      <p className="font-semibold text-zinc-500 dark:text-zinc-400">
+                        {t('cart_empty')}
+                      </p>
+                      <p className="text-sm text-zinc-400 dark:text-zinc-500 mt-1">
+                        Belum ada produk di keranjang Anda
+                      </p>
                     </div>
                     <button
                       onClick={() => {
@@ -406,13 +445,18 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
 
                         {/* Product Detail */}
                         <div className="flex-1 min-w-0">
-                          <h4 className="font-bold text-sm text-zinc-800 dark:text-zinc-100 truncate">{item.variantName}</h4>
+                          <h4 className="font-bold text-sm text-zinc-800 dark:text-zinc-100 truncate">
+                            {item.variantName}
+                          </h4>
                           {item.toppings && item.toppings.length > 0 && (
                             <span className="text-xs text-amber-500 font-medium">
                               + {item.toppings.map((t: any) => t.name).join(', ')}
-                          </span>)}
+                            </span>
+                          )}
                           {item.notes && (
-                            <p className="text-xs text-zinc-400 dark:text-zinc-500 italic mt-0.5 truncate">"{item.notes}"</p>
+                            <p className="text-xs text-zinc-400 dark:text-zinc-500 italic mt-0.5 truncate">
+                              "{item.notes}"
+                            </p>
                           )}
                           <div className="flex items-center justify-between mt-2">
                             {/* Quantity Control — Shopee Style: minus→trash saat qty=1 */}
@@ -428,9 +472,15 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
                                     ? 'text-red-400 hover:bg-red-50 dark:hover:bg-red-950/20 hover:text-red-600'
                                     : 'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-[#D4802A]'
                                 }`}
-                                aria-label={item.quantity === 1 ? 'Hapus item' : 'Kurangi kuantitas'}
+                                aria-label={
+                                  item.quantity === 1 ? 'Hapus item' : 'Kurangi kuantitas'
+                                }
                               >
-                                {item.quantity === 1 ? <Trash2 className="w-3 h-3" /> : <Minus className="w-3 h-3" />}
+                                {item.quantity === 1 ? (
+                                  <Trash2 className="w-3 h-3" />
+                                ) : (
+                                  <Minus className="w-3 h-3" />
+                                )}
                               </button>
                               <span className="w-7 text-center text-sm font-bold text-zinc-800 dark:text-zinc-100">
                                 {item.quantity}
@@ -446,7 +496,10 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
 
                             {/* Price */}
                             <span className="text-sm font-bold text-[#D4802A]">
-                              <CartItemSubtotal cartItemId={item.cartItemId} formatPrice={formatPrice} />
+                              <CartItemSubtotal
+                                cartItemId={item.cartItemId}
+                                formatPrice={formatPrice}
+                              />
                             </span>
                           </div>
                         </div>
@@ -467,7 +520,6 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
                 {/* ===== TAB: CHECKOUT DETAIL ===== */}
                 {cartItems.length > 0 && activeTab === 'checkout' && (
                   <div className="p-5 space-y-5">
-
                     {/* — Customer Info (RHF + Zod Iron Gate) — */}
                     <div className="space-y-3">
                       <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
@@ -489,7 +541,9 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
                             }`}
                           />
                           {errors.customerName && (
-                            <p className="mt-1 text-[10px] text-red-500 font-medium">{errors.customerName.message}</p>
+                            <p className="mt-1 text-[10px] text-red-500 font-medium">
+                              {errors.customerName.message}
+                            </p>
                           )}
                         </div>
                         <div>
@@ -507,7 +561,9 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
                             }`}
                           />
                           {errors.customerPhone && (
-                            <p className="mt-1 text-[10px] text-red-500 font-medium">{errors.customerPhone.message}</p>
+                            <p className="mt-1 text-[10px] text-red-500 font-medium">
+                              {errors.customerPhone.message}
+                            </p>
                           )}
                         </div>
                       </div>
@@ -543,7 +599,11 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
                       <textarea
                         value={address}
                         onChange={(e) => setAddress(e.target.value)}
-                        placeholder={deliveryMethod === 'DELIVERY' ? 'Alamat pengiriman lengkap...' : 'Catatan tambahan (opsional)...'}
+                        placeholder={
+                          deliveryMethod === 'DELIVERY'
+                            ? 'Alamat pengiriman lengkap...'
+                            : 'Catatan tambahan (opsional)...'
+                        }
                         rows={2}
                         className="w-full px-3 py-2.5 border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/50 rounded-xl text-sm text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-[#D4802A]/30 focus:border-[#D4802A] transition-all resize-none"
                       />
@@ -556,7 +616,10 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
                       </h3>
                       <div className="flex gap-2">
                         <div className="relative flex-1">
-                          <TicketPercent className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" aria-hidden />
+                          <TicketPercent
+                            className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400"
+                            aria-hidden
+                          />
                           <input
                             type="text"
                             value={voucherCode}
@@ -582,7 +645,8 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
                       </div>
                       {appliedVoucher && (
                         <p className="mt-1.5 text-xs font-semibold text-green-600 dark:text-green-400">
-                          ✅ Voucher <strong>{appliedVoucher.code}</strong> aktif — hemat {formatPrice(appliedVoucher.discountAmount)}
+                          ✅ Voucher <strong>{appliedVoucher.code}</strong> aktif — hemat{' '}
+                          {formatPrice(appliedVoucher.discountAmount)}
                         </p>
                       )}
                     </div>
@@ -603,7 +667,7 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
                           }`}
                         >
                           <MessageCircle className="w-4 h-4" aria-hidden />
-                          WhatsApp
+                          COD
                         </button>
                         <button
                           type="button"
@@ -629,8 +693,12 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
                         onChange={(e) => setConsent(e.target.checked)}
                         className="mt-0.5 shrink-0 accent-[#D4802A] w-4 h-4 rounded cursor-pointer"
                       />
-                      <label htmlFor="privacy-consent-modal" className="text-xs text-zinc-500 dark:text-zinc-400 cursor-pointer leading-relaxed">
-                        Saya menyetujui data saya disimpan sesuai Kebijakan Privasi perusahaan untuk keperluan pemesanan.
+                      <label
+                        htmlFor="privacy-consent-modal"
+                        className="text-xs text-zinc-500 dark:text-zinc-400 cursor-pointer leading-relaxed"
+                      >
+                        Saya menyetujui data saya disimpan sesuai Kebijakan Privasi perusahaan untuk
+                        keperluan pemesanan.
                       </label>
                     </div>
                   </div>
@@ -640,33 +708,46 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
               {/* ── FOOTER — Sticky Price Summary + CTA ── */}
               {cartItems.length > 0 && (
                 <div className="shrink-0 border-t border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-5 py-4 space-y-3 shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
-
                   {/* Price Breakdown */}
                   <div className="space-y-1.5">
                     <div className="flex justify-between text-xs text-zinc-400 dark:text-zinc-500">
                       <span>Subtotal ({cartItems.reduce((s, i) => s + i.quantity, 0)} item)</span>
-                      <span className="font-semibold text-zinc-600 dark:text-zinc-300">{formatPrice(cartTotal)}</span>
+                      <span className="font-semibold text-zinc-600 dark:text-zinc-300">
+                        {formatPrice(cartTotal)}
+                      </span>
                     </div>
                     {discountAmount > 0 && (
                       <div className="flex justify-between text-xs">
-                        <span className="text-green-600 dark:text-green-400">Diskon {appliedVoucher?.code}</span>
-                        <span className="font-semibold text-green-600 dark:text-green-400">-{formatPrice(discountAmount)}</span>
+                        <span className="text-green-600 dark:text-green-400">
+                          Diskon {appliedVoucher?.code}
+                        </span>
+                        <span className="font-semibold text-green-600 dark:text-green-400">
+                          -{formatPrice(discountAmount)}
+                        </span>
                       </div>
                     )}
                     {/* Ongkos kirim selalu tampil saat Pesan Antar dipilih (CFO mandate) */}
                     {deliveryMethod === 'DELIVERY' && (
                       <div className="flex justify-between text-xs text-zinc-400 dark:text-zinc-500">
                         <span>Ongkos Kirim</span>
-                        <span className={`font-semibold ${
-                          deliveryFee > 0 ? 'text-zinc-600 dark:text-zinc-300' : 'text-green-600 dark:text-green-400'
-                        }`}>
+                        <span
+                          className={`font-semibold ${
+                            deliveryFee > 0
+                              ? 'text-zinc-600 dark:text-zinc-300'
+                              : 'text-green-600 dark:text-green-400'
+                          }`}
+                        >
                           {deliveryFee > 0 ? formatPrice(deliveryFee) : 'Gratis 🎉 (Jarak < 5km)'}
                         </span>
                       </div>
                     )}
                     <div className="flex justify-between items-center pt-2 border-t border-zinc-100 dark:border-zinc-800">
-                      <span className="text-sm font-bold text-zinc-800 dark:text-zinc-100">Total Akhir</span>
-                      <span className="text-xl font-extrabold text-[#D4802A]">{formatPrice(finalTotal)}</span>
+                      <span className="text-sm font-bold text-zinc-800 dark:text-zinc-100">
+                        Total Akhir
+                      </span>
+                      <span className="text-xl font-extrabold text-[#D4802A]">
+                        {formatPrice(finalTotal)}
+                      </span>
                     </div>
                   </div>
 
@@ -705,25 +786,47 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
                         >
                           {isSubmitting ? (
                             <>
-                              <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                              <svg
+                                className="animate-spin h-4 w-4"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                              >
+                                <circle
+                                  className="opacity-25"
+                                  cx="12"
+                                  cy="12"
+                                  r="10"
+                                  stroke="currentColor"
+                                  strokeWidth="4"
+                                />
+                                <path
+                                  className="opacity-75"
+                                  fill="currentColor"
+                                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                                />
                               </svg>
                               Memproses...
                             </>
                           ) : (
                             <>
-                              {paymentMethod === 'ONLINE'
-                                ? <><CreditCard className="w-4 h-4" aria-hidden /> Bayar Online</>
-                                : <><MessageCircle className="w-4 h-4" aria-hidden /> {t('cart_checkout')}</>
-                              }
+                              {paymentMethod === 'ONLINE' ? (
+                                <>
+                                  <CreditCard className="w-4 h-4" aria-hidden /> Bayar Online
+                                </>
+                              ) : (
+                                <>
+                                  <MessageCircle className="w-4 h-4" aria-hidden />{' '}
+                                  {t('cart_checkout')}
+                                </>
+                              )}
                             </>
                           )}
                         </button>
                       </>
                     )}
                   </div>
-                  
+
                   {/* Trust Signal */}
                   <div className="flex items-center justify-center pt-2">
                     <p className="text-[10px] text-zinc-400 dark:text-zinc-500 font-medium flex items-center gap-1">
@@ -732,7 +835,6 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
                   </div>
                 </div>
               )}
-
             </div>
           </motion.div>
         </>
@@ -741,7 +843,13 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
   )
 }
 
-function CartItemSubtotal({ cartItemId, formatPrice }: { cartItemId: string, formatPrice: (n: number) => string }) {
+function CartItemSubtotal({
+  cartItemId,
+  formatPrice
+}: {
+  cartItemId: string
+  formatPrice: (n: number) => string
+}) {
   const subtotal = useCartStore(selectItemSubtotal(cartItemId))
   return <>{formatPrice(subtotal)}</>
 }

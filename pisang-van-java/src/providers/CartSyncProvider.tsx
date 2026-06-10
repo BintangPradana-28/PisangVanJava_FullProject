@@ -1,26 +1,22 @@
 'use client'
-import { useEffect, useRef, useState } from 'react'
-import { useSession } from 'next-auth/react'
 import { usePathname } from 'next/navigation'
-import { useCartStore, type CartItem } from '@/src/stores/cart.store'
+import { useSession } from 'next-auth/react'
+import { useEffect, useRef, useState } from 'react'
 import { MergeConflictModal } from '@/components/user/MergeConflictModal'
 import { api } from '@/src/lib/api'
+import { type CartItem, useCartStore } from '@/src/stores/cart.store'
 
-export function CartSyncProvider({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export function CartSyncProvider({ children }: { children: React.ReactNode }) {
   const { status } = useSession()
   const cartItems = useCartStore((s) => s.items)
   const setItems = useCartStore((s) => s.setItems)
   const clearCart = useCartStore((s) => s.clearCart)
   const _hasHydrated = useCartStore((s) => s._hasHydrated)
-  
+
   const setConflictState = useCartStore((s) => s.setConflictState)
   const resolveConflict = useCartStore((s) => s.resolveConflict)
   const conflictState = useCartStore((s) => s.conflictState)
-  
+
   const pathname = usePathname()
   const [isFirstSyncDone, setIsFirstSyncDone] = useState(false)
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -46,7 +42,7 @@ export function CartSyncProvider({
       const fetchAndMergeCart = async () => {
         try {
           const data = await api<any>('/api/user/cart/sync')
-          
+
           if (data.success && Array.isArray(data.data?.items)) {
             const dbItems: CartItem[] = data.data.items
             const localItems = useCartStore.getState().items
@@ -55,33 +51,41 @@ export function CartSyncProvider({
             const CONFLICT_THRESHOLD = {
               itemCount: 3,
               totalPrice: 75000,
-              diffCount: 2,
+              diffCount: 2
             }
 
             const isSameCartItem = (a: CartItem, b: CartItem) => {
-              if (a.menuVariantId !== b.menuVariantId) return false;
-              if (a.notes !== b.notes) return false;
-              
-              const aToppings = Array.isArray(a.toppings) ? a.toppings : ((a as any).topping ? [(a as any).topping] : []);
-              const bToppings = Array.isArray(b.toppings) ? b.toppings : ((b as any).topping ? [(b as any).topping] : []);
-              
-              if (aToppings.length !== bToppings.length) return false;
-              
-              const aIds = aToppings.map((t: any) => t.toppingId).sort();
-              const bIds = bToppings.map((t: any) => t.toppingId).sort();
-              
-              return aIds.every((val, index) => val === bIds[index]);
+              if (a.menuVariantId !== b.menuVariantId) return false
+              if (a.notes !== b.notes) return false
+
+              const aToppings = Array.isArray(a.toppings)
+                ? a.toppings
+                : (a as any).topping
+                  ? [(a as any).topping]
+                  : []
+              const bToppings = Array.isArray(b.toppings)
+                ? b.toppings
+                : (b as any).topping
+                  ? [(b as any).topping]
+                  : []
+
+              if (aToppings.length !== bToppings.length) return false
+
+              const aIds = aToppings.map((t: any) => t.toppingId).sort()
+              const bIds = bToppings.map((t: any) => t.toppingId).sort()
+
+              return aIds.every((val, index) => val === bIds[index])
             }
 
             // Hitung items yang berbeda (ada di lokal tapi tidak ada di DB)
-            const differentItems = localItems.filter(localItem => 
-              !dbItems.some(dbItem => isSameCartItem(dbItem, localItem))
+            const differentItems = localItems.filter(
+              (localItem) => !dbItems.some((dbItem) => isSameCartItem(dbItem, localItem))
             )
 
             // Smart Merge (Opsi A per user request): Keduanya digabung (DB + Lokal ditambahkan quantity-nya)
             const merged = [...dbItems]
-            localItems.forEach(localItem => {
-              const existingIndex = merged.findIndex(i => isSameCartItem(i, localItem))
+            localItems.forEach((localItem) => {
+              const existingIndex = merged.findIndex((i) => isSameCartItem(i, localItem))
               if (existingIndex !== -1) {
                 merged[existingIndex] = {
                   ...merged[existingIndex],
@@ -92,9 +96,16 @@ export function CartSyncProvider({
               }
             })
 
-            const mergedTotal = merged.reduce((acc, item) => acc + ((item.basePrice + (item.toppings?.reduce((s: number, t: any) => s + (t.priceAdd || 0), 0) || 0)) * item.quantity), 0)
+            const mergedTotal = merged.reduce(
+              (acc, item) =>
+                acc +
+                (item.basePrice +
+                  (item.toppings?.reduce((s: number, t: any) => s + (t.priceAdd || 0), 0) || 0)) *
+                  item.quantity,
+              0
+            )
 
-            const shouldShowModal = 
+            const shouldShowModal =
               merged.length > CONFLICT_THRESHOLD.itemCount ||
               mergedTotal > CONFLICT_THRESHOLD.totalPrice ||
               differentItems.length > CONFLICT_THRESHOLD.diffCount
@@ -123,13 +134,14 @@ export function CartSyncProvider({
   // ── 2. Persist to DB on Change (Debounced) ──
   const syncToDB = async (items: CartItem[]) => {
     if (status !== 'authenticated') return
+    if (useCartStore.getState().isLoggingOut) return
     // Optimasi: Jangan panggil API jika items sama persis dengan yang terakhir disimpan
     if (JSON.stringify(items) === JSON.stringify(previousItemsRef.current)) return
 
     try {
       const res = await api<any>('/api/user/cart/sync', {
         method: 'POST',
-        body: { items },
+        body: { items }
       })
       if (res.success) {
         previousItemsRef.current = [...items]
@@ -163,6 +175,7 @@ export function CartSyncProvider({
     if (status !== 'authenticated') return
 
     const forceSync = () => {
+      if (useCartStore.getState().isLoggingOut) return
       const currentItems = useCartStore.getState().items
       if (JSON.stringify(currentItems) !== JSON.stringify(previousItemsRef.current)) {
         // Gunakan navigator.sendBeacon untuk request fire-and-forget yang andal saat unload

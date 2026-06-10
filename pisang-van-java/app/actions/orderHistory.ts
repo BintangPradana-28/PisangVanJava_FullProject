@@ -1,7 +1,7 @@
 'use server'
 
-import { auth } from '@/src/auth'
 import { prisma } from '@/lib/prisma'
+import { auth } from '@/src/auth'
 
 export async function getUserOrders() {
   try {

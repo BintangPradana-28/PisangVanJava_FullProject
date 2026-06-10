@@ -1,9 +1,9 @@
 'use client'
 
+import type { Banner } from '@prisma/client'
+import Image from 'next/image'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
-import Image from 'next/image'
-import { Banner } from '@prisma/client'
 import ImageUploadDropzone from '@/components/admin/ImageUploadDropzone'
 
 export default function BannersClient({ initialBanners }: { initialBanners: Banner[] }) {
@@ -12,7 +12,17 @@ export default function BannersClient({ initialBanners }: { initialBanners: Bann
   const [editingBanner, setEditingBanner] = useState<Banner | null>(null)
   const [loading, setLoading] = useState(false)
 
-  const emptyForm = { title: '', subtitle: '', badge: '', imageUrl: '', isActive: false, linkUrl: '', startDate: '', endDate: '', priority: 0 }
+  const emptyForm = {
+    title: '',
+    subtitle: '',
+    badge: '',
+    imageUrl: '',
+    isActive: false,
+    linkUrl: '',
+    startDate: '',
+    endDate: '',
+    priority: 0
+  }
   const [form, setForm] = useState(emptyForm)
 
   const handleOpenModal = (b?: Banner) => {
@@ -50,9 +60,9 @@ export default function BannersClient({ initialBanners }: { initialBanners: Bann
       const data = await res.json()
       if (data.success) {
         toast.success(editingBanner ? 'Banner diperbarui' : 'Banner ditambahkan')
-        setBanners(prev => {
-          const exists = prev.find(b => b.id === data.data.id)
-          if (exists) return prev.map(b => b.id === data.data.id ? data.data : b)
+        setBanners((prev) => {
+          const exists = prev.find((b) => b.id === data.data.id)
+          if (exists) return prev.map((b) => (b.id === data.data.id ? data.data : b))
           return [data.data, ...prev]
         })
         setShowModal(false)
@@ -73,7 +83,7 @@ export default function BannersClient({ initialBanners }: { initialBanners: Bann
       const data = await res.json()
       if (data.success) {
         toast.success('Banner dihapus')
-        setBanners(prev => prev.filter(b => b.id !== id))
+        setBanners((prev) => prev.filter((b) => b.id !== id))
       }
     } catch {
       toast.error('Gagal menghapus')
@@ -90,7 +100,7 @@ export default function BannersClient({ initialBanners }: { initialBanners: Bann
       const data = await res.json()
       if (data.success) {
         toast.success(data.data.isActive ? 'Banner diaktifkan' : 'Banner dinonaktifkan')
-        setBanners(prev => prev.map(b => b.id === data.data.id ? data.data : b))
+        setBanners((prev) => prev.map((b) => (b.id === data.data.id ? data.data : b)))
       }
     } catch {
       toast.error('Gagal mengubah status')
@@ -104,7 +114,10 @@ export default function BannersClient({ initialBanners }: { initialBanners: Bann
           <h2 className="font-serif text-xl font-bold text-brown-700">Manajemen Banner</h2>
           <p className="text-sm text-brown-400">Atur hero banner dan promo halaman utama</p>
         </div>
-        <button onClick={() => handleOpenModal()} className="bg-amber-brand text-white font-bold px-4 py-2 rounded-xl shadow-md hover:bg-amber-600 transition">
+        <button
+          onClick={() => handleOpenModal()}
+          className="bg-amber-brand text-white font-bold px-4 py-2 rounded-xl shadow-md hover:bg-amber-600 transition"
+        >
           + Tambah Banner
         </button>
       </div>
@@ -120,36 +133,58 @@ export default function BannersClient({ initialBanners }: { initialBanners: Bann
             </tr>
           </thead>
           <tbody>
-            {banners.map(b => (
-              <tr key={b.id} className="border-b border-cream-100 last:border-0 hover:bg-cream-50 transition">
+            {banners.map((b) => (
+              <tr
+                key={b.id}
+                className="border-b border-cream-100 last:border-0 hover:bg-cream-50 transition"
+              >
                 <td className="p-4">
                   {b.imageUrl ? (
                     <div className="relative w-24 h-16 rounded-lg overflow-hidden bg-cream-200">
                       <Image src={b.imageUrl} alt={b.title} fill className="object-cover" />
                     </div>
                   ) : (
-                    <div className="w-24 h-16 rounded-lg bg-cream-200 flex items-center justify-center text-xs text-brown-400">No Image</div>
+                    <div className="w-24 h-16 rounded-lg bg-cream-200 flex items-center justify-center text-xs text-brown-400">
+                      No Image
+                    </div>
                   )}
                 </td>
                 <td className="p-4">
                   <div className="text-xs font-bold text-amber-brand mb-1">{b.badge || '-'}</div>
                   <div className="font-serif font-bold text-brown-700">{b.title}</div>
-                  <div className="text-xs text-brown-400 max-w-xs truncate">{b.subtitle || '-'}</div>
+                  <div className="text-xs text-brown-400 max-w-xs truncate">
+                    {b.subtitle || '-'}
+                  </div>
                 </td>
                 <td className="p-4 text-center">
-                  <button onClick={() => toggleActive(b)} className={`px-3 py-1 text-xs font-bold rounded-full transition ${b.isActive ? 'bg-green-100 text-green-700' : 'bg-zinc-100 text-zinc-500'}`}>
+                  <button
+                    onClick={() => toggleActive(b)}
+                    className={`px-3 py-1 text-xs font-bold rounded-full transition ${b.isActive ? 'bg-green-100 text-green-700' : 'bg-zinc-100 text-zinc-500'}`}
+                  >
                     {b.isActive ? 'Aktif (Ditampilkan)' : 'Nonaktif'}
                   </button>
                 </td>
                 <td className="p-4 text-right">
-                  <button onClick={() => handleOpenModal(b)} className="text-blue-500 hover:bg-blue-50 p-2 rounded-lg mr-2">✏️</button>
-                  <button onClick={() => handleDelete(b.id)} className="text-red-500 hover:bg-red-50 p-2 rounded-lg">🗑️</button>
+                  <button
+                    onClick={() => handleOpenModal(b)}
+                    className="text-blue-500 hover:bg-blue-50 p-2 rounded-lg mr-2"
+                  >
+                    ✏️
+                  </button>
+                  <button
+                    onClick={() => handleDelete(b.id)}
+                    className="text-red-500 hover:bg-red-50 p-2 rounded-lg"
+                  >
+                    🗑️
+                  </button>
                 </td>
               </tr>
             ))}
             {banners.length === 0 && (
               <tr>
-                <td colSpan={4} className="p-8 text-center text-brown-400">Belum ada banner promo.</td>
+                <td colSpan={4} className="p-8 text-center text-brown-400">
+                  Belum ada banner promo.
+                </td>
               </tr>
             )}
           </tbody>
@@ -159,44 +194,97 @@ export default function BannersClient({ initialBanners }: { initialBanners: Bann
       {showModal && (
         <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl p-6 w-full max-w-md">
-            <h3 className="font-serif font-bold text-xl mb-4">{editingBanner ? 'Edit Banner' : 'Tambah Banner'}</h3>
+            <h3 className="font-serif font-bold text-xl mb-4">
+              {editingBanner ? 'Edit Banner' : 'Tambah Banner'}
+            </h3>
             <form onSubmit={handleSubmit} className="space-y-4 text-sm">
               <div>
                 <label className="block text-brown-500 font-semibold mb-1">Badge (Opsional)</label>
-                <input value={form.badge} onChange={e => setForm({...form, badge: e.target.value})} placeholder="PROMO SPESIAL" className="w-full p-2 rounded-xl border border-cream-200" />
+                <input
+                  value={form.badge}
+                  onChange={(e) => setForm({ ...form, badge: e.target.value })}
+                  placeholder="PROMO SPESIAL"
+                  className="w-full p-2 rounded-xl border border-cream-200"
+                />
               </div>
               <div>
                 <label className="block text-brown-500 font-semibold mb-1">Judul Utama *</label>
-                <input value={form.title} onChange={e => setForm({...form, title: e.target.value})} required className="w-full p-2 rounded-xl border border-cream-200" />
+                <input
+                  value={form.title}
+                  onChange={(e) => setForm({ ...form, title: e.target.value })}
+                  required
+                  className="w-full p-2 rounded-xl border border-cream-200"
+                />
               </div>
               <div>
-                <label className="block text-brown-500 font-semibold mb-1">Sub Judul (Opsional)</label>
-                <textarea value={form.subtitle} onChange={e => setForm({...form, subtitle: e.target.value})} className="w-full p-2 rounded-xl border border-cream-200 resize-none" rows={2} />
+                <label className="block text-brown-500 font-semibold mb-1">
+                  Sub Judul (Opsional)
+                </label>
+                <textarea
+                  value={form.subtitle}
+                  onChange={(e) => setForm({ ...form, subtitle: e.target.value })}
+                  className="w-full p-2 rounded-xl border border-cream-200 resize-none"
+                  rows={2}
+                />
               </div>
               <div className="mb-4">
-                <ImageUploadDropzone 
-                  value={form.imageUrl} 
-                  onChange={(url) => setForm({...form, imageUrl: url})} 
+                <ImageUploadDropzone
+                  value={form.imageUrl}
+                  onChange={(url) => setForm({ ...form, imageUrl: url })}
                   label="Gambar Banner Promo"
                 />
               </div>
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="block text-brown-500 font-semibold mb-1">Mulai Tayang (Opsional)</label>
-                  <input type="datetime-local" value={form.startDate} onChange={e => setForm({...form, startDate: e.target.value})} className="w-full p-2 rounded-xl border border-cream-200" />
+                  <label className="block text-brown-500 font-semibold mb-1">
+                    Mulai Tayang (Opsional)
+                  </label>
+                  <input
+                    type="datetime-local"
+                    value={form.startDate}
+                    onChange={(e) => setForm({ ...form, startDate: e.target.value })}
+                    className="w-full p-2 rounded-xl border border-cream-200"
+                  />
                 </div>
                 <div>
-                  <label className="block text-brown-500 font-semibold mb-1">Akhir Tayang (Opsional)</label>
-                  <input type="datetime-local" value={form.endDate} onChange={e => setForm({...form, endDate: e.target.value})} className="w-full p-2 rounded-xl border border-cream-200" />
+                  <label className="block text-brown-500 font-semibold mb-1">
+                    Akhir Tayang (Opsional)
+                  </label>
+                  <input
+                    type="datetime-local"
+                    value={form.endDate}
+                    onChange={(e) => setForm({ ...form, endDate: e.target.value })}
+                    className="w-full p-2 rounded-xl border border-cream-200"
+                  />
                 </div>
               </div>
               <div>
-                <label className="block text-brown-500 font-semibold mb-1">Prioritas Urutan (Opsional)</label>
-                <input type="number" value={form.priority} onChange={e => setForm({...form, priority: parseInt(e.target.value) || 0})} className="w-full p-2 rounded-xl border border-cream-200" placeholder="0" />
+                <label className="block text-brown-500 font-semibold mb-1">
+                  Prioritas Urutan (Opsional)
+                </label>
+                <input
+                  type="number"
+                  value={form.priority}
+                  onChange={(e) => setForm({ ...form, priority: parseInt(e.target.value) || 0 })}
+                  className="w-full p-2 rounded-xl border border-cream-200"
+                  placeholder="0"
+                />
               </div>
               <div className="flex gap-2 pt-2">
-                <button type="submit" disabled={loading} className="flex-1 bg-green-wa text-white font-bold py-3 rounded-xl">{loading ? '...' : 'Simpan'}</button>
-                <button type="button" onClick={() => setShowModal(false)} className="flex-1 bg-cream-200 text-brown-600 font-bold py-3 rounded-xl">Batal</button>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="flex-1 bg-green-wa text-white font-bold py-3 rounded-xl"
+                >
+                  {loading ? '...' : 'Simpan'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowModal(false)}
+                  className="flex-1 bg-cream-200 text-brown-600 font-bold py-3 rounded-xl"
+                >
+                  Batal
+                </button>
               </div>
             </form>
           </div>

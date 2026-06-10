@@ -1,66 +1,66 @@
-"use client";
+'use client'
 
-import { useEffect, useState } from "react";
-import { Gift, Copy, Users, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
-import toast from "react-hot-toast";
-import { getReferralStats, generateMyReferralCode, applyReferralCode } from "@/app/actions/referral";
+import { AlertCircle, CheckCircle, Copy, Gift, Loader2, Users } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
+import { applyReferralCode, generateMyReferralCode, getReferralStats } from '@/app/actions/referral'
 
 export default function ReferralPage() {
-  const [stats, setStats] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [referralInput, setReferralInput] = useState("");
-  const [isApplying, setIsApplying] = useState(false);
+  const [stats, setStats] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+  const [referralInput, setReferralInput] = useState('')
+  const [isApplying, setIsApplying] = useState(false)
 
   useEffect(() => {
-    fetchStats();
-  }, []);
+    fetchStats()
+  }, [])
 
   const fetchStats = async () => {
     try {
-      const data = await getReferralStats();
-      setStats(data);
+      const data = await getReferralStats()
+      setStats(data)
     } catch (error: any) {
-      toast.error(error.message || "Gagal memuat data referral.");
+      toast.error(error.message || 'Gagal memuat data referral.')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const handleGenerateCode = async () => {
     try {
-      const res = await generateMyReferralCode();
+      const res = await generateMyReferralCode()
       if (res.code) {
-        toast.success("Kode referral berhasil dibuat!");
-        await fetchStats();
+        toast.success('Kode referral berhasil dibuat!')
+        await fetchStats()
       }
     } catch (error: any) {
-      toast.error(error.message);
+      toast.error(error.message)
     }
-  };
+  }
 
   const handleApplyCode = async () => {
-    if (!referralInput) return;
+    if (!referralInput) return
     try {
-      setIsApplying(true);
-      const formData = new FormData();
-      formData.append("code", referralInput);
-      const res = await applyReferralCode(formData);
+      setIsApplying(true)
+      const formData = new FormData()
+      formData.append('code', referralInput)
+      const res = await applyReferralCode(formData)
       if (res.success) {
-        toast.success(res.message);
-        setReferralInput("");
+        toast.success(res.message)
+        setReferralInput('')
       }
     } catch (error: any) {
-      toast.error(error.message);
+      toast.error(error.message)
     } finally {
-      setIsApplying(false);
+      setIsApplying(false)
     }
-  };
+  }
 
   const copyToClipboard = () => {
-    if (!stats?.myCode) return;
-    navigator.clipboard.writeText(stats.myCode);
-    toast.success("Kode disalin ke clipboard!");
-  };
+    if (!stats?.myCode) return
+    navigator.clipboard.writeText(stats.myCode)
+    toast.success('Kode disalin ke clipboard!')
+  }
 
   if (loading) {
     return (
@@ -68,7 +68,7 @@ export default function ReferralPage() {
         <Loader2 className="w-8 h-8 animate-spin text-[#D4802A]" />
         <span className="text-zinc-500 font-medium">Memuat data referral...</span>
       </div>
-    );
+    )
   }
 
   return (
@@ -78,7 +78,10 @@ export default function ReferralPage() {
           <Gift className="w-7 h-7 text-[#D4802A]" />
           Ajak Teman
         </h1>
-        <p className="text-zinc-500 dark:text-zinc-400 mt-1">Dapatkan 5.000 Koin Pisang untuk setiap teman yang mendaftar dan menyelesaikan pesanan pertama mereka.</p>
+        <p className="text-zinc-500 dark:text-zinc-400 mt-1">
+          Dapatkan 5.000 Koin Pisang untuk setiap teman yang mendaftar dan menyelesaikan pesanan
+          pertama mereka.
+        </p>
       </div>
 
       {/* Box Kode Sendiri */}
@@ -87,21 +90,23 @@ export default function ReferralPage() {
         <div className="relative flex flex-col md:flex-row justify-between items-center gap-6">
           <div>
             <h2 className="text-xl font-bold">Kode Referral Anda</h2>
-            <p className="text-orange-100 text-sm mt-1">Bagikan kode ini ke teman-teman Anda untuk mendapatkan koin bersama.</p>
+            <p className="text-orange-100 text-sm mt-1">
+              Bagikan kode ini ke teman-teman Anda untuk mendapatkan koin bersama.
+            </p>
           </div>
           {stats?.myCode ? (
             <div className="flex items-center gap-3 bg-white/20 p-2 pl-6 rounded-2xl backdrop-blur-md border border-white/20 shadow-inner">
               <span className="font-mono text-2xl font-bold tracking-widest">{stats.myCode}</span>
-              <button 
-                onClick={copyToClipboard} 
+              <button
+                onClick={copyToClipboard}
                 className="p-3 bg-white text-[#D4802A] rounded-xl hover:bg-orange-50 active:scale-95 transition-all shadow-sm"
               >
                 <Copy className="w-5 h-5" />
               </button>
             </div>
           ) : (
-            <button 
-              onClick={handleGenerateCode} 
+            <button
+              onClick={handleGenerateCode}
               className="px-8 py-3.5 bg-white text-[#D4802A] font-bold rounded-full hover:bg-orange-50 active:scale-95 transition-all shadow-md"
             >
               Buat Kode Saya
@@ -118,7 +123,9 @@ export default function ReferralPage() {
           </div>
           <div>
             <p className="text-sm text-zinc-500 dark:text-zinc-400 font-medium">Teman Bergabung</p>
-            <p className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">{stats?.invitedCount || 0}</p>
+            <p className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">
+              {stats?.invitedCount || 0}
+            </p>
           </div>
         </div>
         <div className="p-6 bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/80 rounded-3xl flex items-center gap-5 shadow-sm">
@@ -126,8 +133,12 @@ export default function ReferralPage() {
             <CheckCircle className="w-7 h-7" />
           </div>
           <div>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400 font-medium">Sukses Order (Koin Cair)</p>
-            <p className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">{stats?.successfulOrdersCount || 0}</p>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400 font-medium">
+              Sukses Order (Koin Cair)
+            </p>
+            <p className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">
+              {stats?.successfulOrdersCount || 0}
+            </p>
           </div>
         </div>
       </div>
@@ -138,25 +149,26 @@ export default function ReferralPage() {
           Punya Kode Undangan?
         </h3>
         <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1 mb-6">
-          Masukkan kode dari teman Anda sebelum melakukan pesanan pertama untuk mendapatkan perlakuan spesial.
+          Masukkan kode dari teman Anda sebelum melakukan pesanan pertama untuk mendapatkan
+          perlakuan spesial.
         </p>
         <div className="flex flex-col sm:flex-row gap-3">
-          <input 
-            type="text" 
+          <input
+            type="text"
             value={referralInput}
             onChange={(e) => setReferralInput(e.target.value.toUpperCase())}
             placeholder="CONTOH: PVJ-X9A2"
             className="flex-1 px-5 py-3.5 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-transparent focus:ring-2 focus:ring-[#D4802A]/50 outline-none transition-all font-mono tracking-widest text-lg"
           />
-          <button 
+          <button
             onClick={handleApplyCode}
             disabled={isApplying || !referralInput}
             className="px-8 py-3.5 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-bold rounded-2xl hover:bg-zinc-800 dark:hover:bg-zinc-200 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed min-w-[140px] flex justify-center items-center"
           >
-            {isApplying ? <Loader2 className="w-5 h-5 animate-spin" /> : "Terapkan"}
+            {isApplying ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Terapkan'}
           </button>
         </div>
       </div>
     </div>
-  );
+  )
 }

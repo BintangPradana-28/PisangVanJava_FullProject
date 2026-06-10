@@ -1,7 +1,7 @@
 // app/api/toppings/route.ts
-import { NextRequest, NextResponse } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { auth } from "@/src/auth";
+import { auth } from '@/src/auth'
 
 export async function GET() {
   const toppings = await prisma.topping.findMany({ orderBy: { name: 'asc' } })
@@ -13,11 +13,15 @@ export async function POST(req: NextRequest) {
   if (!session) return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
   try {
     const { name, price, emoji, isActive } = await req.json()
-    if (!name) return NextResponse.json({ success: false, error: 'Nama wajib diisi' }, { status: 400 })
-    const t = await prisma.topping.create({ data: { name, price: Number(price) || 2000, emoji: emoji || null, isActive: isActive ?? true } })
+    if (!name)
+      return NextResponse.json({ success: false, error: 'Nama wajib diisi' }, { status: 400 })
+    const t = await prisma.topping.create({
+      data: { name, price: Number(price) || 2000, emoji: emoji || null, isActive: isActive ?? true }
+    })
     return NextResponse.json({ success: true, data: t }, { status: 201 })
   } catch (e: unknown) {
-    if (e && typeof e === 'object' && 'code' in e && e.code === 'P2002') return NextResponse.json({ success: false, error: 'Nama topping sudah ada' }, { status: 409 })
+    if (e && typeof e === 'object' && 'code' in e && e.code === 'P2002')
+      return NextResponse.json({ success: false, error: 'Nama topping sudah ada' }, { status: 409 })
     return NextResponse.json({ success: false, error: 'Gagal menambah topping' }, { status: 500 })
   }
 }

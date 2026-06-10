@@ -6,6 +6,4 @@ const supabaseAnonKey = env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
 // Initialize the Supabase client only if the credentials are provided
 export const supabaseBrowserClient =
-  supabaseUrl && supabaseAnonKey
-    ? createClient(supabaseUrl, supabaseAnonKey)
-    : null
+  supabaseUrl && supabaseAnonKey ? createClient(supabaseUrl, supabaseAnonKey) : null

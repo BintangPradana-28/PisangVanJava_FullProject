@@ -1,16 +1,16 @@
-import { NextResponse } from "next/server";
-import { auth } from "@/src/auth";
-import { prisma } from "@/lib/prisma";
-import { z } from "zod";
+import { NextResponse } from 'next/server'
+import { z } from 'zod'
+import { prisma } from '@/lib/prisma'
+import { auth } from '@/src/auth'
 
 export async function GET(req: Request) {
-  const session = await auth();
-  if (!session || !["ADMIN", "SUPER_ADMIN"].includes(session.user.role)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+  const session = await auth()
+  if (!session || !['ADMIN', 'SUPER_ADMIN'].includes(session.user.role)) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
   }
 
-  const { searchParams } = new URL(req.url);
-  const status = searchParams.get("status");
+  const { searchParams } = new URL(req.url)
+  const status = searchParams.get('status')
 
   const complaints = await prisma.complaint.findMany({
     where: status ? { status: status as any } : undefined,
@@ -19,26 +19,26 @@ export async function GET(req: Request) {
       user: { select: { name: true, email: true } },
       order: { select: { id: true } }
     }
-  });
+  })
 
-  return NextResponse.json(complaints);
+  return NextResponse.json(complaints)
 }
 
 const resolveSchema = z.object({
   complaintId: z.string(),
   adminResponse: z.string().min(5),
-  compensationKoin: z.number().int().min(0).default(0),
-});
+  compensationKoin: z.number().int().min(0).default(0)
+})
 
 export async function PATCH(req: Request) {
   try {
-    const session = await auth();
-    if (!session || !["ADMIN", "SUPER_ADMIN"].includes(session.user.role)) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+    const session = await auth()
+    if (!session || !['ADMIN', 'SUPER_ADMIN'].includes(session.user.role)) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
     }
 
-    const body = await req.json();
-    const { complaintId, adminResponse, compensationKoin } = resolveSchema.parse(body);
+    const body = await req.json()
+    const { complaintId, adminResponse, compensationKoin } = resolveSchema.parse(body)
 
     const result = await prisma.$transaction(async (tx: any) => {
       const complaint = await tx.complaint.update({
@@ -46,34 +46,33 @@ export async function PATCH(req: Request) {
         data: {
           adminResponse,
           compensationKoin,
-          status: "RESOLVED",
+          status: 'RESOLVED'
         }
-      });
+      })
 
       if (compensationKoin > 0) {
         await tx.user.update({
           where: { id: complaint.userId },
           data: { koinPisang: { increment: compensationKoin } }
-        });
+        })
 
         await tx.auditLog.create({
           data: {
-            action: "COMPLAINT_COMPENSATION",
-            resource: "User",
+            action: 'COMPLAINT_COMPENSATION',
+            resource: 'User',
             resourceId: complaint.userId,
             userId: session.user.id,
             details: JSON.stringify({ complaintId, amount: compensationKoin })
           }
-        });
+        })
       }
 
-      return complaint;
-    });
+      return complaint
+    })
 
-    return NextResponse.json({ success: true, complaint: result });
-
+    return NextResponse.json({ success: true, complaint: result })
   } catch (error: any) {
-    console.error("PATCH /api/admin/complaints Error:", error);
-    return NextResponse.json({ error: "Gagal memproses resolusi tiket" }, { status: 500 });
+    console.error('PATCH /api/admin/complaints Error:', error)
+    return NextResponse.json({ error: 'Gagal memproses resolusi tiket' }, { status: 500 })
   }
 }

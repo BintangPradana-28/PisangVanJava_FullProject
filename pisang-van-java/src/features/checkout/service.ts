@@ -1,38 +1,39 @@
-import { Ratelimit } from "@upstash/ratelimit";
-import { auth } from "@/src/auth";
-import { headers } from "next/headers";
-import { z } from "zod";
-import { prisma } from "@/lib/prisma";
-import { redis } from "@/lib/redis";
-import DOMPurify from "isomorphic-dompurify";
-import { generateSnapToken } from "@/src/features/payment/service";
-import { OrderStatus, Prisma } from "@prisma/client";
-import { createPendingPayment } from "@/src/features/payment/payment.service";
+import { OrderStatus, Prisma } from '@prisma/client'
+import { Ratelimit } from '@upstash/ratelimit'
+import DOMPurify from 'isomorphic-dompurify'
+import { headers } from 'next/headers'
+import { z } from 'zod'
+import { prisma } from '@/lib/prisma'
+import { redis } from '@/lib/redis'
+import { auth } from '@/src/auth'
+import { createPendingPayment } from '@/src/features/payment/payment.service'
+import { generateSnapToken } from '@/src/features/payment/service'
 
-const ROLE_VALUES = ["ADMIN", "CUSTOMER", "RESELLER"] as const;
-const BASE_TYPE_VALUES = ["kembung", "lumpia", "krispy"] as const;
-const ORDER_STATUS_VALUES = ["PENDING_PAYMENT", "PROCESSING", "READY", "COMPLETED", "CANCELED"] as const;
-const PAYMENT_METHOD_VALUES = ["WHATSAPP", "ONLINE"] as const;
+const ROLE_VALUES = ['ADMIN', 'CUSTOMER', 'RESELLER'] as const
+const BASE_TYPE_VALUES = ['kembung', 'lumpia', 'krispy'] as const
+const ORDER_STATUS_VALUES = [
+  'PENDING_PAYMENT',
+  'PROCESSING',
+  'READY',
+  'COMPLETED',
+  'CANCELED'
+] as const
+const PAYMENT_METHOD_VALUES = ['WHATSAPP', 'ONLINE'] as const
 
 const resourceIdSchema = z
   .string()
   .min(8)
   .max(64)
-  .regex(/^[a-zA-Z0-9_-]+$/);
+  .regex(/^[a-zA-Z0-9_-]+$/)
 
 const phoneSchema = z
   .string()
   .trim()
   .min(9)
   .max(20)
-  .regex(/^(\+62|62|0)8[1-9][0-9]{6,10}$/);
+  .regex(/^(\+62|62|0)8[1-9][0-9]{6,10}$/)
 
-const moneySchema = z
-  .number()
-  .finite()
-  .int()
-  .min(0)
-  .max(100_000_000);
+const moneySchema = z.number().finite().int().min(0).max(100_000_000)
 
 const voucherCodeSchema = z
   .string()
@@ -40,23 +41,23 @@ const voucherCodeSchema = z
   .min(3)
   .max(50)
   .regex(/^[a-zA-Z0-9_-]+$/)
-  .transform((value) => value.toUpperCase());
+  .transform((value) => value.toUpperCase())
 
-const checkoutRoleSchema = z.enum(ROLE_VALUES);
+const checkoutRoleSchema = z.enum(ROLE_VALUES)
 const checkoutActorSchema = z
   .object({
     userId: resourceIdSchema,
     role: checkoutRoleSchema,
-    email: z.string().max(254).nullable(),
+    email: z.string().max(254).nullable()
   })
-  .strict();
+  .strict()
 
 export const validateVoucherInputSchema = z
   .object({
     code: voucherCodeSchema,
-    cartTotal: moneySchema.min(1),
+    cartTotal: moneySchema.min(1)
   })
-  .strict();
+  .strict()
 
 export const checkoutItemInputSchema = z
   .object({
@@ -64,310 +65,362 @@ export const checkoutItemInputSchema = z
     toppingIds: z.array(resourceIdSchema).max(5).default([]),
     baseType: z.enum(BASE_TYPE_VALUES),
     quantity: z.number().int().min(1).max(99),
-    notes: z.string().trim().max(160).nullable().optional(),
+    notes: z.string().trim().max(160).nullable().optional()
   })
-  .strict();
+  .strict()
 
 export const createOrderInputSchema = z
   .object({
-    customerName: z.string().trim().min(3).max(60).regex(/^[A-Za-z\s]+$/),
+    customerName: z
+      .string()
+      .trim()
+      .min(3)
+      .max(60)
+      .regex(/^[A-Za-z\s]+$/),
     customerPhone: phoneSchema,
-    deliveryMethod: z.enum(["PICKUP", "DELIVERY"]),
+    deliveryMethod: z.enum(['PICKUP', 'DELIVERY']),
     paymentMethod: z.enum(PAYMENT_METHOD_VALUES),
     notes: z.string().trim().max(500).nullable().optional(),
     voucherCode: voucherCodeSchema.nullable().optional(),
     usePoints: z.boolean().default(false),
-    items: z.array(checkoutItemInputSchema).min(1).max(40),
+    items: z.array(checkoutItemInputSchema).min(1).max(40)
   })
   .strict()
   .superRefine((value, context) => {
-    const notes = value.notes;
-    if (value.deliveryMethod === "DELIVERY" && (notes === undefined || notes === null || notes.length === 0)) {
+    const notes = value.notes
+    if (
+      value.deliveryMethod === 'DELIVERY' &&
+      (notes === undefined || notes === null || notes.length === 0)
+    ) {
       context.addIssue({
-        code: "custom",
-        path: ["notes"],
-        message: "Delivery address is required.",
-      });
+        code: 'custom',
+        path: ['notes'],
+        message: 'Delivery address is required.'
+      })
     }
 
     if (value.usePoints && value.voucherCode) {
       context.addIssue({
-        code: "custom",
-        path: ["usePoints"],
-        message: "Tidak dapat menggabungkan koin dan voucher secara bersamaan.",
-      });
+        code: 'custom',
+        path: ['usePoints'],
+        message: 'Tidak dapat menggabungkan koin dan voucher secara bersamaan.'
+      })
     }
-  });
+  })
 
 export const orderQueryInputSchema = z
   .object({
     status: z.enum(ORDER_STATUS_VALUES).optional(),
     page: z.coerce.number().int().min(1).max(500).default(1),
-    limit: z.coerce.number().int().min(1).max(100).default(20),
+    limit: z.coerce.number().int().min(1).max(100).default(20)
   })
-  .strict();
+  .strict()
 
 export const paymentFormInputSchema = z
   .object({
-    orderId: resourceIdSchema,
+    orderId: resourceIdSchema
   })
-  .strict();
+  .strict()
 
-export const orderStatusInputSchema = z.enum(ORDER_STATUS_VALUES);
+export const orderStatusInputSchema = z.enum(ORDER_STATUS_VALUES)
 
-type CheckoutRole = z.infer<typeof checkoutRoleSchema>;
-type BaseType = z.infer<typeof checkoutItemInputSchema>["baseType"];
-type ValidateVoucherInput = z.infer<typeof validateVoucherInputSchema>;
-export type CreateOrderInput = z.infer<typeof createOrderInputSchema>;
-export type OrderQueryInput = z.infer<typeof orderQueryInputSchema>;
+type CheckoutRole = z.infer<typeof checkoutRoleSchema>
+type BaseType = z.infer<typeof checkoutItemInputSchema>['baseType']
+type ValidateVoucherInput = z.infer<typeof validateVoucherInputSchema>
+export type CreateOrderInput = z.infer<typeof createOrderInputSchema>
+export type OrderQueryInput = z.infer<typeof orderQueryInputSchema>
 
 export interface CheckoutActor {
-  userId: string;
-  role: CheckoutRole;
-  email: string | null;
+  userId: string
+  role: CheckoutRole
+  email: string | null
 }
 
 interface VoucherRecord {
-  id: string;
-  code: string;
-  isActive: boolean;
-  startDate: Date;
-  endDate: Date;
-  usageLimit: number;
-  usedCount: number;
-  minPurchase: number;
-  applicableTo: string;
-  discountType: string;
-  discountValue: number;
-  maxDiscount: number | null;
+  id: string
+  code: string
+  isActive: boolean
+  startDate: Date
+  endDate: Date
+  usageLimit: number
+  usedCount: number
+  minPurchase: number
+  applicableTo: string
+  discountType: string
+  discountValue: number
+  maxDiscount: number | null
 }
 
 interface VoucherApplication {
-  voucherId: string;
-  code: string;
-  discountAmount: number;
-  usageLimit: number;
+  voucherId: string
+  code: string
+  discountAmount: number
+  usageLimit: number
 }
 
 interface VariantRecord {
-  id: string;
-  flavorName: string;
-  priceKembung: number;
-  priceLumpia: number;
-  priceKrispy: number;
-  wholesaleKembung: number;
-  wholesaleLumpia: number;
-  wholesaleKrispy: number;
-  isActive: boolean;
-  isAvailable: boolean;
-  isDeleted: boolean;
-  stock: number;
-  version: number;
+  id: string
+  flavorName: string
+  priceKembung: number
+  priceLumpia: number
+  priceKrispy: number
+  wholesaleKembung: number
+  wholesaleLumpia: number
+  wholesaleKrispy: number
+  isActive: boolean
+  isAvailable: boolean
+  isDeleted: boolean
+  stock: number
+  version: number
 }
 
 interface ToppingRecord {
-  id: string;
-  name: string;
-  price: number;
-  emoji: string | null;
-  isActive: boolean;
+  id: string
+  name: string
+  price: number
+  emoji: string | null
+  isActive: boolean
 }
 
 interface PreparedOrderItem {
-  variantId: string;
-  toppingIds: string[];
-  baseType: BaseType;
-  quantity: number;
-  unitPrice: number;
-  subtotal: number;
-  name: string;
-  whatsappLine: string;
+  variantId: string
+  toppingIds: string[]
+  baseType: BaseType
+  quantity: number
+  unitPrice: number
+  subtotal: number
+  name: string
+  whatsappLine: string
 }
 
 export interface CreateCheckoutOrderResult {
-  orderId: string;
-  redirectType: "WHATSAPP" | "PAYMENT" | "CASHLESS_SUCCESS";
-  redirectUrl: string;
-  totalPrice: number;
+  orderId: string
+  redirectType: 'WHATSAPP' | 'PAYMENT' | 'CASHLESS_SUCCESS'
+  redirectUrl: string
+  totalPrice: number
 }
 
 export interface VoucherValidationSuccess {
-  success: true;
+  success: true
   data: {
-    code: string;
-    discountAmount: number;
-    message: string;
-  };
+    code: string
+    discountAmount: number
+    message: string
+  }
 }
 
 export interface VoucherValidationFailure {
-  success: false;
-  error: string;
+  success: false
+  error: string
 }
 
-export type VoucherValidationResult = VoucherValidationSuccess | VoucherValidationFailure;
+export type VoucherValidationResult = VoucherValidationSuccess | VoucherValidationFailure
 
 export interface PaymentOrderView {
-  id: string;
-  customerName: string;
-  customerPhone: string;
-  totalPrice: number;
-  status: string;
-  source: string;
-  midtransToken: string | null;
-  voucherCode: string | null;
-  discountAmount: number;
-  deliveryMethod: string;
-  deliveryFee: number;
-  createdAt: Date;
+  id: string
+  customerName: string
+  customerPhone: string
+  totalPrice: number
+  status: string
+  source: string
+  midtransToken: string | null
+  voucherCode: string | null
+  discountAmount: number
+  deliveryMethod: string
+  deliveryFee: number
+  createdAt: Date
   items: Array<{
-    id: string;
-    quantity: number;
-    baseType: string;
-    subtotal: number;
+    id: string
+    quantity: number
+    baseType: string
+    subtotal: number
     variant: {
-      flavorName: string;
-    };
+      flavorName: string
+    }
     toppings: Array<{
-      name: string;
-      emoji: string | null;
-    }>;
-  }>;
+      name: string
+      emoji: string | null
+    }>
+  }>
 }
 
 export class CheckoutSecurityError extends Error {
-  readonly statusCode: number;
+  readonly statusCode: number
 
   constructor(statusCode: number) {
-    super("CHECKOUT_SECURITY_REJECTION");
-    this.name = "CheckoutSecurityError";
-    this.statusCode = statusCode;
+    super('CHECKOUT_SECURITY_REJECTION')
+    this.name = 'CheckoutSecurityError'
+    this.statusCode = statusCode
   }
 }
 
 const voucherRateLimit = new Ratelimit({
   redis,
-  limiter: Ratelimit.slidingWindow(5, "1 m"),
+  limiter: Ratelimit.slidingWindow(5, '1 m'),
   analytics: true,
-  prefix: "ratelimit_checkout_voucher",
-});
+  prefix: 'ratelimit_checkout_voucher'
+})
 
 const checkoutRateLimit = new Ratelimit({
   redis,
-  limiter: Ratelimit.slidingWindow(8, "10 m"),
+  limiter: Ratelimit.slidingWindow(8, '10 m'),
   analytics: true,
-  prefix: "ratelimit_checkout_order",
-});
+  prefix: 'ratelimit_checkout_order'
+})
 
 const paymentRateLimit = new Ratelimit({
   redis,
-  limiter: Ratelimit.slidingWindow(5, "5 m"),
+  limiter: Ratelimit.slidingWindow(5, '5 m'),
   analytics: true,
-  prefix: "ratelimit_checkout_payment",
-});
+  prefix: 'ratelimit_checkout_payment'
+})
 
 export async function requireCheckoutActor(): Promise<CheckoutActor | null> {
-  const session = await auth();
+  const session = await auth()
   if (!session?.user) {
-    console.error("[SECURITY] requireCheckoutActor: session or session.user is null/undefined", session);
-    return null;
+    console.error(
+      '[SECURITY] requireCheckoutActor: session or session.user is null/undefined',
+      session
+    )
+    return null
   }
 
   // Ensure role defaults to CUSTOMER if somehow undefined for social logins
-  const role = session.user.role || "CUSTOMER";
+  const role = session.user.role || 'CUSTOMER'
 
   const parsed = checkoutActorSchema.safeParse({
-    userId: session.user.id || "",
+    userId: session.user.id || '',
     role: role,
-    email: session.user.email ?? null,
-  });
+    email: session.user.email ?? null
+  })
 
   if (!parsed.success) {
-    console.error("[SECURITY] requireCheckoutActor parsing failed", parsed.error.issues, "User data:", { id: session.user.id, role: session.user.role, email: session.user.email });
-    return null;
+    console.error(
+      '[SECURITY] requireCheckoutActor parsing failed',
+      parsed.error.issues,
+      'User data:',
+      { id: session.user.id, role: session.user.role, email: session.user.email }
+    )
+    return null
   }
 
   return {
     userId: parsed.data.userId,
     role: parsed.data.role,
-    email: parsed.data.email,
-  };
+    email: parsed.data.email
+  }
 }
 
 export async function hasValidSameOriginHeaders(): Promise<boolean> {
-  const headerStore = await headers();
-  const origin = headerStore.get("origin");
-  const host = headerStore.get("host");
+  const headerStore = await headers()
+  const origin = headerStore.get('origin')
+  const referer = headerStore.get('referer')
+  const host = headerStore.get('x-forwarded-host') || headerStore.get('host')
 
-  if (origin === null || host === null) {
-    return false;
+  if (!host) {
+    console.warn('[SECURITY] Same-origin check failed: host header is missing')
+    return false
   }
 
-  try {
-    const originUrl = new URL(origin);
-    return originUrl.host === host;
-  } catch {
-    return false;
+  // Clean host (remove port if present for robust local/Vercel matching)
+  const cleanHost = host.split(':')[0]
+
+  // 1. Check Origin if present
+  if (origin !== null && origin !== 'null' && origin !== undefined) {
+    try {
+      const originUrl = new URL(origin)
+      if (originUrl.hostname === cleanHost) {
+        return true
+      }
+    } catch (e) {
+      console.warn('[SECURITY] Same-origin check: failed to parse origin URL', origin, e)
+    }
   }
+
+  // 2. Check Referer if present (fallback)
+  if (referer !== null && referer !== undefined) {
+    try {
+      const refererUrl = new URL(referer)
+      if (refererUrl.hostname === cleanHost) {
+        return true
+      }
+    } catch (e) {
+      console.warn('[SECURITY] Same-origin check: failed to parse referer URL', referer, e)
+    }
+  }
+
+  // Log headers on failure to aid Vercel debugging
+  console.warn('[SECURITY] Same-origin check failed. Headers: ', {
+    origin,
+    referer,
+    host,
+    cleanHost
+  })
+  return false
 }
 
 export async function getRateLimitIdentifier(scope: string, actor: CheckoutActor): Promise<string> {
-  const headerStore = await headers();
-  const forwardedFor = headerStore.get("x-forwarded-for");
-  const clientIp = forwardedFor?.split(",")[0]?.trim();
-  const networkPart = clientIp && clientIp.length > 0 ? clientIp : "unknown";
-  return `${scope}:${actor.userId}:${networkPart}`;
+  const headerStore = await headers()
+  const forwardedFor = headerStore.get('x-forwarded-for')
+  const clientIp = forwardedFor?.split(',')[0]?.trim()
+  const networkPart = clientIp && clientIp.length > 0 ? clientIp : 'unknown'
+  return `${scope}:${actor.userId}:${networkPart}`
 }
 
 export async function enforceCheckoutRateLimit(actor: CheckoutActor): Promise<boolean> {
-  const identifier = await getRateLimitIdentifier("order", actor);
-  return isRateAllowed(checkoutRateLimit, identifier);
+  const identifier = await getRateLimitIdentifier('order', actor)
+  return isRateAllowed(checkoutRateLimit, identifier)
 }
 
 export async function enforcePaymentRateLimit(actor: CheckoutActor): Promise<boolean> {
-  const identifier = await getRateLimitIdentifier("payment", actor);
-  return isRateAllowed(paymentRateLimit, identifier);
+  const identifier = await getRateLimitIdentifier('payment', actor)
+  return isRateAllowed(paymentRateLimit, identifier)
 }
 
 async function isRateAllowed(limiter: Ratelimit, identifier: string): Promise<boolean> {
   try {
-    const result = await limiter.limit(identifier);
-    return result.success;
+    const result = await limiter.limit(identifier)
+    return result.success
   } catch (error) {
     // CISO Note: Fail-OPEN when Redis is unavailable.
     // Rationale: Failing CLOSED is a self-imposed DoS attack — every checkout
     // is blocked any time Upstash has a hiccup. The business impact of blocking
     // legitimate customers EXCEEDS the risk of a brief gap in rate limiting.
     // Structured alert logged here for SIEM/monitoring visibility.
-    console.warn("[SECURITY] Rate limiter unavailable; failing open. Identifier:", identifier, "Error:", error instanceof Error ? error.message : "unknown");
-    return true;
+    console.warn(
+      '[SECURITY] Rate limiter unavailable; failing open. Identifier:',
+      identifier,
+      'Error:',
+      error instanceof Error ? error.message : 'unknown'
+    )
+    return true
   }
 }
 
 export async function validateVoucherForActor(
   input: ValidateVoucherInput,
-  actor: CheckoutActor,
+  actor: CheckoutActor
 ): Promise<VoucherValidationResult> {
-  const identifier = await getRateLimitIdentifier("voucher", actor);
-  const allowed = await isRateAllowed(voucherRateLimit, identifier);
+  const identifier = await getRateLimitIdentifier('voucher', actor)
+  const allowed = await isRateAllowed(voucherRateLimit, identifier)
   if (!allowed) {
     return {
       success: false,
-      error: "Terlalu banyak percobaan voucher. Silakan coba lagi nanti.",
-    };
+      error: 'Terlalu banyak percobaan voucher. Silakan coba lagi nanti.'
+    }
   }
 
   const voucher = await prisma.voucher.findUnique({
     where: { code: input.code },
-    select: voucherSelect,
-  });
+    select: voucherSelect
+  })
 
-  const application = evaluateVoucher(voucher, input.cartTotal, actor.role);
+  const application = evaluateVoucher(voucher, input.cartTotal, actor.role)
   if (application === null) {
     return {
       success: false,
-      error: "Voucher tidak dapat digunakan untuk pesanan ini.",
-    };
+      error: 'Voucher tidak dapat digunakan untuk pesanan ini.'
+    }
   }
 
   return {
@@ -375,22 +428,18 @@ export async function validateVoucherForActor(
     data: {
       code: application.code,
       discountAmount: application.discountAmount,
-      message: `Voucher diterapkan. Diskon Rp ${application.discountAmount.toLocaleString("id-ID")}.`,
-    },
-  };
+      message: `Voucher diterapkan. Diskon Rp ${application.discountAmount.toLocaleString('id-ID')}.`
+    }
+  }
 }
 
 export async function createCheckoutOrder(
   input: CreateOrderInput,
-  actor: CheckoutActor,
+  actor: CheckoutActor
 ): Promise<CreateCheckoutOrderResult> {
   const result = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-    const variantIds = Array.from(new Set(input.items.map((item) => item.variantId)));
-    const toppingIds = Array.from(
-      new Set(
-        input.items.flatMap((item) => item.toppingIds)
-      ),
-    );
+    const variantIds = Array.from(new Set(input.items.map((item) => item.variantId)))
+    const toppingIds = Array.from(new Set(input.items.flatMap((item) => item.toppingIds)))
 
     const variants = await tx.menuVariant.findMany({
       where: { id: { in: variantIds } },
@@ -407,9 +456,9 @@ export async function createCheckoutOrder(
         isAvailable: true,
         isDeleted: true,
         stock: true,
-        version: true,
-      },
-    });
+        version: true
+      }
+    })
 
     const toppings = await tx.topping.findMany({
       where: { id: { in: toppingIds } },
@@ -418,36 +467,46 @@ export async function createCheckoutOrder(
         name: true,
         price: true,
         emoji: true,
-        isActive: true,
-      },
-    });
+        isActive: true
+      }
+    })
 
-    const variantById = new Map<string, VariantRecord>(variants.map((variant) => [variant.id, variant]));
-    const toppingById = new Map<string, ToppingRecord>(toppings.map((topping) => [topping.id, topping]));
-    const preparedItems: PreparedOrderItem[] = [];
-    let subtotal = 0;
+    const variantById = new Map<string, VariantRecord>(
+      variants.map((variant) => [variant.id, variant])
+    )
+    const toppingById = new Map<string, ToppingRecord>(
+      toppings.map((topping) => [topping.id, topping])
+    )
+    const preparedItems: PreparedOrderItem[] = []
+    let subtotal = 0
 
     for (const item of input.items) {
-      const variant = variantById.get(item.variantId);
-      if (variant === undefined || !variant.isActive || !variant.isAvailable || variant.isDeleted || variant.stock < item.quantity) {
-        throw new CheckoutSecurityError(400);
+      const variant = variantById.get(item.variantId)
+      if (
+        variant === undefined ||
+        !variant.isActive ||
+        !variant.isAvailable ||
+        variant.isDeleted ||
+        variant.stock < item.quantity
+      ) {
+        throw new CheckoutSecurityError(400)
       }
 
-      let itemToppings: ToppingRecord[] = [];
+      const itemToppings: ToppingRecord[] = []
       for (const tId of item.toppingIds) {
-        const selectedTopping = toppingById.get(tId);
+        const selectedTopping = toppingById.get(tId)
         if (selectedTopping === undefined || !selectedTopping.isActive) {
-          throw new CheckoutSecurityError(400);
+          throw new CheckoutSecurityError(400)
         }
-        itemToppings.push(selectedTopping);
+        itemToppings.push(selectedTopping)
       }
 
-      const basePrice = selectBasePrice(variant, item.baseType, actor.role);
-      const toppingPrice = itemToppings.reduce((sum, t) => sum + t.price, 0);
-      const unitPrice = basePrice + toppingPrice;
-      const itemSubtotal = unitPrice * item.quantity;
-      const notes = normalizeNullableText(item.notes);
-      subtotal += itemSubtotal;
+      const basePrice = selectBasePrice(variant, item.baseType, actor.role)
+      const toppingPrice = itemToppings.reduce((sum, t) => sum + t.price, 0)
+      const unitPrice = basePrice + toppingPrice
+      const itemSubtotal = unitPrice * item.quantity
+      const notes = normalizeNullableText(item.notes)
+      subtotal += itemSubtotal
 
       preparedItems.push({
         variantId: item.variantId,
@@ -456,39 +515,51 @@ export async function createCheckoutOrder(
         quantity: item.quantity,
         unitPrice,
         subtotal: itemSubtotal,
-        name: `${variant.flavorName} (${item.baseType})${itemToppings.length > 0 ? ` + ${itemToppings.map(t => t.name).join(", ")}` : ''}`,
-        whatsappLine: buildWhatsAppItemLine(variant.flavorName, item.baseType, item.quantity, itemToppings, itemSubtotal, notes),
-      });
+        name: `${variant.flavorName} (${item.baseType})${itemToppings.length > 0 ? ` + ${itemToppings.map((t) => t.name).join(', ')}` : ''}`,
+        whatsappLine: buildWhatsAppItemLine(
+          variant.flavorName,
+          item.baseType,
+          item.quantity,
+          itemToppings,
+          itemSubtotal,
+          notes
+        )
+      })
     }
 
-    const deliveryFee = await resolveDeliveryFee(input.deliveryMethod, tx);
-    let discountAmount = 0;
-    let voucherApplication = null;
-    let pointsToUse = 0;
+    const deliveryFee = await resolveDeliveryFee(input.deliveryMethod, tx)
+    let discountAmount = 0
+    let voucherApplication = null
+    let pointsToUse = 0
 
     if (input.voucherCode) {
-      voucherApplication = await resolveVoucherApplication(input.voucherCode, subtotal, actor.role, tx);
-      discountAmount = voucherApplication?.discountAmount ?? 0;
+      voucherApplication = await resolveVoucherApplication(
+        input.voucherCode,
+        subtotal,
+        actor.role,
+        tx
+      )
+      discountAmount = voucherApplication?.discountAmount ?? 0
     } else if (input.usePoints) {
       const userRecord = await tx.user.findUnique({
         where: { id: actor.userId },
         select: { koinPisang: true }
-      });
+      })
       if (userRecord && userRecord.koinPisang > 0) {
-         const maxDiscount = subtotal + deliveryFee;
-         pointsToUse = Math.min(userRecord.koinPisang, maxDiscount);
-         discountAmount = pointsToUse;
+        const maxDiscount = subtotal + deliveryFee
+        pointsToUse = Math.min(userRecord.koinPisang, maxDiscount)
+        discountAmount = pointsToUse
       }
     }
 
-    const totalPrice = subtotal - discountAmount + deliveryFee;
+    const totalPrice = subtotal - discountAmount + deliveryFee
 
     if (!Number.isSafeInteger(totalPrice) || totalPrice < 0) {
-      throw new CheckoutSecurityError(400);
+      throw new CheckoutSecurityError(400)
     }
 
-    const earnedPoints = Math.floor(totalPrice * 0.01);
-    const netPointChange = earnedPoints - pointsToUse;
+    const earnedPoints = Math.floor(totalPrice * 0.01)
+    const netPointChange = earnedPoints - pointsToUse
 
     if (netPointChange !== 0) {
       const updateResult = await tx.user.updateMany({
@@ -497,11 +568,14 @@ export async function createCheckoutOrder(
           ...(pointsToUse > 0 ? { koinPisang: { gte: pointsToUse } } : {})
         },
         data: {
-          koinPisang: netPointChange >= 0 ? { increment: netPointChange } : { decrement: Math.abs(netPointChange) }
+          koinPisang:
+            netPointChange >= 0
+              ? { increment: netPointChange }
+              : { decrement: Math.abs(netPointChange) }
         }
-      });
+      })
       if (updateResult.count === 0) {
-         throw new CheckoutSecurityError(409); // Conflict: Insufficient points during transaction
+        throw new CheckoutSecurityError(409) // Conflict: Insufficient points during transaction
       }
     }
 
@@ -509,46 +583,49 @@ export async function createCheckoutOrder(
       const voucherUpdate = await tx.voucher.updateMany({
         where: {
           id: voucherApplication.voucherId,
-          OR: [{ usageLimit: 0 }, { usedCount: { lt: voucherApplication.usageLimit } }],
+          OR: [{ usageLimit: 0 }, { usedCount: { lt: voucherApplication.usageLimit } }]
         },
         data: {
           usedCount: {
-            increment: 1,
-          },
-        },
-      });
+            increment: 1
+          }
+        }
+      })
 
       if (voucherUpdate.count !== 1) {
-        throw new CheckoutSecurityError(409);
+        throw new CheckoutSecurityError(409)
       }
     }
 
     // OCC: Optimistic Concurrency Control for Inventory
-    const variantQuantities = new Map<string, number>();
+    const variantQuantities = new Map<string, number>()
     for (const item of input.items) {
-      variantQuantities.set(item.variantId, (variantQuantities.get(item.variantId) || 0) + item.quantity);
+      variantQuantities.set(
+        item.variantId,
+        (variantQuantities.get(item.variantId) || 0) + item.quantity
+      )
     }
 
     for (const [variantId, totalQuantity] of Array.from(variantQuantities.entries())) {
-      const variant = variantById.get(variantId)!;
+      const variant = variantById.get(variantId)!
       const updateResult = await tx.menuVariant.updateMany({
         where: {
           id: variantId,
           version: variant.version,
-          stock: { gte: totalQuantity },
+          stock: { gte: totalQuantity }
         },
         data: {
           stock: { decrement: totalQuantity },
-          version: { increment: 1 },
-        },
-      });
+          version: { increment: 1 }
+        }
+      })
 
       if (updateResult.count === 0) {
-        throw new CheckoutSecurityError(409); // Conflict: Stock changed or insufficient
+        throw new CheckoutSecurityError(409) // Conflict: Stock changed or insufficient
       }
     }
 
-    const source = input.paymentMethod === "ONLINE" ? "online" : "whatsapp";
+    const source = input.paymentMethod === 'ONLINE' ? 'online' : 'whatsapp'
     const order = await tx.order.create({
       data: {
         userId: actor.userId,
@@ -556,7 +633,9 @@ export async function createCheckoutOrder(
         customerPhone: input.customerPhone,
         totalPrice,
         status: OrderStatus.PENDING_PAYMENT,
-        notes: normalizeNullableText(input.notes) ? DOMPurify.sanitize(normalizeNullableText(input.notes) as string) : null,
+        notes: normalizeNullableText(input.notes)
+          ? DOMPurify.sanitize(normalizeNullableText(input.notes) as string)
+          : null,
         source,
         voucherCode: voucherApplication?.code ?? null,
         discountAmount,
@@ -565,31 +644,34 @@ export async function createCheckoutOrder(
         items: {
           create: preparedItems.map((item) => ({
             variantId: item.variantId,
-            toppings: item.toppingIds.length > 0 ? { connect: item.toppingIds.map((id) => ({ id })) } : undefined,
+            toppings:
+              item.toppingIds.length > 0
+                ? { connect: item.toppingIds.map((id) => ({ id })) }
+                : undefined,
             baseType: item.baseType,
             quantity: item.quantity,
             unitPrice: item.unitPrice,
-            subtotal: item.subtotal,
-          })),
-        },
+            subtotal: item.subtotal
+          }))
+        }
       },
       select: {
         id: true,
-        totalPrice: true,
-      },
-    });
+        totalPrice: true
+      }
+    })
 
     // ATOMIC CART ANNIHILATION
     // Destroy all items in this user's cart synchronously within the transaction.
     // This prevents "Ghost Carts" if the user disconnects before the client sends a DELETE request.
     await tx.userCart.updateMany({
       where: {
-        userId: actor.userId,
+        userId: actor.userId
       },
       data: {
         items: []
       }
-    });
+    })
 
     return {
       orderId: order.id,
@@ -598,87 +680,113 @@ export async function createCheckoutOrder(
       subtotal,
       discountAmount,
       deliveryFee,
-      preparedItems,
-    };
-  });
+      preparedItems
+    }
+  })
 
   // [CACHE INVALIDATION] Hapus Redis cache setelah transaksi sukses.
   // Jika gagal di tengah jalan, cart utuh. Jika sukses, Redis bersih.
-  await redis.del(`user:cart:${actor.userId}`);
+  // Wrapped in try-catch to fail-open if Upstash Redis is down or unconfigured
+  try {
+    await redis.del(`user:cart:${actor.userId}`)
+  } catch (redisError) {
+    console.error('[SECURITY] Failed to invalidate cart cache in Redis:', redisError)
+  }
 
-  if (input.paymentMethod === "ONLINE") {
+  if (input.paymentMethod === 'ONLINE') {
     if (result.totalPrice === 0) {
       // 0 IDR BYPASS (CASHLESS VIA POINTS/VOUCHER)
       await prisma.order.update({
         where: { id: result.orderId },
-        data: { 
+        data: {
           status: OrderStatus.PROCESSING,
           confirmedAt: new Date()
         }
-      });
-      
+      })
+
       await createPendingPayment({
         orderId: result.orderId,
         midtransOrderId: result.orderId,
-        grossAmount: new Prisma.Decimal(0),
-      });
+        grossAmount: new Prisma.Decimal(0)
+      })
 
       await prisma.payment.update({
         where: { orderId: result.orderId },
         data: {
-          status: "PAID",
-          paymentType: "koin_pisang",
+          status: 'PAID',
+          paymentType: 'koin_pisang',
           settlementTime: new Date()
         }
-      });
+      })
 
       return {
         orderId: result.orderId,
-        redirectType: "CASHLESS_SUCCESS",
+        redirectType: 'CASHLESS_SUCCESS',
         redirectUrl: `/profile/pesanan`,
-        totalPrice: 0,
-      };
+        totalPrice: 0
+      }
     }
 
     // Zero-Trust: Generate Midtrans Snap Token securely from backend
+    // Construct items array correctly by including shipping fees and discounts
+    const midtransItems = result.preparedItems.map((item: any) => ({
+      id: item.variantId,
+      price: item.unitPrice,
+      quantity: item.quantity,
+      name: item.name
+    }))
+
+    if (result.deliveryFee > 0) {
+      midtransItems.push({
+        id: 'delivery-fee',
+        price: result.deliveryFee,
+        quantity: 1,
+        name: 'Ongkos Kirim'
+      })
+    }
+
+    if (result.discountAmount > 0) {
+      midtransItems.push({
+        id: 'discount',
+        price: -result.discountAmount,
+        quantity: 1,
+        name: input.voucherCode ? `Diskon (${input.voucherCode})` : 'Diskon Koin'
+      })
+    }
+
     const snapToken = await generateSnapToken({
       orderId: result.orderId,
       grossAmount: result.totalPrice,
       customerName: input.customerName,
       customerPhone: input.customerPhone,
-      items: result.preparedItems.map((item: any) => ({
-        id: item.variantId,
-        price: item.unitPrice,
-        quantity: item.quantity,
-        name: item.name
-      }))
-    });
+      items: midtransItems
+    })
 
     if (snapToken) {
       await prisma.order.update({
         where: { id: result.orderId },
         data: { midtransToken: snapToken }
-      });
+      })
 
       // P0 #10: Buat Payment record setelah snap token sukses di-generate
       await createPendingPayment({
         orderId: result.orderId,
         midtransOrderId: result.orderId,
-        grossAmount: new Prisma.Decimal(result.totalPrice),
-      });
+        grossAmount: new Prisma.Decimal(result.totalPrice)
+      })
     }
 
     return {
       orderId: result.orderId,
-      redirectType: "PAYMENT",
+      redirectType: 'PAYMENT',
       redirectUrl: `/payment/${result.orderId}`,
-      totalPrice: result.totalPrice,
-    };
+      totalPrice: result.totalPrice
+    }
   }
 
-  const whatsappNumber = await resolveWhatsAppNumber();
+  const whatsappNumber = await resolveWhatsAppNumber()
   if (whatsappNumber === null) {
-    throw new CheckoutSecurityError(500);
+    throw new CheckoutSecurityError(500)
   }
 
   const message = buildWhatsAppMessage({
@@ -692,26 +800,26 @@ export async function createCheckoutOrder(
     deliveryFee: result.deliveryFee,
     totalPrice: result.totalPrice,
     voucherCode: input.voucherCode ?? null,
-    itemLines: result.preparedItems.map((item: any) => item.whatsappLine),
-  });
+    itemLines: result.preparedItems.map((item: any) => item.whatsappLine)
+  })
 
   return {
     orderId: result.orderId,
-    redirectType: "WHATSAPP",
+    redirectType: 'WHATSAPP',
     redirectUrl: `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`,
-    totalPrice: result.totalPrice,
-  };
+    totalPrice: result.totalPrice
+  }
 }
 
 export async function getPaymentOrderForActor(
   orderId: string,
-  actor: CheckoutActor,
+  actor: CheckoutActor
 ): Promise<PaymentOrderView | null> {
   return prisma.order.findFirst({
     where: {
       id: orderId,
       userId: actor.userId,
-      source: "online",
+      source: 'online'
     },
     select: {
       id: true,
@@ -734,40 +842,43 @@ export async function getPaymentOrderForActor(
           subtotal: true,
           variant: {
             select: {
-              flavorName: true,
-            },
+              flavorName: true
+            }
           },
           toppings: {
             select: {
               name: true,
-              emoji: true,
-            },
-          },
-        },
-      },
-    },
-  });
+              emoji: true
+            }
+          }
+        }
+      }
+    }
+  })
 }
 
-export async function processPaymentForActor(orderId: string, actor: CheckoutActor): Promise<boolean> {
-  const allowed = await enforcePaymentRateLimit(actor);
+export async function processPaymentForActor(
+  orderId: string,
+  actor: CheckoutActor
+): Promise<boolean> {
+  const allowed = await enforcePaymentRateLimit(actor)
   if (!allowed) {
-    return false;
+    return false
   }
 
   const updateResult = await prisma.order.updateMany({
     where: {
       id: orderId,
       userId: actor.userId,
-      source: "online",
-      status: OrderStatus.PENDING_PAYMENT,
+      source: 'online',
+      status: OrderStatus.PENDING_PAYMENT
     },
     data: {
-      status: OrderStatus.PROCESSING,
-    },
-  });
+      status: OrderStatus.PROCESSING
+    }
+  })
 
-  return updateResult.count === 1;
+  return updateResult.count === 1
 }
 
 const voucherSelect = {
@@ -782,24 +893,24 @@ const voucherSelect = {
   applicableTo: true,
   discountType: true,
   discountValue: true,
-  maxDiscount: true,
-} satisfies Prisma.VoucherSelect;
+  maxDiscount: true
+} satisfies Prisma.VoucherSelect
 
 function normalizeNullableText(value: string | null | undefined): string | null {
   if (value === undefined || value === null || value.length === 0) {
-    return null;
+    return null
   }
 
-  return value;
+  return value
 }
 
 function evaluateVoucher(
   voucher: VoucherRecord | null,
   cartTotal: number,
-  role: CheckoutRole,
+  role: CheckoutRole
 ): VoucherApplication | null {
   if (voucher === null || !voucher.isActive) {
-    return null;
+    return null
   }
 
   if (
@@ -810,164 +921,176 @@ function evaluateVoucher(
     !Number.isFinite(voucher.minPurchase) ||
     voucher.minPurchase < 0
   ) {
-    return null;
+    return null
   }
 
-  const now = new Date();
+  const now = new Date()
   if (now < voucher.startDate || now > voucher.endDate) {
-    return null;
+    return null
   }
 
   if (voucher.usageLimit > 0 && voucher.usedCount >= voucher.usageLimit) {
-    return null;
+    return null
   }
 
   if (cartTotal < voucher.minPurchase) {
-    return null;
+    return null
   }
 
-  if (voucher.applicableTo !== "ALL" && voucher.applicableTo !== role) {
-    return null;
+  if (voucher.applicableTo !== 'ALL' && voucher.applicableTo !== role) {
+    return null
   }
 
-  const discountAmount = calculateDiscount(voucher, cartTotal);
+  const discountAmount = calculateDiscount(voucher, cartTotal)
   if (discountAmount === null) {
-    return null;
+    return null
   }
 
   return {
     voucherId: voucher.id,
     code: voucher.code,
     discountAmount,
-    usageLimit: voucher.usageLimit,
-  };
+    usageLimit: voucher.usageLimit
+  }
 }
 
 function calculateDiscount(voucher: VoucherRecord, cartTotal: number): number | null {
   if (!Number.isFinite(voucher.discountValue) || voucher.discountValue <= 0) {
-    return null;
+    return null
   }
 
-  if (voucher.maxDiscount !== null && (!Number.isFinite(voucher.maxDiscount) || voucher.maxDiscount < 0)) {
-    return null;
+  if (
+    voucher.maxDiscount !== null &&
+    (!Number.isFinite(voucher.maxDiscount) || voucher.maxDiscount < 0)
+  ) {
+    return null
   }
 
-  if (voucher.discountType === "FIXED") {
-    return Math.min(cartTotal, Math.floor(voucher.discountValue));
+  if (voucher.discountType === 'FIXED') {
+    return Math.min(cartTotal, Math.floor(voucher.discountValue))
   }
 
-  if (voucher.discountType === "PERCENTAGE") {
+  if (voucher.discountType === 'PERCENTAGE') {
     if (voucher.discountValue > 100) {
-      return null;
+      return null
     }
 
-    const uncappedDiscount = Math.floor(cartTotal * (voucher.discountValue / 100));
-    const cappedDiscount = voucher.maxDiscount === null ? uncappedDiscount : Math.min(uncappedDiscount, voucher.maxDiscount);
-    return Math.min(cartTotal, Math.floor(cappedDiscount));
+    const uncappedDiscount = Math.floor(cartTotal * (voucher.discountValue / 100))
+    const cappedDiscount =
+      voucher.maxDiscount === null
+        ? uncappedDiscount
+        : Math.min(uncappedDiscount, voucher.maxDiscount)
+    return Math.min(cartTotal, Math.floor(cappedDiscount))
   }
 
-  return null;
+  return null
 }
 
 function selectBasePrice(variant: VariantRecord, baseType: BaseType, role: CheckoutRole): number {
-  if (baseType === "lumpia") {
-    return role === "RESELLER" && variant.wholesaleLumpia > 0 ? variant.wholesaleLumpia : variant.priceLumpia;
+  if (baseType === 'lumpia') {
+    return role === 'RESELLER' && variant.wholesaleLumpia > 0
+      ? variant.wholesaleLumpia
+      : variant.priceLumpia
   }
 
-  if (baseType === "krispy") {
-    return role === "RESELLER" && variant.wholesaleKrispy > 0 ? variant.wholesaleKrispy : variant.priceKrispy;
+  if (baseType === 'krispy') {
+    return role === 'RESELLER' && variant.wholesaleKrispy > 0
+      ? variant.wholesaleKrispy
+      : variant.priceKrispy
   }
 
-  return role === "RESELLER" && variant.wholesaleKembung > 0 ? variant.wholesaleKembung : variant.priceKembung;
+  return role === 'RESELLER' && variant.wholesaleKembung > 0
+    ? variant.wholesaleKembung
+    : variant.priceKembung
 }
 
 async function resolveDeliveryFee(
-  deliveryMethod: CreateOrderInput["deliveryMethod"],
-  tx: Prisma.TransactionClient,
+  deliveryMethod: CreateOrderInput['deliveryMethod'],
+  tx: Prisma.TransactionClient
 ): Promise<number> {
-  if (deliveryMethod === "PICKUP") {
-    return 0;
+  if (deliveryMethod === 'PICKUP') {
+    return 0
   }
 
   const setting = await tx.siteSetting.findUnique({
-    where: { key: "store_delivery_fee" },
-    select: { value: true },
-  });
+    where: { key: 'store_delivery_fee' },
+    select: { value: true }
+  })
 
   if (setting === null) {
-    console.warn("[SECURITY] store_delivery_fee not found in SiteSetting, failing open to 0");
-    return 0;
+    console.warn('[SECURITY] store_delivery_fee not found in SiteSetting, failing open to 0')
+    return 0
   }
 
-  const deliveryFee = parseCurrencySetting(setting.value);
+  const deliveryFee = parseCurrencySetting(setting.value)
   if (deliveryFee === null) {
-    console.warn("[SECURITY] invalid store_delivery_fee in SiteSetting, failing open to 0");
-    return 0;
+    console.warn('[SECURITY] invalid store_delivery_fee in SiteSetting, failing open to 0')
+    return 0
   }
 
-  return deliveryFee;
+  return deliveryFee
 }
 
 async function resolveVoucherApplication(
   voucherCode: string | null | undefined,
   subtotal: number,
   role: CheckoutRole,
-  tx: Prisma.TransactionClient,
+  tx: Prisma.TransactionClient
 ): Promise<VoucherApplication | null> {
   if (voucherCode === undefined || voucherCode === null) {
-    return null;
+    return null
   }
 
   const voucher = await tx.voucher.findUnique({
     where: { code: voucherCode },
-    select: voucherSelect,
-  });
+    select: voucherSelect
+  })
 
-  const application = evaluateVoucher(voucher, subtotal, role);
+  const application = evaluateVoucher(voucher, subtotal, role)
   if (application === null) {
-    throw new CheckoutSecurityError(400);
+    throw new CheckoutSecurityError(400)
   }
 
-  return application;
+  return application
 }
 
 async function resolveWhatsAppNumber(): Promise<string | null> {
   const settings = await prisma.siteSetting.findMany({
     where: {
       key: {
-        in: ["kontak_whatsapp", "nomor_wa"],
-      },
+        in: ['kontak_whatsapp', 'nomor_wa']
+      }
     },
     select: {
       key: true,
-      value: true,
-    },
-  });
+      value: true
+    }
+  })
 
-  const orderedKeys = ["kontak_whatsapp", "nomor_wa"];
+  const orderedKeys = ['kontak_whatsapp', 'nomor_wa']
   for (const key of orderedKeys) {
-    const setting = settings.find((candidate: any) => candidate.key === key);
-    const value = setting?.value.trim();
+    const setting = settings.find((candidate: any) => candidate.key === key)
+    const value = setting?.value.trim()
     if (value !== undefined && /^62[1-9][0-9]{7,14}$/.test(value)) {
-      return value;
+      return value
     }
   }
 
-  return null;
+  return null
 }
 
 function parseCurrencySetting(value: string): number | null {
-  const trimmed = value.trim();
+  const trimmed = value.trim()
   if (!/^[0-9]{1,9}$/.test(trimmed)) {
-    return null;
+    return null
   }
 
-  const parsed = Number(trimmed);
+  const parsed = Number(trimmed)
   if (!Number.isSafeInteger(parsed) || parsed < 0 || parsed > 100_000_000) {
-    return null;
+    return null
   }
 
-  return parsed;
+  return parsed
 }
 
 function buildWhatsAppItemLine(
@@ -976,59 +1099,59 @@ function buildWhatsAppItemLine(
   quantity: number,
   toppings: ToppingRecord[],
   subtotal: number,
-  notes: string | null,
+  notes: string | null
 ): string {
-  let line = `- ${quantity}x ${flavorName} (${baseType})\n`;
+  let line = `- ${quantity}x ${flavorName} (${baseType})\n`
   if (toppings.length > 0) {
-    line += `  Topping: ${toppings.map(t => t.name).join(", ")}\n`;
+    line += `  Topping: ${toppings.map((t) => t.name).join(', ')}\n`
   }
   if (notes !== null) {
-    line += `  Catatan: "${notes}"\n`;
+    line += `  Catatan: "${notes}"\n`
   }
-  line += `  Subtotal: ${formatPrice(subtotal)}\n`;
-  return line;
+  line += `  Subtotal: ${formatPrice(subtotal)}\n`
+  return line
 }
 
 function buildWhatsAppMessage(input: {
-  orderId: string;
-  customerName: string;
-  customerPhone: string;
-  deliveryMethod: CreateOrderInput["deliveryMethod"];
-  notes: string | null;
-  subtotal: number;
-  discountAmount: number;
-  deliveryFee: number;
-  totalPrice: number;
-  voucherCode: string | null;
-  itemLines: string[];
+  orderId: string
+  customerName: string
+  customerPhone: string
+  deliveryMethod: CreateOrderInput['deliveryMethod']
+  notes: string | null
+  subtotal: number
+  discountAmount: number
+  deliveryFee: number
+  totalPrice: number
+  voucherCode: string | null
+  itemLines: string[]
 }): string {
-  const shortOrderId = input.orderId.length > 6 ? input.orderId.slice(-6) : input.orderId;
-  let message = `Halo Pisang Goreng Van Java, saya ingin melakukan pemesanan (Order ID: #${shortOrderId}):\n\n`;
-  message += `Nama: ${input.customerName}\n`;
-  message += `No HP: ${input.customerPhone}\n`;
-  message += `Metode: ${input.deliveryMethod}\n\n`;
-  message += input.itemLines.join("\n");
-  message += "\nRingkasan Pembayaran:\n";
-  message += `Total Pesanan: ${formatPrice(input.subtotal)}\n`;
+  const shortOrderId = input.orderId.length > 6 ? input.orderId.slice(-6) : input.orderId
+  let message = `Halo Pisang Goreng Van Java, saya ingin melakukan pemesanan (Order ID: #${shortOrderId}):\n\n`
+  message += `Nama: ${input.customerName}\n`
+  message += `No HP: ${input.customerPhone}\n`
+  message += `Metode: ${input.deliveryMethod}\n\n`
+  message += input.itemLines.join('\n')
+  message += '\nRingkasan Pembayaran:\n'
+  message += `Total Pesanan: ${formatPrice(input.subtotal)}\n`
   if (input.voucherCode !== null && input.discountAmount > 0) {
-    message += `Diskon Voucher (${input.voucherCode}): -${formatPrice(input.discountAmount)}\n`;
+    message += `Diskon Voucher (${input.voucherCode}): -${formatPrice(input.discountAmount)}\n`
   }
-  if (input.deliveryMethod === "DELIVERY" && input.deliveryFee > 0) {
-    message += `Ongkos Kirim: ${formatPrice(input.deliveryFee)}\n`;
+  if (input.deliveryMethod === 'DELIVERY' && input.deliveryFee > 0) {
+    message += `Ongkos Kirim: ${formatPrice(input.deliveryFee)}\n`
   }
-  message += `Total Akhir: ${formatPrice(input.totalPrice)}\n`;
+  message += `Total Akhir: ${formatPrice(input.totalPrice)}\n`
 
   if (input.notes !== null) {
-    message += `\nCatatan/Alamat: ${input.notes}\n`;
+    message += `\nCatatan/Alamat: ${input.notes}\n`
   }
 
-  return message;
+  return message
 }
 
 function formatPrice(amount: number): string {
-  return new Intl.NumberFormat("id-ID", {
-    style: "currency",
-    currency: "IDR",
-    minimumFractionDigits: 0,
-  }).format(amount);
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    minimumFractionDigits: 0
+  }).format(amount)
 }

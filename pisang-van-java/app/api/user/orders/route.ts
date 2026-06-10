@@ -1,13 +1,13 @@
-import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/src/auth";
-import { prisma } from "@/lib/prisma";
+import { type NextRequest, NextResponse } from 'next/server'
+import { prisma } from '@/lib/prisma'
+import { auth } from '@/src/auth'
 
 export async function GET(req: NextRequest) {
   try {
-    const session = await auth();
-    const userId = session?.user?.id;
+    const session = await auth()
+    const userId = session?.user?.id
     if (!session || !userId) {
-      return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 })
     }
 
     const orders = await prisma.order.findMany({
@@ -21,11 +21,11 @@ export async function GET(req: NextRequest) {
           }
         }
       }
-    });
+    })
 
-    return NextResponse.json({ success: true, data: orders });
+    return NextResponse.json({ success: true, data: orders })
   } catch (error) {
-    console.error("GET /api/user/orders Error:", error);
-    return NextResponse.json({ success: false, message: "Internal Server Error" }, { status: 500 });
+    console.error('GET /api/user/orders Error:', error)
+    return NextResponse.json({ success: false, message: 'Internal Server Error' }, { status: 500 })
   }
 }

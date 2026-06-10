@@ -6,18 +6,18 @@
 import { useMemo } from 'react'
 
 export interface ReviewItem {
-  id:        string
-  userId:    string
-  userName:  string | null
-  rating:    number
-  comment:   string | null
-  imageUrl:  string | null
+  id: string
+  userId: string
+  userName: string | null
+  rating: number
+  comment: string | null
+  imageUrl: string | null
   isVerifiedBuyer: boolean
   createdAt: string // ISO string
 }
 
 interface ReviewListProps {
-  reviews:      ReviewItem[]
+  reviews: ReviewItem[]
   averageRating?: number | null
 }
 
@@ -42,14 +42,19 @@ function StarDisplay({ rating }: { rating: number }) {
 function ReviewCard({ review }: { review: ReviewItem }) {
   const formattedDate = useMemo(() => {
     return new Intl.DateTimeFormat('id-ID', {
-      day:   'numeric',
+      day: 'numeric',
       month: 'long',
-      year:  'numeric',
+      year: 'numeric'
     }).format(new Date(review.createdAt))
   }, [review.createdAt])
 
   const initials = review.userName
-    ? review.userName.split(' ').map((n) => n[0]).slice(0, 2).join('').toUpperCase()
+    ? review.userName
+        .split(' ')
+        .map((n) => n[0])
+        .slice(0, 2)
+        .join('')
+        .toUpperCase()
     : '?'
 
   return (
@@ -67,7 +72,10 @@ function ReviewCard({ review }: { review: ReviewItem }) {
                 {review.userName ?? 'Pelanggan'}
               </p>
               {review.isVerifiedBuyer && (
-                <span title="Pembeli Terverifikasi" className="bg-green-100 text-green-700 text-[10px] px-1.5 py-0.5 rounded-full font-bold flex items-center gap-1">
+                <span
+                  title="Pembeli Terverifikasi"
+                  className="bg-green-100 text-green-700 text-[10px] px-1.5 py-0.5 rounded-full font-bold flex items-center gap-1"
+                >
                   ✓ <span className="hidden sm:inline">Pembeli Terverifikasi</span>
                 </span>
               )}
@@ -88,11 +96,16 @@ function ReviewCard({ review }: { review: ReviewItem }) {
       {/* Image Gallery */}
       {review.imageUrl && (
         <div className="pt-2">
-          <a href={review.imageUrl} target="_blank" rel="noopener noreferrer" className="block max-w-xs rounded-xl overflow-hidden border border-zinc-200">
+          <a
+            href={review.imageUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block max-w-xs rounded-xl overflow-hidden border border-zinc-200"
+          >
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img 
-              src={review.imageUrl} 
-              alt="Ulasan dari pembeli" 
+            <img
+              src={review.imageUrl}
+              alt="Ulasan dari pembeli"
               className="w-full h-auto object-cover hover:scale-105 transition-transform duration-300"
             />
           </a>
@@ -125,7 +138,8 @@ export default function ReviewList({ reviews, averageRating }: ReviewListProps) 
         <div className="text-5xl">🍌</div>
         <p className="font-semibold text-neutral-800">Belum Ada Ulasan</p>
         <p className="text-sm text-neutral-500 max-w-xs mx-auto">
-          Jadilah yang pertama mencicipi dan menilai menu ini! Ulasan Anda sangat berarti bagi warung kami.
+          Jadilah yang pertama mencicipi dan menilai menu ini! Ulasan Anda sangat berarti bagi
+          warung kami.
         </p>
       </div>
     )
@@ -134,9 +148,7 @@ export default function ReviewList({ reviews, averageRating }: ReviewListProps) 
   return (
     <section className="space-y-4" aria-label="Ulasan pelanggan">
       {/* Summary Card */}
-      {averageRating != null && (
-        <AverageSummary average={averageRating} total={reviews.length} />
-      )}
+      {averageRating != null && <AverageSummary average={averageRating} total={reviews.length} />}
 
       {/* Review Cards */}
       <div className="space-y-3">

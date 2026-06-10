@@ -1,41 +1,53 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
-import { useSession } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
-import toast from 'react-hot-toast'
-import { motion, AnimatePresence } from 'framer-motion'
-import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import { User, KeyRound, Loader2, Camera, Trash2, Mail, CheckCircle2, ShieldCheck } from 'lucide-react'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { AnimatePresence, motion } from 'framer-motion'
+import {
+  Camera,
+  CheckCircle2,
+  KeyRound,
+  Loader2,
+  Mail,
+  ShieldCheck,
+  Trash2,
+  User
+} from 'lucide-react'
 import Image from 'next/image'
-import Cropper from 'react-easy-crop'
-import getCroppedImg from '@/src/lib/cropImage'
-import { requestEmailOTP, verifyAndChangeEmail } from '@/app/actions/emailChange'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { api } from '@/src/lib/api'
+import { useRouter } from 'next/navigation'
+import { useSession } from 'next-auth/react'
 import { FetchError } from 'ofetch'
+import { useCallback, useEffect, useState } from 'react'
+import Cropper from 'react-easy-crop'
+import { useForm } from 'react-hook-form'
+import toast from 'react-hot-toast'
+import { z } from 'zod'
+import { requestEmailOTP, verifyAndChangeEmail } from '@/app/actions/emailChange'
+import { api } from '@/src/lib/api'
+import getCroppedImg from '@/src/lib/cropImage'
 
 // --- Schemas ---
 const profileSchema = z.object({
-  name: z.string().min(1, "Nama tidak boleh kosong"),
-  phone: z.string()
-    .min(1, "Nomor WhatsApp tidak boleh kosong")
-    .regex(/^(\+62|62|0)8[1-9][0-9]{6,11}$/, "Nomor WhatsApp tidak valid."),
+  name: z.string().min(1, 'Nama tidak boleh kosong'),
+  phone: z
+    .string()
+    .min(1, 'Nomor WhatsApp tidak boleh kosong')
+    .regex(/^(\+62|62|0)8[1-9][0-9]{6,11}$/, 'Nomor WhatsApp tidak valid.')
 })
 
-const passwordSchema = z.object({
-  currentPassword: z.string().min(1, "Password saat ini wajib diisi"),
-  newPassword: z.string().min(6, "Password baru minimal 6 karakter"),
-  confirmPassword: z.string().min(1, "Konfirmasi password wajib diisi")
-}).refine((data) => data.newPassword === data.confirmPassword, {
-  message: "Konfirmasi password tidak cocok",
-  path: ["confirmPassword"]
-})
+const passwordSchema = z
+  .object({
+    currentPassword: z.string().min(1, 'Password saat ini wajib diisi'),
+    newPassword: z.string().min(6, 'Password baru minimal 6 karakter'),
+    confirmPassword: z.string().min(1, 'Konfirmasi password wajib diisi')
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: 'Konfirmasi password tidak cocok',
+    path: ['confirmPassword']
+  })
 
 const emailSchema = z.object({
-  newEmail: z.string().email("Format email tidak valid")
+  newEmail: z.string().email('Format email tidak valid')
 })
 
 type ProfileFormValues = z.infer<typeof profileSchema>
@@ -46,7 +58,7 @@ export default function ProfileDataDiriPage() {
   const { data: session, status, update } = useSession()
   const router = useRouter()
   const queryClient = useQueryClient()
-  
+
   // Avatar state
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
   const [isUploading, setIsUploading] = useState(false)
@@ -105,7 +117,7 @@ export default function ProfileDataDiriPage() {
       return data.data
     },
     enabled: status === 'authenticated',
-    staleTime: 2 * 60 * 1000,
+    staleTime: 2 * 60 * 1000
   })
 
   useEffect(() => {
@@ -139,7 +151,10 @@ export default function ProfileDataDiriPage() {
       queryClient.invalidateQueries({ queryKey: ['profile'] })
     },
     onError: (error: FetchError | Error) => {
-      const msg = error instanceof FetchError ? (error.data?.message || 'Gagal menyimpan profil') : error.message
+      const msg =
+        error instanceof FetchError
+          ? error.data?.message || 'Gagal menyimpan profil'
+          : error.message
       toast.error(msg || 'Terjadi kesalahan jaringan')
     }
   })
@@ -167,10 +182,13 @@ export default function ProfileDataDiriPage() {
 
   const avatarMutation = useMutation({
     mutationFn: async (formData: FormData) => {
-      const resData = await api<{ success: boolean; data: { url: string }, message?: string }>('/api/user/profile/avatar', {
-        method: 'POST',
-        body: formData,
-      })
+      const resData = await api<{ success: boolean; data: { url: string }; message?: string }>(
+        '/api/user/profile/avatar',
+        {
+          method: 'POST',
+          body: formData
+        }
+      )
       if (!resData.success) throw new Error(resData.message || 'Gagal mengubah foto profil')
       return resData.data.url
     },
@@ -184,7 +202,10 @@ export default function ProfileDataDiriPage() {
     },
     onError: (error: FetchError | Error) => {
       setIsUploading(false)
-      const msg = error instanceof FetchError ? (error.data?.message || 'Gagal mengubah foto profil') : error.message
+      const msg =
+        error instanceof FetchError
+          ? error.data?.message || 'Gagal mengubah foto profil'
+          : error.message
       toast.error(msg || 'Terjadi kesalahan sistem')
     }
   })
@@ -194,7 +215,7 @@ export default function ProfileDataDiriPage() {
     setIsUploading(true)
     try {
       const croppedImageBlob = await getCroppedImg(imageToCrop, croppedAreaPixels)
-      if (!croppedImageBlob) throw new Error("Gagal memproses gambar")
+      if (!croppedImageBlob) throw new Error('Gagal memproses gambar')
       const formData = new FormData()
       formData.append('file', croppedImageBlob, 'avatar.jpg')
       avatarMutation.mutate(formData)
@@ -206,7 +227,9 @@ export default function ProfileDataDiriPage() {
 
   const deleteAvatarMutation = useMutation({
     mutationFn: async () => {
-      const data = await api<{ success: boolean; message?: string }>('/api/user/profile/avatar', { method: 'DELETE' })
+      const data = await api<{ success: boolean; message?: string }>('/api/user/profile/avatar', {
+        method: 'DELETE'
+      })
       if (!data.success) throw new Error(data.message || 'Gagal menghapus foto')
       return true
     },
@@ -219,13 +242,14 @@ export default function ProfileDataDiriPage() {
     },
     onError: (error: FetchError | Error) => {
       setIsUploading(false)
-      const msg = error instanceof FetchError ? (error.data?.message || 'Gagal menghapus foto') : error.message
+      const msg =
+        error instanceof FetchError ? error.data?.message || 'Gagal menghapus foto' : error.message
       toast.error(msg || 'Kesalahan jaringan')
     }
   })
 
   const handleAvatarDelete = () => {
-    if(!confirm("Apakah Anda yakin ingin menghapus foto profil?")) return
+    if (!confirm('Apakah Anda yakin ingin menghapus foto profil?')) return
     setIsUploading(true)
     deleteAvatarMutation.mutate()
   }
@@ -275,7 +299,10 @@ export default function ProfileDataDiriPage() {
       resetPasswordForm()
     },
     onError: (error: FetchError | Error) => {
-      const msg = error instanceof FetchError ? (error.data?.message || 'Gagal mengubah password') : error.message
+      const msg =
+        error instanceof FetchError
+          ? error.data?.message || 'Gagal mengubah password'
+          : error.message
       toast.error(msg || 'Terjadi kesalahan jaringan')
     }
   })
@@ -291,19 +318,29 @@ export default function ProfileDataDiriPage() {
   }
 
   return (
-    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-8 pb-10">
-      
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="space-y-8 pb-10"
+    >
       {/* CROP MODAL */}
       <AnimatePresence>
         {imageToCrop && (
-          <motion.div 
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
           >
             <div className="bg-white dark:bg-zinc-900 rounded-3xl w-full max-w-md overflow-hidden shadow-2xl flex flex-col">
               <div className="p-4 border-b border-zinc-100 dark:border-zinc-800 flex justify-between items-center">
                 <h3 className="font-bold text-zinc-900 dark:text-zinc-100">Sesuaikan Foto</h3>
-                <button onClick={() => setImageToCrop(null)} className="text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200">Batal</button>
+                <button
+                  onClick={() => setImageToCrop(null)}
+                  className="text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200"
+                >
+                  Batal
+                </button>
               </div>
               <div className="relative h-80 w-full bg-zinc-100 dark:bg-zinc-950">
                 <Cropper
@@ -320,11 +357,19 @@ export default function ProfileDataDiriPage() {
               </div>
               <div className="p-4 border-t border-zinc-100 dark:border-zinc-800 flex items-center gap-4">
                 <span className="text-xs font-bold text-zinc-500">Zoom</span>
-                <input type="range" min={1} max={3} step={0.1} value={zoom} onChange={(e) => setZoom(Number(e.target.value))} className="w-full accent-[#D4802A]" />
+                <input
+                  type="range"
+                  min={1}
+                  max={3}
+                  step={0.1}
+                  value={zoom}
+                  onChange={(e) => setZoom(Number(e.target.value))}
+                  className="w-full accent-[#D4802A]"
+                />
               </div>
               <div className="p-4 bg-zinc-50 dark:bg-zinc-800/50">
-                <button 
-                  onClick={handleCropSave} 
+                <button
+                  onClick={handleCropSave}
                   disabled={isUploading}
                   className="w-full bg-[#D4802A] hover:bg-[#b56d24] text-white font-bold py-3 rounded-xl transition-all flex justify-center items-center gap-2"
                 >
@@ -343,8 +388,12 @@ export default function ProfileDataDiriPage() {
             <User className="w-6 h-6" />
           </div>
           <div>
-            <h2 className="text-xl font-bold font-serif text-zinc-900 dark:text-zinc-100">Data Diri</h2>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">Kelola informasi publik dan kontak Anda</p>
+            <h2 className="text-xl font-bold font-serif text-zinc-900 dark:text-zinc-100">
+              Data Diri
+            </h2>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+              Kelola informasi publik dan kontak Anda
+            </p>
           </div>
         </div>
 
@@ -354,7 +403,12 @@ export default function ProfileDataDiriPage() {
             <div className="relative group shrink-0">
               <div className="w-24 h-24 md:w-28 md:h-28 rounded-full overflow-hidden bg-zinc-200 dark:bg-zinc-800 border-4 border-white dark:border-zinc-900 shadow-md relative">
                 {avatarUrl || session?.user?.image ? (
-                  <Image src={avatarUrl || session?.user?.image || ""} alt="Avatar" fill className="object-cover" />
+                  <Image
+                    src={avatarUrl || session?.user?.image || ''}
+                    alt="Avatar"
+                    fill
+                    className="object-cover"
+                  />
                 ) : (
                   <User className="w-12 h-12 text-zinc-400 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
                 )}
@@ -366,16 +420,25 @@ export default function ProfileDataDiriPage() {
               </div>
               <label className="absolute bottom-0 right-0 p-2.5 bg-[#D4802A] text-white rounded-full cursor-pointer shadow-lg hover:bg-[#b56d24] transition-all hover:scale-105 active:scale-95 group-hover:ring-4 ring-white dark:ring-zinc-900">
                 <Camera className="w-4 h-4" />
-                <input type="file" className="hidden" accept="image/jpeg,image/png,image/webp" onChange={onFileChange} disabled={isUploading} />
+                <input
+                  type="file"
+                  className="hidden"
+                  accept="image/jpeg,image/png,image/webp"
+                  onChange={onFileChange}
+                  disabled={isUploading}
+                />
               </label>
             </div>
             <div className="text-center md:text-left flex-1">
               <h3 className="font-bold text-zinc-900 dark:text-zinc-100 text-lg">Foto Profil</h3>
-              <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 max-w-sm">Format JPG, PNG, atau WEBP. Maksimal 2MB. Anda dapat menyesuaikan potongan gambar setelah memilih file.</p>
-              
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 max-w-sm">
+                Format JPG, PNG, atau WEBP. Maksimal 2MB. Anda dapat menyesuaikan potongan gambar
+                setelah memilih file.
+              </p>
+
               {(avatarUrl || session?.user?.image) && (
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   onClick={handleAvatarDelete}
                   disabled={isUploading}
                   className="mt-3 text-sm text-red-500 hover:text-red-600 font-bold flex items-center gap-1.5 mx-auto md:mx-0 transition-colors"
@@ -388,25 +451,33 @@ export default function ProfileDataDiriPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
-              <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">Nama Lengkap</label>
+              <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">
+                Nama Lengkap
+              </label>
               <input
                 type="text"
                 {...registerProfile('name')}
                 className="w-full p-3.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-transparent focus:ring-2 focus:ring-[#D4802A]/50 outline-none transition-all"
                 placeholder="Masukkan nama lengkap"
               />
-              {profileErrors.name && <p className="text-xs text-red-500 mt-1.5">{profileErrors.name.message}</p>}
+              {profileErrors.name && (
+                <p className="text-xs text-red-500 mt-1.5">{profileErrors.name.message}</p>
+              )}
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">Nomor WhatsApp</label>
+              <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">
+                Nomor WhatsApp
+              </label>
               <input
                 type="tel"
                 {...registerProfile('phone')}
                 className="w-full p-3.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-transparent focus:ring-2 focus:ring-[#D4802A]/50 outline-none transition-all"
                 placeholder="Contoh: +6281312167554"
               />
-              {profileErrors.phone && <p className="text-xs text-red-500 mt-1.5">{profileErrors.phone.message}</p>}
+              {profileErrors.phone && (
+                <p className="text-xs text-red-500 mt-1.5">{profileErrors.phone.message}</p>
+              )}
             </div>
           </div>
 
@@ -416,7 +487,11 @@ export default function ProfileDataDiriPage() {
               disabled={profileMutation.isPending || !isProfileValid}
               className="bg-[#D4802A] hover:bg-[#b56d24] text-white font-bold py-3 px-8 rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
-              {profileMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Simpan Profil'}
+              {profileMutation.isPending ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                'Simpan Profil'
+              )}
             </button>
           </div>
         </form>
@@ -430,27 +505,48 @@ export default function ProfileDataDiriPage() {
               <ShieldCheck className="w-6 h-6" />
             </div>
             <div>
-              <h2 className="text-xl font-bold font-serif text-zinc-900 dark:text-zinc-100">Keamanan Akun Terhubung</h2>
-              <p className="text-sm text-zinc-500 dark:text-zinc-400">Autentikasi dikelola oleh pihak ketiga</p>
+              <h2 className="text-xl font-bold font-serif text-zinc-900 dark:text-zinc-100">
+                Keamanan Akun Terhubung
+              </h2>
+              <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                Autentikasi dikelola oleh pihak ketiga
+              </p>
             </div>
           </div>
-          
+
           <div className="bg-blue-50 dark:bg-blue-900/10 p-6 rounded-2xl border border-blue-100 dark:border-blue-900/50 flex flex-col md:flex-row items-center gap-6">
             <div className="w-16 h-16 bg-white dark:bg-zinc-800 rounded-2xl shadow-sm flex items-center justify-center shrink-0">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-8 h-8">
-                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-                <path d="M1 1h22v22H1z" fill="none"/>
+                <path
+                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                  fill="#4285F4"
+                />
+                <path
+                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                  fill="#34A853"
+                />
+                <path
+                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                  fill="#FBBC05"
+                />
+                <path
+                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                  fill="#EA4335"
+                />
+                <path d="M1 1h22v22H1z" fill="none" />
               </svg>
             </div>
             <div>
-              <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100 mb-1">Terhubung dengan Google</h3>
+              <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100 mb-1">
+                Terhubung dengan Google
+              </h3>
               <p className="text-zinc-600 dark:text-zinc-400 text-sm leading-relaxed max-w-xl">
-                Anda mendaftar dan masuk menggunakan akun Google (<span className="font-semibold text-zinc-800 dark:text-zinc-200">{session?.user?.email}</span>). 
-                Oleh karena itu, kata sandi dan alamat email Anda sepenuhnya diamankan dan dikelola oleh sistem Google. 
-                Anda tidak perlu mengganti kata sandi di platform kami.
+                Anda mendaftar dan masuk menggunakan akun Google (
+                <span className="font-semibold text-zinc-800 dark:text-zinc-200">
+                  {session?.user?.email}
+                </span>
+                ). Oleh karena itu, kata sandi dan alamat email Anda sepenuhnya diamankan dan
+                dikelola oleh sistem Google. Anda tidak perlu mengganti kata sandi di platform kami.
               </p>
             </div>
           </div>
@@ -464,8 +560,12 @@ export default function ProfileDataDiriPage() {
                 <Mail className="w-6 h-6" />
               </div>
               <div>
-                <h2 className="text-xl font-bold font-serif text-zinc-900 dark:text-zinc-100">Ubah Alamat Email</h2>
-                <p className="text-sm text-zinc-500 dark:text-zinc-400">Perlu verifikasi OTP ke email lama untuk keamanan</p>
+                <h2 className="text-xl font-bold font-serif text-zinc-900 dark:text-zinc-100">
+                  Ubah Alamat Email
+                </h2>
+                <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                  Perlu verifikasi OTP ke email lama untuk keamanan
+                </p>
               </div>
             </div>
 
@@ -473,7 +573,9 @@ export default function ProfileDataDiriPage() {
               {emailMode === 'idle' && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
                   <div>
-                    <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">Email Saat Ini</label>
+                    <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">
+                      Email Saat Ini
+                    </label>
                     <div className="flex gap-3">
                       <input
                         type="email"
@@ -481,12 +583,16 @@ export default function ProfileDataDiriPage() {
                         disabled
                         className="flex-1 p-3.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/50 text-zinc-500 cursor-not-allowed outline-none"
                       />
-                      <button 
+                      <button
                         onClick={handleRequestEmailOTP}
                         disabled={isEmailLoading}
                         className="px-6 py-3 bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 font-bold rounded-xl transition-all disabled:opacity-50"
                       >
-                        {isEmailLoading ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : 'Ubah Email'}
+                        {isEmailLoading ? (
+                          <Loader2 className="w-5 h-5 animate-spin mx-auto" />
+                        ) : (
+                          'Ubah Email'
+                        )}
                       </button>
                     </div>
                   </div>
@@ -494,10 +600,17 @@ export default function ProfileDataDiriPage() {
               )}
 
               {emailMode === 'otp' && (
-                <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4 bg-blue-50 dark:bg-blue-900/10 p-5 rounded-2xl border border-blue-100 dark:border-blue-900/50">
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="space-y-4 bg-blue-50 dark:bg-blue-900/10 p-5 rounded-2xl border border-blue-100 dark:border-blue-900/50"
+                >
                   <div className="flex gap-3 text-blue-700 dark:text-blue-400 mb-2">
                     <ShieldCheck className="w-5 h-5 shrink-0" />
-                    <p className="text-sm">Kami telah mengirim kode 6-digit ke <strong>{session?.user?.email}</strong>. Masukkan kode di bawah untuk mengotorisasi perubahan email.</p>
+                    <p className="text-sm">
+                      Kami telah mengirim kode 6-digit ke <strong>{session?.user?.email}</strong>.
+                      Masukkan kode di bawah untuk mengotorisasi perubahan email.
+                    </p>
                   </div>
                   <div>
                     <input
@@ -510,9 +623,14 @@ export default function ProfileDataDiriPage() {
                     />
                   </div>
                   <div className="flex gap-3">
-                    <button onClick={() => setEmailMode('idle')} className="flex-1 p-3 text-zinc-600 dark:text-zinc-400 font-bold hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl transition-colors">Batal</button>
-                    <button 
-                      onClick={() => setEmailMode('newEmail')} 
+                    <button
+                      onClick={() => setEmailMode('idle')}
+                      className="flex-1 p-3 text-zinc-600 dark:text-zinc-400 font-bold hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl transition-colors"
+                    >
+                      Batal
+                    </button>
+                    <button
+                      onClick={() => setEmailMode('newEmail')}
                       disabled={otpValue.length !== 6}
                       className="flex-1 p-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all disabled:opacity-50"
                     >
@@ -523,30 +641,55 @@ export default function ProfileDataDiriPage() {
               )}
 
               {emailMode === 'newEmail' && (
-                <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4">
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="space-y-4"
+                >
                   <div className="flex items-center gap-2 text-green-600 dark:text-green-400 mb-2">
                     <CheckCircle2 className="w-5 h-5" />
-                    <p className="text-sm font-bold">Otorisasi Berhasil. Silakan masukkan email baru Anda.</p>
+                    <p className="text-sm font-bold">
+                      Otorisasi Berhasil. Silakan masukkan email baru Anda.
+                    </p>
                   </div>
-                  <form onSubmit={handleEmailSubmit(handleVerifyAndChangeEmail)} className="space-y-4">
+                  <form
+                    onSubmit={handleEmailSubmit(handleVerifyAndChangeEmail)}
+                    className="space-y-4"
+                  >
                     <div>
-                      <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">Email Baru</label>
+                      <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">
+                        Email Baru
+                      </label>
                       <input
                         type="email"
                         {...registerEmail('newEmail')}
                         className="w-full p-3.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-transparent focus:ring-2 focus:ring-blue-500 outline-none transition-all"
                         placeholder="Masukkan email baru yang belum terdaftar"
                       />
-                      {emailErrors.newEmail && <p className="text-xs text-red-500 mt-1.5">{emailErrors.newEmail.message}</p>}
+                      {emailErrors.newEmail && (
+                        <p className="text-xs text-red-500 mt-1.5">
+                          {emailErrors.newEmail.message}
+                        </p>
+                      )}
                     </div>
                     <div className="flex gap-3 pt-2">
-                      <button type="button" onClick={() => setEmailMode('idle')} className="flex-1 p-3 text-zinc-600 dark:text-zinc-400 font-bold hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl transition-colors">Batal</button>
-                      <button 
-                        type="submit" 
+                      <button
+                        type="button"
+                        onClick={() => setEmailMode('idle')}
+                        className="flex-1 p-3 text-zinc-600 dark:text-zinc-400 font-bold hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl transition-colors"
+                      >
+                        Batal
+                      </button>
+                      <button
+                        type="submit"
                         disabled={isEmailLoading || !isEmailValid}
                         className="flex-1 p-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all disabled:opacity-50 flex justify-center"
                       >
-                        {isEmailLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Simpan Email Baru'}
+                        {isEmailLoading ? (
+                          <Loader2 className="w-5 h-5 animate-spin" />
+                        ) : (
+                          'Simpan Email Baru'
+                        )}
                       </button>
                     </div>
                   </form>
@@ -562,43 +705,65 @@ export default function ProfileDataDiriPage() {
                 <KeyRound className="w-6 h-6" />
               </div>
               <div>
-                <h2 className="text-xl font-bold font-serif text-zinc-900 dark:text-zinc-100">Ganti Password</h2>
-                <p className="text-sm text-zinc-500 dark:text-zinc-400">Pastikan akun Anda tetap aman dengan password yang kuat</p>
+                <h2 className="text-xl font-bold font-serif text-zinc-900 dark:text-zinc-100">
+                  Ganti Password
+                </h2>
+                <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                  Pastikan akun Anda tetap aman dengan password yang kuat
+                </p>
               </div>
             </div>
 
             <form onSubmit={handlePasswordSubmit(onPasswordSubmit)} className="space-y-5 max-w-lg">
               <div>
-                <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">Password Saat Ini</label>
+                <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">
+                  Password Saat Ini
+                </label>
                 <input
                   type="password"
                   {...registerPassword('currentPassword')}
                   className="w-full p-3.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-transparent focus:ring-2 focus:ring-[#D4802A]/50 outline-none transition-all"
                   placeholder="Masukkan password saat ini"
                 />
-                {passwordErrors.currentPassword && <p className="text-xs text-red-500 mt-1.5">{passwordErrors.currentPassword.message}</p>}
+                {passwordErrors.currentPassword && (
+                  <p className="text-xs text-red-500 mt-1.5">
+                    {passwordErrors.currentPassword.message}
+                  </p>
+                )}
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">Password Baru</label>
+                <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">
+                  Password Baru
+                </label>
                 <input
                   type="password"
                   {...registerPassword('newPassword')}
                   className="w-full p-3.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-transparent focus:ring-2 focus:ring-[#D4802A]/50 outline-none transition-all"
                   placeholder="Minimal 6 karakter"
                 />
-                {passwordErrors.newPassword && <p className="text-xs text-red-500 mt-1.5">{passwordErrors.newPassword.message}</p>}
+                {passwordErrors.newPassword && (
+                  <p className="text-xs text-red-500 mt-1.5">
+                    {passwordErrors.newPassword.message}
+                  </p>
+                )}
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">Konfirmasi Password Baru</label>
+                <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">
+                  Konfirmasi Password Baru
+                </label>
                 <input
                   type="password"
                   {...registerPassword('confirmPassword')}
                   className="w-full p-3.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-transparent focus:ring-2 focus:ring-[#D4802A]/50 outline-none transition-all"
                   placeholder="Ketik ulang password baru"
                 />
-                {passwordErrors.confirmPassword && <p className="text-xs text-red-500 mt-1.5">{passwordErrors.confirmPassword.message}</p>}
+                {passwordErrors.confirmPassword && (
+                  <p className="text-xs text-red-500 mt-1.5">
+                    {passwordErrors.confirmPassword.message}
+                  </p>
+                )}
               </div>
 
               <div className="pt-4 flex justify-end">
@@ -607,14 +772,17 @@ export default function ProfileDataDiriPage() {
                   disabled={passwordMutation.isPending || !isPasswordValid}
                   className="bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 font-bold py-3 px-8 rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                 >
-                  {passwordMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Perbarui Password'}
+                  {passwordMutation.isPending ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    'Perbarui Password'
+                  )}
                 </button>
               </div>
             </form>
           </section>
         </>
       )}
-
     </motion.div>
   )
 }

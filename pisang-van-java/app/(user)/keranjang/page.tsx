@@ -1,16 +1,26 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
-import { motion, AnimatePresence } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
+import { ArrowLeft, Minus, Plus, ShoppingBag, Trash2 } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
-import { useCartStore, selectCartItems, selectCartDisplayTotal as selectCartTotal, selectCartItemCount, selectItemSubtotal } from '@/src/stores/cart.store'
 import { useLanguage } from '@/context/LanguageContext'
-import { Minus, Plus, Trash2, ShoppingBag, ArrowLeft } from 'lucide-react'
+import {
+  selectCartItemCount,
+  selectCartItems,
+  selectCartDisplayTotal as selectCartTotal,
+  selectItemSubtotal,
+  useCartStore
+} from '@/src/stores/cart.store'
 
 const formatPrice = (n: number): string =>
-  new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(n)
+  new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    minimumFractionDigits: 0
+  }).format(n)
 
 export default function KeranjangPage() {
   const router = useRouter()
@@ -31,7 +41,6 @@ export default function KeranjangPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-orange-50 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950 pt-24 pb-16">
       <div className="max-w-3xl mx-auto px-4 sm:px-6">
-
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
@@ -108,17 +117,26 @@ export default function KeranjangPage() {
                           </span>
                         )}
                         {item.notes && (
-                          <p className="text-xs text-zinc-400 italic mt-0.5">&quot;{item.notes}&quot;</p>
+                          <p className="text-xs text-zinc-400 italic mt-0.5">
+                            &quot;{item.notes}&quot;
+                          </p>
                         )}
                         <p className="text-xs text-zinc-400 mt-1">
-                          <CartItemSubtotal cartItemId={item.cartItemId} formatPrice={formatPrice} />pcs
+                          <CartItemSubtotal
+                            cartItemId={item.cartItemId}
+                            formatPrice={formatPrice}
+                          />
+                          pcs
                         </p>
                       </div>
 
                       {/* Qty + Price */}
                       <div className="flex flex-col items-end gap-2 shrink-0">
                         <p className="text-sm font-bold text-amber-600 dark:text-amber-400">
-                          <CartItemSubtotal cartItemId={item.cartItemId} formatPrice={formatPrice} />
+                          <CartItemSubtotal
+                            cartItemId={item.cartItemId}
+                            formatPrice={formatPrice}
+                          />
                         </p>
                         <div className="flex items-center gap-1.5">
                           <button
@@ -178,7 +196,13 @@ export default function KeranjangPage() {
   )
 }
 
-function CartItemSubtotal({ cartItemId, formatPrice }: { cartItemId: string, formatPrice: (n: number) => string }) {
+function CartItemSubtotal({
+  cartItemId,
+  formatPrice
+}: {
+  cartItemId: string
+  formatPrice: (n: number) => string
+}) {
   const subtotal = useCartStore(selectItemSubtotal(cartItemId))
   return <>{formatPrice(subtotal)}</>
 }

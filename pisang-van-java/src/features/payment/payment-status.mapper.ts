@@ -5,11 +5,8 @@
 //
 // Ref: https://docs.midtrans.com/docs/status-cycle-and-status-definition
 
-import { PaymentStatus } from "@prisma/client";
-import type {
-  MidtransFraudStatus,
-  MidtransTransactionStatus,
-} from "@/src/types/midtrans";
+import { PaymentStatus } from '@prisma/client'
+import type { MidtransFraudStatus, MidtransTransactionStatus } from '@/src/types/midtrans'
 
 // ─────────────────────────────────────────────────────────────
 // Main: mapMidtransStatusToPaymentStatus
@@ -35,42 +32,42 @@ export function mapMidtransStatusToPaymentStatus(
   fraudStatus?: MidtransFraudStatus
 ): PaymentStatus {
   switch (transactionStatus) {
-    case "settlement":
+    case 'settlement':
       // QRIS, GoPay, OVO, bank transfer: langsung settled
-      return PaymentStatus.PAID;
+      return PaymentStatus.PAID
 
-    case "capture":
+    case 'capture':
       // Credit card: fraud_status menentukan outcome
-      if (fraudStatus === "challenge") return PaymentStatus.CHALLENGE;
+      if (fraudStatus === 'challenge') return PaymentStatus.CHALLENGE
       // "accept" atau undefined (beberapa metode tidak kirim fraud_status)
-      return PaymentStatus.PAID;
+      return PaymentStatus.PAID
 
-    case "pending":
-      return PaymentStatus.PENDING;
+    case 'pending':
+      return PaymentStatus.PENDING
 
-    case "deny":
-      return PaymentStatus.FAILED;
+    case 'deny':
+      return PaymentStatus.FAILED
 
-    case "cancel":
-      return PaymentStatus.CANCELED;
+    case 'cancel':
+      return PaymentStatus.CANCELED
 
-    case "expire":
-      return PaymentStatus.EXPIRED;
+    case 'expire':
+      return PaymentStatus.EXPIRED
 
-    case "refund":
-    case "partial_refund":
-      return PaymentStatus.REFUNDED;
+    case 'refund':
+    case 'partial_refund':
+      return PaymentStatus.REFUNDED
 
-    case "authorize":
+    case 'authorize':
       // Pre-authorization — masih butuh capture manual, belum final
-      return PaymentStatus.PENDING;
+      return PaymentStatus.PENDING
 
     default: {
       // TypeScript exhaustive check
       // Jika Midtrans menambahkan status baru, TypeScript akan error di sini
-      const _exhaustive: never = transactionStatus;
-      void _exhaustive;
-      return PaymentStatus.PENDING;
+      const _exhaustive: never = transactionStatus
+      void _exhaustive
+      return PaymentStatus.PENDING
     }
   }
 }
@@ -86,7 +83,7 @@ export function mapMidtransStatusToPaymentStatus(
  * CHALLENGE bukan sukses — butuh konfirmasi manual dari Midtrans dulu.
  */
 export function isPaymentSuccessful(status: PaymentStatus): boolean {
-  return status === PaymentStatus.PAID;
+  return status === PaymentStatus.PAID
 }
 
 /**
@@ -99,7 +96,7 @@ export function isTerminalStatus(status: PaymentStatus): boolean {
     PaymentStatus.FAILED,
     PaymentStatus.EXPIRED,
     PaymentStatus.CANCELED,
-    PaymentStatus.REFUNDED,
-  ];
-  return terminalStatuses.includes(status);
+    PaymentStatus.REFUNDED
+  ]
+  return terminalStatuses.includes(status)
 }

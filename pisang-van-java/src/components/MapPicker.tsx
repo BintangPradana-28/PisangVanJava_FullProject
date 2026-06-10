@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet'
+import { MapContainer, Marker, TileLayer, useMapEvents } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
 
@@ -14,29 +14,35 @@ const customIcon = new L.Icon({
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],
   shadowSize: [41, 41]
-});
+})
 
 type LatLng = { lat: number; lng: number }
 
-function LocationMarker({ position, setPosition }: { position: LatLng | null, setPosition: (p: LatLng) => void }) {
+function LocationMarker({
+  position,
+  setPosition
+}: {
+  position: LatLng | null
+  setPosition: (p: LatLng) => void
+}) {
   const map = useMapEvents({
     click(e) {
       setPosition(e.latlng)
       map.flyTo(e.latlng, map.getZoom())
-    },
+    }
   })
 
   return position === null ? null : (
-    <Marker 
-      position={position} 
-      icon={customIcon} 
-      draggable={true} 
+    <Marker
+      position={position}
+      icon={customIcon}
+      draggable={true}
       eventHandlers={{
         dragend: (e) => {
           const marker = e.target
           setPosition(marker.getLatLng())
         }
-      }} 
+      }}
     />
   )
 }
@@ -49,7 +55,7 @@ interface MapPickerProps {
 export default function MapPicker({ initialPosition, onPositionChange }: MapPickerProps) {
   // Default to Bandung center if no initial position
   const [position, setPosition] = useState<LatLng>(
-    initialPosition || { lat: -6.914744, lng: 107.609810 }
+    initialPosition || { lat: -6.914744, lng: 107.60981 }
   )
 
   useEffect(() => {

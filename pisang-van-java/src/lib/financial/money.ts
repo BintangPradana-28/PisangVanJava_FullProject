@@ -16,9 +16,9 @@
  */
 
 // Server-only guard — build akan gagal jika file ini diimport di client bundle
-import "server-only";
+import 'server-only'
 
-import Decimal from "decimal.js";
+import Decimal from 'decimal.js'
 
 // ─── Konfigurasi Global Decimal.js ───────────────────────────────────────────
 // Presisi 20 digit cukup untuk semua intermediate calculation IDR
@@ -27,8 +27,8 @@ Decimal.set({
   precision: 20,
   rounding: Decimal.ROUND_HALF_UP,
   toExpNeg: -9,
-  toExpPos: 20,
-});
+  toExpPos: 20
+})
 
 // ─── Type Definitions ─────────────────────────────────────────────────────────
 
@@ -36,7 +36,7 @@ Decimal.set({
  * Input type yang bisa diterima oleh fungsi kalkulasi.
  * Menerima Prisma Decimal, number, atau string untuk fleksibilitas.
  */
-export type MoneyInput = Decimal | number | string | null | undefined;
+export type MoneyInput = Decimal | number | string | null | undefined
 
 /**
  * Hasil kalkulasi order yang siap dikirim ke Midtrans dan disimpan ke DB.
@@ -44,26 +44,26 @@ export type MoneyInput = Decimal | number | string | null | undefined;
  */
 export interface OrderCalculation {
   /** Total harga item sebelum diskon dan ongkir */
-  subtotal: number;
+  subtotal: number
   /** Nilai diskon dalam Rupiah */
-  discountAmount: number;
+  discountAmount: number
   /** Biaya pengiriman dalam Rupiah */
-  deliveryFee: number;
+  deliveryFee: number
   /** Total akhir yang ditagihkan ke pelanggan */
-  totalPrice: number;
+  totalPrice: number
   /** Breakdown per item untuk audit */
-  items: OrderItemCalculation[];
+  items: OrderItemCalculation[]
 }
 
 export interface OrderItemCalculation {
-  menuVariantId: string;
-  quantity: number;
+  menuVariantId: string
+  quantity: number
   /** Harga satuan dari DB (sebelum topping) */
-  unitPrice: number;
+  unitPrice: number
   /** Total harga topping untuk item ini */
-  toppingTotal: number;
+  toppingTotal: number
   /** Subtotal item: (unitPrice + toppingTotal) × quantity */
-  subtotal: number;
+  subtotal: number
 }
 
 // ─── Core Money Functions ─────────────────────────────────────────────────────
@@ -74,18 +74,16 @@ export interface OrderItemCalculation {
  */
 export function toDecimal(value: MoneyInput): Decimal {
   if (value === null || value === undefined) {
-    return new Decimal(0);
+    return new Decimal(0)
   }
 
-  const d = new Decimal(value.toString());
+  const d = new Decimal(value.toString())
 
   if (!d.isFinite()) {
-    throw new Error(
-      `[money.ts] Nilai tidak valid untuk kalkulasi finansial: ${value}`
-    );
+    throw new Error(`[money.ts] Nilai tidak valid untuk kalkulasi finansial: ${value}`)
   }
 
-  return d;
+  return d
 }
 
 /**
@@ -97,7 +95,7 @@ export function toDecimal(value: MoneyInput): Decimal {
  * roundToRupiah(new Decimal("15249.49")) // → 15249
  */
 export function roundToRupiah(value: Decimal): number {
-  return value.toDecimalPlaces(0, Decimal.ROUND_HALF_UP).toNumber();
+  return value.toDecimalPlaces(0, Decimal.ROUND_HALF_UP).toNumber()
 }
 
 /**
@@ -109,27 +107,25 @@ export function roundToRupiah(value: Decimal): number {
  * Ini mencegah akumulasi rounding error.
  */
 export function calculateItemSubtotal(params: {
-  unitPrice: MoneyInput;
-  toppingPrices: MoneyInput[];
-  quantity: number;
+  unitPrice: MoneyInput
+  toppingPrices: MoneyInput[]
+  quantity: number
 }): Decimal {
-  const { unitPrice, toppingPrices, quantity } = params;
+  const { unitPrice, toppingPrices, quantity } = params
 
   if (quantity <= 0 || !Number.isInteger(quantity)) {
-    throw new Error(
-      `[money.ts] Kuantitas tidak valid: ${quantity}. Harus integer positif.`
-    );
+    throw new Error(`[money.ts] Kuantitas tidak valid: ${quantity}. Harus integer positif.`)
   }
 
-  const basePrice = toDecimal(unitPrice);
+  const basePrice = toDecimal(unitPrice)
 
   // Akumulasi harga topping tanpa rounding intermediate
   const toppingTotal = toppingPrices.reduce<Decimal>((acc, price) => {
-    return acc.plus(toDecimal(price));
-  }, new Decimal(0));
+    return acc.plus(toDecimal(price))
+  }, new Decimal(0))
 
   // (basePrice + toppingTotal) × quantity — rounding SETELAH semua operasi
-  return basePrice.plus(toppingTotal).times(quantity);
+  return basePrice.plus(toppingTotal).times(quantity)
 }
 
 /**
@@ -150,45 +146,45 @@ export function calculateItemSubtotal(params: {
  */
 export function calculateDiscount(
   subtotal: MoneyInput,
-  discountType: "FIXED" | "PERCENTAGE",
+  discountType: 'FIXED' | 'PERCENTAGE',
   discountValue: MoneyInput,
   maxDiscount?: MoneyInput
 ): Decimal {
-  const subtotalD = toDecimal(subtotal);
-  const valueD = toDecimal(discountValue);
+  const subtotalD = toDecimal(subtotal)
+  const valueD = toDecimal(discountValue)
 
   if (valueD.isNegative()) {
-    throw new Error("[money.ts] Nilai diskon tidak boleh negatif.");
+    throw new Error('[money.ts] Nilai diskon tidak boleh negatif.')
   }
 
-  let discountAmount: Decimal;
+  let discountAmount: Decimal
 
-  if (discountType === "FIXED") {
-    discountAmount = valueD;
-  } else if (discountType === "PERCENTAGE") {
+  if (discountType === 'FIXED') {
+    discountAmount = valueD
+  } else if (discountType === 'PERCENTAGE') {
     if (valueD.greaterThan(100)) {
-      throw new Error("[money.ts] Persentase diskon tidak boleh melebihi 100%.");
+      throw new Error('[money.ts] Persentase diskon tidak boleh melebihi 100%.')
     }
     // subtotal × (percentage / 100) — presisi penuh sebelum rounding
-    discountAmount = subtotalD.times(valueD).dividedBy(100);
+    discountAmount = subtotalD.times(valueD).dividedBy(100)
   } else {
-    throw new Error(`[money.ts] Tipe diskon tidak dikenal: ${discountType}`);
+    throw new Error(`[money.ts] Tipe diskon tidak dikenal: ${discountType}`)
   }
 
   // Terapkan batas maksimum diskon jika ada
   if (maxDiscount !== undefined && maxDiscount !== null) {
-    const maxD = toDecimal(maxDiscount);
+    const maxD = toDecimal(maxDiscount)
     if (discountAmount.greaterThan(maxD)) {
-      discountAmount = maxD;
+      discountAmount = maxD
     }
   }
 
   // Diskon tidak boleh melebihi subtotal
   if (discountAmount.greaterThan(subtotalD)) {
-    discountAmount = subtotalD;
+    discountAmount = subtotalD
   }
 
-  return discountAmount;
+  return discountAmount
 }
 
 /**
@@ -201,21 +197,20 @@ export function calculateDiscount(
  */
 export function calculateOrder(params: {
   items: Array<{
-    menuVariantId: string;
-    quantity: number;
-    unitPrice: MoneyInput;
-    toppingPrices: MoneyInput[];
-  }>;
-  deliveryFee: MoneyInput;
-  discountType?: "FIXED" | "PERCENTAGE";
-  discountValue?: MoneyInput;
-  maxDiscount?: MoneyInput;
+    menuVariantId: string
+    quantity: number
+    unitPrice: MoneyInput
+    toppingPrices: MoneyInput[]
+  }>
+  deliveryFee: MoneyInput
+  discountType?: 'FIXED' | 'PERCENTAGE'
+  discountValue?: MoneyInput
+  maxDiscount?: MoneyInput
 }): OrderCalculation {
-  const { items, deliveryFee, discountType, discountValue, maxDiscount } =
-    params;
+  const { items, deliveryFee, discountType, discountValue, maxDiscount } = params
 
   if (items.length === 0) {
-    throw new Error("[money.ts] Order tidak boleh kosong.");
+    throw new Error('[money.ts] Order tidak boleh kosong.')
   }
 
   // ── Step 1: Hitung per-item ───────────────────────────────────────────────
@@ -223,22 +218,22 @@ export function calculateOrder(params: {
     const toppingTotal = item.toppingPrices.reduce<Decimal>(
       (acc, price) => acc.plus(toDecimal(price)),
       new Decimal(0)
-    );
+    )
 
     const subtotalDecimal = calculateItemSubtotal({
       unitPrice: item.unitPrice,
       toppingPrices: item.toppingPrices,
-      quantity: item.quantity,
-    });
+      quantity: item.quantity
+    })
 
     return {
       menuVariantId: item.menuVariantId,
       quantity: item.quantity,
       unitPrice: roundToRupiah(toDecimal(item.unitPrice)),
       toppingTotal: roundToRupiah(toppingTotal),
-      subtotal: roundToRupiah(subtotalDecimal),
-    };
-  });
+      subtotal: roundToRupiah(subtotalDecimal)
+    }
+  })
 
   // ── Step 2: Akumulasi subtotal tanpa rounding ─────────────────────────────
   // Rounding Salami-Safe: sum SEMUA item dulu, baru bulatkan
@@ -247,41 +242,37 @@ export function calculateOrder(params: {
       calculateItemSubtotal({
         unitPrice: item.unitPrice,
         toppingPrices: item.toppingPrices,
-        quantity: item.quantity,
+        quantity: item.quantity
       })
-    );
-  }, new Decimal(0));
+    )
+  }, new Decimal(0))
 
-  const subtotal = roundToRupiah(subtotalDecimal);
+  const subtotal = roundToRupiah(subtotalDecimal)
 
   // ── Step 3: Kalkulasi diskon ──────────────────────────────────────────────
-  let discountAmount = 0;
+  let discountAmount = 0
   if (discountType && discountValue !== undefined && discountValue !== null) {
     const discountDecimal = calculateDiscount(
       subtotalDecimal,
       discountType,
       discountValue,
       maxDiscount
-    );
-    discountAmount = roundToRupiah(discountDecimal);
+    )
+    discountAmount = roundToRupiah(discountDecimal)
   }
 
   // ── Step 4: Total akhir ───────────────────────────────────────────────────
-  const deliveryFeeAmount = roundToRupiah(toDecimal(deliveryFee));
+  const deliveryFeeAmount = roundToRupiah(toDecimal(deliveryFee))
 
   // Final total: subtotal - diskon + ongkir
   // Menggunakan Decimal sekali lagi untuk final sum — tidak ada rounding error
   const totalPrice = roundToRupiah(
-    new Decimal(subtotal)
-      .minus(discountAmount)
-      .plus(deliveryFeeAmount)
-  );
+    new Decimal(subtotal).minus(discountAmount).plus(deliveryFeeAmount)
+  )
 
   // Guard: total tidak boleh negatif
   if (totalPrice < 0) {
-    throw new Error(
-      "[money.ts] Total order tidak boleh negatif. Periksa kalkulasi diskon."
-    );
+    throw new Error('[money.ts] Total order tidak boleh negatif. Periksa kalkulasi diskon.')
   }
 
   return {
@@ -289,8 +280,8 @@ export function calculateOrder(params: {
     discountAmount,
     deliveryFee: deliveryFeeAmount,
     totalPrice,
-    items: itemCalculations,
-  };
+    items: itemCalculations
+  }
 }
 
 /**
@@ -302,9 +293,9 @@ export function calculateOrder(params: {
  * const totalForClient = decimalToNumber(order.totalPrice) // → 25000
  */
 export function decimalToNumber(value: Decimal | number | null | undefined): number {
-  if (value === null || value === undefined) return 0;
-  if (typeof value === "number") return value;
-  return roundToRupiah(new Decimal(value.toString()));
+  if (value === null || value === undefined) return 0
+  if (typeof value === 'number') return value
+  return roundToRupiah(new Decimal(value.toString()))
 }
 
 /**
@@ -315,10 +306,10 @@ export function decimalToNumber(value: Decimal | number | null | undefined): num
  * formatRupiah(25000) // → "Rp 25.000"
  */
 export function formatRupiah(value: number): string {
-  return new Intl.NumberFormat("id-ID", {
-    style: "currency",
-    currency: "IDR",
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
     minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(value);
+    maximumFractionDigits: 0
+  }).format(value)
 }

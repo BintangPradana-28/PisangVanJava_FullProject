@@ -1,13 +1,15 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
+import nextDynamic from 'next/dynamic'
 import Image from 'next/image'
 import Link from 'next/link'
-import nextDynamic from 'next/dynamic'
+import { useEffect, useState } from 'react'
+
 const QuickViewModal = nextDynamic(() => import('@/components/user/QuickViewModal'), { ssr: false })
-import { useLanguage } from '@/context/LanguageContext'
+
 import { useSession } from 'next-auth/react'
+import { useLanguage } from '@/context/LanguageContext'
 
 export interface ProductType {
   id: string
@@ -36,22 +38,33 @@ const formatPrice = (price: number): string => {
   return new Intl.NumberFormat('id-ID', {
     style: 'currency',
     currency: 'IDR',
-    minimumFractionDigits: 0,
+    minimumFractionDigits: 0
   }).format(price)
 }
 
 const getFallbackImageUrl = (name: string): string => {
   const lowercaseName = name.toLowerCase()
   if (lowercaseName.includes('matcha')) return '/images/flavors/matcha.png'
-  if (lowercaseName.includes('strawberry') || lowercaseName.includes('stroberi')) return '/images/flavors/strawberry.png'
-  if (lowercaseName.includes('blueberry') || lowercaseName.includes('bluberi')) return '/images/flavors/blueberry.png'
+  if (lowercaseName.includes('strawberry') || lowercaseName.includes('stroberi'))
+    return '/images/flavors/strawberry.png'
+  if (lowercaseName.includes('blueberry') || lowercaseName.includes('bluberi'))
+    return '/images/flavors/blueberry.png'
   if (lowercaseName.includes('taro')) return '/images/flavors/taro.png'
-  if (lowercaseName.includes('cokelat') || lowercaseName.includes('coklat')) return '/images/flavors/taro.png'
+  if (lowercaseName.includes('cokelat') || lowercaseName.includes('coklat'))
+    return '/images/flavors/taro.png'
   if (lowercaseName.includes('keju')) return '/images/flavors/matcha.png'
   return '/kitchen.png'
 }
 
-const ProductImage = ({ src, alt, available }: { src: string; alt: string; available: boolean }) => {
+const ProductImage = ({
+  src,
+  alt,
+  available
+}: {
+  src: string
+  alt: string
+  available: boolean
+}) => {
   const [imgSrc, setImgSrc] = useState(src)
 
   return (
@@ -63,7 +76,7 @@ const ProductImage = ({ src, alt, available }: { src: string; alt: string; avail
         sizes="(max-width: 640px) 360px, 360px"
         loading="lazy"
         className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
-        onError={() => setImgSrc("/kitchen.png")}
+        onError={() => setImgSrc('/kitchen.png')}
         placeholder="blur"
         blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
       />
@@ -81,27 +94,27 @@ const ProductImage = ({ src, alt, available }: { src: string; alt: string; avail
 }
 
 const getSalesMagnetTag = (flavorName: string): string => {
-  const lower = flavorName.toLowerCase();
+  const lower = flavorName.toLowerCase()
   if (lower.includes('original') || lower.includes('cokelat') || lower.includes('coklat')) {
-    return '🔥 Terlaris';
+    return '🔥 Terlaris'
   }
   // The user requested 'Rekomendasi Chef' to be changed to 'Baru' like the other cards
-  return '⭐ Baru';
+  return '⭐ Baru'
 }
 
 const getFlavorDescriptionKey = (flavorName: string): string | null => {
-  const lower = flavorName.toLowerCase();
-  if (lower.includes('cokelat') || lower.includes('coklat')) return 'menu_desc_cokelat';
-  if (lower.includes('matcha')) return 'menu_desc_matcha';
-  if (lower.includes('strawberry') || lower.includes('stroberi')) return 'menu_desc_strawberry';
-  if (lower.includes('blueberry') || lower.includes('bluberi')) return 'menu_desc_blueberry';
-  if (lower.includes('taro')) return 'menu_desc_taro';
-  if (lower.includes('tiramisu')) return 'menu_desc_tiramisu';
-  if (lower.includes('keju')) return 'menu_desc_keju';
-  if (lower.includes('susu')) return 'menu_desc_susu';
-  if (lower.includes('original')) return 'menu_desc_original';
-  if (lower.includes('milky')) return 'menu_desc_milky';
-  return null;
+  const lower = flavorName.toLowerCase()
+  if (lower.includes('cokelat') || lower.includes('coklat')) return 'menu_desc_cokelat'
+  if (lower.includes('matcha')) return 'menu_desc_matcha'
+  if (lower.includes('strawberry') || lower.includes('stroberi')) return 'menu_desc_strawberry'
+  if (lower.includes('blueberry') || lower.includes('bluberi')) return 'menu_desc_blueberry'
+  if (lower.includes('taro')) return 'menu_desc_taro'
+  if (lower.includes('tiramisu')) return 'menu_desc_tiramisu'
+  if (lower.includes('keju')) return 'menu_desc_keju'
+  if (lower.includes('susu')) return 'menu_desc_susu'
+  if (lower.includes('original')) return 'menu_desc_original'
+  if (lower.includes('milky')) return 'menu_desc_milky'
+  return null
 }
 
 export default function MenuCards({ products }: Props) {
@@ -112,24 +125,27 @@ export default function MenuCards({ products }: Props) {
   const [activeTag, setActiveTag] = useState<string>('ALL')
 
   const baseTags = ['Kembung', 'Lumpia', 'Krispy']
-  const dbTags = Array.from(new Set(products.flatMap(p => p.tags || [])))
+  const dbTags = Array.from(new Set(products.flatMap((p) => p.tags || [])))
   const allTags = ['ALL', ...baseTags, ...dbTags].filter(Boolean)
-  
-  const filteredProducts = activeTag === 'ALL' 
-    ? products 
-    : baseTags.includes(activeTag)
-      ? products.filter(p => {
-          if (activeTag === 'Kembung') return p.priceKembung > 0 || p.wholesaleKembung > 0
-          if (activeTag === 'Lumpia') return p.priceLumpia > 0 || p.wholesaleLumpia > 0
-          if (activeTag === 'Krispy') return p.priceKrispy > 0 || p.wholesaleKrispy > 0
-          return true
-        })
-      : products.filter(p => p.tags?.includes(activeTag))
+
+  const filteredProducts =
+    activeTag === 'ALL'
+      ? products
+      : baseTags.includes(activeTag)
+        ? products.filter((p) => {
+            if (activeTag === 'Kembung') return p.priceKembung > 0 || p.wholesaleKembung > 0
+            if (activeTag === 'Lumpia') return p.priceLumpia > 0 || p.wholesaleLumpia > 0
+            if (activeTag === 'Krispy') return p.priceKrispy > 0 || p.wholesaleKrispy > 0
+            return true
+          })
+        : products.filter((p) => p.tags?.includes(activeTag))
 
   return (
-    <section id="menu" className="py-24 bg-surface-container-low border-b border-outline-variant/20 dark:bg-zinc-900/40">
+    <section
+      id="menu"
+      className="py-24 bg-surface-container-low border-b border-outline-variant/20 dark:bg-zinc-900/40"
+    >
       <div className="max-w-[1200px] mx-auto px-6">
-        
         {/* Section Title */}
         <motion.div
           initial={{ opacity: 0, y: 15 }}
@@ -150,19 +166,19 @@ export default function MenuCards({ products }: Props) {
 
         {/* Filter Chips */}
         {allTags.length > 1 && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             className="flex flex-wrap justify-center gap-3 mb-10"
           >
-            {allTags.map(tag => (
+            {allTags.map((tag) => (
               <button
                 key={tag}
                 onClick={() => setActiveTag(tag)}
                 className={`px-5 py-2 rounded-full text-sm font-medium transition-all active:scale-95 ${
-                  activeTag === tag 
-                    ? 'bg-amber-brand text-white shadow-sbx-card' 
+                  activeTag === tag
+                    ? 'bg-amber-brand text-white shadow-sbx-card'
                     : 'bg-surface-container hover:bg-surface-container-high text-on-surface-variant border border-outline-variant/30'
                 }`}
               >
@@ -181,7 +197,7 @@ export default function MenuCards({ products }: Props) {
           ) : (
             filteredProducts.map((product, i) => {
               const image = product.imageUrl || getFallbackImageUrl(product.flavorName)
-              const available = product.isAvailable && product.stock > 0;
+              const available = product.isAvailable && product.stock > 0
               return (
                 <motion.div
                   key={product.id}
@@ -196,10 +212,12 @@ export default function MenuCards({ products }: Props) {
 
                   {/* Card Content */}
                   <div className="p-6.5 flex flex-col items-center text-center flex-grow">
-                    <h3 className={`font-serif text-2xl font-bold text-primary dark:text-zinc-100 mb-1 w-full text-center ${!available ? 'text-zinc-500' : ''}`}>
+                    <h3
+                      className={`font-serif text-2xl font-bold text-primary dark:text-zinc-100 mb-1 w-full text-center ${!available ? 'text-zinc-500' : ''}`}
+                    >
                       {product.flavorName}
                     </h3>
-                    
+
                     {/* Stock Indicator */}
                     <div className="flex items-center justify-center gap-1.5 mb-2 mt-1 w-full">
                       {product.stock > 0 ? (
@@ -218,9 +236,12 @@ export default function MenuCards({ products }: Props) {
                         </>
                       )}
                     </div>
-                    
+
                     {/* Rating UI / Sales Magnet */}
-                    <Link href="/ulasan" className="flex items-center gap-1.5 mb-3 text-sm text-zinc-500 hover:text-[#D4802A] transition-colors cursor-pointer active:scale-95">
+                    <Link
+                      href="/ulasan"
+                      className="flex items-center gap-1.5 mb-3 text-sm text-zinc-500 hover:text-[#D4802A] transition-colors cursor-pointer active:scale-95"
+                    >
                       {product.rating ? (
                         <>
                           <span className="text-amber-400">⭐</span>
@@ -239,23 +260,30 @@ export default function MenuCards({ products }: Props) {
                     </Link>
 
                     <p className="text-on-surface-variant dark:text-zinc-400 text-sm leading-relaxed mb-6 flex-grow font-sans w-full text-center">
-                      {product.deskripsi_topping || (() => {
-                        const key = getFlavorDescriptionKey(product.flavorName);
-                        return key ? t(key) : t('menu_default_desc');
-                      })()}
+                      {product.deskripsi_topping ||
+                        (() => {
+                          const key = getFlavorDescriptionKey(product.flavorName)
+                          return key ? t(key) : t('menu_default_desc')
+                        })()}
                     </p>
-                    
+
                     {/* Action row */}
                     <div className="flex flex-col items-center gap-3 pt-6 pb-8 border-t border-outline-variant/20 dark:border-zinc-800 mt-auto w-full">
                       <div className="text-center">
                         <div className="text-[10px] text-zinc-400 uppercase tracking-wider font-semibold mb-0.5">
                           {isReseller ? 'Harga Grosir (Mulai)' : t('menu_price')}
                         </div>
-                        <div className={`font-sans text-lg font-bold text-primary dark:text-amber-400 ${!available ? 'text-zinc-500' : ''}`}>
+                        <div
+                          className={`font-sans text-lg font-bold text-primary dark:text-amber-400 ${!available ? 'text-zinc-500' : ''}`}
+                        >
                           {isReseller && product.wholesaleKembung > 0 ? (
                             <div className="flex flex-col items-center leading-tight">
-                              <span className="text-xs line-through text-zinc-400 font-normal">{formatPrice(product.priceKembung)}</span>
-                              <span className="text-[#D4802A]">{formatPrice(product.wholesaleKembung)}</span>
+                              <span className="text-xs line-through text-zinc-400 font-normal">
+                                {formatPrice(product.priceKembung)}
+                              </span>
+                              <span className="text-[#D4802A]">
+                                {formatPrice(product.wholesaleKembung)}
+                              </span>
                             </div>
                           ) : (
                             formatPrice(product.priceKembung)
@@ -266,9 +294,10 @@ export default function MenuCards({ products }: Props) {
                       <button
                         onClick={() => available && setSelectedProduct(product)}
                         disabled={!available}
-                        className={available 
-                          ? "bg-amber-brand hover:bg-amber-brand/90 text-white font-bold text-sm px-8 py-3 rounded-full shadow-sbx-card transition-all duration-200 focus:outline-none flex items-center justify-center gap-1.5 active:scale-95" 
-                          : "bg-zinc-300 text-zinc-500 cursor-not-allowed font-bold text-sm px-8 py-3 rounded-full flex items-center justify-center gap-1.5 opacity-70"
+                        className={
+                          available
+                            ? 'bg-amber-brand hover:bg-amber-brand/90 text-white font-bold text-sm px-8 py-3 rounded-full shadow-sbx-card transition-all duration-200 focus:outline-none flex items-center justify-center gap-1.5 active:scale-95'
+                            : 'bg-zinc-300 text-zinc-500 cursor-not-allowed font-bold text-sm px-8 py-3 rounded-full flex items-center justify-center gap-1.5 opacity-70'
                         }
                       >
                         <span>{available ? t('menu_btn_order') : 'Habis Terjual'}</span>
@@ -296,7 +325,6 @@ export default function MenuCards({ products }: Props) {
             🍌 Lihat Semua Menu &amp; Varian →
           </Link>
         </motion.div>
-
       </div>
 
       {/* Quick View Modal */}

@@ -1,15 +1,15 @@
 'use server'
 
-import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
-import { auth } from "@/src/auth";
+import { prisma } from '@/lib/prisma'
+import { auth } from '@/src/auth'
 
 export async function requireAdminActor() {
   const session = await auth()
   if (!session?.user?.id) {
     return null
   }
-  
+
   if (session.user.role !== 'ADMIN') {
     return null
   }
@@ -17,15 +17,17 @@ export async function requireAdminActor() {
   return { userId: session.user.id }
 }
 
-const createDealSchema = z.object({
-  companyName: z.string().min(2, 'Nama perusahaan terlalu pendek').max(100),
-  contactName: z.string().min(2, 'Nama kontak terlalu pendek').max(100),
-  phone: z.string().min(8, 'Nomor HP tidak valid').max(20),
-  email: z.string().email('Email tidak valid').optional().or(z.literal('')),
-  dealName: z.string().min(5, 'Nama deal terlalu pendek').max(150),
-  amount: z.coerce.number().nonnegative('Nominal tidak boleh negatif').optional().nullable(),
-  notes: z.string().max(1000).optional().nullable()
-}).strict()
+const createDealSchema = z
+  .object({
+    companyName: z.string().min(2, 'Nama perusahaan terlalu pendek').max(100),
+    contactName: z.string().min(2, 'Nama kontak terlalu pendek').max(100),
+    phone: z.string().min(8, 'Nomor HP tidak valid').max(20),
+    email: z.string().email('Email tidak valid').optional().or(z.literal('')),
+    dealName: z.string().min(5, 'Nama deal terlalu pendek').max(150),
+    amount: z.coerce.number().nonnegative('Nominal tidak boleh negatif').optional().nullable(),
+    notes: z.string().max(1000).optional().nullable()
+  })
+  .strict()
 
 export async function createB2BDeal(payload: unknown) {
   const admin = await requireAdminActor()
@@ -48,7 +50,7 @@ export async function createB2BDeal(payload: unknown) {
         dealName: parsed.data.dealName,
         amount: parsed.data.amount || null,
         notes: parsed.data.notes || null,
-        ownerId: admin.userId,
+        ownerId: admin.userId
       }
     })
     return { success: true as const, data: newDeal }
@@ -58,10 +60,12 @@ export async function createB2BDeal(payload: unknown) {
   }
 }
 
-const updateDealStatusSchema = z.object({
-  dealId: z.string().cuid(),
-  stage: z.enum(['PROSPECTING', 'NEGOTIATION', 'CLOSED_WON', 'CLOSED_LOST'])
-}).strict()
+const updateDealStatusSchema = z
+  .object({
+    dealId: z.string().cuid(),
+    stage: z.enum(['PROSPECTING', 'NEGOTIATION', 'CLOSED_WON', 'CLOSED_LOST'])
+  })
+  .strict()
 
 export async function updateB2BDealStatus(payload: unknown) {
   const admin = await requireAdminActor()

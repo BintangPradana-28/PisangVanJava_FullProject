@@ -1,15 +1,15 @@
 'use client'
+import { useRouter } from 'next/navigation'
+import { signIn } from 'next-auth/react'
 // app/(admin)/login/page.tsx
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import toast, { Toaster } from 'react-hot-toast'
-import { signIn } from 'next-auth/react'
 
 export default function AdminLoginPage() {
   const router = useRouter()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [loading,  setLoading]  = useState(false)
+  const [loading, setLoading] = useState(false)
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -25,7 +25,7 @@ export default function AdminLoginPage() {
       const res = await signIn('credentials', {
         redirect: false,
         username,
-        password,
+        password
       })
       toast.dismiss('login-toast')
 
@@ -47,13 +47,13 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-brown-700 via-brown-600 to-brown-800
-                    flex items-center justify-center p-4">
+    <div
+      className="min-h-screen bg-gradient-to-br from-brown-700 via-brown-600 to-brown-800
+                    flex items-center justify-center p-4"
+    >
       <Toaster position="top-center" />
 
-      <div
-        className="w-full max-w-sm bg-cream-100 rounded-3xl p-8 shadow-2xl text-center"
-      >
+      <div className="w-full max-w-sm bg-cream-100 rounded-3xl p-8 shadow-2xl text-center">
         {/* Logo */}
         <div className="w-20 h-20 bg-brown-700 rounded-full mx-auto flex items-center justify-center text-4xl mb-4 shadow-lg">
           🍌
@@ -62,7 +62,9 @@ export default function AdminLoginPage() {
         <p className="text-xs text-brown-400 mb-6">Panel Administrasi</p>
 
         <div className="h-px bg-cream-200 mb-6" />
-        <div className="text-xs font-bold text-brown-700 tracking-[0.2em] uppercase mb-6">LOGIN ADMIN</div>
+        <div className="text-xs font-bold text-brown-700 tracking-[0.2em] uppercase mb-6">
+          LOGIN ADMIN
+        </div>
 
         <form className="space-y-4 text-left">
           <div>
@@ -110,7 +112,6 @@ export default function AdminLoginPage() {
             {loading ? 'Memproses...' : 'LOGIN'}
           </button>
         </form>
-
       </div>
     </div>
   )

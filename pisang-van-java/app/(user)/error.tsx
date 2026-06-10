@@ -1,9 +1,9 @@
 'use client'
 
-import { useEffect } from 'react'
 import * as Sentry from '@sentry/nextjs'
+import { AlertTriangle, Home, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
-import { AlertTriangle, RefreshCw, Home } from 'lucide-react'
+import { useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 
 interface GlobalErrorProps {
@@ -16,8 +16,8 @@ export default function UserAreaError({ error, reset }: GlobalErrorProps) {
     Sentry.captureException(error, {
       tags: {
         boundary: 'user-area-global',
-        digest: error.digest ?? 'unknown',
-      },
+        digest: error.digest ?? 'unknown'
+      }
     })
   }, [error])
 
@@ -28,18 +28,13 @@ export default function UserAreaError({ error, reset }: GlobalErrorProps) {
           <AlertTriangle className="w-8 h-8 text-red-400" />
         </div>
 
-        <h1 className="text-xl font-semibold text-gray-900 mb-2">
-          Terjadi Kesalahan
-        </h1>
+        <h1 className="text-xl font-semibold text-gray-900 mb-2">Terjadi Kesalahan</h1>
         <p className="text-gray-500 text-sm mb-6">
-          Halaman ini mengalami gangguan. Tim kami sudah diberitahu dan sedang
-          memperbaikinya.
+          Halaman ini mengalami gangguan. Tim kami sudah diberitahu dan sedang memperbaikinya.
         </p>
 
         {error.digest && (
-          <p className="text-xs text-gray-400 font-mono mb-6">
-            Kode error: {error.digest}
-          </p>
+          <p className="text-xs text-gray-400 font-mono mb-6">Kode error: {error.digest}</p>
         )}
 
         <div className="flex flex-col gap-3">

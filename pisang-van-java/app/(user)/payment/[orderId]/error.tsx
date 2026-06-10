@@ -1,10 +1,10 @@
 'use client'
 
-import { useEffect } from 'react'
 import * as Sentry from '@sentry/nextjs'
+import { ClipboardList, CreditCard, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
-import { CreditCard, RefreshCw, ClipboardList } from 'lucide-react'
+import { useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 
 interface PaymentErrorProps {
@@ -28,12 +28,12 @@ export default function PaymentError({ error, reset }: PaymentErrorProps) {
     Sentry.captureException(error, {
       tags: {
         boundary: 'payment',
-        digest: error.digest ?? 'unknown',
+        digest: error.digest ?? 'unknown'
       },
       extra: {
         orderId: orderId ?? 'unknown',
-        hasDigest: !!error.digest,
-      },
+        hasDigest: !!error.digest
+      }
     })
   }, [error, orderId])
 
@@ -53,20 +53,18 @@ export default function PaymentError({ error, reset }: PaymentErrorProps) {
             ✅ Pesanan Anda sudah berhasil dibuat
           </p>
           <p className="text-green-700 text-xs mt-1">
-            Data pesanan aman tersimpan di sistem kami. Anda bisa melanjutkan
-            pembayaran dari halaman pesanan.
+            Data pesanan aman tersimpan di sistem kami. Anda bisa melanjutkan pembayaran dari
+            halaman pesanan.
           </p>
         </div>
 
         <p className="text-gray-500 text-sm mb-6">
-          Terjadi gangguan saat memuat gateway pembayaran. Silakan coba lagi atau
-          bayar melalui halaman pesanan Anda.
+          Terjadi gangguan saat memuat gateway pembayaran. Silakan coba lagi atau bayar melalui
+          halaman pesanan Anda.
         </p>
 
         {error.digest && (
-          <p className="text-xs text-gray-400 font-mono mb-6">
-            Kode error: {error.digest}
-          </p>
+          <p className="text-xs text-gray-400 font-mono mb-6">Kode error: {error.digest}</p>
         )}
 
         <div className="flex flex-col gap-3">
@@ -84,11 +82,7 @@ export default function PaymentError({ error, reset }: PaymentErrorProps) {
             className="w-full rounded-full py-3 font-medium flex items-center justify-center gap-2 border-gray-200 text-gray-700"
           >
             <Link
-              href={
-                orderId
-                  ? `/profile?tab=orders&highlight=${orderId}`
-                  : '/profile?tab=orders'
-              }
+              href={orderId ? `/profile?tab=orders&highlight=${orderId}` : '/profile?tab=orders'}
             >
               <ClipboardList className="w-4 h-4" />
               Lihat Status Pesanan

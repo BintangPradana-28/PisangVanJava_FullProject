@@ -1,12 +1,12 @@
-import { auth } from "@/src/auth"
-import { prisma } from "@/lib/prisma"
-import { redirect } from "next/navigation"
-import VoucherClient from "./VoucherClient"
+import { redirect } from 'next/navigation'
+import { prisma } from '@/lib/prisma'
+import { auth } from '@/src/auth'
+import VoucherClient from './VoucherClient'
 
 export default async function VoucherPage() {
   const session = await auth()
   if (!session?.user?.id) {
-    redirect("/auth/signin")
+    redirect('/auth/signin')
   }
 
   const user = await prisma.user.findUnique({
@@ -15,7 +15,7 @@ export default async function VoucherPage() {
   })
 
   if (!user) {
-    redirect("/auth/signin")
+    redirect('/auth/signin')
   }
 
   // Fetch active vouchers applicable to this user
@@ -23,10 +23,7 @@ export default async function VoucherPage() {
     where: {
       isActive: true,
       endDate: { gte: new Date() },
-      OR: [
-        { applicableTo: "ALL" },
-        { applicableTo: user.role }
-      ]
+      OR: [{ applicableTo: 'ALL' }, { applicableTo: user.role }]
     },
     orderBy: { endDate: 'asc' },
     select: {
@@ -36,11 +33,9 @@ export default async function VoucherPage() {
       discountValue: true,
       minPurchase: true,
       maxDiscount: true,
-      endDate: true,
+      endDate: true
     }
   })
 
-  return (
-    <VoucherClient koinPisang={user.koinPisang} vouchers={vouchers} />
-  )
+  return <VoucherClient koinPisang={user.koinPisang} vouchers={vouchers} />
 }

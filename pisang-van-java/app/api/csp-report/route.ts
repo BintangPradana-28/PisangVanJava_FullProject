@@ -5,7 +5,7 @@ export async function POST(req: Request) {
     const body = await req.json()
     Sentry.captureMessage('CSP Violation', {
       level: 'warning',
-      extra: body['csp-report'] ?? body,
+      extra: body['csp-report'] ?? body
     })
     return new Response(null, { status: 204 })
   } catch (error) {

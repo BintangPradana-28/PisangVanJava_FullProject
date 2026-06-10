@@ -1,87 +1,86 @@
-import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/src/auth";
-import { prisma } from "@/lib/prisma";
-export const dynamic = "force-dynamic";
-
+import { type NextRequest, NextResponse } from 'next/server'
+import { prisma } from '@/lib/prisma'
+import { auth } from '@/src/auth'
+export const dynamic = 'force-dynamic'
 
 export async function GET(req: NextRequest) {
   try {
-    const session = await auth();
+    const session = await auth()
     if (!session || !session.user || !session.user.email) {
-      return NextResponse.json({ success: false, data: [] });
+      return NextResponse.json({ success: false, data: [] })
     }
 
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
-      select: { id: true },
-    });
+      select: { id: true }
+    })
 
     if (!user) {
-      return NextResponse.json({ success: false, data: [] });
+      return NextResponse.json({ success: false, data: [] })
     }
 
     const favorites = await prisma.favorite.findMany({
       where: { userId: user.id },
-      select: { variantId: true },
-    });
+      select: { variantId: true }
+    })
 
-    const favoriteVariantIds = favorites.map((fav: any) => fav.variantId);
+    const favoriteVariantIds = favorites.map((fav: any) => fav.variantId)
 
-    return NextResponse.json({ success: true, data: favoriteVariantIds });
+    return NextResponse.json({ success: true, data: favoriteVariantIds })
   } catch (error) {
-    console.error("GET /api/favorites Error:", error);
-    return NextResponse.json({ success: false, error: "Internal Server Error" }, { status: 500 });
+    console.error('GET /api/favorites Error:', error)
+    return NextResponse.json({ success: false, error: 'Internal Server Error' }, { status: 500 })
   }
 }
 
 export async function POST(req: NextRequest) {
   try {
-    const session = await auth();
+    const session = await auth()
     if (!session || !session.user || !session.user.email) {
-      return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
     }
 
-    const body = await req.json();
-    const { variantId } = body;
+    const body = await req.json()
+    const { variantId } = body
 
     if (!variantId) {
-      return NextResponse.json({ success: false, error: "Variant ID required" }, { status: 400 });
+      return NextResponse.json({ success: false, error: 'Variant ID required' }, { status: 400 })
     }
 
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
-      select: { id: true },
-    });
+      select: { id: true }
+    })
 
     if (!user) {
-      return NextResponse.json({ success: false, error: "User not found" }, { status: 404 });
+      return NextResponse.json({ success: false, error: 'User not found' }, { status: 404 })
     }
 
     const existingFav = await prisma.favorite.findUnique({
       where: {
         userId_variantId: {
           userId: user.id,
-          variantId,
-        },
-      },
-    });
+          variantId
+        }
+      }
+    })
 
     if (existingFav) {
       await prisma.favorite.delete({
-        where: { id: existingFav.id },
-      });
-      return NextResponse.json({ success: true, action: "removed", variantId });
+        where: { id: existingFav.id }
+      })
+      return NextResponse.json({ success: true, action: 'removed', variantId })
     } else {
       await prisma.favorite.create({
         data: {
           userId: user.id,
-          variantId,
-        },
-      });
-      return NextResponse.json({ success: true, action: "added", variantId });
+          variantId
+        }
+      })
+      return NextResponse.json({ success: true, action: 'added', variantId })
     }
   } catch (error) {
-    console.error("POST /api/favorites Error:", error);
-    return NextResponse.json({ success: false, error: "Internal Server Error" }, { status: 500 });
+    console.error('POST /api/favorites Error:', error)
+    return NextResponse.json({ success: false, error: 'Internal Server Error' }, { status: 500 })
   }
 }

@@ -4,8 +4,8 @@
 // Upgraded: Debounced search + Sticky swipeable category tabs (mobile-first)
 // Uses URL search params as the single source of truth — no hydration mismatch.
 
-import { useState, useEffect, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { useEffect, useRef, useState } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 
 // ── Tipe Adonan (Base Type) — shown as primary sticky tabs ──────────────────
@@ -13,7 +13,7 @@ const BASE_TABS = [
   { key: 'all', label: '🍌 Semua', emoji: '' },
   { key: 'Kembung', label: '🥟 Kembung', emoji: '🥟' },
   { key: 'Lumpia', label: '🌯 Lumpia', emoji: '🌯' },
-  { key: 'Krispy', label: '🥨 Krispy', emoji: '🥨' },
+  { key: 'Krispy', label: '🥨 Krispy', emoji: '🥨' }
 ]
 
 // ── Kategori Rasa — shown as secondary swipeable chips ───────────────────────
@@ -26,7 +26,7 @@ const FLAVOR_CHIPS = [
   { key: 'Blueberry', label: '🫐 Blueberry' },
   { key: 'Milky', label: '🥛 Milky' },
   { key: 'Taro', label: '🟣 Taro' },
-  { key: 'Original', label: '✨ Original' },
+  { key: 'Original', label: '✨ Original' }
 ]
 
 interface SearchFilterBarProps {
@@ -65,8 +65,14 @@ export default function SearchFilterBar({ totalItems }: SearchFilterBarProps) {
     dragStart.current = { x: e.pageX - el.offsetLeft, scrollLeft: el.scrollLeft }
     el.style.cursor = 'grabbing'
   }
-  const onMouseLeave = () => { setIsDragging(false); if (chipRowRef.current) chipRowRef.current.style.cursor = 'grab' }
-  const onMouseUp = () => { setIsDragging(false); if (chipRowRef.current) chipRowRef.current.style.cursor = 'grab' }
+  const onMouseLeave = () => {
+    setIsDragging(false)
+    if (chipRowRef.current) chipRowRef.current.style.cursor = 'grab'
+  }
+  const onMouseUp = () => {
+    setIsDragging(false)
+    if (chipRowRef.current) chipRowRef.current.style.cursor = 'grab'
+  }
   const onMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!isDragging || !chipRowRef.current) return
     e.preventDefault()
@@ -78,7 +84,10 @@ export default function SearchFilterBar({ totalItems }: SearchFilterBarProps) {
   return (
     <div
       className="sticky top-16 z-30 shadow-sm"
-      style={{ background: 'var(--background-custom)', borderBottom: '1px solid var(--border-custom)' }}
+      style={{
+        background: 'var(--background-custom)',
+        borderBottom: '1px solid var(--border-custom)'
+      }}
     >
       {/* ── Row 1: Search + item count ──────────────────────────────────────── */}
       <div className="max-w-[1200px] mx-auto px-4 sm:px-6 pt-4 pb-3 flex items-center gap-3">
@@ -86,11 +95,17 @@ export default function SearchFilterBar({ totalItems }: SearchFilterBarProps) {
         <div className="relative flex-1 max-w-sm">
           <svg
             className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none"
-            fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
             style={{ color: 'var(--text-custom)', opacity: 0.5 }}
           >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
           </svg>
           <input
             type="text"
@@ -102,7 +117,7 @@ export default function SearchFilterBar({ totalItems }: SearchFilterBarProps) {
             style={{
               background: 'var(--surface-custom)',
               border: '1px solid var(--border-custom)',
-              color: 'var(--text-custom)',
+              color: 'var(--text-custom)'
             }}
           />
           {search && (
@@ -116,7 +131,10 @@ export default function SearchFilterBar({ totalItems }: SearchFilterBarProps) {
           )}
         </div>
 
-        <span className="text-xs shrink-0 font-medium tabular-nums" style={{ color: 'var(--text-custom)', opacity: 0.55 }}>
+        <span
+          className="text-xs shrink-0 font-medium tabular-nums"
+          style={{ color: 'var(--text-custom)', opacity: 0.55 }}
+        >
           {totalItems} {t('menu_count_suffix')}
         </span>
       </div>
@@ -133,8 +151,16 @@ export default function SearchFilterBar({ totalItems }: SearchFilterBarProps) {
               className="flex-shrink-0 text-xs font-bold px-4 py-2 rounded-full transition-all duration-200 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-amber-400"
               style={
                 active
-                  ? { background: '#D4802A', color: 'white', boxShadow: '0 4px 14px rgba(212,128,42,0.35)' }
-                  : { background: 'var(--surface-custom)', border: '1px solid var(--border-custom)', color: 'var(--text-custom)' }
+                  ? {
+                      background: '#D4802A',
+                      color: 'white',
+                      boxShadow: '0 4px 14px rgba(212,128,42,0.35)'
+                    }
+                  : {
+                      background: 'var(--surface-custom)',
+                      border: '1px solid var(--border-custom)',
+                      color: 'var(--text-custom)'
+                    }
               }
             >
               {tab.label}
@@ -165,8 +191,17 @@ export default function SearchFilterBar({ totalItems }: SearchFilterBarProps) {
               className="flex-shrink-0 text-[11px] font-semibold px-3.5 py-1.5 rounded-full transition-all duration-200 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
               style={
                 active
-                  ? { background: 'rgba(212,128,42,0.15)', border: '1.5px solid #D4802A', color: '#D4802A' }
-                  : { background: 'var(--surface-custom)', border: '1px solid var(--border-custom)', color: 'var(--text-custom)', opacity: 0.75 }
+                  ? {
+                      background: 'rgba(212,128,42,0.15)',
+                      border: '1.5px solid #D4802A',
+                      color: '#D4802A'
+                    }
+                  : {
+                      background: 'var(--surface-custom)',
+                      border: '1px solid var(--border-custom)',
+                      color: 'var(--text-custom)',
+                      opacity: 0.75
+                    }
               }
             >
               {chip.label}

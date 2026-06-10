@@ -10,18 +10,18 @@
 // Tanpa ini, hacker bisa guess signature karakter per karakter dengan
 // mengukur perbedaan response time (< 1ms per karakter yang benar).
 
-import { createHash, timingSafeEqual } from "crypto";
+import { createHash, timingSafeEqual } from 'crypto'
 
 // ─────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────
 
 interface VerifySignatureParams {
-  orderId: string;
-  statusCode: string;
-  grossAmount: string;
-  serverKey: string;
-  receivedSignature: string;
+  orderId: string
+  statusCode: string
+  grossAmount: string
+  serverKey: string
+  receivedSignature: string
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -36,38 +36,33 @@ interface VerifySignatureParams {
  * PENTING: Selalu return boolean — jangan throw exception dari sini.
  * Route handler yang menentukan HTTP response berdasarkan return value.
  */
-export function verifyMidtransSignature(
-  params: VerifySignatureParams
-): boolean {
-  const { orderId, statusCode, grossAmount, serverKey, receivedSignature } =
-    params;
+export function verifyMidtransSignature(params: VerifySignatureParams): boolean {
+  const { orderId, statusCode, grossAmount, serverKey, receivedSignature } = params
 
   // Guard: jika ada parameter kosong, tolak langsung
   if (!orderId || !statusCode || !grossAmount || !serverKey || !receivedSignature) {
-    return false;
+    return false
   }
 
   // SHA512 selalu menghasilkan 128 karakter hex
   // Jika panjang berbeda, pasti invalid — tolak sebelum komputasi
   if (receivedSignature.length !== 128) {
-    return false;
+    return false
   }
 
   // Hitung expected signature
-  const rawString = `${orderId}${statusCode}${grossAmount}${serverKey}`;
-  const expectedHash = createHash("sha512")
-    .update(rawString, "utf8")
-    .digest("hex");
+  const rawString = `${orderId}${statusCode}${grossAmount}${serverKey}`
+  const expectedHash = createHash('sha512').update(rawString, 'utf8').digest('hex')
 
   try {
     // timingSafeEqual membandingkan dua Buffer dalam waktu konstan
     // sehingga tidak ada informasi yang bocor melalui timing
     return timingSafeEqual(
-      Buffer.from(expectedHash, "utf8"),
-      Buffer.from(receivedSignature, "utf8")
-    );
+      Buffer.from(expectedHash, 'utf8'),
+      Buffer.from(receivedSignature, 'utf8')
+    )
   } catch {
     // Buffer.from() bisa throw jika input tidak valid encoding
-    return false;
+    return false
   }
 }

@@ -1,5 +1,5 @@
+import { auth } from '@/src/auth'
 import { prisma } from './prisma'
-import { auth } from "@/src/auth";
 
 export async function logAudit(
   action: string,

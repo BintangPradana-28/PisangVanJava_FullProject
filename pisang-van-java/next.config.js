@@ -1,4 +1,4 @@
-const { withSentryConfig } = require('@sentry/nextjs');
+const { withSentryConfig } = require('@sentry/nextjs')
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -6,11 +6,11 @@ const nextConfig = {
     remotePatterns: [
       { protocol: 'https', hostname: 'vamxyslzeimlsofhgmry.supabase.co' },
       { protocol: 'https', hostname: 'lh3.googleusercontent.com' } // Google OAuth avatars
-    ],
+    ]
   },
   serverExternalPackages: ['@prisma/client', '@node-rs/argon2'],
   experimental: {
-    optimizePackageImports: ['framer-motion', 'lucide-react', 'react-hot-toast'],
+    optimizePackageImports: ['framer-motion', 'lucide-react', 'react-hot-toast']
   },
 
   async headers() {
@@ -45,14 +45,11 @@ const nextConfig = {
           {
             key: 'Permissions-Policy',
             value: 'camera=(), microphone=(), geolocation=(), browsing-topics=()'
-          },
+          }
         ]
       }
     ]
   }
 }
 
-module.exports = nextConfig;
-
-
-
+module.exports = nextConfig

@@ -1,18 +1,14 @@
-import { Metadata } from 'next'
+import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
-import { auth } from "@/src/auth";
 import ProfileSidebar from '@/components/user/profile/ProfileSidebar'
+import { auth } from '@/src/auth'
 
 export const metadata: Metadata = {
   title: 'Dashboard Profil | Pisang Goreng Van Java',
-  description: 'Kelola data diri, riwayat pesanan, alamat, dan keamanan akun Anda.',
+  description: 'Kelola data diri, riwayat pesanan, alamat, dan keamanan akun Anda.'
 }
 
-export default async function ProfileLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default async function ProfileLayout({ children }: { children: React.ReactNode }) {
   const session = await auth()
 
   if (!session?.user) {
@@ -35,9 +31,7 @@ export default async function ProfileLayout({
         <ProfileSidebar />
 
         {/* Main Content Area */}
-        <div className="flex-1 w-full min-w-0">
-          {children}
-        </div>
+        <div className="flex-1 w-full min-w-0">{children}</div>
       </div>
     </div>
   )

@@ -1,100 +1,104 @@
-import type { NextAuthConfig, DefaultSession } from "next-auth";
-import GoogleProvider from "next-auth/providers/google";
-import * as jwt from "jose";
+import * as jwt from 'jose'
+import type { DefaultSession, NextAuthConfig } from 'next-auth'
+import GoogleProvider from 'next-auth/providers/google'
 
-declare module "next-auth" {
+declare module 'next-auth' {
   interface Session {
-    supabaseAccessToken?: string;
+    supabaseAccessToken?: string
     user: {
-      id: string;
-      role: string;
-      isBanned: boolean;
-      sessionId?: string;
-    } & DefaultSession["user"]
+      id: string
+      role: string
+      isBanned: boolean
+      sessionId?: string
+    } & DefaultSession['user']
   }
 }
 
 export const authConfig = {
   pages: {
-    signIn: "/member-login",
+    signIn: '/member-login'
   },
   session: {
-    strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 Days
+    strategy: 'jwt',
+    maxAge: 30 * 24 * 60 * 60 // 30 Days
   },
   callbacks: {
     async jwt({ token, user, trigger, session }) {
       if (user) {
-        token.id = user.id;
-        token.role = (user as any).role;
-        token.isBanned = (user as any).isBanned;
-        
+        token.id = user.id
+        token.role = (user as any).role
+        token.isBanned = (user as any).isBanned
+
         // Inject sessionId
-        const { nanoid } = await import("nanoid");
-        const sessionId = nanoid();
-        token.sessionId = sessionId;
+        const { nanoid } = await import('nanoid')
+        const sessionId = nanoid()
+        token.sessionId = sessionId
 
         // Register session to Redis
         try {
-          const { redis } = await import("@/lib/redis");
-          const sessionKey = `session:${user.id}:${sessionId}`;
-          const userAgent = "Unknown Device"; // Could fetch from headers if passed, but this is server-side
-          await redis.setex(sessionKey, 60 * 60 * 24 * 30, JSON.stringify({ createdAt: Date.now(), device: userAgent }));
+          const { redis } = await import('@/lib/redis')
+          const sessionKey = `session:${user.id}:${sessionId}`
+          const userAgent = 'Unknown Device' // Could fetch from headers if passed, but this is server-side
+          await redis.setex(
+            sessionKey,
+            60 * 60 * 24 * 30,
+            JSON.stringify({ createdAt: Date.now(), device: userAgent })
+          )
         } catch (e) {
-          console.error("Failed to register session in Redis", e);
+          console.error('Failed to register session in Redis', e)
         }
       }
-      
-      if (trigger === "update" && session) {
-        if (session.role) token.role = session.role;
-        if (session.name) token.name = session.name;
-        if (session.image) token.picture = session.image;
+
+      if (trigger === 'update' && session) {
+        if (session.role) token.role = session.role
+        if (session.name) token.name = session.name
+        if (session.image) token.picture = session.image
       }
-      return token;
+      return token
     },
     async session({ session, token }) {
       if (session.user) {
-        session.user.id = (token.id as string) || (token.sub as string);
-        session.user.role = (token.role as any) || "CUSTOMER";
-        session.user.isBanned = token.isBanned as boolean;
-        session.user.sessionId = token.sessionId as string;
-        
+        session.user.id = (token.id as string) || (token.sub as string)
+        session.user.role = (token.role as any) || 'CUSTOMER'
+        session.user.isBanned = token.isBanned as boolean
+        session.user.sessionId = token.sessionId as string
+
         // ─── SUPABASE JOSE JWT BRIDGE ──────────────────────────────────────
-        const signingSecret = process.env.SUPABASE_JWT_SECRET;
+        const signingSecret = process.env.SUPABASE_JWT_SECRET
         if (signingSecret) {
           const payload = {
-            aud: "authenticated",
+            aud: 'authenticated',
             exp: Math.floor(new Date(session.expires).getTime() / 1000),
             sub: session.user.id,
             email: session.user.email,
-            role: "authenticated",
-          };
+            role: 'authenticated'
+          }
           session.supabaseAccessToken = await new jwt.SignJWT(payload)
-            .setProtectedHeader({ alg: "HS256" })
-            .sign(new TextEncoder().encode(signingSecret));
+            .setProtectedHeader({ alg: 'HS256' })
+            .sign(new TextEncoder().encode(signingSecret))
         } else {
-          console.warn("[SECURITY] SUPABASE_JWT_SECRET is missing. Storage RLS will fail.");
+          console.warn('[SECURITY] SUPABASE_JWT_SECRET is missing. Storage RLS will fail.')
         }
       }
-      return session;
-    },
+      return session
+    }
   },
-  secret: process.env.NEXTAUTH_SECRET || "default_secret_key_change_me_in_production",
-  debug: false, 
+  secret: process.env.NEXTAUTH_SECRET || 'default_secret_key_change_me_in_production',
+  debug: false,
   logger: {
     error(error) {
-      console.error("[NEXTAUTH SECURITY ERROR]:", error);
+      console.error('[NEXTAUTH SECURITY ERROR]:', error)
     },
     warn(code) {
-      console.warn("[NEXTAUTH WARN]:", code);
+      console.warn('[NEXTAUTH WARN]:', code)
     },
     debug(code) {}
   },
   providers: [
     GoogleProvider({
-      clientId: process.env.AUTH_GOOGLE_ID || "MOCK_CLIENT_ID",
-      clientSecret: process.env.AUTH_GOOGLE_SECRET || "MOCK_CLIENT_SECRET",
-      allowDangerousEmailAccountLinking: true,
-    }),
-  ],
-} satisfies NextAuthConfig;
+      clientId: process.env.AUTH_GOOGLE_ID || 'MOCK_CLIENT_ID',
+      clientSecret: process.env.AUTH_GOOGLE_SECRET || 'MOCK_CLIENT_SECRET',
+      allowDangerousEmailAccountLinking: true
+    })
+  ]
+} satisfies NextAuthConfig

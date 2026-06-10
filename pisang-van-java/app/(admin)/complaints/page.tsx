@@ -1,9 +1,9 @@
-import { prisma } from '@/lib/prisma'
 import { redirect } from 'next/navigation'
-import { auth } from "@/src/auth";
-import AdminSidebar from '@/components/admin/AdminSidebar'
-import ManageComplaintsClient from './ManageComplaintsClient'
 import { Toaster } from 'react-hot-toast'
+import AdminSidebar from '@/components/admin/AdminSidebar'
+import { prisma } from '@/lib/prisma'
+import { auth } from '@/src/auth'
+import ManageComplaintsClient from './ManageComplaintsClient'
 
 export default async function ComplaintsPage() {
   const session = await auth()

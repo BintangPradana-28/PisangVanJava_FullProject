@@ -1,10 +1,25 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { MapPin, Plus, Edit2, Trash2, CheckCircle2, Loader2, Navigation, AlertCircle } from 'lucide-react'
+import {
+  AlertCircle,
+  CheckCircle2,
+  Edit2,
+  Loader2,
+  MapPin,
+  Navigation,
+  Plus,
+  Trash2
+} from 'lucide-react'
 import dynamic from 'next/dynamic'
-import { getUserAddresses, createAddress, updateAddress, deleteAddress, setDefaultAddress } from '@/app/actions/address'
+import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
+import {
+  createAddress,
+  deleteAddress,
+  getUserAddresses,
+  setDefaultAddress,
+  updateAddress
+} from '@/app/actions/address'
 
 // Dynamic import Leaflet map (disable SSR to prevent window is not defined error)
 const MapPicker = dynamic(() => import('@/src/components/MapPicker'), {
@@ -140,7 +155,9 @@ export default function AlamatPage() {
             <MapPin className="w-7 h-7 text-[#D4802A]" />
             Daftar Alamat Pengiriman
           </h1>
-          <p className="text-zinc-500 dark:text-zinc-400 mt-1">Kelola alamat rumah, kantor, atau tujuan pengiriman lainnya.</p>
+          <p className="text-zinc-500 dark:text-zinc-400 mt-1">
+            Kelola alamat rumah, kantor, atau tujuan pengiriman lainnya.
+          </p>
         </div>
         <button
           onClick={() => handleOpenModal()}
@@ -154,7 +171,10 @@ export default function AlamatPage() {
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {[1, 2].map((i) => (
-            <div key={i} className="h-48 bg-zinc-100 dark:bg-zinc-800/50 rounded-3xl animate-pulse"></div>
+            <div
+              key={i}
+              className="h-48 bg-zinc-100 dark:bg-zinc-800/50 rounded-3xl animate-pulse"
+            ></div>
           ))}
         </div>
       ) : addresses.length === 0 ? (
@@ -162,9 +182,12 @@ export default function AlamatPage() {
           <div className="w-20 h-20 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center mb-4">
             <Navigation className="w-10 h-10 text-zinc-400" />
           </div>
-          <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-2">Belum Ada Alamat</h3>
+          <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-2">
+            Belum Ada Alamat
+          </h3>
           <p className="text-zinc-500 dark:text-zinc-400 max-w-md mx-auto mb-6">
-            Anda belum menambahkan alamat pengiriman. Tambahkan alamat sekarang untuk mempercepat proses checkout.
+            Anda belum menambahkan alamat pengiriman. Tambahkan alamat sekarang untuk mempercepat
+            proses checkout.
           </p>
           <button
             onClick={() => handleOpenModal()}
@@ -176,11 +199,11 @@ export default function AlamatPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {addresses.map((addr) => (
-            <div 
-              key={addr.id} 
+            <div
+              key={addr.id}
               className={`relative bg-white dark:bg-zinc-900 rounded-3xl p-6 shadow-sm border transition-all duration-300 ${
-                addr.isDefault 
-                  ? 'border-[#D4802A] ring-1 ring-[#D4802A]/20' 
+                addr.isDefault
+                  ? 'border-[#D4802A] ring-1 ring-[#D4802A]/20'
                   : 'border-zinc-200/50 dark:border-zinc-800/80 hover:border-zinc-300 dark:hover:border-zinc-700'
               }`}
             >
@@ -190,14 +213,16 @@ export default function AlamatPage() {
                   Alamat Utama
                 </div>
               )}
-              
+
               <div className="flex justify-between items-start mb-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-orange-50 text-[#D4802A] dark:bg-orange-900/20 flex items-center justify-center shrink-0">
                     <MapPin className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-zinc-900 dark:text-zinc-100 text-lg">{addr.label}</h3>
+                    <h3 className="font-bold text-zinc-900 dark:text-zinc-100 text-lg">
+                      {addr.label}
+                    </h3>
                     {addr.latitude && addr.longitude && (
                       <span className="text-xs text-green-600 dark:text-green-400 font-medium flex items-center gap-1 mt-0.5">
                         <Navigation className="w-3 h-3" /> Pin Peta Tersimpan
@@ -214,29 +239,34 @@ export default function AlamatPage() {
                 {addr.notes && (
                   <div className="bg-zinc-50 dark:bg-zinc-800/50 p-3 rounded-xl text-xs text-zinc-500 dark:text-zinc-400 flex items-start gap-2">
                     <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-zinc-400" />
-                    <span><strong className="text-zinc-700 dark:text-zinc-300">Catatan:</strong> {addr.notes}</span>
+                    <span>
+                      <strong className="text-zinc-700 dark:text-zinc-300">Catatan:</strong>{' '}
+                      {addr.notes}
+                    </span>
                   </div>
                 )}
               </div>
 
               <div className="flex items-center gap-3 pt-4 border-t border-zinc-100 dark:border-zinc-800">
                 {!addr.isDefault && (
-                  <button 
+                  <button
                     onClick={() => handleSetDefault(addr.id)}
                     className="text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-[#D4802A] transition-colors flex-1 text-left"
                   >
                     Jadikan Utama
                   </button>
                 )}
-                <div className={`flex items-center gap-2 ${addr.isDefault ? 'w-full justify-end' : ''}`}>
-                  <button 
+                <div
+                  className={`flex items-center gap-2 ${addr.isDefault ? 'w-full justify-end' : ''}`}
+                >
+                  <button
                     onClick={() => handleOpenModal(addr)}
                     className="p-2 text-zinc-400 hover:text-blue-500 bg-zinc-50 hover:bg-blue-50 dark:bg-zinc-800/50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
                     title="Edit Alamat"
                   >
                     <Edit2 className="w-4 h-4" />
                   </button>
-                  <button 
+                  <button
                     onClick={() => handleDelete(addr.id)}
                     className="p-2 text-zinc-400 hover:text-red-500 bg-zinc-50 hover:bg-red-50 dark:bg-zinc-800/50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
                     title="Hapus Alamat"
@@ -254,13 +284,16 @@ export default function AlamatPage() {
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-white dark:bg-zinc-900 w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col animate-in zoom-in-95 duration-300">
-            
             <div className="p-6 border-b border-zinc-100 dark:border-zinc-800 flex justify-between items-center bg-zinc-50 dark:bg-zinc-900/80 sticky top-0 z-10">
               <h2 className="text-xl font-bold font-serif text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
-                {editingId ? <Edit2 className="w-5 h-5 text-[#D4802A]" /> : <Plus className="w-5 h-5 text-[#D4802A]" />}
+                {editingId ? (
+                  <Edit2 className="w-5 h-5 text-[#D4802A]" />
+                ) : (
+                  <Plus className="w-5 h-5 text-[#D4802A]" />
+                )}
                 {editingId ? 'Edit Alamat' : 'Tambah Alamat Baru'}
               </h2>
-              <button 
+              <button
                 onClick={() => setIsModalOpen(false)}
                 className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors p-2"
               >
@@ -272,29 +305,36 @@ export default function AlamatPage() {
               <form id="addressForm" onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2 md:col-span-2">
-                    <label className="text-sm font-bold text-zinc-700 dark:text-zinc-300">Label Alamat <span className="text-red-500">*</span></label>
-                    <input 
-                      type="text" 
+                    <label className="text-sm font-bold text-zinc-700 dark:text-zinc-300">
+                      Label Alamat <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
                       required
                       placeholder="Contoh: Rumah, Kantor, Kosan"
                       value={formData.label}
-                      onChange={(e) => setFormData({...formData, label: e.target.value})}
+                      onChange={(e) => setFormData({ ...formData, label: e.target.value })}
                       className="w-full p-3.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-transparent focus:ring-2 focus:ring-[#D4802A]/50 outline-none transition-all"
                     />
                   </div>
 
                   <div className="space-y-2 md:col-span-2">
                     <label className="text-sm font-bold text-zinc-700 dark:text-zinc-300 flex items-center justify-between">
-                      <span>Pin Lokasi Peta <span className="text-zinc-400 font-normal text-xs">(Opsional untuk akurasi kurir)</span></span>
+                      <span>
+                        Pin Lokasi Peta{' '}
+                        <span className="text-zinc-400 font-normal text-xs">
+                          (Opsional untuk akurasi kurir)
+                        </span>
+                      </span>
                       {mapPosition && (
                         <span className="text-xs text-green-600 dark:text-green-400 font-medium bg-green-50 dark:bg-green-900/20 px-2 py-1 rounded-md flex items-center gap-1">
                           <CheckCircle2 className="w-3 h-3" /> Pin Tersimpan
                         </span>
                       )}
                     </label>
-                    <MapPicker 
-                      initialPosition={mapPosition} 
-                      onPositionChange={(pos) => setMapPosition(pos)} 
+                    <MapPicker
+                      initialPosition={mapPosition}
+                      onPositionChange={(pos) => setMapPosition(pos)}
                     />
                     <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-2">
                       * Geser peta atau marker untuk menetapkan titik kordinat yang akurat.
@@ -302,24 +342,29 @@ export default function AlamatPage() {
                   </div>
 
                   <div className="space-y-2 md:col-span-2">
-                    <label className="text-sm font-bold text-zinc-700 dark:text-zinc-300">Alamat Lengkap <span className="text-red-500">*</span></label>
-                    <textarea 
+                    <label className="text-sm font-bold text-zinc-700 dark:text-zinc-300">
+                      Alamat Lengkap <span className="text-red-500">*</span>
+                    </label>
+                    <textarea
                       required
                       rows={3}
                       placeholder="Nama Jalan, RT/RW, Kelurahan, Kecamatan, Kota/Kabupaten, Provinsi, Kode Pos"
                       value={formData.fullAddress}
-                      onChange={(e) => setFormData({...formData, fullAddress: e.target.value})}
+                      onChange={(e) => setFormData({ ...formData, fullAddress: e.target.value })}
                       className="w-full p-3.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-transparent focus:ring-2 focus:ring-[#D4802A]/50 outline-none transition-all resize-none"
                     ></textarea>
                   </div>
 
                   <div className="space-y-2 md:col-span-2">
-                    <label className="text-sm font-bold text-zinc-700 dark:text-zinc-300">Catatan untuk Kurir <span className="text-zinc-400 font-normal text-xs">(Opsional)</span></label>
-                    <input 
-                      type="text" 
+                    <label className="text-sm font-bold text-zinc-700 dark:text-zinc-300">
+                      Catatan untuk Kurir{' '}
+                      <span className="text-zinc-400 font-normal text-xs">(Opsional)</span>
+                    </label>
+                    <input
+                      type="text"
                       placeholder="Contoh: Rumah cat hijau dekat pertigaan, titip di satpam"
                       value={formData.notes}
-                      onChange={(e) => setFormData({...formData, notes: e.target.value})}
+                      onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                       className="w-full p-3.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-transparent focus:ring-2 focus:ring-[#D4802A]/50 outline-none transition-all"
                     />
                   </div>
@@ -328,14 +373,20 @@ export default function AlamatPage() {
                     <div className="md:col-span-2 pt-2">
                       <label className="flex items-center gap-3 cursor-pointer group">
                         <div className="relative flex items-center">
-                          <input 
-                            type="checkbox" 
+                          <input
+                            type="checkbox"
                             checked={formData.isDefault}
-                            onChange={(e) => setFormData({...formData, isDefault: e.target.checked})}
+                            onChange={(e) =>
+                              setFormData({ ...formData, isDefault: e.target.checked })
+                            }
                             className="sr-only"
                           />
-                          <div className={`w-11 h-6 bg-zinc-200 dark:bg-zinc-700 rounded-full transition-colors ${formData.isDefault ? 'bg-[#D4802A] dark:bg-[#D4802A]' : ''}`}></div>
-                          <div className={`absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform ${formData.isDefault ? 'translate-x-5' : ''}`}></div>
+                          <div
+                            className={`w-11 h-6 bg-zinc-200 dark:bg-zinc-700 rounded-full transition-colors ${formData.isDefault ? 'bg-[#D4802A] dark:bg-[#D4802A]' : ''}`}
+                          ></div>
+                          <div
+                            className={`absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform ${formData.isDefault ? 'translate-x-5' : ''}`}
+                          ></div>
                         </div>
                         <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300 group-hover:text-[#D4802A] transition-colors">
                           Jadikan sebagai Alamat Utama
@@ -348,7 +399,7 @@ export default function AlamatPage() {
             </div>
 
             <div className="p-6 border-t border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/80 flex justify-end gap-3 sticky bottom-0 z-10">
-              <button 
+              <button
                 type="button"
                 onClick={() => setIsModalOpen(false)}
                 className="px-6 py-2.5 rounded-full font-bold text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors"
@@ -356,7 +407,7 @@ export default function AlamatPage() {
               >
                 Batal
               </button>
-              <button 
+              <button
                 type="submit"
                 form="addressForm"
                 disabled={isSubmitting}
@@ -365,7 +416,6 @@ export default function AlamatPage() {
                 {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Simpan'}
               </button>
             </div>
-
           </div>
         </div>
       )}

@@ -1,12 +1,11 @@
-import { prisma } from '@/lib/prisma'
-import Footer from '@/components/user/Footer'
-import SearchFilterBar from '@/components/user/SearchFilterBar'
-import MenuGrid from '@/components/user/MenuGrid'
-import HeroBanner from './HeroBanner' // We'll extract the hero part to a small component or just inline it
-import Link from 'next/link'
-import { cookies } from 'next/headers'
-
 import { unstable_cache } from 'next/cache'
+import { cookies } from 'next/headers'
+import Link from 'next/link'
+import Footer from '@/components/user/Footer'
+import MenuGrid from '@/components/user/MenuGrid'
+import SearchFilterBar from '@/components/user/SearchFilterBar'
+import { prisma } from '@/lib/prisma'
+import HeroBanner from './HeroBanner' // We'll extract the hero part to a small component or just inline it
 
 // Removing force-dynamic to allow Next.js optimizations
 export const dynamic = 'force-dynamic'
@@ -19,30 +18,39 @@ const getCachedProducts = async () => {
       include: {
         reviews: { select: { rating: true } }
       }
-    });
+    })
   } catch (e) {
-    console.warn("[Safe Log] DB fetch failed for menu-spesial", e instanceof Error ? e.message : String(e));
-    return [];
+    console.warn(
+      '[Safe Log] DB fetch failed for menu-spesial',
+      e instanceof Error ? e.message : String(e)
+    )
+    return []
   }
-};
+}
 
 export default async function MenuSpesialPage(props: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
-  const searchParams = await props.searchParams;
-  const q      = typeof searchParams.q      === 'string' ? searchParams.q      : ''
+  const searchParams = await props.searchParams
+  const q = typeof searchParams.q === 'string' ? searchParams.q : ''
   const filter = typeof searchParams.filter === 'string' ? searchParams.filter : 'all'
   const flavor = typeof searchParams.flavor === 'string' ? searchParams.flavor : 'all'
 
   // Module 4: Edge Middleware Personalization Context
   const cookieStore = await cookies()
   const menuContextCookie = cookieStore.get('x-menu-context')?.value
-  let promoContext = { earlyMorning: false, lunch: false, lateAfternoon: false, evening: false, isLateNight: false }
-  
+  let promoContext = {
+    earlyMorning: false,
+    lunch: false,
+    lateAfternoon: false,
+    evening: false,
+    isLateNight: false
+  }
+
   if (menuContextCookie) {
     try {
       promoContext = JSON.parse(menuContextCookie)
-    } catch(e) {}
+    } catch (e) {}
   }
 
   // Fetch all active products with review aggregates (Cached)
@@ -62,27 +70,31 @@ export default async function MenuSpesialPage(props: {
     isAvailable: p.isAvailable,
     stock: p.stock,
     tags: p.tags || [],
-    rating: p.reviews.length > 0
-      ? Math.round((p.reviews.reduce((s: any, r: any) => s + r.rating, 0) / p.reviews.length) * 10) / 10
-      : undefined,
+    rating:
+      p.reviews.length > 0
+        ? Math.round(
+            (p.reviews.reduce((s: any, r: any) => s + r.rating, 0) / p.reviews.length) * 10
+          ) / 10
+        : undefined,
     reviewCount: p.reviews.length > 0 ? p.reviews.length : undefined,
-    isActive: p.isActive,
+    isActive: p.isActive
   }))
 
   // Two-pass filter: base-type tab → flavor-family chip → search query
   const filtered = products.filter((p: any) => {
-    const name        = p.flavorName.toLowerCase()
-    const matchSearch = q      === ''    || name.includes(q.toLowerCase())
-    
+    const name = p.flavorName.toLowerCase()
+    const matchSearch = q === '' || name.includes(q.toLowerCase())
+
     // Check if the base type has a price > 0
     const fLower = filter.toLowerCase()
-    const matchBase   = filter === 'all' 
-                     || (fLower === 'kembung' && p.priceKembung > 0)
-                     || (fLower === 'lumpia' && p.priceLumpia > 0)
-                     || (fLower === 'krispy' && p.priceKrispy > 0)
+    const matchBase =
+      filter === 'all' ||
+      (fLower === 'kembung' && p.priceKembung > 0) ||
+      (fLower === 'lumpia' && p.priceLumpia > 0) ||
+      (fLower === 'krispy' && p.priceKrispy > 0)
 
     const matchFlavor = flavor === 'all' || name.includes(flavor.toLowerCase())
-    
+
     return matchSearch && matchBase && matchFlavor
   })
 
@@ -101,7 +113,12 @@ export default async function MenuSpesialPage(props: {
     })
   } else if (promoContext.isLateNight) {
     filtered.sort((a: any, b: any) => {
-      const isMilky = (name: string) => name.toLowerCase().includes('susu') || name.toLowerCase().includes('milky') || name.toLowerCase().includes('coklat') ? 1 : 0
+      const isMilky = (name: string) =>
+        name.toLowerCase().includes('susu') ||
+        name.toLowerCase().includes('milky') ||
+        name.toLowerCase().includes('coklat')
+          ? 1
+          : 0
       return isMilky(b.flavorName) - isMilky(a.flavorName)
     })
   } else if (promoContext.lunch) {
@@ -113,7 +130,10 @@ export default async function MenuSpesialPage(props: {
   }
 
   return (
-    <div className="min-h-screen" style={{ background: 'var(--background-custom)', color: 'var(--text-custom)' }}>
+    <div
+      className="min-h-screen"
+      style={{ background: 'var(--background-custom)', color: 'var(--text-custom)' }}
+    >
       {/* ── Hero ── */}
       <HeroBanner />
 
@@ -124,14 +144,24 @@ export default async function MenuSpesialPage(props: {
       <MenuGrid products={filtered} />
 
       {/* ── Info Banner ── */}
-      <section className="py-16 text-white" style={{ background: 'linear-gradient(135deg, #3D1C02 0%, #5a2e0a 100%)' }}>
+      <section
+        className="py-16 text-white"
+        style={{ background: 'linear-gradient(135deg, #3D1C02 0%, #5a2e0a 100%)' }}
+      >
         <div className="max-w-[1200px] mx-auto px-6 text-center">
           <div className="text-4xl mb-4">📍</div>
-          <h2 className="font-serif text-2xl sm:text-3xl font-bold mb-3">Tersedia Juga di Outlet Kami</h2>
-          <p className="text-white/70 mb-6">Kunjungi gerai Pisang Goreng Van Java terdekat untuk mencicipi langsung saat masih panas.</p>
-          <Link href="/lokasi-kontak"
+          <h2 className="font-serif text-2xl sm:text-3xl font-bold mb-3">
+            Tersedia Juga di Outlet Kami
+          </h2>
+          <p className="text-white/70 mb-6">
+            Kunjungi gerai Pisang Goreng Van Java terdekat untuk mencicipi langsung saat masih
+            panas.
+          </p>
+          <Link
+            href="/lokasi-kontak"
             className="inline-block px-8 py-3.5 rounded-full font-bold text-sm transition-all active:scale-95"
-            style={{ background: '#D4802A', color: 'white' }}>
+            style={{ background: '#D4802A', color: 'white' }}
+          >
             Lihat Lokasi Outlet
           </Link>
         </div>

@@ -1,11 +1,12 @@
-import ReviewSystem from '@/src/features/reviews/components/ReviewSystem'
-import { Metadata } from 'next'
+import type { Prisma } from '@prisma/client'
+import type { Metadata } from 'next'
 import { prisma } from '@/lib/prisma'
-import { Prisma } from '@prisma/client'
+import ReviewSystem from '@/src/features/reviews/components/ReviewSystem'
 
 export const metadata: Metadata = {
   title: 'Ulasan Pelanggan | Pisang Van Java',
-  description: 'Apa kata mereka tentang kerenyahan Pisang Van Java? Baca ulasan jujur dari pelanggan kami.',
+  description:
+    'Apa kata mereka tentang kerenyahan Pisang Van Java? Baca ulasan jujur dari pelanggan kami.'
 }
 
 export const dynamic = 'force-dynamic'
@@ -27,10 +28,10 @@ export default async function UlasanPage(props: {
   const reviews = await prisma.review.findMany({
     where,
     orderBy: { createdAt: 'desc' },
-    include: { 
+    include: {
       user: { select: { name: true } },
       variant: { select: { flavorName: true } }
-    },
+    }
   })
 
   const maskName = (name: string | null) => {
@@ -40,15 +41,15 @@ export default async function UlasanPage(props: {
   }
 
   const data = reviews.map((r: any) => ({
-    id:        r.id,
-    userId:    r.userId,
-    userName:  maskName(r.user?.name),
+    id: r.id,
+    userId: r.userId,
+    userName: maskName(r.user?.name),
     variantName: r.variant?.flavorName || 'Pesanan Umum',
-    rating:    r.rating,
-    comment:   r.comment,
-    imageUrl:  r.imageUrl,
+    rating: r.rating,
+    comment: r.comment,
+    imageUrl: r.imageUrl,
     isVerifiedBuyer: r.isVerifiedBuyer,
-    createdAt: r.createdAt.toISOString(),
+    createdAt: r.createdAt.toISOString()
   }))
 
   const allReviews = await prisma.review.findMany({
@@ -57,7 +58,7 @@ export default async function UlasanPage(props: {
 
   let average = 0
   const starCounts = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
-  
+
   if (allReviews.length > 0) {
     let sum = 0
     allReviews.forEach((r: any) => {

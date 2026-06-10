@@ -1,10 +1,11 @@
 // app/(admin)/toppings/page.tsx
-import { prisma } from '@/lib/prisma'
+
 import { redirect } from 'next/navigation'
-import { auth } from "@/src/auth";
+import { Toaster } from 'react-hot-toast'
 import AdminSidebar from '@/components/admin/AdminSidebar'
 import ToppingsClient from '@/components/admin/ToppingsClient'
-import { Toaster } from 'react-hot-toast'
+import { prisma } from '@/lib/prisma'
+import { auth } from '@/src/auth'
 
 export default async function ToppingsPage() {
   const session = await auth()

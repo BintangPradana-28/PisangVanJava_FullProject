@@ -5,7 +5,7 @@ module.exports = {
     './pages/**/*.{js,ts,jsx,tsx,mdx}',
     './components/**/*.{js,ts,jsx,tsx,mdx}',
     './app/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/**/*.{js,ts,jsx,tsx,mdx}'
   ],
   theme: {
     extend: {
@@ -51,13 +51,13 @@ module.exports = {
 
         // Legacy colors to prevent dashboard compilation issues
         cream: {
-          50:  '#FDFAF2',
+          50: '#FDFAF2',
           100: '#FDF6E3',
           200: '#F5E6C8',
-          300: '#EDD4A0',
+          300: '#EDD4A0'
         },
         brown: {
-          50:  '#F5EDE5',
+          50: '#F5EDE5',
           100: '#E6CBB3',
           200: '#C4956A',
           300: '#A0522D',
@@ -66,19 +66,19 @@ module.exports = {
           600: '#5C2A0A',
           700: '#3D1C02',
           800: '#2A1201',
-          900: '#1A0A00',
+          900: '#1A0A00'
         },
         amber: {
-          brand: '#D4802A',
+          brand: '#D4802A'
         },
         green: {
           wa: '#2E7D32',
-          'wa-light': '#4CAF50',
-        },
+          'wa-light': '#4CAF50'
+        }
       },
       fontFamily: {
-        serif:  ['var(--font-serif)', 'Playfair Display', 'Georgia', 'serif'],
-        sans:   ['var(--font-sans)', 'DM Sans', 'system-ui', 'sans-serif'],
+        serif: ['var(--font-serif)', 'Playfair Display', 'Georgia', 'serif'],
+        sans: ['var(--font-sans)', 'DM Sans', 'system-ui', 'sans-serif']
       },
       spacing: {
         'unit-xs': '4px',
@@ -86,32 +86,43 @@ module.exports = {
         'unit-md': '16px',
         'unit-lg': '24px',
         'margin-page': '2rem',
-        'gutter': '1.5rem',
+        gutter: '1.5rem',
         'sidebar-width': '280px',
-        'container-max': '1200px',
+        'container-max': '1200px'
       },
       animation: {
-        'fade-in':      'fadeIn 0.6s ease-out forwards',
-        'slide-up':     'slideUp 0.6s ease-out forwards',
-        'slide-in-left':'slideInLeft 0.5s ease-out forwards',
-        'float':        'float 3s ease-in-out infinite',
-        'pulse-slow':   'pulse 3s ease-in-out infinite',
+        'fade-in': 'fadeIn 0.6s ease-out forwards',
+        'slide-up': 'slideUp 0.6s ease-out forwards',
+        'slide-in-left': 'slideInLeft 0.5s ease-out forwards',
+        float: 'float 3s ease-in-out infinite',
+        'pulse-slow': 'pulse 3s ease-in-out infinite'
       },
       keyframes: {
-        fadeIn:      { from: { opacity: '0' },                    to: { opacity: '1' } },
-        slideUp:     { from: { opacity: '0', transform: 'translateY(30px)' }, to: { opacity: '1', transform: 'translateY(0)' } },
-        slideInLeft: { from: { opacity: '0', transform: 'translateX(-30px)' }, to: { opacity: '1', transform: 'translateX(0)' } },
-        float:       { '0%,100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-12px)' } },
+        fadeIn: { from: { opacity: '0' }, to: { opacity: '1' } },
+        slideUp: {
+          from: { opacity: '0', transform: 'translateY(30px)' },
+          to: { opacity: '1', transform: 'translateY(0)' }
+        },
+        slideInLeft: {
+          from: { opacity: '0', transform: 'translateX(-30px)' },
+          to: { opacity: '1', transform: 'translateX(0)' }
+        },
+        float: {
+          '0%,100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-12px)' }
+        }
       },
       backgroundImage: {
-        'hero-pattern': "url(\"data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='30' cy='30' r='1.5' fill='rgba(212,128,42,0.15)'/%3E%3C/svg%3E\")",
+        'hero-pattern':
+          "url(\"data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='30' cy='30' r='1.5' fill='rgba(212,128,42,0.15)'/%3E%3C/svg%3E\")"
       },
       boxShadow: {
         'sbx-card': '0 0 0.5px rgba(0,0,0,0.14), 0 1px 1px rgba(0,0,0,0.24)',
-        'sbx-nav': '0 1px 3px rgba(0,0,0,0.1), 0 2px 2px rgba(0,0,0,0.06), 0 0 2px rgba(0,0,0,0.07)',
-        'sbx-frap': '0 0 6px rgba(0,0,0,0.24), 0 8px 12px rgba(0,0,0,0.14)',
-      },
-    },
+        'sbx-nav':
+          '0 1px 3px rgba(0,0,0,0.1), 0 2px 2px rgba(0,0,0,0.06), 0 0 2px rgba(0,0,0,0.07)',
+        'sbx-frap': '0 0 6px rgba(0,0,0,0.24), 0 8px 12px rgba(0,0,0,0.14)'
+      }
+    }
   },
-  plugins: [],
+  plugins: []
 }

@@ -1,18 +1,24 @@
 'use client'
-// components/user/OrderHistory.tsx — Riwayat Pesanan Pelanggan
-import { useState, useEffect, useCallback } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useCartStore } from '@/src/stores/cart.store'
+// components/user/OrderHistory.tsx — Riwayat Pesanan Pelanggan
+import { useCallback, useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
+import { useCartStore } from '@/src/stores/cart.store'
 
 interface OrderItem {
   id: string
   baseType: string
   quantity: number
   subtotal: number
-  variant: { id: string; flavorName: string; priceKembung: number; priceLumpia: number; priceKrispy: number }
+  variant: {
+    id: string
+    flavorName: string
+    priceKembung: number
+    priceLumpia: number
+    priceKrispy: number
+  }
   toppings?: { id: string; name: string; emoji: string | null; price: number }[] | null
 }
 
@@ -27,16 +33,50 @@ interface Order {
 }
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; icon: string }> = {
-  pending:   { label: 'Menunggu',      color: 'text-yellow-700',  bg: 'bg-yellow-50 dark:bg-yellow-950/20',   icon: '⏳' },
-  paid:      { label: 'Dibayar',       color: 'text-emerald-700', bg: 'bg-emerald-50 dark:bg-emerald-950/20', icon: '💳' },
-  confirmed: { label: 'Dikonfirmasi', color: 'text-blue-700',    bg: 'bg-blue-50 dark:bg-blue-950/20',       icon: '✅' },
-  ready:     { label: 'Siap Diambil', color: 'text-purple-700',  bg: 'bg-purple-50 dark:bg-purple-950/20',   icon: '📦' },
-  done:      { label: 'Selesai',       color: 'text-green-700',   bg: 'bg-green-50 dark:bg-green-950/20',     icon: '🎉' },
-  cancelled: { label: 'Dibatalkan',   color: 'text-red-700',     bg: 'bg-red-50 dark:bg-red-950/20',         icon: '❌' },
+  pending: {
+    label: 'Menunggu',
+    color: 'text-yellow-700',
+    bg: 'bg-yellow-50 dark:bg-yellow-950/20',
+    icon: '⏳'
+  },
+  paid: {
+    label: 'Dibayar',
+    color: 'text-emerald-700',
+    bg: 'bg-emerald-50 dark:bg-emerald-950/20',
+    icon: '💳'
+  },
+  confirmed: {
+    label: 'Dikonfirmasi',
+    color: 'text-blue-700',
+    bg: 'bg-blue-50 dark:bg-blue-950/20',
+    icon: '✅'
+  },
+  ready: {
+    label: 'Siap Diambil',
+    color: 'text-purple-700',
+    bg: 'bg-purple-50 dark:bg-purple-950/20',
+    icon: '📦'
+  },
+  done: {
+    label: 'Selesai',
+    color: 'text-green-700',
+    bg: 'bg-green-50 dark:bg-green-950/20',
+    icon: '🎉'
+  },
+  cancelled: {
+    label: 'Dibatalkan',
+    color: 'text-red-700',
+    bg: 'bg-red-50 dark:bg-red-950/20',
+    icon: '❌'
+  }
 }
 
 const formatPrice = (n: number) =>
-  new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(n)
+  new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    minimumFractionDigits: 0
+  }).format(n)
 
 interface Props {
   phone?: string
@@ -44,11 +84,11 @@ interface Props {
 }
 
 export default function OrderHistory({ phone = '', useAuth = false }: Props) {
-  const [orders, setOrders]     = useState<Order[]>([])
+  const [orders, setOrders] = useState<Order[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [expandedId, setExpandedId] = useState<string | null>(null)
-  const [error, setError]       = useState<string | null>(null)
-  
+  const [error, setError] = useState<string | null>(null)
+
   const router = useRouter()
   const addToCart = useCartStore((s) => s.addItem)
 
@@ -62,9 +102,11 @@ export default function OrderHistory({ phone = '', useAuth = false }: Props) {
         menuVariantId: item.variant.id,
         variantName: `${item.variant.flavorName} (${item.baseType})`,
         basePrice,
-        toppings: item.toppings ? item.toppings.map((t: any) => ({ toppingId: t.id, name: t.name, priceAdd: t.price })) : [],
+        toppings: item.toppings
+          ? item.toppings.map((t: any) => ({ toppingId: t.id, name: t.name, priceAdd: t.price }))
+          : [],
         quantity: item.quantity,
-        notes: '',
+        notes: ''
       })
     })
     toast.success('Pesanan ditambahkan ke keranjang')
@@ -72,16 +114,22 @@ export default function OrderHistory({ phone = '', useAuth = false }: Props) {
   }
 
   const fetchOrders = useCallback(async () => {
-    if (!useAuth && !phone) { setIsLoading(false); return }
+    if (!useAuth && !phone) {
+      setIsLoading(false)
+      return
+    }
     setIsLoading(true)
     setError(null)
     try {
-      let res;
+      let res
       if (useAuth) {
         res = await fetch(`/api/user/orders`, { credentials: 'include', cache: 'no-store' })
       } else {
         const encodedPhone = encodeURIComponent(phone)
-        res = await fetch(`/api/orders/track?phone=${encodedPhone}`, { credentials: 'include', cache: 'no-store' })
+        res = await fetch(`/api/orders/track?phone=${encodedPhone}`, {
+          credentials: 'include',
+          cache: 'no-store'
+        })
       }
       const data = await res.json()
       if (data.success) {
@@ -96,12 +144,14 @@ export default function OrderHistory({ phone = '', useAuth = false }: Props) {
     }
   }, [phone])
 
-  useEffect(() => { fetchOrders() }, [fetchOrders])
+  useEffect(() => {
+    fetchOrders()
+  }, [fetchOrders])
 
   if (isLoading) {
     return (
       <div className="space-y-3">
-        {[1, 2, 3].map(i => (
+        {[1, 2, 3].map((i) => (
           <div key={i} className="h-20 rounded-2xl bg-zinc-100 dark:bg-zinc-800 animate-pulse" />
         ))}
       </div>
@@ -112,7 +162,9 @@ export default function OrderHistory({ phone = '', useAuth = false }: Props) {
     return (
       <div className="bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/50 rounded-2xl p-6 text-center">
         <p className="text-red-600 dark:text-red-400 font-medium text-sm mb-3">{error}</p>
-        <button onClick={fetchOrders} className="text-xs font-bold text-red-600 hover:underline">Coba Lagi</button>
+        <button onClick={fetchOrders} className="text-xs font-bold text-red-600 hover:underline">
+          Coba Lagi
+        </button>
       </div>
     )
   }
@@ -121,16 +173,20 @@ export default function OrderHistory({ phone = '', useAuth = false }: Props) {
     return (
       <div className="bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-8 sm:p-12 text-center">
         <div className="text-5xl mb-4">📋</div>
-        <h3 className="font-bold text-zinc-800 dark:text-zinc-200 mb-2 text-lg">Belum Ada Pesanan</h3>
+        <h3 className="font-bold text-zinc-800 dark:text-zinc-200 mb-2 text-lg">
+          Belum Ada Pesanan
+        </h3>
         <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-6 max-w-sm mx-auto">
           Yuk, mulai pesan Pisang Van Java kesukaan Anda!
         </p>
-        
+
         {/* Sprint 5: Visual loyalty progress placeholder */}
         <div className="max-w-xs mx-auto mb-8 p-4 bg-white dark:bg-zinc-800 rounded-xl border border-zinc-100 dark:border-zinc-700 shadow-sm text-left">
           <div className="flex justify-between items-center mb-2">
             <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">Member Emas</span>
-            <span className="text-[10px] font-medium text-zinc-400 dark:text-zinc-500">0/3 Pesanan</span>
+            <span className="text-[10px] font-medium text-zinc-400 dark:text-zinc-500">
+              0/3 Pesanan
+            </span>
           </div>
           <div className="h-2 w-full bg-zinc-100 dark:bg-zinc-700 rounded-full overflow-hidden">
             <div className="h-full bg-amber-400 w-[5%]" />
@@ -140,18 +196,25 @@ export default function OrderHistory({ phone = '', useAuth = false }: Props) {
 
         {/* Sprint 5: Popular products suggestion */}
         <div className="mb-8">
-          <p className="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-4">🔥 Coba yang populer minggu ini</p>
+          <p className="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-4">
+            🔥 Coba yang populer minggu ini
+          </p>
           <div className="flex justify-center gap-3 flex-wrap">
-            {['Coklat Keju (Kembung)', 'Matcha (Krispy)', 'Tiramisu (Lumpia)'].map(item => (
-              <div key={item} className="px-3 py-1.5 text-xs font-medium bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 border border-amber-100 dark:border-amber-900/40 rounded-lg">
+            {['Coklat Keju (Kembung)', 'Matcha (Krispy)', 'Tiramisu (Lumpia)'].map((item) => (
+              <div
+                key={item}
+                className="px-3 py-1.5 text-xs font-medium bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 border border-amber-100 dark:border-amber-900/40 rounded-lg"
+              >
                 {item}
               </div>
             ))}
           </div>
         </div>
 
-        <Link href="/menu-spesial"
-          className="inline-flex items-center gap-2 bg-[#D4802A] hover:bg-[#b56d24] text-white font-bold text-sm px-8 py-3.5 rounded-full transition-all active:scale-95 shadow-md shadow-[#D4802A]/20">
+        <Link
+          href="/menu-spesial"
+          className="inline-flex items-center gap-2 bg-[#D4802A] hover:bg-[#b56d24] text-white font-bold text-sm px-8 py-3.5 rounded-full transition-all active:scale-95 shadow-md shadow-[#D4802A]/20"
+        >
           🍌 Pesan Sekarang
         </Link>
       </div>
@@ -160,15 +223,17 @@ export default function OrderHistory({ phone = '', useAuth = false }: Props) {
 
   return (
     <div className="space-y-3">
-      {orders.map(order => {
-        const cfg   = STATUS_CONFIG[order.status] ?? STATUS_CONFIG.pending
-        const isEx  = expandedId === order.id
-        const date  = new Date(order.createdAt)
+      {orders.map((order) => {
+        const cfg = STATUS_CONFIG[order.status] ?? STATUS_CONFIG.pending
+        const isEx = expandedId === order.id
+        const date = new Date(order.createdAt)
 
         return (
           <motion.div
-            key={order.id} layout
-            initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
+            key={order.id}
+            layout
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
             className="bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800 rounded-2xl overflow-hidden hover:border-zinc-300 dark:hover:border-zinc-700 transition-all shadow-sm hover:shadow-md"
           >
             {/* Header Row */}
@@ -177,27 +242,41 @@ export default function OrderHistory({ phone = '', useAuth = false }: Props) {
               onClick={() => setExpandedId(isEx ? null : order.id)}
             >
               {/* Status badge */}
-              <div className={`flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-lg ${cfg.bg}`}>
+              <div
+                className={`flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-lg ${cfg.bg}`}
+              >
                 {cfg.icon}
               </div>
 
               {/* Info */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-xs font-mono text-zinc-400 dark:text-zinc-500">#{order.id.slice(-8)}</span>
-                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${cfg.bg} ${cfg.color}`}>
+                  <span className="text-xs font-mono text-zinc-400 dark:text-zinc-500">
+                    #{order.id.slice(-8)}
+                  </span>
+                  <span
+                    className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${cfg.bg} ${cfg.color}`}
+                  >
                     {cfg.label}
                   </span>
                 </div>
                 <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
                   {order.items.length} item •
-                  {date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                  {date.toLocaleDateString('id-ID', {
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })}
                 </p>
               </div>
 
               {/* Price + chevron */}
               <div className="text-right flex-shrink-0 flex items-center gap-2">
-                <span className="font-bold text-zinc-900 dark:text-zinc-100 text-sm">{formatPrice(order.totalPrice)}</span>
+                <span className="font-bold text-zinc-900 dark:text-zinc-100 text-sm">
+                  {formatPrice(order.totalPrice)}
+                </span>
                 <span className="text-zinc-300 dark:text-zinc-600 text-xs">{isEx ? '▲' : '▼'}</span>
               </div>
             </div>
@@ -214,15 +293,26 @@ export default function OrderHistory({ phone = '', useAuth = false }: Props) {
                 >
                   <div className="border-t border-zinc-100 dark:border-zinc-800 px-4 pt-3 pb-4">
                     <div className="space-y-2 bg-zinc-50 dark:bg-zinc-800/40 rounded-xl p-3">
-                      {order.items.map(item => (
+                      {order.items.map((item) => (
                         <div key={item.id} className="flex justify-between text-sm gap-2">
                           <span className="text-zinc-600 dark:text-zinc-400">
                             {item.variant.flavorName}
                             <span className="text-xs text-zinc-400 ml-1">({item.baseType})</span>
-                            {item.toppings && item.toppings.length > 0 && <span className="text-xs text-amber-500 ml-1">+ {item.toppings.map((t: any) => `${t.emoji || ''} ${t.name}`).join(', ')}</span>}
-                            {item.quantity > 1 && <span className="text-xs text-zinc-400 ml-1">×{item.quantity}</span>}
+                            {item.toppings && item.toppings.length > 0 && (
+                              <span className="text-xs text-amber-500 ml-1">
+                                +{' '}
+                                {item.toppings
+                                  .map((t: any) => `${t.emoji || ''} ${t.name}`)
+                                  .join(', ')}
+                              </span>
+                            )}
+                            {item.quantity > 1 && (
+                              <span className="text-xs text-zinc-400 ml-1">×{item.quantity}</span>
+                            )}
                           </span>
-                          <span className="font-semibold text-zinc-700 dark:text-zinc-300 shrink-0">{formatPrice(item.subtotal)}</span>
+                          <span className="font-semibold text-zinc-700 dark:text-zinc-300 shrink-0">
+                            {formatPrice(item.subtotal)}
+                          </span>
                         </div>
                       ))}
                       <div className="pt-2 border-t border-zinc-200 dark:border-zinc-700 flex justify-between font-bold text-zinc-800 dark:text-zinc-200">
@@ -238,13 +328,19 @@ export default function OrderHistory({ phone = '', useAuth = false }: Props) {
                           🌟 Pesanan selesai! Bagikan pengalaman atau pesan lagi.
                         </p>
                         <div className="flex gap-2 w-full sm:w-auto">
-                          <Link href="/ulasan"
-                            className="flex-1 sm:flex-none text-center text-xs font-bold border border-amber-500 text-amber-600 hover:bg-amber-100 dark:hover:bg-amber-900/50 px-3 py-1.5 rounded-lg transition-all">
+                          <Link
+                            href="/ulasan"
+                            className="flex-1 sm:flex-none text-center text-xs font-bold border border-amber-500 text-amber-600 hover:bg-amber-100 dark:hover:bg-amber-900/50 px-3 py-1.5 rounded-lg transition-all"
+                          >
                             Ulas
                           </Link>
                           <button
-                            onClick={(e) => { e.stopPropagation(); handleReorder(order); }}
-                            className="flex-1 sm:flex-none text-center text-xs font-bold bg-[#D4802A] hover:bg-[#b56d24] text-white px-3 py-1.5 rounded-lg transition-all shadow-sm">
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleReorder(order)
+                            }}
+                            className="flex-1 sm:flex-none text-center text-xs font-bold bg-[#D4802A] hover:bg-[#b56d24] text-white px-3 py-1.5 rounded-lg transition-all shadow-sm"
+                          >
                             Pesan Lagi
                           </button>
                         </div>
@@ -252,7 +348,11 @@ export default function OrderHistory({ phone = '', useAuth = false }: Props) {
                     )}
 
                     {/* Pending → reminder & ETA */}
-                    {(order.status === 'pending' || order.status === 'confirmed' || order.status === 'ready' || order.status === 'processing' || order.status === 'paid') && (
+                    {(order.status === 'pending' ||
+                      order.status === 'confirmed' ||
+                      order.status === 'ready' ||
+                      order.status === 'processing' ||
+                      order.status === 'paid') && (
                       <div className="mt-3 bg-amber-50/50 dark:bg-amber-950/10 border border-amber-100/50 dark:border-amber-900/30 rounded-xl p-3 text-center">
                         <p className="text-xs text-zinc-500 mb-1">
                           Pesanan Anda sedang diproses. Kami akan segera menghubungi Anda.

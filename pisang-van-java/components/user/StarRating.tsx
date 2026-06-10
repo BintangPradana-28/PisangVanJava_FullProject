@@ -9,7 +9,12 @@ interface StarRatingProps {
   variantId: string
   existingRating?: number | null
   /** Called after the user submits a rating. Return an error string to show it, or null on success. */
-  onSubmit: (variantId: string, rating: number, comment: string, imageUrl?: string) => Promise<string | null>
+  onSubmit: (
+    variantId: string,
+    rating: number,
+    comment: string,
+    imageUrl?: string
+  ) => Promise<string | null>
 }
 
 const LABELS: Record<number, string> = {
@@ -17,7 +22,7 @@ const LABELS: Record<number, string> = {
   2: 'Cukup',
   3: 'Lumayan',
   4: 'Enak Banget!',
-  5: 'Luar Biasa! ⭐',
+  5: 'Luar Biasa! ⭐'
 }
 
 function StarIcon({ filled, hovered }: { filled: boolean; hovered: boolean }) {
@@ -36,14 +41,14 @@ function StarIcon({ filled, hovered }: { filled: boolean; hovered: boolean }) {
 }
 
 export default function StarRating({ variantId, existingRating, onSubmit }: StarRatingProps) {
-  const [hovered, setHovered]   = useState<number>(0)
+  const [hovered, setHovered] = useState<number>(0)
   const [selected, setSelected] = useState<number>(existingRating ?? 0)
-  const [comment, setComment]   = useState('')
-  const [photo, setPhoto]       = useState<File | null>(null)
+  const [comment, setComment] = useState('')
+  const [photo, setPhoto] = useState<File | null>(null)
   const [photoPreview, setPhotoPreview] = useState<string | null>(null)
-  const [isUploading, setIsUploading]   = useState(false)
-  const [error, setError]       = useState<string | null>(null)
-  const [success, setSuccess]   = useState(false)
+  const [isUploading, setIsUploading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState(false)
   const [isPending, startTransition] = useTransition()
 
   const displayRating = hovered || selected
@@ -66,7 +71,7 @@ export default function StarRating({ variantId, existingRating, onSubmit }: Star
       return
     }
     setError(null)
-    
+
     let uploadedImageUrl = ''
 
     if (photo) {
@@ -159,19 +164,26 @@ export default function StarRating({ variantId, existingRating, onSubmit }: Star
         <label className="flex items-center gap-2 cursor-pointer border border-dashed border-amber-300 rounded-xl p-3 hover:bg-amber-100/50 transition-colors text-sm text-amber-700 font-medium w-max">
           <span>📸</span>
           <span>{photo ? 'Ganti Foto' : 'Unggah Foto (Opsional)'}</span>
-          <input 
-            type="file" 
+          <input
+            type="file"
             accept="image/jpeg, image/png, image/webp"
-            className="hidden" 
+            className="hidden"
             onChange={handlePhotoChange}
           />
         </label>
         {photoPreview && (
           <div className="mt-3 relative w-max">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={photoPreview} alt="Preview" className="w-24 h-24 object-cover rounded-xl border border-amber-200 shadow-sm" />
-            <button 
-              onClick={() => { setPhoto(null); setPhotoPreview(null) }}
+            <img
+              src={photoPreview}
+              alt="Preview"
+              className="w-24 h-24 object-cover rounded-xl border border-amber-200 shadow-sm"
+            />
+            <button
+              onClick={() => {
+                setPhoto(null)
+                setPhotoPreview(null)
+              }}
               className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs shadow-md hover:bg-red-600"
             >
               ✕
@@ -182,9 +194,7 @@ export default function StarRating({ variantId, existingRating, onSubmit }: Star
 
       {/* Error Message */}
       {error && (
-        <p className="text-sm text-red-500 transition-all duration-200 ease-in-out">
-          ⚠️ {error}
-        </p>
+        <p className="text-sm text-red-500 transition-all duration-200 ease-in-out">⚠️ {error}</p>
       )}
 
       {/* Submit Button */}
