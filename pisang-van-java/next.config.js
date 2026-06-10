@@ -9,6 +9,9 @@ const nextConfig = {
     ],
   },
   serverExternalPackages: ['@prisma/client', '@node-rs/argon2'],
+  experimental: {
+    optimizePackageImports: ['framer-motion', 'lucide-react', 'react-hot-toast'],
+  },
 
   async headers() {
     return [

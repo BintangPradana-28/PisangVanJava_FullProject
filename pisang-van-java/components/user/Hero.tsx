@@ -38,7 +38,7 @@ export default function Hero({
   const badge = t("hero_badge");
   const bgImage =
     banner?.imageUrl ||
-    "https://lh3.googleusercontent.com/aida-public/AB6AXuCuoAcWHG4QUqFwzpuBNIiaBkLcJz1LV9m6p9PxV2_qn2WSGWrEBvMDt8FRrqMy_OoFbvbxPhWt-rkUfOJb6etQcez1ASToorW3mXf5JS_xl10v3v70igMCcIrAMpBGGaEu04I3Of3ciTtE2-7xONBem-5vFcik2fJR33PPVUjV0FJFGjlkjfzgQPrhIoCaiuE8cwWt7W1RSkuSY1Z9FKR9sgdyodxJg59Nruc3CsWtal9atky3HkE_WCrMJk7WkLsMqPddUVASBgtH";
+    "/kitchen.png"; // Fix 400 Bad Request caused by expired external aida-public images
   const ctaLink = banner?.linkUrl || "/menu-spesial";
 
   // REMOVED LEAK 2: Manual preload(bgImage) removed because it forces a direct download of unoptimized external assets (bypassing /_next/image). Next.js <Image priority /> handles this automatically.
@@ -176,10 +176,7 @@ export default function Hero({
         <div className="hidden lg:flex justify-end">
           <div className="relative w-full aspect-[4/3] rounded-[12px] overflow-hidden shadow-sbx-card border-8 border-white/10 bg-black/50">
             <Image
-              src={
-                banner?.imageUrl ||
-                "https://lh3.googleusercontent.com/aida-public/AB6AXuBj4eUVL4GCnyXWfJPOOd9fAAG9IxfaNxn7XlL0ezKjhPebxL4ZQuTq75Cyv8_DEpTEXWQ-wVbufB-cMwyGHieei2jGWIlLG2w8WLrne_pM3P3cZuTxOL5UfH0LeZuAK3jhuTxOL5UfH0LeZuAK3jhuZU0DA4A6yJbLm4rGFnfHBlQRU81JrRhBI1Td1w-q4U0n5lau31RqJU7sH8hqx_96O56Q_ZdQNYi59sOZ3GahcZk33rHTp-CwMKrjQXohknO-GwV4axvtwl-4-Y9IdSElxWbmHxafFKU"
-              }
+              src={banner?.imageUrl || "/kitchen.png"}
               alt="Visual Promosi"
               fill
               priority

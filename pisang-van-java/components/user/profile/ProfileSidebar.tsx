@@ -32,13 +32,13 @@ export default function ProfileSidebar() {
         
         {/* Profile Info (Desktop) */}
         <div className="hidden md:flex flex-col items-center pb-6 mb-6 border-b border-zinc-100 dark:border-zinc-800">
-          <div className="w-24 h-24 rounded-full overflow-hidden bg-zinc-100 dark:bg-zinc-800 mb-4 shadow-sm relative border-4 border-white dark:border-zinc-900">
-            {session?.user?.image ? (
-              <Image src={session.user.image} alt="Avatar" fill className="object-cover" />
-            ) : (
-              <User className="w-10 h-10 text-zinc-400 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
-            )}
-          </div>
+            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden border-4 border-white dark:border-zinc-900 shadow-md relative bg-zinc-100 dark:bg-zinc-800">
+              {session?.user?.image ? (
+                <Image src={session.user.image} alt="Avatar" fill className="object-cover" />
+              ) : (
+                <User className="w-12 h-12 text-zinc-400 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+              )}
+            </div>
           <h3 className="font-bold text-lg text-zinc-900 dark:text-zinc-100 text-center">{session?.user?.name || 'Pelanggan'}</h3>
           <p className="text-sm text-zinc-500 dark:text-zinc-400 text-center truncate w-full px-2">{session?.user?.email}</p>
         </div>

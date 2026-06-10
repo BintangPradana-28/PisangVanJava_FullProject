@@ -47,7 +47,7 @@ export default function About() {
             className="relative w-full aspect-[4/3] rounded-3xl overflow-hidden shadow-xl border border-outline-variant/30 bg-surface-container dark:border-zinc-800"
           >
             <Image
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuCR1fdcxKbWFydWHbeLUdTplGwYff0W_EkWxDeDQO9gO9NgZeCKJiSH3oKGWd9Kd0S3MlYErY2lazlzkcNMM1eRSBHewjL8fot_lG2NgcnR64PJmbF8WH6yfyzcKg4AMkZhri91WuXNC2Kkw6ZKvxoYnnN__1ZRRLxsRVT_JYxNLkoWKt85Ui2pUOxKx7SDx1rGtj1PelXxJPprXrtgdzG-TXF1xpytXqHYKhqaVxj7QK7JtWJHTSkGQvqw5kHQG1K5Jbmi42-a_BXl"
+              src="/kitchen.png"
               alt="Konsep Kedai Modern Tradisional Pisang Goreng Van Java"
               fill
               sizes="(max-width: 1024px) 100vw, 550px"

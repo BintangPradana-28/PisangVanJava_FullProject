@@ -45,7 +45,7 @@ const localBusinessJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FoodEstablishment',
   name: 'Pisang Goreng Van Java',
-  image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCuoAcWHG4QUqFwzpuBNIiaBkLcJz1LV9m6p9PxV2_qn2WSGWrEBvMDt8FRrqMy_OoFbvbxPhWt-rkUfOJb6etQcez1ASToorW3mXf5JS_xl10v3v70igMCcIrAMpBGGaEu04I3Of3ciTtE2-7xONBem-5vFcik2fJR33PPVUjV0FJFGjlkjfzgQPrhIoCaiuE8cwWt7W1RSkuSY1Z9FKR9sgdyodxJg59Nruc3CsWtal9atky3HkE_WCrMJk7WkLsMqPddUVASBgtH',
+  image: '/kitchen.png',
   '@id': '',
   url: 'https://pisanggorengvanjava.com',
   telephone: '+6281312167554',
