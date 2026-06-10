@@ -1,6 +1,6 @@
 import { OrderStatus, Prisma } from '@prisma/client'
 import { Ratelimit } from '@upstash/ratelimit'
-import DOMPurify from 'isomorphic-dompurify'
+import DOMPurify from '@/lib/sanitize'
 import { headers } from 'next/headers'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
