@@ -1,6 +1,7 @@
 import 'server-only'
 import crypto from 'crypto'
 import { snap } from '@/src/lib/midtrans'
+import { headers } from 'next/headers'
 
 interface MidtransItem {
   id: string
@@ -31,6 +32,33 @@ export async function generateSnapToken(params: GenerateSnapTokenParams): Promis
       return null
     }
 
+    // Resolve dynamic site URL from headers to prevent redirection to localhost:3000 in Vercel preview/production
+    let siteUrl = ''
+    try {
+      const headerStore = await headers()
+      const host = headerStore.get('x-forwarded-host') || headerStore.get('host')
+      const proto = headerStore.get('x-forwarded-proto') || 'https'
+      if (host) {
+        siteUrl = `${proto}://${host}`
+      }
+    } catch (e) {
+      console.warn('[MIDTRANS] Failed to read headers for dynamic site url:', e)
+    }
+
+    if (!siteUrl) {
+      if (process.env.NEXT_PUBLIC_SITE_URL) {
+        siteUrl = process.env.NEXT_PUBLIC_SITE_URL
+      } else if (process.env.NEXT_PUBLIC_VERCEL_URL) {
+        siteUrl = `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
+      } else if (process.env.VERCEL_URL) {
+        siteUrl = `https://${process.env.VERCEL_URL}`
+      } else {
+        siteUrl = 'http://localhost:3000'
+      }
+    }
+
+    siteUrl = siteUrl.replace(/\/$/, '')
+
     const requestData = {
       transaction_details: {
         order_id: params.orderId,
@@ -47,7 +75,9 @@ export async function generateSnapToken(params: GenerateSnapTokenParams): Promis
         name: item.name.slice(0, 50)
       })),
       callbacks: {
-        finish: `${process.env.NEXT_PUBLIC_SITE_URL}/thanks`
+        finish: `${siteUrl}/thanks`,
+        unfinish: `${siteUrl}/payment/${params.orderId}?payment=failed`,
+        error: `${siteUrl}/payment/${params.orderId}?payment=failed`
       }
     }
 
