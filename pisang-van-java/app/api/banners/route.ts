@@ -5,7 +5,7 @@ import { bannerSchema } from './schema'
 
 async function checkAdmin() {
   const session = await auth()
-  if (!session || session.user.role !== 'ADMIN') return false
+  if (!session || !['ADMIN', 'SUPER_ADMIN'].includes(session.user.role)) return false
   return true
 }
 

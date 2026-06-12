@@ -119,42 +119,38 @@ export default function KitchenClient({ initialOrders }: KitchenClientProps) {
 
     const channel = supabaseBrowserClient
       .channel('kitchen-orders')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'Order' },
-        (payload) => {
-          const record = (payload.new || payload.old) as {
-            id: string
-            customerName?: string
-            status?: string
-            notes?: string
-            source?: string
-            deliveryMethod?: string
-            createdAt?: string
-          }
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'Order' }, (payload) => {
+        const record = (payload.new || payload.old) as {
+          id: string
+          customerName?: string
+          status?: string
+          notes?: string
+          source?: string
+          deliveryMethod?: string
+          createdAt?: string
+        }
 
-          if (!record?.id) return
+        if (!record?.id) return
 
-          if (payload.eventType === 'INSERT') {
-            // New order arrived — refetch full order data from API
-            handleNewOrder(record.id)
-          } else if (payload.eventType === 'UPDATE' && record.status) {
-            const activeStatuses = ['PENDING_PAYMENT', 'PROCESSING', 'READY']
+        if (payload.eventType === 'INSERT') {
+          // New order arrived — refetch full order data from API
+          handleNewOrder(record.id)
+        } else if (payload.eventType === 'UPDATE' && record.status) {
+          const activeStatuses = ['PENDING_PAYMENT', 'PROCESSING', 'READY']
 
-            if (activeStatuses.includes(record.status)) {
-              // Update status in local state
-              setOrders((prev) =>
-                prev.map((o) => (o.id === record.id ? { ...o, status: record.status! } : o))
-              )
-            } else {
-              // Order completed/cancelled — remove from display
-              setOrders((prev) => prev.filter((o) => o.id !== record.id))
-            }
-          } else if (payload.eventType === 'DELETE') {
+          if (activeStatuses.includes(record.status)) {
+            // Update status in local state
+            setOrders((prev) =>
+              prev.map((o) => (o.id === record.id ? { ...o, status: record.status! } : o))
+            )
+          } else {
+            // Order completed/cancelled — remove from display
             setOrders((prev) => prev.filter((o) => o.id !== record.id))
           }
+        } else if (payload.eventType === 'DELETE') {
+          setOrders((prev) => prev.filter((o) => o.id !== record.id))
         }
-      )
+      })
       .subscribe((status) => {
         if (status === 'SUBSCRIBED') setConnectionStatus('connected')
         else if (status === 'CLOSED' || status === 'CHANNEL_ERROR' || status === 'TIMED_OUT')
@@ -208,13 +204,14 @@ export default function KitchenClient({ initialOrders }: KitchenClientProps) {
           source: json.data.source,
           deliveryMethod: json.data.deliveryMethod,
           createdAt: json.data.createdAt,
-          items: json.data.items?.map((item: Record<string, unknown>) => ({
-            id: item.id,
-            baseType: item.baseType,
-            quantity: item.quantity,
-            variant: item.variant,
-            toppings: item.toppings || []
-          })) || []
+          items:
+            json.data.items?.map((item: Record<string, unknown>) => ({
+              id: item.id,
+              baseType: item.baseType,
+              quantity: item.quantity,
+              variant: item.variant,
+              toppings: item.toppings || []
+            })) || []
         }
 
         const activeStatuses = ['PENDING_PAYMENT', 'PROCESSING', 'READY']
@@ -256,9 +253,7 @@ export default function KitchenClient({ initialOrders }: KitchenClientProps) {
       if (nextStatus === 'COMPLETED' || nextStatus === 'CANCELED') {
         setOrders((prev) => prev.filter((o) => o.id !== orderId))
       } else {
-        setOrders((prev) =>
-          prev.map((o) => (o.id === orderId ? { ...o, status: nextStatus } : o))
-        )
+        setOrders((prev) => prev.map((o) => (o.id === orderId ? { ...o, status: nextStatus } : o)))
       }
 
       toast.success(`Status diperbarui: ${STATUS_LABELS[nextStatus] || nextStatus}`)
@@ -287,9 +282,7 @@ export default function KitchenClient({ initialOrders }: KitchenClientProps) {
       {/* Header Bar */}
       <header className="bg-gray-800 border-b border-gray-700 px-6 py-4 flex items-center justify-between sticky top-0 z-10">
         <div>
-          <h1 className="text-2xl font-black tracking-tight text-amber-400">
-            🍌 KITCHEN DISPLAY
-          </h1>
+          <h1 className="text-2xl font-black tracking-tight text-amber-400">🍌 KITCHEN DISPLAY</h1>
           <p className="text-xs text-gray-400 font-medium uppercase tracking-widest">
             Pisang Van Java — Dapur
           </p>
@@ -389,7 +382,9 @@ function OrderSection({
 }) {
   return (
     <section>
-      <h2 className="text-lg font-bold text-gray-300 mb-3">{title} ({orders.length})</h2>
+      <h2 className="text-lg font-bold text-gray-300 mb-3">
+        {title} ({orders.length})
+      </h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         <AnimatePresence mode="popLayout">
           {orders.map((order) => (
@@ -436,9 +431,7 @@ function OrderCard({
       {/* Card Header */}
       <div className="px-4 py-3 flex items-center justify-between border-b border-gray-200/30">
         <div>
-          <p className="text-sm font-bold text-gray-800">
-            #{order.id.slice(-5).toUpperCase()}
-          </p>
+          <p className="text-sm font-bold text-gray-800">#{order.id.slice(-5).toUpperCase()}</p>
           <p className="text-xs text-gray-600 font-medium">{order.customerName}</p>
         </div>
         <div className="text-right">

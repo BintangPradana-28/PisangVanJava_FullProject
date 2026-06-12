@@ -5,7 +5,7 @@ import { auth } from '@/src/auth'
 export async function GET(req: NextRequest) {
   try {
     const session = await auth()
-    if (!session || session.user.role !== 'ADMIN') {
+    if (!session || !['ADMIN', 'SUPER_ADMIN'].includes(session.user.role)) {
       return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 403 })
     }
 
@@ -42,7 +42,7 @@ export async function GET(req: NextRequest) {
 export async function PATCH(req: NextRequest) {
   try {
     const session = await auth()
-    if (!session || session.user.role !== 'ADMIN') {
+    if (!session || !['ADMIN', 'SUPER_ADMIN'].includes(session.user.role)) {
       return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 403 })
     }
 

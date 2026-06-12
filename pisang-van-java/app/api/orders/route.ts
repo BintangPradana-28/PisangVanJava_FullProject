@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
   }
 
-  if (actor.role !== 'ADMIN') {
+  if (actor.role !== 'ADMIN' && actor.role !== 'SUPER_ADMIN') {
     return NextResponse.json({ success: false, error: 'Forbidden' }, { status: 403 })
   }
 

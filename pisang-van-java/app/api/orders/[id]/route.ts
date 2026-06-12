@@ -2,13 +2,13 @@ import { type NextRequest, NextResponse } from 'next/server'
 import { logAudit } from '@/lib/audit'
 import { sendWhatsAppNotification } from '@/lib/notifications'
 import { prisma } from '@/lib/prisma'
-import { sendOrderStatusEmail } from '@/src/features/payment/email'
 import {
   hasValidSameOriginHeaders,
   orderStatusInputSchema,
   paymentFormInputSchema,
   requireCheckoutActor
 } from '@/src/features/checkout/service'
+import { sendOrderStatusEmail } from '@/src/features/payment/email'
 
 interface OrderRouteContext {
   params: Promise<{
@@ -203,7 +203,7 @@ export async function DELETE(_: NextRequest, { params }: OrderRouteContext) {
     return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
   }
 
-  if (actor.role !== 'ADMIN') {
+  if (actor.role !== 'ADMIN' && actor.role !== 'SUPER_ADMIN') {
     return NextResponse.json({ success: false, error: 'Forbidden' }, { status: 403 })
   }
 

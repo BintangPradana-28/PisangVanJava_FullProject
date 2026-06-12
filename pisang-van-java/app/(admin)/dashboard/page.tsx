@@ -1,7 +1,6 @@
-// app/(admin)/dashboard/page.tsx
-
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
+import { unstable_cache } from 'next/cache'
 import AdminHeader from '@/components/admin/AdminHeader'
 import AdminSidebar from '@/components/admin/AdminSidebar'
 import { prisma } from '@/lib/prisma'
@@ -10,11 +9,11 @@ import { auth } from '@/src/auth'
 
 export const metadata: Metadata = { title: 'Dashboard' }
 
-async function getDashboardData() {
+async function getDashboardDataInternal() {
   const today = new Date()
   today.setHours(0, 0, 0, 0)
 
-  const [totalProducts, recentOrders, todaysOrders, pendingOrders] = await Promise.all([
+  const [totalProducts, recentOrders, todaysOrdersAggregation, pendingOrders] = await Promise.all([
     prisma.menuVariant.count({ where: { isDeleted: false } }),
     prisma.order.findMany({
       orderBy: { createdAt: 'desc' },
@@ -32,16 +31,18 @@ async function getDashboardData() {
         }
       }
     }),
-    prisma.order.findMany({
+    prisma.order.aggregate({
       where: { createdAt: { gte: today } },
-      select: { totalPrice: true }
+      _sum: { totalPrice: true },
+      _count: { id: true }
     }),
     prisma.order.count({
       where: { status: 'PENDING_PAYMENT' }
     })
   ])
 
-  const todayRevenue = todaysOrders.reduce((sum: any, o: any) => sum + o.totalPrice, 0)
+  const todayRevenue = todaysOrdersAggregation._sum.totalPrice || 0
+  const todaysOrdersCount = todaysOrdersAggregation._count.id || 0
 
   // Hitung grafik penjualan 7 hari terakhir
   const last7Days = Array.from({ length: 7 }).map((_, i) => {
@@ -72,18 +73,30 @@ async function getDashboardData() {
   return {
     totalProducts,
     recentOrders,
-    todaysOrders: todaysOrders.length,
+    todaysOrders: todaysOrdersCount,
     todayRevenue,
     pendingOrders,
     chartData
   }
 }
 
+// Wrap with unstable_cache for 2-minute revalidation TTL
+const getCachedDashboardData = unstable_cache(
+  async () => {
+    return getDashboardDataInternal()
+  },
+  ['admin-dashboard-stats-cache'],
+  {
+    revalidate: 120, // 2 minutes TTL
+    tags: ['admin-dashboard']
+  }
+)
+
 export default async function DashboardPage() {
   const session = await auth()
-  if (!session || session.user.role !== 'ADMIN') redirect('/member-login')
+  if (!session || !['ADMIN', 'SUPER_ADMIN'].includes(session.user.role)) redirect('/member-login')
 
-  const data = await getDashboardData()
+  const data = await getCachedDashboardData()
 
   const metrics = [
     {

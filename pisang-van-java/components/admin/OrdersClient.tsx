@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 // components/admin/OrdersClient.tsx — COMMAND CENTER v2 (Real-time + Bulk + CSV)
 import { useCallback, useEffect, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { formatPrice } from '@/lib/utils'
 import { supabaseBrowserClient } from '@/src/lib/supabase-client'
 
@@ -115,7 +116,19 @@ function exportToCSV(orders: Order[]) {
   toast.success('Data pesanan berhasil diunduh')
 }
 
-export default function OrdersClient({ initialOrders }: { initialOrders: Order[] }) {
+export default function OrdersClient({
+  initialOrders,
+  totalOrders,
+  currentPage,
+  limit
+}: {
+  initialOrders: Order[]
+  totalOrders: number
+  currentPage: number
+  limit: number
+}) {
+  const router = useRouter()
+  const searchParams = useSearchParams()
   const [orders, setOrders] = useState<Order[]>(initialOrders)
   const [statusFilter, setStatusFilter] = useState<'all' | OrderStatus>('all')
   const [dateFilter, setDateFilter] = useState<DateFilter>('all')
@@ -131,6 +144,15 @@ export default function OrdersClient({ initialOrders }: { initialOrders: Order[]
     'connecting' | 'connected' | 'disconnected'
   >('disconnected')
   const prevCountRef = useRef(initialOrders.length)
+
+  const pageRef = useRef(currentPage)
+  const limitRef = useRef(limit)
+
+  useEffect(() => {
+    pageRef.current = currentPage
+    limitRef.current = limit
+    setOrders(initialOrders)
+  }, [currentPage, limit, initialOrders])
 
   const playNotificationSound = () => {
     try {
@@ -153,7 +175,7 @@ export default function OrdersClient({ initialOrders }: { initialOrders: Order[]
   // ── Real-time polling ────────────────────────────────────────────────────
   const fetchOrders = useCallback(async (silent = false) => {
     try {
-      const res = await fetch('/api/orders?limit=100', {
+      const res = await fetch(`/api/orders?page=${pageRef.current}&limit=${limitRef.current}`, {
         cache: 'no-store',
         credentials: 'include'
       })
@@ -320,6 +342,22 @@ export default function OrdersClient({ initialOrders }: { initialOrders: Order[]
       .length,
     done: orders.filter((o) => o.status === 'COMPLETED').length,
     pending: orders.filter((o) => o.status === 'PENDING_PAYMENT').length
+  }
+
+  const totalPages = Math.ceil(totalOrders / limit)
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage < 1 || newPage > totalPages) return
+    const params = new URLSearchParams(searchParams.toString())
+    params.set('page', newPage.toString())
+    router.push(`/orders?${params.toString()}`)
+  }
+
+  const handleLimitChange = (newLimit: number) => {
+    const params = new URLSearchParams(searchParams.toString())
+    params.set('limit', newLimit.toString())
+    params.set('page', '1')
+    router.push(`/orders?${params.toString()}`)
   }
 
   return (
@@ -719,8 +757,77 @@ export default function OrdersClient({ initialOrders }: { initialOrders: Order[]
         )}
       </div>
 
-      {/* Results count */}
-      {filtered.length > 0 && (
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="flex flex-col sm:flex-row items-center justify-between border-t border-cream-200 pt-4 mt-6 gap-4">
+          <div className="flex items-center gap-4 text-xs text-brown-500">
+            <div>
+              Menampilkan <span className="font-semibold">{Math.min((currentPage - 1) * limit + 1, totalOrders)}</span> -{' '}
+              <span className="font-semibold">{Math.min(currentPage * limit, totalOrders)}</span> dari{' '}
+              <span className="font-semibold">{totalOrders}</span> pesanan
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="text-brown-400">Tampilkan:</span>
+              <select
+                value={limit}
+                onChange={(e) => handleLimitChange(Number(e.target.value))}
+                className="text-xs px-2 py-1 rounded-[4px] border border-cream-200 text-brown-600 bg-white focus:outline-none"
+              >
+                {[20, 50, 100].map((size) => (
+                  <option key={size} value={size}>
+                    {size}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage <= 1}
+              className="px-3 py-1.5 rounded-[4px] text-xs font-semibold bg-white border border-cream-200 text-brown-700 hover:bg-cream-50 disabled:opacity-50 disabled:hover:bg-white transition-all"
+            >
+              Sebelumnya
+            </button>
+
+            {Array.from({ length: Math.min(5, totalPages) }).map((_, idx) => {
+              let pageNum = idx + 1
+              if (currentPage > 3 && totalPages > 5) {
+                if (currentPage + 2 > totalPages) {
+                  pageNum = totalPages - 4 + idx
+                } else {
+                  pageNum = currentPage - 2 + idx
+                }
+              }
+              return (
+                <button
+                  key={pageNum}
+                  onClick={() => handlePageChange(pageNum)}
+                  className={`w-8 h-8 flex items-center justify-center rounded-[4px] text-xs font-bold transition-all border ${
+                    currentPage === pageNum
+                      ? 'bg-brown-700 text-white border-brown-700'
+                      : 'bg-white text-brown-500 border-cream-200 hover:border-brown-300'
+                  }`}
+                >
+                  {pageNum}
+                </button>
+              )
+            })}
+
+            <button
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage >= totalPages}
+              className="px-3 py-1.5 rounded-[4px] text-xs font-semibold bg-white border border-cream-200 text-brown-700 hover:bg-cream-50 disabled:opacity-50 disabled:hover:bg-white transition-all"
+            >
+              Selanjutnya
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Results count (fallback if only 1 page) */}
+      {totalPages <= 1 && filtered.length > 0 && (
         <p className="text-center text-xs text-brown-400 pb-4">
           Menampilkan {filtered.length} dari {orders.length} pesanan
         </p>

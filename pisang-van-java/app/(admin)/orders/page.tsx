@@ -7,45 +7,60 @@ import OrdersClient from '@/components/admin/OrdersClient'
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/src/auth'
 
-export default async function OrdersPage() {
+export default async function OrdersPage(props: {
+  searchParams: Promise<{
+    page?: string
+    limit?: string
+  }>
+}) {
   const session = await auth()
-  if (!session || session.user.role !== 'ADMIN') redirect('/member-login')
-  const orders = await prisma.order.findMany({
-    orderBy: { createdAt: 'desc' },
-    take: 50,
-    select: {
-      id: true,
-      customerName: true,
-      customerPhone: true,
-      totalPrice: true,
-      status: true,
-      notes: true,
-      source: true,
-      createdAt: true,
-      deliveryMethod: true,
-      deliveryFee: true,
-      items: {
-        select: {
-          id: true,
-          baseType: true,
-          quantity: true,
-          unitPrice: true,
-          subtotal: true,
-          variant: {
-            select: {
-              flavorName: true
-            }
-          },
-          toppings: {
-            select: {
-              name: true,
-              emoji: true
+  if (!session || !['ADMIN', 'SUPER_ADMIN'].includes(session.user.role)) redirect('/member-login')
+
+  const searchParams = await props.searchParams
+  const page = Math.max(1, parseInt(searchParams.page || '1', 10))
+  const limit = Math.max(1, Math.min(100, parseInt(searchParams.limit || '20', 10)))
+  const skip = (page - 1) * limit
+
+  const [orders, totalOrders] = await Promise.all([
+    prisma.order.findMany({
+      orderBy: { createdAt: 'desc' },
+      skip,
+      take: limit,
+      select: {
+        id: true,
+        customerName: true,
+        customerPhone: true,
+        totalPrice: true,
+        status: true,
+        notes: true,
+        source: true,
+        createdAt: true,
+        deliveryMethod: true,
+        deliveryFee: true,
+        items: {
+          select: {
+            id: true,
+            baseType: true,
+            quantity: true,
+            unitPrice: true,
+            subtotal: true,
+            variant: {
+              select: {
+                flavorName: true
+              }
+            },
+            toppings: {
+              select: {
+                name: true,
+                emoji: true
+              }
             }
           }
         }
       }
-    }
-  })
+    }),
+    prisma.order.count()
+  ])
 
   const formattedOrders = orders.map((o: any) => ({
     id: o.id,
@@ -81,7 +96,12 @@ export default async function OrdersPage() {
       <AdminSidebar />
       <main className="flex-1 p-6 sm:p-8 bg-cream-100 overflow-y-auto">
         <Toaster position="top-right" />
-        <OrdersClient initialOrders={formattedOrders} />
+        <OrdersClient
+          initialOrders={formattedOrders}
+          totalOrders={totalOrders}
+          currentPage={page}
+          limit={limit}
+        />
       </main>
     </div>
   )

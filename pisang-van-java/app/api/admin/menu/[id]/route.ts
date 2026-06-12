@@ -1,8 +1,8 @@
-import DOMPurify from '@/lib/sanitize'
 import { revalidatePath, revalidateTag } from 'next/cache'
 import { type NextRequest, NextResponse } from 'next/server'
 import { sseEmitter } from '@/lib/eventEmitter'
 import { prisma } from '@/lib/prisma'
+import DOMPurify from '@/lib/sanitize'
 import { auth } from '@/src/auth'
 import { updateMenuVariantSchema } from '@/src/features/menu/schemas'
 import { StockManager } from '@/src/lib/stock-manager'
@@ -35,7 +35,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await auth()
-    if (!session || session.user?.role !== 'ADMIN') {
+    if (!session || !['ADMIN', 'SUPER_ADMIN'].includes(session.user?.role || '')) {
       return NextResponse.json(
         { success: false, message: 'Unauthorized: Admin access required' },
         { status: 403 }
@@ -122,7 +122,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await auth()
-    if (!session || session.user?.role !== 'ADMIN') {
+    if (!session || !['ADMIN', 'SUPER_ADMIN'].includes(session.user?.role || '')) {
       return NextResponse.json(
         { success: false, message: 'Unauthorized: Admin access required' },
         { status: 403 }

@@ -1,15 +1,15 @@
 import { OrderStatus, Prisma } from '@prisma/client'
 import { Ratelimit } from '@upstash/ratelimit'
-import DOMPurify from '@/lib/sanitize'
 import { headers } from 'next/headers'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { redis } from '@/lib/redis'
+import DOMPurify from '@/lib/sanitize'
 import { auth } from '@/src/auth'
 import { createPendingPayment } from '@/src/features/payment/payment.service'
 import { generateSnapToken } from '@/src/features/payment/service'
 
-const ROLE_VALUES = ['ADMIN', 'CUSTOMER', 'RESELLER', 'KITCHEN', 'CASHIER'] as const
+const ROLE_VALUES = ['SUPER_ADMIN', 'ADMIN', 'CUSTOMER', 'RESELLER', 'KITCHEN', 'CASHIER'] as const
 const BASE_TYPE_VALUES = ['kembung', 'lumpia', 'krispy'] as const
 const ORDER_STATUS_VALUES = [
   'PENDING_PAYMENT',

@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
   try {
     // THE IRON GATE: Verify Authentication & Authorization
     const session = await auth()
-    if (!session || session.user.role !== 'ADMIN') {
+    if (!session || !['ADMIN', 'SUPER_ADMIN'].includes(session.user.role)) {
       return NextResponse.json({ error: 'Unauthorized Access' }, { status: 401 })
     }
 
