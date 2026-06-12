@@ -136,18 +136,21 @@ export default async function MenuSpesialPage(props: {
   const menuJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Menu',
-    'name': 'Menu Spesial Pisang Goreng Van Java',
-    'description': 'Pilihan varian rasa premium pisang kembung, lumpia, dan krispy',
-    'numberOfItems': filtered.length,
-    'hasMenuItem': filtered.map((p: any) => ({
+    name: 'Menu Spesial Pisang Goreng Van Java',
+    description: 'Pilihan varian rasa premium pisang kembung, lumpia, dan krispy',
+    numberOfItems: filtered.length,
+    hasMenuItem: filtered.map((p: any) => ({
       '@type': 'MenuItem',
-      'name': p.flavorName,
-      'description': p.deskripsi_topping || `${p.flavorName} premium`,
-      'offers': {
+      name: p.flavorName,
+      description: p.deskripsi_topping || `${p.flavorName} premium`,
+      offers: {
         '@type': 'Offer',
-        'priceCurrency': 'IDR',
-        'price': p.priceKembung || p.priceLumpia || p.priceKrispy,
-        'availability': p.isAvailable && p.stock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock'
+        priceCurrency: 'IDR',
+        price: p.priceKembung || p.priceLumpia || p.priceKrispy,
+        availability:
+          p.isAvailable && p.stock > 0
+            ? 'https://schema.org/InStock'
+            : 'https://schema.org/OutOfStock'
       }
     }))
   }

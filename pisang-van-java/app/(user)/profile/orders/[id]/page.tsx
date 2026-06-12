@@ -129,27 +129,29 @@ export default async function ProfileOrderDetailPage({
     notes: order.notes,
     user: order.user,
     payment: order.payment,
-    items: order.items.map((item: {
-      id: string
-      baseType: string
-      quantity: number
-      unitPrice: number
-      subtotal: number
-      variant: { id: string; flavorName: string; imageUrl: string | null } | null
-      toppings: Array<{ id: string; name: string; price: number }>
-    }) => ({
-      id: item.id,
-      baseType: item.baseType,
-      quantity: item.quantity,
-      unitPrice: item.unitPrice,
-      subtotal: item.subtotal,
-      variant: item.variant,
-      toppings: item.toppings.map((t: { id: string; name: string; price: number }) => ({
-        id: t.id,
-        name: t.name,
-        price: t.price
-      }))
-    })) as SerializedOrderItem[]
+    items: order.items.map(
+      (item: {
+        id: string
+        baseType: string
+        quantity: number
+        unitPrice: number
+        subtotal: number
+        variant: { id: string; flavorName: string; imageUrl: string | null } | null
+        toppings: Array<{ id: string; name: string; price: number }>
+      }) => ({
+        id: item.id,
+        baseType: item.baseType,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+        subtotal: item.subtotal,
+        variant: item.variant,
+        toppings: item.toppings.map((t: { id: string; name: string; price: number }) => ({
+          id: t.id,
+          name: t.name,
+          price: t.price
+        }))
+      })
+    ) as SerializedOrderItem[]
   }
 
   return <ProfileOrderDetailClient order={serializedOrder} />

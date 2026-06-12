@@ -762,9 +762,12 @@ export default function OrdersClient({
         <div className="flex flex-col sm:flex-row items-center justify-between border-t border-cream-200 pt-4 mt-6 gap-4">
           <div className="flex items-center gap-4 text-xs text-brown-500">
             <div>
-              Menampilkan <span className="font-semibold">{Math.min((currentPage - 1) * limit + 1, totalOrders)}</span> -{' '}
-              <span className="font-semibold">{Math.min(currentPage * limit, totalOrders)}</span> dari{' '}
-              <span className="font-semibold">{totalOrders}</span> pesanan
+              Menampilkan{' '}
+              <span className="font-semibold">
+                {Math.min((currentPage - 1) * limit + 1, totalOrders)}
+              </span>{' '}
+              - <span className="font-semibold">{Math.min(currentPage * limit, totalOrders)}</span>{' '}
+              dari <span className="font-semibold">{totalOrders}</span> pesanan
             </div>
             <div className="flex items-center gap-1.5">
               <span className="text-brown-400">Tampilkan:</span>

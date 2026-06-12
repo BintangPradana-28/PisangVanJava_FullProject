@@ -36,11 +36,27 @@ interface TrackOrderDetailClientProps {
 }
 
 const ORDER_STEPS = [
-  { status: 'PENDING_PAYMENT', label: 'Menunggu Pembayaran', description: 'Menunggu proses verifikasi pembayaran Anda.' },
+  {
+    status: 'PENDING_PAYMENT',
+    label: 'Menunggu Pembayaran',
+    description: 'Menunggu proses verifikasi pembayaran Anda.'
+  },
   { status: 'PAID', label: 'Dikonfirmasi', description: 'Pembayaran diterima & dikonfirmasi.' },
-  { status: 'PROCESSING', label: 'Sedang Dimasak', description: 'Koki sedang memasak pesanan Anda di dapur.' },
-  { status: 'READY', label: 'Siap Diambil/Antar', description: 'Pesanan siap diambil atau sedang diantar oleh kurir.' },
-  { status: 'COMPLETED', label: 'Selesai', description: 'Pesanan selesai diterima. Selamat menikmati!' }
+  {
+    status: 'PROCESSING',
+    label: 'Sedang Dimasak',
+    description: 'Koki sedang memasak pesanan Anda di dapur.'
+  },
+  {
+    status: 'READY',
+    label: 'Siap Diambil/Antar',
+    description: 'Pesanan siap diambil atau sedang diantar oleh kurir.'
+  },
+  {
+    status: 'COMPLETED',
+    label: 'Selesai',
+    description: 'Pesanan selesai diterima. Selamat menikmati!'
+  }
 ]
 
 const STATUS_ICONS: Record<string, string> = {
@@ -83,21 +99,23 @@ function playClientNotificationSound(): void {
 
 function formatTime(dateStr: string | null): string {
   if (!dateStr) return ''
-  return new Date(dateStr).toLocaleTimeString('id-ID', {
-    hour: '2-digit',
-    minute: '2-digit'
-  }) + ' WIB'
+  return (
+    new Date(dateStr).toLocaleTimeString('id-ID', {
+      hour: '2-digit',
+      minute: '2-digit'
+    }) + ' WIB'
+  )
 }
 
-export default function TrackOrderDetailClient({
-  order,
-  storePhone
-}: TrackOrderDetailClientProps) {
+export default function TrackOrderDetailClient({ order, storePhone }: TrackOrderDetailClientProps) {
   const [currentStatus, setCurrentStatus] = useState<string>(order.status)
   const [timestamps, setTimestamps] = useState<Record<string, string | null>>({
     PENDING_PAYMENT: order.createdAt,
     PAID: order.confirmedAt,
-    PROCESSING: order.status === 'PROCESSING' || order.status === 'READY' || order.status === 'COMPLETED' ? order.updatedAt : null,
+    PROCESSING:
+      order.status === 'PROCESSING' || order.status === 'READY' || order.status === 'COMPLETED'
+        ? order.updatedAt
+        : null,
     READY: order.status === 'READY' || order.status === 'COMPLETED' ? order.updatedAt : null,
     COMPLETED: order.status === 'COMPLETED' ? order.updatedAt : null
   })
@@ -122,22 +140,36 @@ export default function TrackOrderDetailClient({
           filter: `id=eq.${order.id}`
         },
         (payload) => {
-          const newRecord = payload.new as { status: string; confirmedAt?: string; updatedAt: string }
+          const newRecord = payload.new as {
+            status: string
+            confirmedAt?: string
+            updatedAt: string
+          }
           if (newRecord?.status) {
             setCurrentStatus(newRecord.status)
             playClientNotificationSound()
-            toast.success(`Pesanan Anda diperbarui: ${STATUS_LABELS[newRecord.status] || newRecord.status}`, {
-              icon: '🔄',
-              duration: 5000
-            })
+            toast.success(
+              `Pesanan Anda diperbarui: ${STATUS_LABELS[newRecord.status] || newRecord.status}`,
+              {
+                icon: '🔄',
+                duration: 5000
+              }
+            )
 
             // Update timestamps dynamically on live event
             setTimestamps((prev) => ({
               ...prev,
               [newRecord.status]: newRecord.updatedAt,
-              PAID: newRecord.status !== 'PENDING_PAYMENT' ? (newRecord.confirmedAt || newRecord.updatedAt) : prev.PAID,
-              PROCESSING: ['PROCESSING', 'READY', 'COMPLETED'].includes(newRecord.status) ? newRecord.updatedAt : prev.PROCESSING,
-              READY: ['READY', 'COMPLETED'].includes(newRecord.status) ? newRecord.updatedAt : prev.READY,
+              PAID:
+                newRecord.status !== 'PENDING_PAYMENT'
+                  ? newRecord.confirmedAt || newRecord.updatedAt
+                  : prev.PAID,
+              PROCESSING: ['PROCESSING', 'READY', 'COMPLETED'].includes(newRecord.status)
+                ? newRecord.updatedAt
+                : prev.PROCESSING,
+              READY: ['READY', 'COMPLETED'].includes(newRecord.status)
+                ? newRecord.updatedAt
+                : prev.READY,
               COMPLETED: newRecord.status === 'COMPLETED' ? newRecord.updatedAt : prev.COMPLETED
             }))
           }
@@ -168,7 +200,6 @@ export default function TrackOrderDetailClient({
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-150 py-12 px-4 md:py-20">
       <Toaster position="top-center" />
       <div className="max-w-xl mx-auto space-y-6">
-        
         {/* Main Status Header Card */}
         <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800 p-6 shadow-sm">
           <div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-4 mb-4">
@@ -180,7 +211,7 @@ export default function TrackOrderDetailClient({
                 #{order.id.slice(-8).toUpperCase()}
               </h1>
             </div>
-            
+
             <div className="text-right">
               <span className="text-xs font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-widest">
                 PELANGGAN
@@ -193,14 +224,14 @@ export default function TrackOrderDetailClient({
 
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <span className="text-4xl shrink-0">
-                {STATUS_ICONS[currentStatus] || '🍌'}
-              </span>
+              <span className="text-4xl shrink-0">{STATUS_ICONS[currentStatus] || '🍌'}</span>
               <div>
                 <p className="text-xs text-zinc-400 font-bold uppercase tracking-wider">
                   STATUS SEKARANG
                 </p>
-                <p className={`text-base font-black ${isCanceled ? 'text-rose-500' : 'text-amber-600 dark:text-amber-400'}`}>
+                <p
+                  className={`text-base font-black ${isCanceled ? 'text-rose-500' : 'text-amber-600 dark:text-amber-400'}`}
+                >
                   {STATUS_LABELS[currentStatus] || currentStatus}
                 </p>
               </div>
@@ -234,13 +265,15 @@ export default function TrackOrderDetailClient({
                 <div>
                   <h3 className="font-bold text-sm">Pesanan Dibatalkan</h3>
                   <p className="text-xs text-rose-500/80 leading-relaxed mt-1">
-                    Mohon maaf, pesanan Anda telah dibatalkan oleh dapur/kasir kami (misalnya karena keterbatasan stok atau operasional). 
-                    Proses pengembalian dana (refund) akan segera diproses secara otomatis jika Anda membayar menggunakan metode non-tunai.
+                    Mohon maaf, pesanan Anda telah dibatalkan oleh dapur/kasir kami (misalnya karena
+                    keterbatasan stok atau operasional). Proses pengembalian dana (refund) akan
+                    segera diproses secara otomatis jika Anda membayar menggunakan metode non-tunai.
                   </p>
                 </div>
               </div>
               <p className="text-xs text-zinc-400 text-center font-medium">
-                Silakan hubungi dukungan Whatsapp di bawah jika Anda memerlukan bantuan lebih lanjut.
+                Silakan hubungi dukungan Whatsapp di bawah jika Anda memerlukan bantuan lebih
+                lanjut.
               </p>
             </div>
           ) : (
@@ -274,7 +307,9 @@ export default function TrackOrderDetailClient({
 
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2">
-                        <h3 className={`text-sm font-bold leading-none ${isActive ? 'text-amber-600 dark:text-amber-400' : isCompleted ? 'text-zinc-800 dark:text-zinc-200' : 'text-zinc-450'}`}>
+                        <h3
+                          className={`text-sm font-bold leading-none ${isActive ? 'text-amber-600 dark:text-amber-400' : isCompleted ? 'text-zinc-800 dark:text-zinc-200' : 'text-zinc-450'}`}
+                        >
                           {step.label}
                         </h3>
                         {isCompleted && time && (
@@ -299,7 +334,7 @@ export default function TrackOrderDetailClient({
           <h2 className="text-xs font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-4 border-b border-zinc-100 dark:border-zinc-800 pb-2.5">
             RINCIAN ITEM PESANAN
           </h2>
-          
+
           <div className="space-y-3.5">
             {order.items.map((item) => (
               <div key={item.id} className="flex items-start gap-3">
@@ -358,7 +393,6 @@ export default function TrackOrderDetailClient({
             <span>🏪 MENU UTAMA</span>
           </Link>
         </div>
-
       </div>
     </div>
   )

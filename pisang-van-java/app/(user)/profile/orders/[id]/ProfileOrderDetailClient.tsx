@@ -66,9 +66,7 @@ const formatPaymentMethod = (paymentType: string | null) => {
   return maps[paymentType] || paymentType.toUpperCase()
 }
 
-export default function ProfileOrderDetailClient({
-  order
-}: ProfileOrderDetailClientProps) {
+export default function ProfileOrderDetailClient({ order }: ProfileOrderDetailClientProps) {
   const router = useRouter()
   const addItemToCart = useCartStore((state) => state.addItem)
 
@@ -251,7 +249,6 @@ export default function ProfileOrderDetailClient({
 
         {/* Right Column: Invoicing Info & Actions */}
         <div className="space-y-6">
-          
           {/* Customer Metadata Block */}
           <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200/50 dark:border-zinc-850 p-5 shadow-sm space-y-3">
             <h4 className="text-xs font-black text-zinc-450 dark:text-zinc-500 border-b border-zinc-100 dark:border-zinc-800 pb-2.5 uppercase tracking-wider">
@@ -259,11 +256,15 @@ export default function ProfileOrderDetailClient({
             </h4>
             <div className="space-y-1">
               <p className="text-xs text-zinc-400 font-bold uppercase">NAMA PENERIMA</p>
-              <p className="text-sm font-bold text-zinc-800 dark:text-zinc-200">{order.customerName}</p>
+              <p className="text-sm font-bold text-zinc-800 dark:text-zinc-200">
+                {order.customerName}
+              </p>
             </div>
             <div className="space-y-1 pt-1.5">
               <p className="text-xs text-zinc-400 font-bold uppercase">NOMOR WHATSAPP</p>
-              <p className="text-sm font-mono text-zinc-800 dark:text-zinc-200">{order.customerPhone}</p>
+              <p className="text-sm font-mono text-zinc-800 dark:text-zinc-200">
+                {order.customerPhone}
+              </p>
             </div>
           </div>
 
@@ -276,7 +277,9 @@ export default function ProfileOrderDetailClient({
               {formatPaymentMethod(order.payment?.paymentType || null)}
             </p>
             {order.payment?.status && (
-              <p className={`text-xs font-black uppercase tracking-wider ${order.payment.status === 'PAID' ? 'text-green-600' : 'text-yellow-600'}`}>
+              <p
+                className={`text-xs font-black uppercase tracking-wider ${order.payment.status === 'PAID' ? 'text-green-600' : 'text-yellow-600'}`}
+              >
                 Status: {order.payment.status}
               </p>
             )}
@@ -291,9 +294,7 @@ export default function ProfileOrderDetailClient({
             <div className="flex justify-between text-xs text-zinc-500 dark:text-zinc-400 font-medium">
               <span>Subtotal Menu</span>
               <span>
-                {formatPrice(
-                  order.totalPrice - order.deliveryFee + order.discountAmount
-                )}
+                {formatPrice(order.totalPrice - order.deliveryFee + order.discountAmount)}
               </span>
             </div>
 
@@ -346,7 +347,6 @@ export default function ProfileOrderDetailClient({
               <Repeat className="w-4 h-4" /> Ulangi Pemesanan
             </button>
           </div>
-
         </div>
       </div>
     </motion.div>

@@ -427,8 +427,12 @@ export default function Navbar() {
           <div className="flex items-center gap-3 sm:hidden">
             <ShoppingBagIcon />
             <div className="text-left">
-              <span className="font-bold text-sm block leading-none text-[#1a0f0a]">Lihat Keranjang</span>
-              <span className="text-xs text-[#1a0f0a]/80 mt-0.5 block leading-none">{cartCount} Item</span>
+              <span className="font-bold text-sm block leading-none text-[#1a0f0a]">
+                Lihat Keranjang
+              </span>
+              <span className="text-xs text-[#1a0f0a]/80 mt-0.5 block leading-none">
+                {cartCount} Item
+              </span>
             </div>
           </div>
           <div className="font-bold text-base text-[#1a0f0a] sm:hidden">

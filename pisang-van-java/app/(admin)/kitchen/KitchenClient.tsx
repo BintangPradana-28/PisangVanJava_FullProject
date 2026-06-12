@@ -470,7 +470,9 @@ export default function KitchenClient({ initialOrders }: KitchenClientProps) {
           <div className="flex flex-col items-center justify-center h-full text-zinc-650 bg-zinc-900/10 border border-zinc-900/50 rounded-2xl">
             <div className="text-6xl mb-4 animate-bounce">🍳</div>
             <p className="text-lg font-bold text-zinc-400">Dapur Sedang Santai</p>
-            <p className="text-xs text-zinc-600 mt-1 uppercase tracking-widest">Tidak ada pesanan aktif saat ini</p>
+            <p className="text-xs text-zinc-600 mt-1 uppercase tracking-widest">
+              Tidak ada pesanan aktif saat ini
+            </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-full overflow-hidden">
@@ -523,7 +525,9 @@ function OrderColumn({
   headerColorClass: string
 }) {
   return (
-    <div className={`flex flex-col bg-zinc-900/30 border border-zinc-805 rounded-xl h-full overflow-hidden ${headerColorClass}`}>
+    <div
+      className={`flex flex-col bg-zinc-900/30 border border-zinc-805 rounded-xl h-full overflow-hidden ${headerColorClass}`}
+    >
       {/* Column Header */}
       <div className="px-4 py-3.5 bg-zinc-900/80 border-b border-zinc-800 flex items-center justify-between shrink-0">
         <h2 className="text-sm font-black text-zinc-300 tracking-wider uppercase flex items-center gap-2">
@@ -589,11 +593,16 @@ function OrderCard({
       <div className="px-4 py-3 flex items-center justify-between border-b border-zinc-800/80 bg-zinc-900/50">
         <div>
           <p className="text-sm font-black text-amber-400">#{order.id.slice(-5).toUpperCase()}</p>
-          <p className="text-sm text-zinc-200 font-bold tracking-wide mt-0.5">{order.customerName}</p>
+          <p className="text-sm text-zinc-200 font-bold tracking-wide mt-0.5">
+            {order.customerName}
+          </p>
         </div>
         <div className="text-right">
-          <p className={`text-xs font-black tracking-wide ${isUrgent ? 'text-red-400 font-black animate-pulse' : 'text-zinc-400'}`}>
-            {isUrgent ? '🚨 ' : ''}{formatElapsed(elapsed)}
+          <p
+            className={`text-xs font-black tracking-wide ${isUrgent ? 'text-red-400 font-black animate-pulse' : 'text-zinc-400'}`}
+          >
+            {isUrgent ? '🚨 ' : ''}
+            {formatElapsed(elapsed)}
           </p>
           <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider mt-0.5">
             {order.source} · {order.deliveryMethod === 'DELIVERY' ? '🛵 Antar' : '🏪 Ambil'}
@@ -651,8 +660,19 @@ function OrderCard({
             {isUpdating ? (
               <span className="flex items-center justify-center gap-2">
                 <svg className="w-4 h-4 animate-spin text-zinc-950" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                  />
                 </svg>
                 MEMPROSES...
               </span>
@@ -665,4 +685,3 @@ function OrderCard({
     </motion.div>
   )
 }
-
