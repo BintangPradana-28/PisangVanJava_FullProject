@@ -1,13 +1,22 @@
 'use client'
 
-import { ChevronRight, LogOut, MapPin, Shield, ShoppingBag, Ticket, User } from 'lucide-react'
+import {
+  ChevronRight,
+  Gift,
+  HelpCircle,
+  LogOut,
+  MapPin,
+  Shield,
+  ShoppingBag,
+  Ticket,
+  User
+} from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { signOut, useSession } from 'next-auth/react'
-import { useCartStore } from '@/src/stores/cart.store'
 import { useLanguage } from '@/context/LanguageContext'
-import { Gift, HelpCircle } from 'lucide-react'
+import { useCartStore } from '@/src/stores/cart.store'
 
 const menuItems = [
   { key: 'profile_menu_info', href: '/profile', icon: User },

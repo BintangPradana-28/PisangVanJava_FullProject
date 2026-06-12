@@ -6,10 +6,10 @@
 // RAG Source: context/SettingsContext.tsx (getSetting)
 
 import { motion } from 'framer-motion'
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import toast, { Toaster } from 'react-hot-toast'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+import toast, { Toaster } from 'react-hot-toast'
 import { applyForReseller } from '@/src/features/crm/actions'
 
 interface ProductVariant {
@@ -59,11 +59,26 @@ const formatDateTime = (isoStr: string): string => {
 }
 
 const STATUS_BADGES: Record<string, { label: string; style: string }> = {
-  PENDING_PAYMENT: { label: '⏳ Belum Bayar', style: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' },
-  PROCESSING: { label: '🍳 Dimasak', style: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400' },
-  READY: { label: '✅ Siap Ambil', style: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400' },
-  COMPLETED: { label: '🎉 Selesai', style: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400' },
-  CANCELED: { label: '❌ Batal', style: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400' }
+  PENDING_PAYMENT: {
+    label: '⏳ Belum Bayar',
+    style: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
+  },
+  PROCESSING: {
+    label: '🍳 Dimasak',
+    style: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400'
+  },
+  READY: {
+    label: '✅ Siap Ambil',
+    style: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400'
+  },
+  COMPLETED: {
+    label: '🎉 Selesai',
+    style: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
+  },
+  CANCELED: {
+    label: '❌ Batal',
+    style: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+  }
 }
 
 export default function ResellerClient({
@@ -125,23 +140,21 @@ export default function ResellerClient({
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-orange-50 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950 pt-24 pb-16">
       <Toaster position="top-right" />
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
-        
         {/* Header */}
         <header className="mb-12 text-center">
           <h1 className="font-serif text-4xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-100">
             🤝 Kemitraan Reseller
           </h1>
           <p className="text-zinc-500 dark:text-zinc-400 mt-2 max-w-xl mx-auto">
-            Program kemitraan resmi Pisang Van Java. Kembangkan bisnis Anda bersama produk kuliner terlaris kami.
+            Program kemitraan resmi Pisang Van Java. Kembangkan bisnis Anda bersama produk kuliner
+            terlaris kami.
           </p>
         </header>
 
         {/* Main Section */}
         <div className="grid lg:grid-cols-[1fr_400px] gap-8 items-start">
-          
           {/* Left panel: Form, Dashboard, or Info */}
           <div className="space-y-6">
-            
             {/* 1. Unauthenticated view */}
             {!isLoggedIn && (
               <motion.div
@@ -154,7 +167,9 @@ export default function ResellerClient({
                   Nikmati Harga Grosir Spesial Reseller
                 </h2>
                 <p className="text-sm text-zinc-650 dark:text-zinc-400 leading-relaxed">
-                  Dapatkan diskon harga hingga 30% untuk setiap varian rasa Pisang Goreng Van Java dengan bergabung menjadi reseller resmi. Tanpa biaya pendaftaran, cukup melakukan minimal order harian/mingguan yang sangat ringan.
+                  Dapatkan diskon harga hingga 30% untuk setiap varian rasa Pisang Goreng Van Java
+                  dengan bergabung menjadi reseller resmi. Tanpa biaya pendaftaran, cukup melakukan
+                  minimal order harian/mingguan yang sangat ringan.
                 </p>
                 <div className="flex gap-4">
                   <Link
@@ -188,7 +203,10 @@ export default function ResellerClient({
                     </h2>
                     <p className="text-sm text-amber-750 dark:text-amber-300 max-w-lg mx-auto leading-relaxed">
                       Terima kasih atas minat Anda bergabung menjadi reseller Pisang Van Java!
-                      Pendaftaran yang Anda ajukan pada <strong>{formatDateTime(pendingApplication.createdAt)}</strong> saat ini sedang diproses oleh Tim Admin kami. Kami akan menghubungi Anda kembali lewat WhatsApp dalam waktu maksimal 1x24 jam.
+                      Pendaftaran yang Anda ajukan pada{' '}
+                      <strong>{formatDateTime(pendingApplication.createdAt)}</strong> saat ini
+                      sedang diproses oleh Tim Admin kami. Kami akan menghubungi Anda kembali lewat
+                      WhatsApp dalam waktu maksimal 1x24 jam.
                     </p>
                     <div className="pt-2 text-xs text-zinc-400 dark:text-zinc-500">
                       Deal ID: {pendingApplication.id}
@@ -210,7 +228,9 @@ export default function ResellerClient({
                           ⚠️ Nomor WhatsApp Diperlukan
                         </div>
                         <p className="text-xs text-red-650 dark:text-red-350 leading-relaxed">
-                          Anda harus menambahkan nomor WhatsApp aktif di profil akun Anda sebelum mendaftar menjadi reseller. Hal ini diperlukan agar tim kami dapat menghubungi Anda untuk proses persetujuan.
+                          Anda harus menambahkan nomor WhatsApp aktif di profil akun Anda sebelum
+                          mendaftar menjadi reseller. Hal ini diperlukan agar tim kami dapat
+                          menghubungi Anda untuk proses persetujuan.
                         </p>
                         <Link
                           href="/profile/keamanan"
@@ -290,7 +310,9 @@ export default function ResellerClient({
                           disabled={isSubmitting}
                           className="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3.5 rounded-[4px] transition-all active:scale-[0.98] shadow-sm shadow-amber-200 dark:shadow-none text-sm disabled:opacity-50"
                         >
-                          {isSubmitting ? 'Mengirimkan Pendaftaran...' : 'Kirim Pendaftaran Reseller 🚀'}
+                          {isSubmitting
+                            ? 'Mengirimkan Pendaftaran...'
+                            : 'Kirim Pendaftaran Reseller 🚀'}
                         </button>
                       </form>
                     )}
@@ -313,7 +335,8 @@ export default function ResellerClient({
                       Selamat Datang, Reseller Resmi! 🍌
                     </h2>
                     <p className="text-xs text-amber-750 dark:text-amber-300 mt-1 max-w-md">
-                      Akun Anda aktif sebagai mitra reseller. Harga grosir otomatis diterapkan saat Anda berbelanja.
+                      Akun Anda aktif sebagai mitra reseller. Harga grosir otomatis diterapkan saat
+                      Anda berbelanja.
                     </p>
                   </div>
                   <Link
@@ -333,7 +356,9 @@ export default function ResellerClient({
                     </span>
                   </div>
                   <div className="bg-white dark:bg-zinc-900 rounded-[4px] border border-zinc-100 dark:border-zinc-800 p-5 shadow-xs">
-                    <span className="text-xs text-zinc-400 block mb-1">Total Belanja (Selesai)</span>
+                    <span className="text-xs text-zinc-400 block mb-1">
+                      Total Belanja (Selesai)
+                    </span>
                     <span className="text-2xl font-black text-amber-600 dark:text-amber-400">
                       {formatPrice(totalSpent)}
                     </span>
@@ -364,11 +389,20 @@ export default function ResellerClient({
                         </thead>
                         <tbody>
                           {resellerOrders.map((order) => {
-                            const badge = STATUS_BADGES[order.status] || { label: order.status, style: 'bg-zinc-100 text-zinc-800' }
+                            const badge = STATUS_BADGES[order.status] || {
+                              label: order.status,
+                              style: 'bg-zinc-100 text-zinc-800'
+                            }
                             return (
-                              <tr key={order.id} className="border-b border-zinc-50 dark:border-zinc-800/50 last:border-0 hover:bg-zinc-50/50 dark:hover:bg-zinc-800/10">
+                              <tr
+                                key={order.id}
+                                className="border-b border-zinc-50 dark:border-zinc-800/50 last:border-0 hover:bg-zinc-50/50 dark:hover:bg-zinc-800/10"
+                              >
                                 <td className="py-3.5 font-bold font-mono">
-                                  <Link href={`/track-order?id=${order.id}`} className="text-amber-600 dark:text-amber-400 hover:underline">
+                                  <Link
+                                    href={`/track-order?id=${order.id}`}
+                                    className="text-amber-600 dark:text-amber-400 hover:underline"
+                                  >
                                     #{order.id.slice(-6).toUpperCase()}
                                   </Link>
                                 </td>
@@ -382,7 +416,9 @@ export default function ResellerClient({
                                   {formatPrice(order.totalPrice)}
                                 </td>
                                 <td className="py-3.5 text-right">
-                                  <span className={`px-2 py-1 rounded-[4px] text-[10px] font-bold ${badge.style}`}>
+                                  <span
+                                    className={`px-2 py-1 rounded-[4px] text-[10px] font-bold ${badge.style}`}
+                                  >
                                     {badge.label}
                                   </span>
                                 </td>
@@ -403,21 +439,31 @@ export default function ResellerClient({
                 📋 Daftar Harga Grosir & Retail
               </h3>
               <p className="text-xs text-zinc-400 dark:text-zinc-500 mb-6">
-                Bandingkan harga normal dan harga khusus reseller PVJ untuk melihat estimasi keuntungan Anda.
+                Bandingkan harga normal dan harga khusus reseller PVJ untuk melihat estimasi
+                keuntungan Anda.
               </p>
 
               <div className="space-y-4">
                 {products.map((prod) => (
-                  <div key={prod.id} className="border-b border-zinc-100 dark:border-zinc-800/60 last:border-0 pb-4 last:pb-0">
+                  <div
+                    key={prod.id}
+                    className="border-b border-zinc-100 dark:border-zinc-800/60 last:border-0 pb-4 last:pb-0"
+                  >
                     <h4 className="font-sans font-bold text-sm text-zinc-800 dark:text-zinc-100 mb-2">
                       🍌 Varian: {prod.flavorName}
                     </h4>
                     <div className="grid grid-cols-3 gap-2 text-center text-xs">
                       {/* Kembung */}
                       <div className="bg-zinc-50 dark:bg-zinc-800/30 p-2.5 rounded-[4px] border border-zinc-100/50 dark:border-zinc-800/20">
-                        <span className="font-bold text-zinc-400 block text-[9px] uppercase tracking-wider mb-1">Base Kembung</span>
-                        <span className="text-[10px] text-zinc-500 line-through block">{formatPrice(prod.priceKembung)}</span>
-                        <span className="font-bold text-amber-600 dark:text-amber-400 block">{formatPrice(prod.wholesaleKembung)}</span>
+                        <span className="font-bold text-zinc-400 block text-[9px] uppercase tracking-wider mb-1">
+                          Base Kembung
+                        </span>
+                        <span className="text-[10px] text-zinc-500 line-through block">
+                          {formatPrice(prod.priceKembung)}
+                        </span>
+                        <span className="font-bold text-amber-600 dark:text-amber-400 block">
+                          {formatPrice(prod.wholesaleKembung)}
+                        </span>
                         {prod.priceKembung > prod.wholesaleKembung && (
                           <span className="text-[9px] text-emerald-600 font-extrabold block mt-0.5">
                             Hemat {formatPrice(prod.priceKembung - prod.wholesaleKembung)}
@@ -427,9 +473,15 @@ export default function ResellerClient({
 
                       {/* Lumpia */}
                       <div className="bg-zinc-50 dark:bg-zinc-800/30 p-2.5 rounded-[4px] border border-zinc-100/50 dark:border-zinc-800/20">
-                        <span className="font-bold text-zinc-400 block text-[9px] uppercase tracking-wider mb-1">Base Lumpia</span>
-                        <span className="text-[10px] text-zinc-500 line-through block">{formatPrice(prod.priceLumpia)}</span>
-                        <span className="font-bold text-amber-600 dark:text-amber-400 block">{formatPrice(prod.wholesaleLumpia)}</span>
+                        <span className="font-bold text-zinc-400 block text-[9px] uppercase tracking-wider mb-1">
+                          Base Lumpia
+                        </span>
+                        <span className="text-[10px] text-zinc-500 line-through block">
+                          {formatPrice(prod.priceLumpia)}
+                        </span>
+                        <span className="font-bold text-amber-600 dark:text-amber-400 block">
+                          {formatPrice(prod.wholesaleLumpia)}
+                        </span>
                         {prod.priceLumpia > prod.wholesaleLumpia && (
                           <span className="text-[9px] text-emerald-600 font-extrabold block mt-0.5">
                             Hemat {formatPrice(prod.priceLumpia - prod.wholesaleLumpia)}
@@ -439,9 +491,15 @@ export default function ResellerClient({
 
                       {/* Krispy */}
                       <div className="bg-zinc-50 dark:bg-zinc-800/30 p-2.5 rounded-[4px] border border-zinc-100/50 dark:border-zinc-800/20">
-                        <span className="font-bold text-zinc-400 block text-[9px] uppercase tracking-wider mb-1">Base Krispy</span>
-                        <span className="text-[10px] text-zinc-500 line-through block">{formatPrice(prod.priceKrispy)}</span>
-                        <span className="font-bold text-amber-600 dark:text-amber-400 block">{formatPrice(prod.wholesaleKrispy)}</span>
+                        <span className="font-bold text-zinc-400 block text-[9px] uppercase tracking-wider mb-1">
+                          Base Krispy
+                        </span>
+                        <span className="text-[10px] text-zinc-500 line-through block">
+                          {formatPrice(prod.priceKrispy)}
+                        </span>
+                        <span className="font-bold text-amber-600 dark:text-amber-400 block">
+                          {formatPrice(prod.wholesaleKrispy)}
+                        </span>
                         {prod.priceKrispy > prod.wholesaleKrispy && (
                           <span className="text-[9px] text-emerald-600 font-extrabold block mt-0.5">
                             Hemat {formatPrice(prod.priceKrispy - prod.wholesaleKrispy)}
@@ -466,37 +524,49 @@ export default function ResellerClient({
                 <span className="text-amber-500 shrink-0">💸</span>
                 <div>
                   <strong>Harga Khusus Grosir</strong>
-                  <p className="mt-0.5 text-[11px] text-zinc-450">Potongan harga khusus reseller langsung terpotong di keranjang hingga Rp 5.000 per box.</p>
+                  <p className="mt-0.5 text-[11px] text-zinc-450">
+                    Potongan harga khusus reseller langsung terpotong di keranjang hingga Rp 5.000
+                    per box.
+                  </p>
                 </div>
               </li>
               <li className="flex gap-2">
                 <span className="text-amber-500 shrink-0">📦</span>
                 <div>
                   <strong>Minimal Order Ringan</strong>
-                  <p className="mt-0.5 text-[11px] text-zinc-450">Tanpa harus menimbun stok ribuan box. Anda sudah mendapatkan harga grosir dengan minimal pembelian 5 box per order.</p>
+                  <p className="mt-0.5 text-[11px] text-zinc-450">
+                    Tanpa harus menimbun stok ribuan box. Anda sudah mendapatkan harga grosir dengan
+                    minimal pembelian 5 box per order.
+                  </p>
                 </div>
               </li>
               <li className="flex gap-2">
                 <span className="text-amber-500 shrink-0">🚀</span>
                 <div>
                   <strong>Prioritas Dapur</strong>
-                  <p className="mt-0.5 text-[11px] text-zinc-450">Pesanan grosir reseller diprioritaskan di sistem dapur (KDS) agar hidangan selalu segar dan selesai tepat waktu.</p>
+                  <p className="mt-0.5 text-[11px] text-zinc-450">
+                    Pesanan grosir reseller diprioritaskan di sistem dapur (KDS) agar hidangan
+                    selalu segar dan selesai tepat waktu.
+                  </p>
                 </div>
               </li>
               <li className="flex gap-2">
                 <span className="text-amber-500 shrink-0">📢</span>
                 <div>
                   <strong>Materi Promosi Gratis</strong>
-                  <p className="mt-0.5 text-[11px] text-zinc-450">Dapatkan akses aset foto HD produk, video marketing, dan katalog digital untuk promosi di sosial media Anda.</p>
+                  <p className="mt-0.5 text-[11px] text-zinc-450">
+                    Dapatkan akses aset foto HD produk, video marketing, dan katalog digital untuk
+                    promosi di sosial media Anda.
+                  </p>
                 </div>
               </li>
             </ul>
 
             <div className="border-t border-zinc-100 dark:border-zinc-800 pt-4 text-[10px] text-zinc-400 dark:text-zinc-500">
-              💡 Syarat & Ketentuan berlaku. Peninjauan kelayakan akun berhak sepenuhnya oleh kebijakan manajemen Pisang Van Java.
+              💡 Syarat & Ketentuan berlaku. Peninjauan kelayakan akun berhak sepenuhnya oleh
+              kebijakan manajemen Pisang Van Java.
             </div>
           </aside>
-
         </div>
       </div>
     </div>

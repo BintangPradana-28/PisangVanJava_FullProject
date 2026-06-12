@@ -207,7 +207,12 @@ export default function MenuGrid({ products }: { products: ProductType[] }) {
                     </button>
 
                     {/* Image */}
-                    <ProductImage src={img} alt={product.flavorName} available={available} priority={i < 3} />
+                    <ProductImage
+                      src={img}
+                      alt={product.flavorName}
+                      available={available}
+                      priority={i < 3}
+                    />
 
                     {/* Content */}
                     <div className="p-6 flex flex-col items-center text-center flex-grow">

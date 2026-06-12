@@ -12,7 +12,8 @@ import ResellerClient from './ResellerClient'
 
 export const metadata: Metadata = {
   title: 'Kemitraan Reseller | Pisang Van Java',
-  description: 'Bergabung sebagai Reseller resmi Pisang Van Java dan nikmati keuntungan harga grosir khusus.'
+  description:
+    'Bergabung sebagai Reseller resmi Pisang Van Java dan nikmati keuntungan harga grosir khusus.'
 }
 
 export const revalidate = 0

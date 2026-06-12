@@ -164,7 +164,10 @@ export async function applyForReseller(payload: unknown) {
     })
 
     if (existing) {
-      return { success: false as const, error: 'Pendaftaran Reseller Anda sebelumnya masih dalam antrean/sedang diproses.' }
+      return {
+        success: false as const,
+        error: 'Pendaftaran Reseller Anda sebelumnya masih dalam antrean/sedang diproses.'
+      }
     }
 
     // Fetch user phone/email
@@ -174,7 +177,10 @@ export async function applyForReseller(payload: unknown) {
     })
 
     if (!userObj || !userObj.phone) {
-      return { success: false as const, error: 'Nomor WhatsApp wajib diisi di profil Anda sebelum mendaftar Reseller.' }
+      return {
+        success: false as const,
+        error: 'Nomor WhatsApp wajib diisi di profil Anda sebelum mendaftar Reseller.'
+      }
     }
 
     const newDeal = await prisma.b2BDeal.create({

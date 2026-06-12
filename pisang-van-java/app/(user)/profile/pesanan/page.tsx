@@ -85,7 +85,11 @@ const getStatusConfig = (status: string, t: any) => {
         label: t('status_done') || 'Selesai'
       }
     case 'CANCELED':
-      return { color: 'bg-red-100 text-red-700 border-red-200', icon: XCircle, label: t('status_cancelled') || 'Dibatalkan' }
+      return {
+        color: 'bg-red-100 text-red-700 border-red-200',
+        icon: XCircle,
+        label: t('status_cancelled') || 'Dibatalkan'
+      }
     default:
       return {
         color: 'bg-zinc-100 text-zinc-700 border-zinc-200',
@@ -133,7 +137,9 @@ const OrderTimeline = ({ currentStatus, t }: { currentStatus: string; t: any }) 
 
   return (
     <div className="py-6 px-2">
-      <h4 className="text-sm font-bold text-zinc-800 dark:text-zinc-200 mb-6">{t('orders_detail_status')}</h4>
+      <h4 className="text-sm font-bold text-zinc-800 dark:text-zinc-200 mb-6">
+        {t('orders_detail_status')}
+      </h4>
       <div className="relative flex justify-between items-center w-full">
         {/* Connecting Line Background */}
         <div className="absolute top-4 left-0 w-full h-1 bg-zinc-200 dark:bg-zinc-800 -z-10 rounded-[4px]"></div>
@@ -316,7 +322,9 @@ export default function PesananPage() {
 
                   <div className="flex items-center justify-between md:justify-end gap-6">
                     <div className="text-left md:text-right">
-                      <p className="text-xs text-zinc-500 font-medium mb-0.5">{t('orders_payment_total')}</p>
+                      <p className="text-xs text-zinc-500 font-medium mb-0.5">
+                        {t('orders_payment_total')}
+                      </p>
                       <p className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
                         Rp {new Intl.NumberFormat('id-ID').format(order.totalPrice)}
                       </p>
@@ -401,7 +409,8 @@ export default function PesananPage() {
                             {/* Payment Method Block */}
                             <div className="bg-white dark:bg-zinc-900 rounded-[4px] p-4 border border-zinc-200 dark:border-zinc-800 shadow-sm">
                               <h4 className="text-sm font-bold text-zinc-800 dark:text-zinc-200 mb-3 flex items-center gap-2">
-                                <CreditCard className="w-4 h-4 text-blue-500" /> {t('orders_payment_method')}
+                                <CreditCard className="w-4 h-4 text-blue-500" />{' '}
+                                {t('orders_payment_method')}
                               </h4>
                               <p className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">
                                 {formatPaymentMethod(order.payment?.paymentType || null)}
@@ -432,7 +441,9 @@ export default function PesananPage() {
                               </div>
 
                               <div className="flex justify-between text-xs text-zinc-600 dark:text-zinc-400">
-                                <span>{t('orders_delivery')} ({order.deliveryMethod})</span>
+                                <span>
+                                  {t('orders_delivery')} ({order.deliveryMethod})
+                                </span>
                                 <span>
                                   Rp {new Intl.NumberFormat('id-ID').format(order.deliveryFee)}
                                 </span>

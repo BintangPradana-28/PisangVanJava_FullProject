@@ -44,9 +44,10 @@ export async function sendOrderConfirmationEmail(orderId: string): Promise<boole
       }).format(n)
 
     const mappedItems = order.items.map((item: any) => {
-      const toppingText = item.toppings && item.toppings.length > 0
-        ? ` + ${item.toppings.map((t: any) => t.name).join(', ')}`
-        : ''
+      const toppingText =
+        item.toppings && item.toppings.length > 0
+          ? ` + ${item.toppings.map((t: any) => t.name).join(', ')}`
+          : ''
       return {
         name: `${item.variant.flavorName} (${item.baseType})${toppingText}`,
         qty: item.quantity,
@@ -139,7 +140,9 @@ export async function sendOrderStatusEmail(orderId: string, status: string): Pro
       return false
     }
 
-    console.log(`[EMAIL] Status update email (${status}) sent to ${customerEmail} for order ${orderId}`)
+    console.log(
+      `[EMAIL] Status update email (${status}) sent to ${customerEmail} for order ${orderId}`
+    )
     return true
   } catch (error) {
     console.error('[EMAIL] Exception while sending status email:', error)

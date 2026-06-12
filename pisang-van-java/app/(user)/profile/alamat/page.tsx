@@ -157,9 +157,7 @@ export default function AlamatPage() {
             <MapPin className="w-7 h-7 text-[#D4802A]" />
             {t('address_title')}
           </h1>
-          <p className="text-zinc-500 dark:text-zinc-400 mt-1">
-            {t('address_subtitle')}
-          </p>
+          <p className="text-zinc-500 dark:text-zinc-400 mt-1">{t('address_subtitle')}</p>
         </div>
         <button
           onClick={() => handleOpenModal()}
@@ -226,7 +224,8 @@ export default function AlamatPage() {
                     </h3>
                     {addr.latitude && addr.longitude && (
                       <span className="text-xs text-green-600 dark:text-green-400 font-medium flex items-center gap-1 mt-0.5">
-                        <Navigation className="w-3 h-3" /> {t('address_pin_saved') ?? 'Pin Peta Tersimpan'}
+                        <Navigation className="w-3 h-3" />{' '}
+                        {t('address_pin_saved') ?? 'Pin Peta Tersimpan'}
                       </span>
                     )}
                   </div>
@@ -241,7 +240,9 @@ export default function AlamatPage() {
                   <div className="bg-zinc-50 dark:bg-zinc-800/50 p-3 rounded-[4px] text-xs text-zinc-500 dark:text-zinc-400 flex items-start gap-2">
                     <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-zinc-400" />
                     <span>
-                      <strong className="text-zinc-700 dark:text-zinc-300">{t('address_note_label') ?? 'Catatan:'}</strong>{' '}
+                      <strong className="text-zinc-700 dark:text-zinc-300">
+                        {t('address_note_label') ?? 'Catatan:'}
+                      </strong>{' '}
                       {addr.notes}
                     </span>
                   </div>
@@ -329,7 +330,8 @@ export default function AlamatPage() {
                       </span>
                       {mapPosition && (
                         <span className="text-xs text-green-600 dark:text-green-400 font-medium bg-green-50 dark:bg-green-900/20 px-2 py-1 rounded-md flex items-center gap-1">
-                          <CheckCircle2 className="w-3 h-3" /> {t('address_pin_saved') ?? 'Pin Tersimpan'}
+                          <CheckCircle2 className="w-3 h-3" />{' '}
+                          {t('address_pin_saved') ?? 'Pin Tersimpan'}
                         </span>
                       )}
                     </label>
@@ -359,9 +361,7 @@ export default function AlamatPage() {
                   <div className="space-y-2 md:col-span-2">
                     <label className="text-sm font-bold text-zinc-700 dark:text-zinc-300">
                       {t('address_notes')}{' '}
-                      <span className="text-zinc-400 font-normal text-xs">
-                        (Opsional)
-                      </span>
+                      <span className="text-zinc-400 font-normal text-xs">(Opsional)</span>
                     </label>
                     <input
                       type="text"
@@ -416,7 +416,11 @@ export default function AlamatPage() {
                 disabled={isSubmitting}
                 className="bg-[#D4802A] hover:bg-[#b56d24] text-white px-8 py-2.5 rounded-[4px] font-bold flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed min-w-[140px]"
               >
-                {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : t('address_save_btn')}
+                {isSubmitting ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  t('address_save_btn')
+                )}
               </button>
             </div>
           </div>

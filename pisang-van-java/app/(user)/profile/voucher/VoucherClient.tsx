@@ -2,9 +2,9 @@
 
 import { motion } from 'framer-motion'
 import { ChevronRight, Clock, Coins, Ticket } from 'lucide-react'
-import { useState, useEffect } from 'react'
-import { useLanguage } from '@/context/LanguageContext'
+import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
+import { useLanguage } from '@/context/LanguageContext'
 
 interface VoucherData {
   id: string
@@ -103,27 +103,30 @@ export default function VoucherClient({
         </div>
 
         {koinLogs.length === 0 ? (
-          <div className="text-center py-8 text-zinc-500 text-sm">
-            {t('voucher_history_empty')}
-          </div>
+          <div className="text-center py-8 text-zinc-500 text-sm">{t('voucher_history_empty')}</div>
         ) : (
           <div className="divide-y divide-zinc-100 dark:divide-zinc-800 max-h-80 overflow-y-auto pr-2 space-y-3">
             {koinLogs.map((log) => {
               const isPositive = log.amount >= 0
               return (
-                <div key={log.id} className="flex justify-between items-center py-3 first:pt-0 last:pb-0">
+                <div
+                  key={log.id}
+                  className="flex justify-between items-center py-3 first:pt-0 last:pb-0"
+                >
                   <div className="flex flex-col">
                     <span className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">
                       {log.description}
                     </span>
                     <span className="text-xs text-zinc-400">
-                      {mounted ? new Intl.DateTimeFormat('id-ID', {
-                        day: 'numeric',
-                        month: 'short',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      }).format(new Date(log.createdAt)) : ''}
+                      {mounted
+                        ? new Intl.DateTimeFormat('id-ID', {
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          }).format(new Date(log.createdAt))
+                        : ''}
                     </span>
                   </div>
                   <span
@@ -160,9 +163,7 @@ export default function VoucherClient({
         {vouchers.length === 0 ? (
           <div className="flex flex-col items-center justify-center text-center py-12 px-4 border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-[4px]">
             <Ticket className="w-12 h-12 text-zinc-300 dark:text-zinc-700 mb-3" />
-            <p className="text-zinc-500 font-medium">
-              {t('voucher_available_empty')}
-            </p>
+            <p className="text-zinc-500 font-medium">{t('voucher_available_empty')}</p>
           </div>
         ) : (
           <div className="grid sm:grid-cols-2 gap-4">
@@ -209,7 +210,10 @@ export default function VoucherClient({
                   <button
                     onClick={() => {
                       navigator.clipboard.writeText(v.code)
-                      toast.success(t('voucher_copied_alert')?.replace('{code}', v.code) || `Voucher ${v.code} copied!`)
+                      toast.success(
+                        t('voucher_copied_alert')?.replace('{code}', v.code) ||
+                          `Voucher ${v.code} copied!`
+                      )
                     }}
                     className="text-xs font-bold text-amber-600 dark:text-amber-500 hover:text-amber-700 flex items-center gap-1"
                   >

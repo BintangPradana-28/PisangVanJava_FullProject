@@ -23,9 +23,9 @@ import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import { z } from 'zod'
 import { requestEmailOTP, verifyAndChangeEmail } from '@/app/actions/emailChange'
+import { useLanguage } from '@/context/LanguageContext'
 import { api } from '@/src/lib/api'
 import getCroppedImg from '@/src/lib/cropImage'
-import { useLanguage } from '@/context/LanguageContext'
 
 // --- Schemas ---
 const profileSchema = z.object({
@@ -393,9 +393,7 @@ export default function ProfileDataDiriPage() {
             <h2 className="text-xl font-bold font-serif text-zinc-900 dark:text-zinc-100">
               {t('profile_title')}
             </h2>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">
-              {t('profile_subtitle')}
-            </p>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400">{t('profile_subtitle')}</p>
           </div>
         </div>
 
@@ -432,7 +430,9 @@ export default function ProfileDataDiriPage() {
               </label>
             </div>
             <div className="text-center md:text-left flex-1">
-              <h3 className="font-bold text-zinc-900 dark:text-zinc-100 text-lg">{t('profile_avatar_title')}</h3>
+              <h3 className="font-bold text-zinc-900 dark:text-zinc-100 text-lg">
+                {t('profile_avatar_title')}
+              </h3>
               <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1 max-w-sm">
                 {t('profile_avatar_desc')}
               </p>
@@ -603,7 +603,15 @@ export default function ProfileDataDiriPage() {
                 >
                   <div className="flex gap-3 text-blue-700 dark:text-blue-400 mb-2">
                     <ShieldCheck className="w-5 h-5 shrink-0" />
-                    <p className="text-sm" dangerouslySetInnerHTML={{__html: t('profile_email_otp_sent').replace('{email}', `<strong>${session?.user?.email}</strong>`)}} />
+                    <p
+                      className="text-sm"
+                      dangerouslySetInnerHTML={{
+                        __html: t('profile_email_otp_sent').replace(
+                          '{email}',
+                          `<strong>${session?.user?.email}</strong>`
+                        )
+                      }}
+                    />
                   </div>
                   <div>
                     <input
@@ -641,9 +649,7 @@ export default function ProfileDataDiriPage() {
                 >
                   <div className="flex items-center gap-2 text-green-600 dark:text-green-400 mb-2">
                     <CheckCircle2 className="w-5 h-5" />
-                    <p className="text-sm font-bold">
-                      {t('profile_email_otp_verified')}
-                    </p>
+                    <p className="text-sm font-bold">{t('profile_email_otp_verified')}</p>
                   </div>
                   <form
                     onSubmit={handleEmailSubmit(handleVerifyAndChangeEmail)}

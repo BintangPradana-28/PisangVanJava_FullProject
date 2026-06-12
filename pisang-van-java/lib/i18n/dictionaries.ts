@@ -296,7 +296,8 @@ export const dictionaries: Record<Locale, Translations> = {
     admin_settings: 'Pengaturan',
     // Profile Translations
     profile_welcome: 'Halo, {name}! 👋',
-    profile_welcome_desc: 'Selamat datang di dashboard profil Anda. Kelola pesanan dan preferensi di sini.',
+    profile_welcome_desc:
+      'Selamat datang di dashboard profil Anda. Kelola pesanan dan preferensi di sini.',
     profile_member: 'Pelanggan',
     profile_menu_info: 'Data Diri',
     profile_menu_address: 'Alamat Pengiriman',
@@ -310,7 +311,8 @@ export const dictionaries: Record<Locale, Translations> = {
     profile_title: 'Data Diri',
     profile_subtitle: 'Kelola informasi publik dan kontak Anda',
     profile_avatar_title: 'Foto Profil',
-    profile_avatar_desc: 'Format JPG, PNG, atau WEBP. Maksimal 2MB. Anda dapat menyesuaikan potongan gambar setelah memilih file.',
+    profile_avatar_desc:
+      'Format JPG, PNG, atau WEBP. Maksimal 2MB. Anda dapat menyesuaikan potongan gambar setelah memilih file.',
     profile_avatar_delete: 'Hapus Foto',
     profile_name_label: 'Nama Lengkap',
     profile_name_placeholder: 'Masukkan nama lengkap',
@@ -320,12 +322,14 @@ export const dictionaries: Record<Locale, Translations> = {
     profile_save_loading: 'Menyimpan...',
     profile_oauth_title: 'Keamanan Akun Terhubung',
     profile_oauth_subtitle: 'Autentikasi dikelola oleh pihak ketiga',
-    profile_oauth_desc: 'Anda mendaftar dan masuk menggunakan akun Google ({email}). Oleh karena itu, kata sandi dan alamat email Anda sepenuhnya diamankan dan dikelola oleh sistem Google. Anda tidak perlu mengganti kata sandi di platform kami.',
+    profile_oauth_desc:
+      'Anda mendaftar dan masuk menggunakan akun Google ({email}). Oleh karena itu, kata sandi dan alamat email Anda sepenuhnya diamankan dan dikelola oleh sistem Google. Anda tidak perlu mengganti kata sandi di platform kami.',
     profile_email_title: 'Ubah Alamat Email',
     profile_email_subtitle: 'Perlu verifikasi OTP ke email lama untuk keamanan',
     profile_email_current: 'Email Saat Ini',
     profile_email_change_btn: 'Ubah Email',
-    profile_email_otp_sent: 'Kami telah mengirim kode 6-digit ke {email}. Masukkan kode di bawah untuk mengotorisasi perubahan email.',
+    profile_email_otp_sent:
+      'Kami telah mengirim kode 6-digit ke {email}. Masukkan kode di bawah untuk mengotorisasi perubahan email.',
     profile_email_otp_verify_btn: 'Verifikasi OTP',
     profile_email_otp_verified: 'Otorisasi Berhasil. Silakan masukkan email baru Anda.',
     profile_email_new_label: 'Email Baru',
@@ -342,7 +346,8 @@ export const dictionaries: Record<Locale, Translations> = {
     profile_password_save_btn: 'Perbarui Password',
     // Keamanan Translations
     security_title: 'Notifikasi & Keamanan',
-    security_subtitle: 'Kelola preferensi notifikasi, sesi aktif, dan keamanan lapis ganda Anda di sini.',
+    security_subtitle:
+      'Kelola preferensi notifikasi, sesi aktif, dan keamanan lapis ganda Anda di sini.',
     security_prefs_title: 'Preferensi Notifikasi',
     security_pref_promo: 'Email Promosi',
     security_pref_promo_desc: 'Dapatkan info promo & diskon Koin Pisang via email.',
@@ -351,16 +356,19 @@ export const dictionaries: Record<Locale, Translations> = {
     security_pref_push: 'Push Notification',
     security_pref_push_desc: 'Notifikasi instan di browser (Memerlukan izin).',
     security_totp_title: 'Verifikasi 2 Langkah (TOTP)',
-    security_totp_desc: 'Lindungi akun Anda dengan lapisan keamanan tambahan menggunakan aplikasi seperti Google Authenticator.',
+    security_totp_desc:
+      'Lindungi akun Anda dengan lapisan keamanan tambahan menggunakan aplikasi seperti Google Authenticator.',
     security_totp_enable_btn: 'Aktifkan 2FA',
     security_totp_disable_btn: 'Nonaktifkan',
     security_totp_active: 'Aktif',
     security_sessions_title: 'Sesi & Perangkat Aktif',
-    security_sessions_desc: 'Daftar perangkat yang saat ini masuk ke akun Anda. Jika ada perangkat yang tidak dikenali, segera cabut aksesnya.',
+    security_sessions_desc:
+      'Daftar perangkat yang saat ini masuk ke akun Anda. Jika ada perangkat yang tidak dikenali, segera cabut aksesnya.',
     security_sessions_current: 'Perangkat Ini',
     security_sessions_revoke_btn: 'Cabut Akses',
     security_danger_title: 'Zona Berbahaya',
-    security_danger_desc: 'Hapus akun Anda beserta semua data Koin Pisang dan Voucher secara permanen. Tindakan ini tidak bisa dibatalkan.',
+    security_danger_desc:
+      'Hapus akun Anda beserta semua data Koin Pisang dan Voucher secara permanen. Tindakan ini tidak bisa dibatalkan.',
     security_danger_delete_btn: 'Hapus Akun Saya',
     security_danger_confirm_title: 'Konfirmasi Hapus Akun',
     security_danger_password_placeholder: 'Masukkan kata sandi Anda',
@@ -371,7 +379,8 @@ export const dictionaries: Record<Locale, Translations> = {
     address_subtitle: 'Kelola alamat rumah, kantor, atau tujuan pengiriman lainnya.',
     address_add_btn: 'Tambah Alamat Baru',
     address_empty_title: 'Belum Ada Alamat',
-    address_empty_desc: 'Anda belum menambahkan alamat pengiriman. Tambahkan alamat sekarang untuk mempercepat proses checkout.',
+    address_empty_desc:
+      'Anda belum menambahkan alamat pengiriman. Tambahkan alamat sekarang untuk mempercepat proses checkout.',
     address_empty_btn: 'Tambah Alamat Sekarang',
     address_default_badge: 'Alamat Utama',
     address_set_default: 'Jadikan Utama',
@@ -383,7 +392,8 @@ export const dictionaries: Record<Locale, Translations> = {
     address_map_desc: 'Opsional untuk akurasi kurir',
     address_map_help: '* Geser peta atau marker untuk menetapkan titik koordinat yang akurat.',
     address_full: 'Alamat Lengkap',
-    address_full_placeholder: 'Nama Jalan, RT/RW, Kelurahan, Kecamatan, Kota/Kabupaten, Provinsi, Kode Pos',
+    address_full_placeholder:
+      'Nama Jalan, RT/RW, Kelurahan, Kecamatan, Kota/Kabupaten, Provinsi, Kode Pos',
     address_notes: 'Catatan untuk Kurir',
     address_notes_placeholder: 'Contoh: Rumah cat hijau dekat pertigaan, titip di satpam',
     address_set_default_chk: 'Jadikan sebagai Alamat Utama',
@@ -734,7 +744,8 @@ export const dictionaries: Record<Locale, Translations> = {
     profile_title: 'Personal Info',
     profile_subtitle: 'Manage your public information and contacts',
     profile_avatar_title: 'Profile Picture',
-    profile_avatar_desc: 'Format JPG, PNG, or WEBP. Max 2MB. You can adjust the crop after selecting the file.',
+    profile_avatar_desc:
+      'Format JPG, PNG, or WEBP. Max 2MB. You can adjust the crop after selecting the file.',
     profile_avatar_delete: 'Delete Photo',
     profile_name_label: 'Full Name',
     profile_name_placeholder: 'Enter full name',
@@ -744,12 +755,14 @@ export const dictionaries: Record<Locale, Translations> = {
     profile_save_loading: 'Saving...',
     profile_oauth_title: 'Linked Account Security',
     profile_oauth_subtitle: 'Authentication managed by a third party',
-    profile_oauth_desc: 'You registered and logged in using Google ({email}). Therefore, your password and email address are fully secured and managed by Google. You do not need to change your password on our platform.',
+    profile_oauth_desc:
+      'You registered and logged in using Google ({email}). Therefore, your password and email address are fully secured and managed by Google. You do not need to change your password on our platform.',
     profile_email_title: 'Change Email Address',
     profile_email_subtitle: 'Need OTP verification to old email for security',
     profile_email_current: 'Current Email',
     profile_email_change_btn: 'Change Email',
-    profile_email_otp_sent: 'We have sent a 6-digit code to {email}. Enter the code below to authorize the email change.',
+    profile_email_otp_sent:
+      'We have sent a 6-digit code to {email}. Enter the code below to authorize the email change.',
     profile_email_otp_verify_btn: 'Verify OTP',
     profile_email_otp_verified: 'Authorization Successful. Please enter your new email.',
     profile_email_new_label: 'New Email',
@@ -766,7 +779,8 @@ export const dictionaries: Record<Locale, Translations> = {
     profile_password_save_btn: 'Update Password',
     // Keamanan Translations
     security_title: 'Notifications & Security',
-    security_subtitle: 'Manage notification preferences, active sessions, and multi-factor security here.',
+    security_subtitle:
+      'Manage notification preferences, active sessions, and multi-factor security here.',
     security_prefs_title: 'Notification Preferences',
     security_pref_promo: 'Promo Emails',
     security_pref_promo_desc: 'Get promo info & coin discounts via email.',
@@ -775,16 +789,19 @@ export const dictionaries: Record<Locale, Translations> = {
     security_pref_push: 'Push Notifications',
     security_pref_push_desc: 'Instant browser notifications (requires permission).',
     security_totp_title: '2-Step Verification (TOTP)',
-    security_totp_desc: 'Protect your account with an extra layer of security using apps like Google Authenticator.',
+    security_totp_desc:
+      'Protect your account with an extra layer of security using apps like Google Authenticator.',
     security_totp_enable_btn: 'Enable 2FA',
     security_totp_disable_btn: 'Disable',
     security_totp_active: 'Active',
     security_sessions_title: 'Active Sessions & Devices',
-    security_sessions_desc: 'List of devices currently logged into your account. If any device is unrecognized, revoke its access immediately.',
+    security_sessions_desc:
+      'List of devices currently logged into your account. If any device is unrecognized, revoke its access immediately.',
     security_sessions_current: 'This Device',
     security_sessions_revoke_btn: 'Revoke Access',
     security_danger_title: 'Danger Zone',
-    security_danger_desc: 'Permanently delete your account along with all coin and voucher data. This action cannot be undone.',
+    security_danger_desc:
+      'Permanently delete your account along with all coin and voucher data. This action cannot be undone.',
     security_danger_delete_btn: 'Delete My Account',
     security_danger_confirm_title: 'Confirm Account Deletion',
     security_danger_password_placeholder: 'Enter your password',
@@ -795,7 +812,8 @@ export const dictionaries: Record<Locale, Translations> = {
     address_subtitle: 'Manage home, office, or other shipping addresses.',
     address_add_btn: 'Add New Address',
     address_empty_title: 'No Address Yet',
-    address_empty_desc: 'You have not added any shipping addresses. Add one now to speed up the checkout process.',
+    address_empty_desc:
+      'You have not added any shipping addresses. Add one now to speed up the checkout process.',
     address_empty_btn: 'Add Address Now',
     address_default_badge: 'Default Address',
     address_set_default: 'Set Default',
@@ -807,9 +825,11 @@ export const dictionaries: Record<Locale, Translations> = {
     address_map_desc: 'Optional for courier accuracy',
     address_map_help: '* Drag the map or marker to set accurate coordinates.',
     address_full: 'Full Address',
-    address_full_placeholder: 'Street Name, RT/RW, Village, Sub-district, City, Province, Postal Code',
+    address_full_placeholder:
+      'Street Name, RT/RW, Village, Sub-district, City, Province, Postal Code',
     address_notes: 'Notes for Courier',
-    address_notes_placeholder: 'Example: Green painted house near the intersection, leave at security',
+    address_notes_placeholder:
+      'Example: Green painted house near the intersection, leave at security',
     address_set_default_chk: 'Set as Default Address',
     address_cancel_btn: 'Cancel',
     address_save_btn: 'Save',
@@ -819,7 +839,7 @@ export const dictionaries: Record<Locale, Translations> = {
     orders_title: 'Order History',
     orders_subtitle: 'Track order statuses and view purchase details',
     orders_empty: 'No order history yet.',
-    orders_empty_desc: 'Let\'s start exploring our delicious menu!',
+    orders_empty_desc: "Let's start exploring our delicious menu!",
     orders_empty_btn: 'See Special Menu',
     orders_id: 'Order ID:',
     orders_payment_total: 'Total Payment',

@@ -33,7 +33,7 @@ export function CartSyncProvider({ children }: { children: React.ReactNode }) {
   // Hydrate cart dari localStorage — satu kali saat mount
   useEffect(() => {
     useCartStore.persist.rehydrate()
-  }, [])  // ── 1. Sinkronisasi Awal & Lintas Perangkat (Focus Sync) ──
+  }, []) // ── 1. Sinkronisasi Awal & Lintas Perangkat (Focus Sync) ──
   useEffect(() => {
     if (!_hasHydrated) return
 

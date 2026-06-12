@@ -1,6 +1,6 @@
 // app/layout.tsx
 import type { Metadata } from 'next'
-import { Plus_Jakarta_Sans, Fraunces } from 'next/font/google'
+import { Fraunces, Plus_Jakarta_Sans } from 'next/font/google'
 import '../styles/globals.css'
 import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'

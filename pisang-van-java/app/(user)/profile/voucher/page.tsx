@@ -50,10 +50,14 @@ export default async function VoucherPage() {
     }
   })
 
-  const serializedLogs = user.koinLogs.map((log: { id: string; amount: number; description: string; createdAt: Date }) => ({
-    ...log,
-    createdAt: log.createdAt.toISOString()
-  }))
+  const serializedLogs = user.koinLogs.map(
+    (log: { id: string; amount: number; description: string; createdAt: Date }) => ({
+      ...log,
+      createdAt: log.createdAt.toISOString()
+    })
+  )
 
-  return <VoucherClient koinPisang={user.koinPisang} vouchers={vouchers} koinLogs={serializedLogs} />
+  return (
+    <VoucherClient koinPisang={user.koinPisang} vouchers={vouchers} koinLogs={serializedLogs} />
+  )
 }

@@ -2,7 +2,7 @@
 
 import { BellRing, ShieldCheck, Smartphone, Trash2 } from 'lucide-react'
 import Image from 'next/image'
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'react-hot-toast'
 import {
   deleteAccount,
@@ -131,7 +131,9 @@ export default function SecurityClient({
           <div className="w-12 h-12 rounded-[4px] bg-[#D4802A]/10 text-[#D4802A] flex items-center justify-center">
             <BellRing className="w-6 h-6" />
           </div>
-          <h3 className="text-xl font-bold font-serif text-zinc-900 dark:text-zinc-100">{t('security_prefs_title')}</h3>
+          <h3 className="text-xl font-bold font-serif text-zinc-900 dark:text-zinc-100">
+            {t('security_prefs_title')}
+          </h3>
         </div>
         <div className="space-y-4">
           <ToggleItem
@@ -162,10 +164,10 @@ export default function SecurityClient({
             <ShieldCheck className="w-6 h-6" />
           </div>
           <div>
-            <h3 className="text-xl font-bold font-serif text-zinc-900 dark:text-zinc-100">{t('security_totp_title')}</h3>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">
-              {t('security_totp_desc')}
-            </p>
+            <h3 className="text-xl font-bold font-serif text-zinc-900 dark:text-zinc-100">
+              {t('security_totp_title')}
+            </h3>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400">{t('security_totp_desc')}</p>
           </div>
         </div>
 
@@ -181,7 +183,8 @@ export default function SecurityClient({
         ) : (
           <div className="space-y-4">
             <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400 text-sm font-bold rounded-[4px]">
-              <span className="w-2 h-2 rounded-[4px] bg-green-500"></span> {t('security_totp_active')}
+              <span className="w-2 h-2 rounded-[4px] bg-green-500"></span>{' '}
+              {t('security_totp_active')}
             </span>
             <form onSubmit={handleDisable2FA} className="flex gap-3 items-center">
               {hasPassword && (
@@ -193,13 +196,15 @@ export default function SecurityClient({
                   required
                 />
               )}
-              <button type="submit" className="text-sm px-4 py-2 bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/40 font-bold rounded-[4px] transition-colors">
+              <button
+                type="submit"
+                className="text-sm px-4 py-2 bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/40 font-bold rounded-[4px] transition-colors"
+              >
                 {t('security_totp_disable_btn')}
               </button>
             </form>
           </div>
         )}
-
       </section>
 
       {/* 3. Manajemen Sesi Aktif */}
@@ -209,7 +214,9 @@ export default function SecurityClient({
             <Smartphone className="w-6 h-6" />
           </div>
           <div>
-            <h3 className="text-xl font-bold font-serif text-zinc-900 dark:text-zinc-100">{t('security_sessions_title')}</h3>
+            <h3 className="text-xl font-bold font-serif text-zinc-900 dark:text-zinc-100">
+              {t('security_sessions_title')}
+            </h3>
             <p className="text-sm text-zinc-500 dark:text-zinc-400">
               {t('security_sessions_desc')}
             </p>
@@ -217,7 +224,9 @@ export default function SecurityClient({
         </div>
 
         <div className="space-y-3">
-          {sessions.length === 0 && <p className="text-sm text-zinc-500 dark:text-zinc-400">Tidak ada data sesi.</p>}
+          {sessions.length === 0 && (
+            <p className="text-sm text-zinc-500 dark:text-zinc-400">Tidak ada data sesi.</p>
+          )}
           {sessions.map((sess) => (
             <div
               key={sess.sessionId}
@@ -258,10 +267,10 @@ export default function SecurityClient({
             <Trash2 className="w-6 h-6" />
           </div>
           <div>
-            <h3 className="text-xl font-bold font-serif text-red-600 dark:text-red-400">{t('security_danger_title')}</h3>
-            <p className="text-sm text-red-500 dark:text-red-400/80">
-              {t('security_danger_desc')}
-            </p>
+            <h3 className="text-xl font-bold font-serif text-red-600 dark:text-red-400">
+              {t('security_danger_title')}
+            </h3>
+            <p className="text-sm text-red-500 dark:text-red-400/80">{t('security_danger_desc')}</p>
           </div>
         </div>
 
@@ -277,7 +286,9 @@ export default function SecurityClient({
             onSubmit={handleDeleteAccount}
             className="bg-white dark:bg-zinc-900 p-6 rounded-[4px] border border-red-200 dark:border-red-900/50"
           >
-            <p className="text-sm font-bold mb-4 text-red-600 dark:text-red-400">{t('security_danger_confirm_title')}</p>
+            <p className="text-sm font-bold mb-4 text-red-600 dark:text-red-400">
+              {t('security_danger_confirm_title')}
+            </p>
             {hasPassword && (
               <input
                 type="password"
@@ -316,7 +327,9 @@ export default function SecurityClient({
             >
               ✕
             </button>
-            <h4 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-2 font-serif">Setup Authenticator</h4>
+            <h4 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-2 font-serif">
+              Setup Authenticator
+            </h4>
             <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-6">
               Pindai kode QR ini menggunakan aplikasi Google Authenticator atau Authy.
             </p>
