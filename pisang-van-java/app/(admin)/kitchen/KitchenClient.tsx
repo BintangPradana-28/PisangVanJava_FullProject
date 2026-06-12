@@ -52,9 +52,9 @@ const STATUS_LABELS: Record<string, string> = {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  PENDING_PAYMENT: 'border-yellow-400 bg-yellow-50',
-  PROCESSING: 'border-orange-500 bg-orange-50',
-  READY: 'border-green-500 bg-green-50'
+  PENDING_PAYMENT: 'border-yellow-500 bg-zinc-900/90 text-zinc-100 shadow-yellow-950/20',
+  PROCESSING: 'border-orange-500 bg-zinc-900/90 text-zinc-100 shadow-orange-950/20',
+  READY: 'border-emerald-500 bg-zinc-900/90 text-zinc-100 shadow-emerald-950/20'
 }
 
 const BUTTON_LABELS: Record<string, string> = {
@@ -65,20 +65,38 @@ const BUTTON_LABELS: Record<string, string> = {
 
 // ── Audio notification helper ──────────────────────────────────────────────────
 
+let sharedAudioCtx: AudioContext | null = null
+
+function getSharedAudioContext(): AudioContext | null {
+  if (typeof window === 'undefined') return null
+  if (!sharedAudioCtx) {
+    const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext
+    if (AudioContextClass) {
+      sharedAudioCtx = new AudioContextClass()
+    }
+  }
+  return sharedAudioCtx
+}
+
 function playNotificationSound(): void {
   try {
-    const audioCtx = new AudioContext()
-    const oscillator = audioCtx.createOscillator()
-    const gainNode = audioCtx.createGain()
+    const ctx = getSharedAudioContext()
+    if (!ctx) return
+    if (ctx.state === 'suspended') {
+      console.warn('[KDS] AudioContext is suspended. Notification sound skipped.')
+      return
+    }
+    const oscillator = ctx.createOscillator()
+    const gainNode = ctx.createGain()
     oscillator.connect(gainNode)
-    gainNode.connect(audioCtx.destination)
+    gainNode.connect(ctx.destination)
     oscillator.frequency.value = 880
     oscillator.type = 'sine'
     gainNode.gain.value = 0.3
     oscillator.start()
-    oscillator.stop(audioCtx.currentTime + 0.2)
-  } catch {
-    // Audio API unavailable — fail silently
+    oscillator.stop(ctx.currentTime + 0.2)
+  } catch (error) {
+    console.error('[KDS] Failed to play notification sound:', error)
   }
 }
 
@@ -105,11 +123,108 @@ export default function KitchenClient({ initialOrders }: KitchenClientProps) {
   const [, forceRender] = useState(0)
   const prevOrderIdsRef = useRef<Set<string>>(new Set(initialOrders.map((o) => o.id)))
 
+  // Audio Context state
+  const [isAudioUnlocked, setIsAudioUnlocked] = useState(false)
+
+  // WakeLock state and refs
+  const wakeLockRef = useRef<any>(null)
+  const [isWakeLockActive, setIsWakeLockActive] = useState(false)
+
+  const requestWakeLock = useCallback(async () => {
+    if (typeof window === 'undefined' || !('wakeLock' in navigator)) return
+    try {
+      if (wakeLockRef.current) {
+        await wakeLockRef.current.release()
+        wakeLockRef.current = null
+      }
+      const sentinel = await (navigator as any).wakeLock.request('screen')
+      wakeLockRef.current = sentinel
+      setIsWakeLockActive(true)
+      console.log('[KDS] Wake Lock successfully acquired.')
+    } catch (err) {
+      console.error('[KDS] Failed to acquire Wake Lock:', err)
+      setIsWakeLockActive(false)
+    }
+  }, [])
+
+  const releaseWakeLock = useCallback(async () => {
+    if (wakeLockRef.current) {
+      try {
+        await wakeLockRef.current.release()
+      } catch (err) {
+        console.error('[KDS] Failed to release Wake Lock:', err)
+      }
+      wakeLockRef.current = null
+      setIsWakeLockActive(false)
+    }
+  }, [])
+
   // Force re-render every 30s to keep elapsed times fresh
   useEffect(() => {
     const interval = setInterval(() => forceRender((c) => c + 1), 30000)
     return () => clearInterval(interval)
   }, [])
+
+  // Request screen wake lock on mount and visibility changes
+  useEffect(() => {
+    requestWakeLock()
+
+    const handleVisibilityChange = async () => {
+      if (document.visibilityState === 'visible') {
+        await requestWakeLock()
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+      releaseWakeLock()
+    }
+  }, [requestWakeLock, releaseWakeLock])
+
+  // Monitor AudioContext state on mount (in case it's already unlocked)
+  useEffect(() => {
+    const ctx = getSharedAudioContext()
+    if (ctx) {
+      if (ctx.state === 'running') {
+        setIsAudioUnlocked(true)
+      } else {
+        const checkState = () => {
+          if (ctx.state === 'running') {
+            setIsAudioUnlocked(true)
+            ctx.removeEventListener('statechange', checkState)
+          }
+        }
+        ctx.addEventListener('statechange', checkState)
+        return () => ctx.removeEventListener('statechange', checkState)
+      }
+    }
+  }, [])
+
+  // Audio unlock click handler
+  const handleUnlockAudio = async () => {
+    try {
+      const ctx = getSharedAudioContext()
+      if (ctx) {
+        await ctx.resume()
+        // Play a short chime to verify sound is active
+        const osc = ctx.createOscillator()
+        const gain = ctx.createGain()
+        osc.connect(gain)
+        gain.connect(ctx.destination)
+        osc.frequency.value = 880
+        osc.type = 'sine'
+        gain.gain.value = 0.2
+        osc.start()
+        osc.stop(ctx.currentTime + 0.15)
+        setIsAudioUnlocked(true)
+        toast.success('Suara dapur diaktifkan 🔔')
+      }
+    } catch (err) {
+      console.error('[KDS] Failed to resume AudioContext:', err)
+      toast.error('Gagal mengaktifkan suara')
+    }
+  }
 
   // ── Supabase Realtime Subscription ───────────────────────────────────────────
   useEffect(() => {
@@ -144,7 +259,7 @@ export default function KitchenClient({ initialOrders }: KitchenClientProps) {
               prev.map((o) => (o.id === record.id ? { ...o, status: record.status! } : o))
             )
           } else {
-            // Order completed/cancelled — remove from display
+            // Order completed/cancelled/expired — remove from display
             setOrders((prev) => prev.filter((o) => o.id !== record.id))
           }
         } else if (payload.eventType === 'DELETE') {
@@ -184,7 +299,6 @@ export default function KitchenClient({ initialOrders }: KitchenClientProps) {
   }, [orders])
 
   // ── Fetch new order data ─────────────────────────────────────────────────────
-
   const handleNewOrder = useCallback(async (orderId: string) => {
     try {
       const res = await fetch(`/api/orders/${orderId}`, {
@@ -229,12 +343,22 @@ export default function KitchenClient({ initialOrders }: KitchenClientProps) {
   }, [])
 
   // ── Update Order Status ──────────────────────────────────────────────────────
-
   const handleStatusUpdate = useCallback(async (orderId: string, currentStatus: string) => {
     const nextStatus = STATUS_FLOW[currentStatus]
     if (!nextStatus) return
 
     setUpdatingIds((prev) => new Set(prev).add(orderId))
+
+    // Take a snapshot for optimistic UI rollback
+    let snapshot: KitchenOrder[] = []
+    setOrders((prev) => {
+      snapshot = prev
+      if (nextStatus === 'COMPLETED' || nextStatus === 'CANCELED') {
+        return prev.filter((o) => o.id !== orderId)
+      } else {
+        return prev.map((o) => (o.id === orderId ? { ...o, status: nextStatus } : o))
+      }
+    })
 
     try {
       const res = await fetch(`/api/orders/${orderId}`, {
@@ -249,15 +373,10 @@ export default function KitchenClient({ initialOrders }: KitchenClientProps) {
         throw new Error(json.error || 'Gagal update status')
       }
 
-      // Optimistic update — Supabase Realtime will confirm
-      if (nextStatus === 'COMPLETED' || nextStatus === 'CANCELED') {
-        setOrders((prev) => prev.filter((o) => o.id !== orderId))
-      } else {
-        setOrders((prev) => prev.map((o) => (o.id === orderId ? { ...o, status: nextStatus } : o)))
-      }
-
       toast.success(`Status diperbarui: ${STATUS_LABELS[nextStatus] || nextStatus}`)
     } catch (error) {
+      // Revert change if API fails
+      setOrders(snapshot)
       const message = error instanceof Error ? error.message : 'Gagal update status'
       toast.error(message)
     } finally {
@@ -270,96 +389,117 @@ export default function KitchenClient({ initialOrders }: KitchenClientProps) {
   }, [])
 
   // ── Group orders by status ───────────────────────────────────────────────────
-
+  const pendingOrders = orders.filter((o) => o.status === 'PENDING_PAYMENT')
   const processingOrders = orders.filter((o) => o.status === 'PROCESSING')
   const readyOrders = orders.filter((o) => o.status === 'READY')
-  const pendingOrders = orders.filter((o) => o.status === 'PENDING_PAYMENT')
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
+    <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col h-screen overflow-hidden font-sans select-none">
       <Toaster position="top-center" />
 
       {/* Header Bar */}
-      <header className="bg-gray-800 border-b border-gray-700 px-6 py-4 flex items-center justify-between sticky top-0 z-10">
+      <header className="bg-zinc-900 border-b border-zinc-800 px-6 py-4 flex flex-col sm:flex-row items-center justify-between shrink-0 gap-4">
         <div>
-          <h1 className="text-2xl font-black tracking-tight text-amber-400">🍌 KITCHEN DISPLAY</h1>
-          <p className="text-xs text-gray-400 font-medium uppercase tracking-widest">
-            Pisang Van Java — Dapur
+          <h1 className="text-2xl font-black tracking-wider text-amber-400 flex items-center gap-2">
+            <span>🍌</span> KITCHEN DISPLAY SYSTEM
+          </h1>
+          <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mt-0.5">
+            Ekosistem F&B Pisang Van Java
           </p>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center gap-4">
+          {/* Audio Unlock control */}
+          <button
+            onClick={handleUnlockAudio}
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${
+              isAudioUnlocked
+                ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
+                : 'bg-rose-500/20 text-rose-400 border-rose-500/40 animate-pulse hover:bg-rose-500/30'
+            }`}
+          >
+            <span>{isAudioUnlocked ? '🔔 Suara Aktif' : '🔕 Aktifkan Suara'}</span>
+          </button>
+
+          {/* Wake Lock Status */}
+          <div
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold border ${
+              isWakeLockActive
+                ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
+                : 'bg-zinc-800 text-zinc-400 border-zinc-700'
+            }`}
+          >
+            <span>{isWakeLockActive ? '🔒 Layar Siaga' : '🔓 Layar Normal'}</span>
+          </div>
+
           {/* Connection indicator */}
-          <div className="flex items-center gap-2 text-xs">
-            <span className="relative flex h-2.5 w-2.5">
+          <div className="flex items-center gap-2 text-xs bg-zinc-900 border border-zinc-800 px-3 py-1.5 rounded-lg">
+            <span className="relative flex h-2 w-2">
               {connectionStatus === 'connected' && (
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-[4px] bg-green-400 opacity-75" />
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
               )}
               <span
-                className={`relative inline-flex rounded-[4px] h-2.5 w-2.5 ${
+                className={`relative inline-flex rounded-full h-2 w-2 ${
                   connectionStatus === 'connected'
-                    ? 'bg-green-500'
+                    ? 'bg-emerald-500'
                     : connectionStatus === 'connecting'
                       ? 'bg-amber-400'
-                      : 'bg-red-500'
+                      : 'bg-rose-500'
                 }`}
               />
             </span>
-            <span className="text-gray-400 font-medium">
+            <span className="text-zinc-400 font-bold">
               {connectionStatus === 'connected'
-                ? 'Live'
+                ? 'Live Connection'
                 : connectionStatus === 'connecting'
-                  ? 'Menghubungkan...'
-                  : 'Terputus'}
+                  ? 'Connecting...'
+                  : 'Disconnected'}
             </span>
           </div>
 
           {/* Order count badge */}
-          <div className="bg-amber-500/20 text-amber-400 px-3 py-1.5 rounded-lg text-sm font-bold">
-            {orders.length} Pesanan Aktif
+          <div className="bg-amber-500 text-zinc-950 px-3.5 py-1.5 rounded-lg text-xs font-black uppercase tracking-wider">
+            {orders.length} Pesanan
           </div>
         </div>
       </header>
 
-      {/* Main Grid */}
-      <main className="p-4 md:p-6">
+      {/* Main Kanban Board Area */}
+      <main className="flex-1 p-4 md:p-6 overflow-hidden">
         {orders.length === 0 ? (
-          <div className="flex flex-col items-center justify-center min-h-[60vh] text-gray-500">
-            <div className="text-6xl mb-4">🍳</div>
-            <p className="text-xl font-semibold">Tidak ada pesanan aktif</p>
-            <p className="text-sm mt-2">Pesanan baru akan muncul otomatis di sini</p>
+          <div className="flex flex-col items-center justify-center h-full text-zinc-650 bg-zinc-900/10 border border-zinc-900/50 rounded-2xl">
+            <div className="text-6xl mb-4 animate-bounce">🍳</div>
+            <p className="text-lg font-bold text-zinc-400">Dapur Sedang Santai</p>
+            <p className="text-xs text-zinc-600 mt-1 uppercase tracking-widest">Tidak ada pesanan aktif saat ini</p>
           </div>
         ) : (
-          <div className="space-y-8">
-            {/* Pending Payment */}
-            {pendingOrders.length > 0 && (
-              <OrderSection
-                title="⏳ Menunggu Pembayaran"
-                orders={pendingOrders}
-                updatingIds={updatingIds}
-                onStatusUpdate={handleStatusUpdate}
-              />
-            )}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-full overflow-hidden">
+            {/* Column 1: PENDING_PAYMENT */}
+            <OrderColumn
+              title="⏳ Menunggu Bayar"
+              orders={pendingOrders}
+              updatingIds={updatingIds}
+              onStatusUpdate={handleStatusUpdate}
+              headerColorClass="border-t-4 border-yellow-500"
+            />
 
-            {/* Processing */}
-            {processingOrders.length > 0 && (
-              <OrderSection
-                title="🔥 Sedang Dimasak"
-                orders={processingOrders}
-                updatingIds={updatingIds}
-                onStatusUpdate={handleStatusUpdate}
-              />
-            )}
+            {/* Column 2: PROCESSING */}
+            <OrderColumn
+              title="🍳 Sedang Dimasak"
+              orders={processingOrders}
+              updatingIds={updatingIds}
+              onStatusUpdate={handleStatusUpdate}
+              headerColorClass="border-t-4 border-orange-500"
+            />
 
-            {/* Ready */}
-            {readyOrders.length > 0 && (
-              <OrderSection
-                title="✅ Siap Diambil"
-                orders={readyOrders}
-                updatingIds={updatingIds}
-                onStatusUpdate={handleStatusUpdate}
-              />
-            )}
+            {/* Column 3: READY */}
+            <OrderColumn
+              title="✅ Siap Diambil"
+              orders={readyOrders}
+              updatingIds={updatingIds}
+              onStatusUpdate={handleStatusUpdate}
+              headerColorClass="border-t-4 border-emerald-500"
+            />
           </div>
         )}
       </main>
@@ -367,25 +507,35 @@ export default function KitchenClient({ initialOrders }: KitchenClientProps) {
   )
 }
 
-// ── Order Section Component ────────────────────────────────────────────────────
+// ── Order Section (Kanban Column) Component ─────────────────────────────────────
 
-function OrderSection({
+function OrderColumn({
   title,
   orders,
   updatingIds,
-  onStatusUpdate
+  onStatusUpdate,
+  headerColorClass
 }: {
   title: string
   orders: KitchenOrder[]
   updatingIds: Set<string>
   onStatusUpdate: (orderId: string, currentStatus: string) => void
+  headerColorClass: string
 }) {
   return (
-    <section>
-      <h2 className="text-lg font-bold text-gray-300 mb-3">
-        {title} ({orders.length})
-      </h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+    <div className={`flex flex-col bg-zinc-900/30 border border-zinc-805 rounded-xl h-full overflow-hidden ${headerColorClass}`}>
+      {/* Column Header */}
+      <div className="px-4 py-3.5 bg-zinc-900/80 border-b border-zinc-800 flex items-center justify-between shrink-0">
+        <h2 className="text-sm font-black text-zinc-300 tracking-wider uppercase flex items-center gap-2">
+          {title}
+        </h2>
+        <span className="bg-zinc-850 text-zinc-400 font-extrabold text-xs px-2.5 py-1 rounded-full border border-zinc-800">
+          {orders.length}
+        </span>
+      </div>
+
+      {/* Column Scrollable Content */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 pr-2 pb-12 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent">
         <AnimatePresence mode="popLayout">
           {orders.map((order) => (
             <OrderCard
@@ -396,8 +546,13 @@ function OrderSection({
             />
           ))}
         </AnimatePresence>
+        {orders.length === 0 && (
+          <div className="flex flex-col items-center justify-center py-20 text-zinc-605 text-xs uppercase tracking-widest font-bold">
+            ✨ Kosong
+          </div>
+        )}
       </div>
-    </section>
+    </div>
   )
 }
 
@@ -414,49 +569,51 @@ function OrderCard({
 }) {
   const elapsed = getElapsedMinutes(order.createdAt)
   const isUrgent = elapsed > 15 && order.status === 'PROCESSING'
-  const statusColor = STATUS_COLORS[order.status] || 'border-gray-600 bg-gray-800'
   const nextAction = BUTTON_LABELS[order.status]
+
+  // Decide card background & border style
+  const cardStyle = isUrgent
+    ? 'border-2 border-red-600 bg-red-950/20 text-zinc-100 ring-2 ring-red-500 ring-offset-2 ring-offset-zinc-950 shadow-lg shadow-red-950/30'
+    : `${STATUS_COLORS[order.status] || 'border-zinc-800 bg-zinc-900'} border-2`
 
   return (
     <motion.div
       layout
-      initial={{ opacity: 0, scale: 0.9, y: 20 }}
+      initial={{ opacity: 0, scale: 0.95, y: 10 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.8, y: -20 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-      className={`rounded-[4px] border-2 ${statusColor} ${
-        isUrgent ? 'ring-2 ring-red-500 animate-pulse' : ''
-      } shadow-sm overflow-hidden`}
+      exit={{ opacity: 0, scale: 0.9, y: -10 }}
+      transition={{ duration: 0.15 }}
+      className={`rounded-xl ${cardStyle} shadow-sm overflow-hidden flex flex-col`}
     >
       {/* Card Header */}
-      <div className="px-4 py-3 flex items-center justify-between border-b border-gray-200/30">
+      <div className="px-4 py-3 flex items-center justify-between border-b border-zinc-800/80 bg-zinc-900/50">
         <div>
-          <p className="text-sm font-bold text-gray-800">#{order.id.slice(-5).toUpperCase()}</p>
-          <p className="text-xs text-gray-600 font-medium">{order.customerName}</p>
+          <p className="text-sm font-black text-amber-400">#{order.id.slice(-5).toUpperCase()}</p>
+          <p className="text-sm text-zinc-200 font-bold tracking-wide mt-0.5">{order.customerName}</p>
         </div>
         <div className="text-right">
-          <p className={`text-xs font-bold ${isUrgent ? 'text-red-600' : 'text-gray-500'}`}>
-            {formatElapsed(elapsed)}
+          <p className={`text-xs font-black tracking-wide ${isUrgent ? 'text-red-400 font-black animate-pulse' : 'text-zinc-400'}`}>
+            {isUrgent ? '🚨 ' : ''}{formatElapsed(elapsed)}
           </p>
-          <p className="text-[10px] text-gray-400 uppercase">
-            {order.source} · {order.deliveryMethod === 'DELIVERY' ? '🛵' : '🏪'}
+          <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider mt-0.5">
+            {order.source} · {order.deliveryMethod === 'DELIVERY' ? '🛵 Antar' : '🏪 Ambil'}
           </p>
         </div>
       </div>
 
       {/* Items List */}
-      <div className="px-4 py-3 space-y-2">
+      <div className="px-4 py-3.5 space-y-3 flex-1">
         {order.items.map((item) => (
-          <div key={item.id} className="flex items-start gap-2">
-            <span className="bg-amber-100 text-amber-800 text-xs font-black rounded-[4px] w-6 h-6 flex items-center justify-center shrink-0">
-              {item.quantity}
+          <div key={item.id} className="flex items-start gap-2.5">
+            <span className="bg-zinc-850 border border-zinc-750 text-amber-400 text-xs font-black rounded-lg w-7 h-7 flex items-center justify-center shrink-0">
+              {item.quantity}x
             </span>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-gray-800 truncate">
+              <p className="text-sm font-bold text-zinc-100 leading-tight">
                 {item.variant?.flavorName || 'Varian'} ({item.baseType})
               </p>
               {item.toppings.length > 0 && (
-                <p className="text-xs text-gray-500 truncate">
+                <p className="text-xs text-zinc-400 mt-1 leading-snug">
                   + {item.toppings.map((t) => `${t.emoji || ''} ${t.name}`).join(', ')}
                 </p>
               )}
@@ -466,42 +623,38 @@ function OrderCard({
 
         {/* Notes */}
         {order.notes && (
-          <div className="bg-yellow-100 text-yellow-800 text-xs px-3 py-2 rounded-lg font-medium mt-2">
-            📝 {order.notes}
+          <div className="bg-yellow-950/20 border border-yellow-800/30 text-yellow-400 text-xs px-3 py-2.5 rounded-lg font-bold tracking-wide mt-2 leading-relaxed">
+            📝 Catatan: {order.notes}
+          </div>
+        )}
+
+        {/* SLA Warning Badge */}
+        {isUrgent && (
+          <div className="bg-red-950/60 border border-red-800 text-red-200 text-xs px-3 py-2 rounded-lg font-black tracking-wide text-center uppercase animate-pulse mt-2">
+            ⚠️ SLA LEWAT! &gt;15 Menit
           </div>
         )}
       </div>
 
       {/* Action Button */}
       {nextAction && (
-        <div className="px-4 pb-4">
+        <div className="px-4 pb-4 shrink-0">
           <button
             onClick={() => onStatusUpdate(order.id, order.status)}
             disabled={isUpdating}
-            className={`w-full py-3 rounded-[4px] font-bold text-sm transition-all active:scale-95 disabled:opacity-50 disabled:cursor-wait ${
+            className={`w-full py-3.5 rounded-lg font-black text-sm uppercase tracking-wider transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-wait shadow-sm ${
               order.status === 'READY'
-                ? 'bg-green-600 hover:bg-green-700 text-white'
-                : 'bg-amber-500 hover:bg-amber-600 text-white'
+                ? 'bg-emerald-600 hover:bg-emerald-500 text-white border border-emerald-500/30'
+                : 'bg-amber-500 hover:bg-amber-400 text-zinc-950 border border-amber-400/30'
             }`}
           >
             {isUpdating ? (
               <span className="flex items-center justify-center gap-2">
-                <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  />
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                  />
+                <svg className="w-4 h-4 animate-spin text-zinc-950" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                 </svg>
-                Memproses...
+                MEMPROSES...
               </span>
             ) : (
               nextAction
@@ -512,3 +665,4 @@ function OrderCard({
     </motion.div>
   )
 }
+
