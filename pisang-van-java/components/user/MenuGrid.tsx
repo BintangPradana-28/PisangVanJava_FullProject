@@ -54,11 +54,11 @@ const ProductImage = ({
         blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
       />
       {available ? (
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 rounded-full px-3 py-1 text-xs font-bold backdrop-blur-sm bg-white/90 dark:bg-zinc-900/90 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 shadow-sm">
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 rounded-[4px] px-3 py-1 text-xs font-bold backdrop-blur-sm bg-white/90 dark:bg-zinc-900/90 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 shadow-sm">
           {t('menu_fresh_badge')}
         </div>
       ) : (
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 rounded-full px-3 py-1 text-xs font-bold backdrop-blur-sm bg-red-600 text-white shadow-md">
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 rounded-[4px] px-3 py-1 text-xs font-bold backdrop-blur-sm bg-red-600 text-white shadow-md">
           Sold Out
         </div>
       )}
@@ -154,7 +154,7 @@ export default function MenuGrid({ products }: { products: ProductType[] }) {
             </p>
             <button
               onClick={() => router.push('?', { scroll: false })}
-              className="mt-4 text-sm font-bold px-6 py-2.5 rounded-full transition-all"
+              className="mt-4 text-sm font-bold px-6 py-2.5 rounded-[4px] transition-all"
               style={{ background: '#D4802A', color: 'white' }}
             >
               {t('menu_reset_btn')}
@@ -176,7 +176,7 @@ export default function MenuGrid({ products }: { products: ProductType[] }) {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95 }}
                     transition={{ duration: 0.4, delay: i * 0.04 }}
-                    className={`relative rounded-3xl overflow-hidden flex flex-col group transition-all duration-300 ${available ? 'hover:shadow-2xl hover:-translate-y-1' : 'opacity-80 grayscale-[50%]'}`}
+                    className={`relative rounded-[4px] overflow-hidden flex flex-col group transition-all duration-300 ${available ? 'hover:shadow-sm hover:-translate-y-1' : 'opacity-80 grayscale-[50%]'}`}
                     style={{
                       background: 'var(--card-bg)',
                       border: '1px solid var(--border-custom)'
@@ -185,7 +185,7 @@ export default function MenuGrid({ products }: { products: ProductType[] }) {
                     {/* Favorite Button */}
                     <button
                       onClick={(e) => toggleFavorite(e, product.id)}
-                      className="absolute top-4 right-4 z-20 w-10 h-10 rounded-full flex items-center justify-center transition-all bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md shadow-sm hover:scale-110 active:scale-95 border border-zinc-200/50 dark:border-zinc-800"
+                      className="absolute top-4 right-4 z-20 w-10 h-10 rounded-[4px] flex items-center justify-center transition-all bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md shadow-sm hover:scale-110 active:scale-95 border border-zinc-200/50 dark:border-zinc-800"
                       aria-label="Toggle Favorite"
                     >
                       <svg
@@ -219,14 +219,14 @@ export default function MenuGrid({ products }: { products: ProductType[] }) {
                       <div className="flex items-center gap-1.5 mb-2 mt-1">
                         {product.stock > 0 ? (
                           <>
-                            <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                            <span className="w-2 h-2 rounded-[4px] bg-green-500"></span>
                             <span className="text-xs font-semibold text-green-600 dark:text-green-400 tracking-wide">
                               Tersedia: <span className="font-bold">{product.stock}</span> porsi
                             </span>
                           </>
                         ) : (
                           <>
-                            <span className="w-2 h-2 rounded-full bg-red-500"></span>
+                            <span className="w-2 h-2 rounded-[4px] bg-red-500"></span>
                             <span className="text-xs font-semibold text-red-600 dark:text-red-400 tracking-wide">
                               Habis Terjual
                             </span>
@@ -295,8 +295,8 @@ export default function MenuGrid({ products }: { products: ProductType[] }) {
                           disabled={!available || !isStoreOpen}
                           className={
                             available && isStoreOpen
-                              ? 'font-bold text-sm px-8 py-3 rounded-full shadow-md transition-all duration-200 active:scale-95 hover:shadow-lg'
-                              : 'bg-zinc-300 text-zinc-500 cursor-not-allowed font-bold text-sm px-8 py-3 rounded-full flex items-center justify-center gap-1.5 opacity-70'
+                              ? 'font-bold text-sm px-8 py-3 rounded-[4px] shadow-md transition-all duration-200 active:scale-95 hover:shadow-sm'
+                              : 'bg-zinc-300 text-zinc-500 cursor-not-allowed font-bold text-sm px-8 py-3 rounded-[4px] flex items-center justify-center gap-1.5 opacity-70'
                           }
                           style={
                             available && isStoreOpen

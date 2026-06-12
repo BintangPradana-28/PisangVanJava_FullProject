@@ -336,7 +336,7 @@ export default function OrdersClient({ initialOrders }: { initialOrders: Order[]
               <motion.span
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                className="text-[10px] font-bold bg-red-500 text-white px-2 py-0.5 rounded-full cursor-pointer"
+                className="text-[10px] font-bold bg-red-500 text-white px-2 py-0.5 rounded-[4px] cursor-pointer"
                 onClick={() => {
                   setHasNewOrder(false)
                   setStatusFilter('PENDING_PAYMENT')
@@ -346,15 +346,15 @@ export default function OrdersClient({ initialOrders }: { initialOrders: Order[]
               </motion.span>
             )}
             {connectionStatus === 'connected' ? (
-              <span className="flex items-center gap-1 text-[10px] font-bold bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
-                <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" /> LIVE
+              <span className="flex items-center gap-1 text-[10px] font-bold bg-green-100 text-green-700 px-2 py-0.5 rounded-[4px]">
+                <span className="w-2 h-2 bg-green-500 rounded-[4px] animate-pulse" /> LIVE
               </span>
             ) : (
               <span
-                className="flex items-center gap-1 text-[10px] font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full"
+                className="flex items-center gap-1 text-[10px] font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-[4px]"
                 title="Real-time terputus. Beralih ke fallback polling tiap 30 detik."
               >
-                <span className="w-2 h-2 bg-amber-500 rounded-full" /> FALLBACK
+                <span className="w-2 h-2 bg-amber-500 rounded-[4px]" /> FALLBACK
               </span>
             )}
           </div>
@@ -397,7 +397,7 @@ export default function OrdersClient({ initialOrders }: { initialOrders: Order[]
             key={label}
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-2xl p-4 border border-cream-200 shadow-sm hover:shadow-md transition-shadow"
+            className="bg-white rounded-[4px] p-4 border border-cream-200 shadow-sm hover:shadow-md transition-shadow"
           >
             <div className="text-2xl mb-1">{icon}</div>
             <div className={`font-serif text-xl font-bold ${color}`}>{value}</div>
@@ -407,7 +407,7 @@ export default function OrdersClient({ initialOrders }: { initialOrders: Order[]
       </div>
 
       {/* ── Filters Row ── */}
-      <div className="bg-white rounded-2xl border border-cream-200 p-4 space-y-3">
+      <div className="bg-white rounded-[4px] border border-cream-200 p-4 space-y-3">
         {/* Search */}
         <div className="flex gap-2">
           <input
@@ -415,7 +415,7 @@ export default function OrdersClient({ initialOrders }: { initialOrders: Order[]
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="🔍 Cari nama, nomor, atau ID pesanan..."
-            className="flex-1 px-3 py-2 text-sm rounded-xl border border-cream-200 text-brown-700 focus:outline-none focus:ring-2 focus:ring-amber-300"
+            className="flex-1 px-3 py-2 text-sm rounded-[4px] border border-cream-200 text-brown-700 focus:outline-none focus:ring-2 focus:ring-amber-300"
           />
         </div>
 
@@ -423,7 +423,7 @@ export default function OrdersClient({ initialOrders }: { initialOrders: Order[]
         <div className="flex gap-2 flex-wrap">
           <button
             onClick={() => setStatusFilter('all')}
-            className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all border ${statusFilter === 'all' ? 'bg-brown-700 text-white border-brown-700' : 'bg-white text-brown-500 border-cream-200 hover:border-brown-300'}`}
+            className={`px-3 py-1.5 rounded-[4px] text-xs font-semibold transition-all border ${statusFilter === 'all' ? 'bg-brown-700 text-white border-brown-700' : 'bg-white text-brown-500 border-cream-200 hover:border-brown-300'}`}
           >
             Semua ({orders.length})
           </button>
@@ -431,7 +431,7 @@ export default function OrdersClient({ initialOrders }: { initialOrders: Order[]
             <button
               key={s}
               onClick={() => setStatusFilter(s)}
-              className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all border ${statusFilter === s ? `${STATUS_CONFIG[s].bg} ${STATUS_CONFIG[s].color} border-current` : 'bg-white text-brown-500 border-cream-200 hover:border-brown-300'}`}
+              className={`px-3 py-1.5 rounded-[4px] text-xs font-semibold transition-all border ${statusFilter === s ? `${STATUS_CONFIG[s].bg} ${STATUS_CONFIG[s].color} border-current` : 'bg-white text-brown-500 border-cream-200 hover:border-brown-300'}`}
             >
               {STATUS_CONFIG[s].label} ({orders.filter((o) => o.status === s).length})
             </button>
@@ -444,7 +444,7 @@ export default function OrdersClient({ initialOrders }: { initialOrders: Order[]
             <button
               key={d}
               onClick={() => setDateFilter(d)}
-              className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all border ${dateFilter === d ? 'bg-amber-100 text-amber-800 border-amber-300' : 'bg-white text-brown-400 border-cream-200'}`}
+              className={`px-3 py-1.5 rounded-[4px] text-xs font-semibold transition-all border ${dateFilter === d ? 'bg-amber-100 text-amber-800 border-amber-300' : 'bg-white text-brown-400 border-cream-200'}`}
             >
               {d === 'today'
                 ? 'Hari ini'
@@ -465,7 +465,7 @@ export default function OrdersClient({ initialOrders }: { initialOrders: Order[]
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
-            className="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex flex-wrap items-center gap-3"
+            className="bg-amber-50 border border-amber-200 rounded-[4px] p-4 flex flex-wrap items-center gap-3"
           >
             <span className="text-sm font-bold text-amber-800">
               {bulkSelected.size} pesanan dipilih
@@ -473,7 +473,7 @@ export default function OrdersClient({ initialOrders }: { initialOrders: Order[]
             <select
               value={bulkStatus}
               onChange={(e) => setBulkStatus(e.target.value as OrderStatus)}
-              className="text-xs px-3 py-2 rounded-xl border border-amber-300 bg-white text-brown-700 focus:outline-none"
+              className="text-xs px-3 py-2 rounded-[4px] border border-amber-300 bg-white text-brown-700 focus:outline-none"
             >
               {STATUS_ORDER.map((s) => (
                 <option key={s} value={s}>
@@ -484,19 +484,19 @@ export default function OrdersClient({ initialOrders }: { initialOrders: Order[]
             <button
               onClick={handleBulkUpdate}
               disabled={isBulkUpdating}
-              className="text-xs px-4 py-2 rounded-xl bg-amber-600 text-white font-bold hover:bg-amber-700 disabled:opacity-50"
+              className="text-xs px-4 py-2 rounded-[4px] bg-amber-600 text-white font-bold hover:bg-amber-700 disabled:opacity-50"
             >
               {isBulkUpdating ? 'Memproses...' : 'Update Semua'}
             </button>
             <button
               onClick={selectAll}
-              className="text-xs px-3 py-2 rounded-xl border border-amber-300 text-amber-700 font-medium hover:bg-amber-100"
+              className="text-xs px-3 py-2 rounded-[4px] border border-amber-300 text-amber-700 font-medium hover:bg-amber-100"
             >
               Pilih Semua ({filtered.length})
             </button>
             <button
               onClick={clearSelection}
-              className="text-xs px-3 py-2 rounded-xl border border-amber-300 text-amber-700 font-medium hover:bg-amber-100"
+              className="text-xs px-3 py-2 rounded-[4px] border border-amber-300 text-amber-700 font-medium hover:bg-amber-100"
             >
               Batalkan Pilihan
             </button>
@@ -507,7 +507,7 @@ export default function OrdersClient({ initialOrders }: { initialOrders: Order[]
       {/* ── Orders List ── */}
       <div className="space-y-3">
         {filtered.length === 0 ? (
-          <div className="bg-white rounded-2xl border border-cream-200 p-16 text-center text-brown-300">
+          <div className="bg-white rounded-[4px] border border-cream-200 p-16 text-center text-brown-300">
             <div className="text-5xl mb-3">📋</div>
             <div className="font-semibold text-base">Tidak ada pesanan ditemukan</div>
             <p className="text-xs mt-1">Coba ubah filter atau kata kunci pencarian</p>
@@ -525,7 +525,7 @@ export default function OrdersClient({ initialOrders }: { initialOrders: Order[]
                 layout
                 initial={{ opacity: 0, y: 4 }}
                 animate={{ opacity: 1, y: 0 }}
-                className={`bg-white rounded-2xl border overflow-hidden shadow-sm transition-all duration-200 ${isSelected ? 'border-amber-400 shadow-amber-100' : 'border-cream-200 hover:border-cream-300 hover:shadow-md'}`}
+                className={`bg-white rounded-[4px] border overflow-hidden shadow-sm transition-all duration-200 ${isSelected ? 'border-amber-400 shadow-amber-100' : 'border-cream-200 hover:border-cream-300 hover:shadow-md'}`}
               >
                 {/* Card Header (always visible) */}
                 <div className="flex items-center gap-3 p-4">
@@ -576,7 +576,7 @@ export default function OrdersClient({ initialOrders }: { initialOrders: Order[]
                   {/* Status badge + expand chevron */}
                   <div className="flex items-center gap-2 flex-shrink-0">
                     <span
-                      className={`text-xs font-bold px-2.5 py-1 rounded-full ${cfg?.bg ?? 'bg-zinc-100'} ${cfg?.color ?? 'text-zinc-600'}`}
+                      className={`text-xs font-bold px-2.5 py-1 rounded-[4px] ${cfg?.bg ?? 'bg-zinc-100'} ${cfg?.color ?? 'text-zinc-600'}`}
                     >
                       {cfg?.label ?? 'Unknown'}
                     </span>
@@ -601,7 +601,7 @@ export default function OrdersClient({ initialOrders }: { initialOrders: Order[]
                     >
                       <div className="border-t border-cream-200 px-4 pb-4 pt-3 space-y-4">
                         {/* Items breakdown */}
-                        <div className="bg-cream-50 rounded-xl p-3 space-y-2">
+                        <div className="bg-cream-50 rounded-[4px] p-3 space-y-2">
                           {order.items.map((item) => (
                             <div key={item.id} className="flex justify-between text-sm">
                               <span className="text-brown-600">
@@ -654,10 +654,10 @@ export default function OrdersClient({ initialOrders }: { initialOrders: Order[]
                             <button
                               onClick={() => updateStatus(order.id, nextStatus)}
                               disabled={updating === order.id}
-                              className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold bg-brown-700 text-white rounded-xl hover:bg-brown-800 disabled:opacity-50 transition-all"
+                              className="flex items-center gap-1.5 px-4 py-2 text-xs font-bold bg-brown-700 text-white rounded-[4px] hover:bg-brown-800 disabled:opacity-50 transition-all"
                             >
                               {updating === order.id ? (
-                                <span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                <span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-[4px] animate-spin" />
                               ) : (
                                 '→'
                               )}
@@ -669,7 +669,7 @@ export default function OrdersClient({ initialOrders }: { initialOrders: Order[]
                             <button
                               onClick={() => updateStatus(order.id, 'CANCELED')}
                               disabled={updating === order.id}
-                              className="px-3 py-2 text-xs font-bold bg-red-50 text-red-600 rounded-xl hover:bg-red-100 disabled:opacity-50 transition-all"
+                              className="px-3 py-2 text-xs font-bold bg-red-50 text-red-600 rounded-[4px] hover:bg-red-100 disabled:opacity-50 transition-all"
                             >
                               ✕ Batalkan
                             </button>
@@ -677,7 +677,7 @@ export default function OrdersClient({ initialOrders }: { initialOrders: Order[]
 
                           <button
                             onClick={() => openWhatsApp(order)}
-                            className="flex items-center gap-1 px-3 py-2 text-xs font-bold bg-green-50 text-green-700 rounded-xl hover:bg-green-100 transition-all"
+                            className="flex items-center gap-1 px-3 py-2 text-xs font-bold bg-green-50 text-green-700 rounded-[4px] hover:bg-green-100 transition-all"
                           >
                             💬 WhatsApp
                           </button>
@@ -690,7 +690,7 @@ export default function OrdersClient({ initialOrders }: { initialOrders: Order[]
                                 isOrderStatus(e.target.value) &&
                                 updateStatus(order.id, e.target.value as OrderStatus)
                               }
-                              className="text-xs px-2 py-2 rounded-xl border border-cream-200 text-brown-600 bg-white focus:outline-none"
+                              className="text-xs px-2 py-2 rounded-[4px] border border-cream-200 text-brown-600 bg-white focus:outline-none"
                               onClick={(e) => e.stopPropagation()}
                             >
                               {STATUS_ORDER.map((s) => (
@@ -702,7 +702,7 @@ export default function OrdersClient({ initialOrders }: { initialOrders: Order[]
 
                             <button
                               onClick={() => deleteOrder(order.id)}
-                              className="p-2 text-xs text-red-400 rounded-xl hover:bg-red-50 transition-all"
+                              className="p-2 text-xs text-red-400 rounded-[4px] hover:bg-red-50 transition-all"
                               title="Hapus pesanan"
                             >
                               🗑️

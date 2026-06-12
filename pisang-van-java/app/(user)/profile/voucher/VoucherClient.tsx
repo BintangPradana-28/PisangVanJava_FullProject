@@ -62,13 +62,13 @@ export default function VoucherClient({
       className="space-y-6"
     >
       {/* ── Koin Pisang ── */}
-      <section className="bg-gradient-to-br from-amber-400 to-amber-600 rounded-3xl p-6 md:p-8 shadow-lg shadow-amber-200 dark:shadow-none text-white relative overflow-hidden">
-        <div className="absolute top-0 right-0 -mr-8 -mt-8 w-40 h-40 bg-white/20 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 -ml-8 -mb-8 w-32 h-32 bg-amber-800/20 rounded-full blur-2xl" />
+      <section className="bg-gradient-to-br from-amber-400 to-amber-600 rounded-[4px] p-6 md:p-8 shadow-sm shadow-amber-200 dark:shadow-none text-white relative overflow-hidden">
+        <div className="absolute top-0 right-0 -mr-8 -mt-8 w-40 h-40 bg-white/20 rounded-[4px] blur-3xl" />
+        <div className="absolute bottom-0 left-0 -ml-8 -mb-8 w-32 h-32 bg-amber-800/20 rounded-[4px] blur-2xl" />
 
         <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-md border border-white/30 shadow-inner">
+            <div className="w-16 h-16 rounded-[4px] bg-white/20 flex items-center justify-center backdrop-blur-md border border-white/30 shadow-inner">
               <span className="text-4xl">🪙</span>
             </div>
             <div>
@@ -81,7 +81,7 @@ export default function VoucherClient({
             </div>
           </div>
 
-          <div className="bg-black/10 backdrop-blur-sm border border-white/20 rounded-2xl p-4 w-full md:w-auto">
+          <div className="bg-black/10 backdrop-blur-sm border border-white/20 rounded-[4px] p-4 w-full md:w-auto">
             <p className="text-sm text-white/90 font-medium">✨ {t('voucher_points_desc')}</p>
             <p className="text-xs text-white/70 mt-1">{t('voucher_points_info')}</p>
           </div>
@@ -89,9 +89,9 @@ export default function VoucherClient({
       </section>
 
       {/* ── Histori Transaksi Koin ── */}
-      <section className="bg-white dark:bg-zinc-900 rounded-3xl p-6 md:p-8 shadow-sm border border-zinc-200/50 dark:border-zinc-800/80">
+      <section className="bg-white dark:bg-zinc-900 rounded-[4px] p-6 md:p-8 shadow-sm border border-zinc-200/50 dark:border-zinc-800/80">
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-[4px] bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
             <Coins className="w-5 h-5 text-amber-600 dark:text-amber-400" />
           </div>
           <div>
@@ -144,9 +144,9 @@ export default function VoucherClient({
       </section>
 
       {/* ── Daftar Voucher ── */}
-      <section className="bg-white dark:bg-zinc-900 rounded-3xl p-6 md:p-8 shadow-sm border border-zinc-200/50 dark:border-zinc-800/80">
+      <section className="bg-white dark:bg-zinc-900 rounded-[4px] p-6 md:p-8 shadow-sm border border-zinc-200/50 dark:border-zinc-800/80">
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-xl bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-[4px] bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
             <Ticket className="w-5 h-5 text-green-600 dark:text-green-400" />
           </div>
           <div>
@@ -158,7 +158,7 @@ export default function VoucherClient({
         </div>
 
         {vouchers.length === 0 ? (
-          <div className="flex flex-col items-center justify-center text-center py-12 px-4 border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-3xl">
+          <div className="flex flex-col items-center justify-center text-center py-12 px-4 border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-[4px]">
             <Ticket className="w-12 h-12 text-zinc-300 dark:text-zinc-700 mb-3" />
             <p className="text-zinc-500 font-medium">
               {t('voucher_available_empty')}
@@ -172,17 +172,17 @@ export default function VoucherClient({
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: i * 0.05 }}
-                className="group relative bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700/50 rounded-2xl p-5 hover:border-amber-400 dark:hover:border-amber-500 transition-all overflow-hidden"
+                className="group relative bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700/50 rounded-[4px] p-5 hover:border-amber-400 dark:hover:border-amber-500 transition-all overflow-hidden"
               >
                 {/* Visual perforations */}
-                <div className="absolute top-1/2 -translate-y-1/2 -left-2 w-4 h-4 bg-white dark:bg-zinc-900 rounded-full border-r border-zinc-200 dark:border-zinc-700/50" />
-                <div className="absolute top-1/2 -translate-y-1/2 -right-2 w-4 h-4 bg-white dark:bg-zinc-900 rounded-full border-l border-zinc-200 dark:border-zinc-700/50" />
+                <div className="absolute top-1/2 -translate-y-1/2 -left-2 w-4 h-4 bg-white dark:bg-zinc-900 rounded-[4px] border-r border-zinc-200 dark:border-zinc-700/50" />
+                <div className="absolute top-1/2 -translate-y-1/2 -right-2 w-4 h-4 bg-white dark:bg-zinc-900 rounded-[4px] border-l border-zinc-200 dark:border-zinc-700/50" />
 
                 <div className="flex justify-between items-start mb-3">
                   <div className="bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-400 text-xs font-black uppercase tracking-widest px-3 py-1 rounded-lg border border-amber-200 dark:border-amber-800 font-mono">
                     {v.code}
                   </div>
-                  <div className="flex items-center gap-1 text-[10px] font-bold text-zinc-400 uppercase bg-zinc-100 dark:bg-zinc-800 px-2 py-1 rounded-full">
+                  <div className="flex items-center gap-1 text-[10px] font-bold text-zinc-400 uppercase bg-zinc-100 dark:bg-zinc-800 px-2 py-1 rounded-[4px]">
                     <Clock className="w-3 h-3" />
                     Batas: {formatDate(v.endDate)}
                   </div>

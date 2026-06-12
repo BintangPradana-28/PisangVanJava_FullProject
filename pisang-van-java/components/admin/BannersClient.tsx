@@ -108,7 +108,7 @@ export default function BannersClient({ initialBanners }: { initialBanners: Bann
   }
 
   return (
-    <div className="bg-white rounded-3xl p-6 shadow-sm border border-cream-200">
+    <div className="bg-white rounded-[4px] p-6 shadow-sm border border-cream-200">
       <div className="flex justify-between items-center mb-6">
         <div>
           <h2 className="font-serif text-xl font-bold text-brown-700">Manajemen Banner</h2>
@@ -116,7 +116,7 @@ export default function BannersClient({ initialBanners }: { initialBanners: Bann
         </div>
         <button
           onClick={() => handleOpenModal()}
-          className="bg-amber-brand text-white font-bold px-4 py-2 rounded-xl shadow-md hover:bg-amber-600 transition"
+          className="bg-amber-brand text-white font-bold px-4 py-2 rounded-[4px] shadow-md hover:bg-amber-600 transition"
         >
           + Tambah Banner
         </button>
@@ -159,7 +159,7 @@ export default function BannersClient({ initialBanners }: { initialBanners: Bann
                 <td className="p-4 text-center">
                   <button
                     onClick={() => toggleActive(b)}
-                    className={`px-3 py-1 text-xs font-bold rounded-full transition ${b.isActive ? 'bg-green-100 text-green-700' : 'bg-zinc-100 text-zinc-500'}`}
+                    className={`px-3 py-1 text-xs font-bold rounded-[4px] transition ${b.isActive ? 'bg-green-100 text-green-700' : 'bg-zinc-100 text-zinc-500'}`}
                   >
                     {b.isActive ? 'Aktif (Ditampilkan)' : 'Nonaktif'}
                   </button>
@@ -193,7 +193,7 @@ export default function BannersClient({ initialBanners }: { initialBanners: Bann
 
       {showModal && (
         <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-6 w-full max-w-md">
+          <div className="bg-white rounded-[4px] p-6 w-full max-w-md">
             <h3 className="font-serif font-bold text-xl mb-4">
               {editingBanner ? 'Edit Banner' : 'Tambah Banner'}
             </h3>
@@ -204,7 +204,7 @@ export default function BannersClient({ initialBanners }: { initialBanners: Bann
                   value={form.badge}
                   onChange={(e) => setForm({ ...form, badge: e.target.value })}
                   placeholder="PROMO SPESIAL"
-                  className="w-full p-2 rounded-xl border border-cream-200"
+                  className="w-full p-2 rounded-[4px] border border-cream-200"
                 />
               </div>
               <div>
@@ -213,7 +213,7 @@ export default function BannersClient({ initialBanners }: { initialBanners: Bann
                   value={form.title}
                   onChange={(e) => setForm({ ...form, title: e.target.value })}
                   required
-                  className="w-full p-2 rounded-xl border border-cream-200"
+                  className="w-full p-2 rounded-[4px] border border-cream-200"
                 />
               </div>
               <div>
@@ -223,7 +223,7 @@ export default function BannersClient({ initialBanners }: { initialBanners: Bann
                 <textarea
                   value={form.subtitle}
                   onChange={(e) => setForm({ ...form, subtitle: e.target.value })}
-                  className="w-full p-2 rounded-xl border border-cream-200 resize-none"
+                  className="w-full p-2 rounded-[4px] border border-cream-200 resize-none"
                   rows={2}
                 />
               </div>
@@ -243,7 +243,7 @@ export default function BannersClient({ initialBanners }: { initialBanners: Bann
                     type="datetime-local"
                     value={form.startDate}
                     onChange={(e) => setForm({ ...form, startDate: e.target.value })}
-                    className="w-full p-2 rounded-xl border border-cream-200"
+                    className="w-full p-2 rounded-[4px] border border-cream-200"
                   />
                 </div>
                 <div>
@@ -254,7 +254,7 @@ export default function BannersClient({ initialBanners }: { initialBanners: Bann
                     type="datetime-local"
                     value={form.endDate}
                     onChange={(e) => setForm({ ...form, endDate: e.target.value })}
-                    className="w-full p-2 rounded-xl border border-cream-200"
+                    className="w-full p-2 rounded-[4px] border border-cream-200"
                   />
                 </div>
               </div>
@@ -266,7 +266,7 @@ export default function BannersClient({ initialBanners }: { initialBanners: Bann
                   type="number"
                   value={form.priority}
                   onChange={(e) => setForm({ ...form, priority: parseInt(e.target.value) || 0 })}
-                  className="w-full p-2 rounded-xl border border-cream-200"
+                  className="w-full p-2 rounded-[4px] border border-cream-200"
                   placeholder="0"
                 />
               </div>
@@ -274,14 +274,14 @@ export default function BannersClient({ initialBanners }: { initialBanners: Bann
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 bg-green-wa text-white font-bold py-3 rounded-xl"
+                  className="flex-1 bg-green-wa text-white font-bold py-3 rounded-[4px]"
                 >
                   {loading ? '...' : 'Simpan'}
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="flex-1 bg-cream-200 text-brown-600 font-bold py-3 rounded-xl"
+                  className="flex-1 bg-cream-200 text-brown-600 font-bold py-3 rounded-[4px]"
                 >
                   Batal
                 </button>

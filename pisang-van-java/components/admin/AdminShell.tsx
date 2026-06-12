@@ -126,11 +126,11 @@ export default function AdminShell({ children, adminName }: AdminShellProps) {
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
               transition={{ type: 'tween', duration: 0.25 }}
-              className="fixed left-0 top-0 h-full w-64 bg-brown-700 z-50 lg:hidden flex flex-col shadow-2xl"
+              className="fixed left-0 top-0 h-full w-64 bg-brown-700 z-50 lg:hidden flex flex-col shadow-sm"
             >
               <button
                 onClick={() => setMobileOpen(false)}
-                className="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white text-sm"
+                className="absolute top-4 right-4 w-8 h-8 rounded-[4px] bg-white/10 flex items-center justify-center text-white text-sm"
               >
                 ✕
               </button>

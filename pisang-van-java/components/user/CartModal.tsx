@@ -340,12 +340,12 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
           >
             <div
               onClick={(e) => e.stopPropagation()}
-              className="pointer-events-auto w-full max-w-2xl max-h-[90vh] flex flex-col bg-white dark:bg-zinc-900 rounded-3xl shadow-2xl overflow-hidden border border-zinc-200/60 dark:border-zinc-800"
+              className="pointer-events-auto w-full max-w-2xl max-h-[90vh] flex flex-col bg-white dark:bg-zinc-900 rounded-[4px] shadow-sm overflow-hidden border border-zinc-200/60 dark:border-zinc-800"
             >
               {/* ── HEADER ── */}
               <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-100 dark:border-zinc-800 bg-gradient-to-r from-[#D4802A]/5 to-transparent shrink-0">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-2xl bg-[#D4802A]/15 flex items-center justify-center">
+                  <div className="w-9 h-9 rounded-[4px] bg-[#D4802A]/15 flex items-center justify-center">
                     <ShoppingCart className="w-5 h-5 text-[#D4802A]" />
                   </div>
                   <div>
@@ -361,7 +361,7 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
                 </div>
                 <button
                   onClick={onClose}
-                  className="w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-400 flex items-center justify-center transition-colors focus:outline-none"
+                  className="w-8 h-8 rounded-[4px] bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-400 flex items-center justify-center transition-colors focus:outline-none"
                   aria-label="Tutup keranjang"
                 >
                   <X className="w-4 h-4" />
@@ -381,7 +381,7 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
                   >
                     🛒 Keranjang
                     {activeTab === 'cart' && (
-                      <span className="absolute bottom-0 left-1/4 right-1/4 h-0.5 rounded-full bg-[#D4802A]" />
+                      <span className="absolute bottom-0 left-1/4 right-1/4 h-0.5 rounded-[4px] bg-[#D4802A]" />
                     )}
                   </button>
                   <button
@@ -394,7 +394,7 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
                   >
                     📋 Detail Pesanan
                     {activeTab === 'checkout' && (
-                      <span className="absolute bottom-0 left-1/4 right-1/4 h-0.5 rounded-full bg-[#D4802A]" />
+                      <span className="absolute bottom-0 left-1/4 right-1/4 h-0.5 rounded-[4px] bg-[#D4802A]" />
                     )}
                   </button>
                 </div>
@@ -419,7 +419,7 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
                         onClose()
                         router.push('/menu-spesial')
                       }}
-                      className="mt-2 px-6 py-2.5 bg-[#D4802A] text-white text-sm font-bold rounded-full hover:bg-[#b56d24] transition-all active:scale-95"
+                      className="mt-2 px-6 py-2.5 bg-[#D4802A] text-white text-sm font-bold rounded-[4px] hover:bg-[#b56d24] transition-all active:scale-95"
                     >
                       Mulai Belanja →
                     </button>
@@ -436,10 +436,10 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, x: -20 }}
                         transition={{ delay: index * 0.04 }}
-                        className="flex items-start gap-4 p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800 hover:border-[#D4802A]/30 transition-all"
+                        className="flex items-start gap-4 p-4 rounded-[4px] bg-zinc-50 dark:bg-zinc-800/40 border border-zinc-100 dark:border-zinc-800 hover:border-[#D4802A]/30 transition-all"
                       >
                         {/* Product Emoji Avatar */}
-                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-100 to-orange-100 dark:from-zinc-700 dark:to-zinc-800 flex items-center justify-center text-2xl shrink-0 shadow-sm">
+                        <div className="w-12 h-12 rounded-[4px] bg-gradient-to-br from-amber-100 to-orange-100 dark:from-zinc-700 dark:to-zinc-800 flex items-center justify-center text-2xl shrink-0 shadow-sm">
                           🍌
                         </div>
 
@@ -460,14 +460,14 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
                           )}
                           <div className="flex items-center justify-between mt-2">
                             {/* Quantity Control — Shopee Style: minus→trash saat qty=1 */}
-                            <div className="flex items-center gap-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-full p-0.5 shadow-sm">
+                            <div className="flex items-center gap-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-[4px] p-0.5 shadow-sm">
                               <button
                                 onClick={() =>
                                   item.quantity === 1
                                     ? removeFromCart(item.cartItemId)
                                     : updateQuantity(item.cartItemId, item.quantity - 1)
                                 }
-                                className={`w-7 h-7 rounded-full flex items-center justify-center transition-all active:scale-90 ${
+                                className={`w-7 h-7 rounded-[4px] flex items-center justify-center transition-all active:scale-90 ${
                                   item.quantity === 1
                                     ? 'text-red-400 hover:bg-red-50 dark:hover:bg-red-950/20 hover:text-red-600'
                                     : 'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-[#D4802A]'
@@ -487,7 +487,7 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
                               </span>
                               <button
                                 onClick={() => updateQuantity(item.cartItemId, item.quantity + 1)}
-                                className="w-7 h-7 rounded-full flex items-center justify-center bg-[#D4802A] text-white hover:bg-[#b56d24] transition-all active:scale-90"
+                                className="w-7 h-7 rounded-[4px] flex items-center justify-center bg-[#D4802A] text-white hover:bg-[#b56d24] transition-all active:scale-90"
                                 aria-label="Tambah kuantitas"
                               >
                                 <Plus className="w-3 h-3" />
@@ -534,7 +534,7 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
                             {...register('customerName')}
                             type="text"
                             placeholder="Nama Anda..."
-                            className={`w-full px-3 py-2.5 border rounded-xl text-sm text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-400 focus:outline-none focus:ring-2 transition-all bg-zinc-50 dark:bg-zinc-800/50 ${
+                            className={`w-full px-3 py-2.5 border rounded-[4px] text-sm text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-400 focus:outline-none focus:ring-2 transition-all bg-zinc-50 dark:bg-zinc-800/50 ${
                               errors.customerName
                                 ? 'border-red-400 focus:ring-red-300/30'
                                 : 'border-zinc-200 dark:border-zinc-700 focus:ring-[#D4802A]/30 focus:border-[#D4802A]'
@@ -554,7 +554,7 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
                             {...register('customerPhone')}
                             type="tel"
                             placeholder="08123456789"
-                            className={`w-full px-3 py-2.5 border rounded-xl text-sm text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-400 focus:outline-none focus:ring-2 transition-all bg-zinc-50 dark:bg-zinc-800/50 ${
+                            className={`w-full px-3 py-2.5 border rounded-[4px] text-sm text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-400 focus:outline-none focus:ring-2 transition-all bg-zinc-50 dark:bg-zinc-800/50 ${
                               errors.customerPhone
                                 ? 'border-red-400 focus:ring-red-300/30'
                                 : 'border-zinc-200 dark:border-zinc-700 focus:ring-[#D4802A]/30 focus:border-[#D4802A]'
@@ -577,7 +577,7 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
                       <div className="grid grid-cols-2 gap-2 mb-3">
                         <button
                           onClick={() => setDeliveryMethod('DELIVERY')}
-                          className={`flex items-center justify-center gap-2 py-3 text-sm font-bold rounded-2xl transition-all border-2 ${
+                          className={`flex items-center justify-center gap-2 py-3 text-sm font-bold rounded-[4px] transition-all border-2 ${
                             deliveryMethod === 'DELIVERY'
                               ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-800 dark:text-amber-300 border-[#D4802A]'
                               : 'bg-white dark:bg-zinc-800 text-zinc-500 border-zinc-200 dark:border-zinc-700'
@@ -587,7 +587,7 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
                         </button>
                         <button
                           onClick={() => setDeliveryMethod('PICKUP')}
-                          className={`flex items-center justify-center gap-2 py-3 text-sm font-bold rounded-2xl transition-all border-2 ${
+                          className={`flex items-center justify-center gap-2 py-3 text-sm font-bold rounded-[4px] transition-all border-2 ${
                             deliveryMethod === 'PICKUP'
                               ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-800 dark:text-amber-300 border-[#D4802A]'
                               : 'bg-white dark:bg-zinc-800 text-zinc-500 border-zinc-200 dark:border-zinc-700'
@@ -605,7 +605,7 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
                             : 'Catatan tambahan (opsional)...'
                         }
                         rows={2}
-                        className="w-full px-3 py-2.5 border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/50 rounded-xl text-sm text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-[#D4802A]/30 focus:border-[#D4802A] transition-all resize-none"
+                        className="w-full px-3 py-2.5 border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/50 rounded-[4px] text-sm text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-[#D4802A]/30 focus:border-[#D4802A] transition-all resize-none"
                       />
                     </div>
 
@@ -631,14 +631,14 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
                               }
                             }}
                             placeholder="Kode promo"
-                            className="w-full pl-9 pr-3 py-2.5 border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/50 rounded-xl text-sm text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-[#D4802A]/30 focus:border-[#D4802A] transition-all"
+                            className="w-full pl-9 pr-3 py-2.5 border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/50 rounded-[4px] text-sm text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-[#D4802A]/30 focus:border-[#D4802A] transition-all"
                           />
                         </div>
                         <button
                           type="button"
                           onClick={handleApplyVoucher}
                           disabled={isValidatingVoucher || cartTotal <= 0}
-                          className="px-5 rounded-xl text-sm font-bold border-2 border-amber-300 bg-amber-50 dark:bg-amber-900/20 text-amber-800 dark:text-amber-300 hover:bg-amber-100 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="px-5 rounded-[4px] text-sm font-bold border-2 border-amber-300 bg-amber-50 dark:bg-amber-900/20 text-amber-800 dark:text-amber-300 hover:bg-amber-100 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           {isValidatingVoucher ? '...' : 'Pakai'}
                         </button>
@@ -660,7 +660,7 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
                         <button
                           type="button"
                           onClick={() => setPaymentMethod('WHATSAPP')}
-                          className={`flex items-center justify-center gap-2 py-3 text-sm font-bold rounded-2xl transition-all border-2 ${
+                          className={`flex items-center justify-center gap-2 py-3 text-sm font-bold rounded-[4px] transition-all border-2 ${
                             paymentMethod === 'WHATSAPP'
                               ? 'bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-300 border-green-400'
                               : 'bg-white dark:bg-zinc-800 text-zinc-500 border-zinc-200 dark:border-zinc-700'
@@ -672,7 +672,7 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
                         <button
                           type="button"
                           onClick={() => setPaymentMethod('ONLINE')}
-                          className={`flex items-center justify-center gap-2 py-3 text-sm font-bold rounded-2xl transition-all border-2 ${
+                          className={`flex items-center justify-center gap-2 py-3 text-sm font-bold rounded-[4px] transition-all border-2 ${
                             paymentMethod === 'ONLINE'
                               ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300 border-blue-400'
                               : 'bg-white dark:bg-zinc-800 text-zinc-500 border-zinc-200 dark:border-zinc-700'
@@ -756,14 +756,14 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
                     {activeTab === 'cart' && (
                       <div className="flex flex-col gap-2 w-full">
                         {!storeStatus.isOpen && (
-                          <div className="text-center p-2 rounded-xl bg-red-50 text-red-600 text-xs font-bold border border-red-200">
+                          <div className="text-center p-2 rounded-[4px] bg-red-50 text-red-600 text-xs font-bold border border-red-200">
                             {storeStatus.message}
                           </div>
                         )}
                         <button
                           onClick={() => setActiveTab('checkout')}
                           disabled={!storeStatus.isOpen}
-                          className="w-full py-3.5 bg-[#D4802A] hover:bg-[#b56d24] text-white font-bold rounded-2xl shadow-lg shadow-[#D4802A]/25 transition-all active:scale-95 text-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="w-full py-3.5 bg-[#D4802A] hover:bg-[#b56d24] text-white font-bold rounded-[4px] shadow-sm shadow-[#D4802A]/25 transition-all active:scale-95 text-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           Lanjut ke Checkout →
                         </button>
@@ -773,7 +773,7 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
                       <>
                         <button
                           onClick={() => setActiveTab('cart')}
-                          className="px-4 py-3.5 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-300 font-bold rounded-2xl transition-all active:scale-95 text-sm"
+                          className="px-4 py-3.5 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-300 font-bold rounded-[4px] transition-all active:scale-95 text-sm"
                         >
                           ← Kembali
                         </button>
@@ -781,7 +781,7 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
                         <button
                           onClick={handleSubmit(handleCheckout)}
                           disabled={isSubmitting}
-                          className="flex-1 py-3.5 flex items-center justify-center gap-2 text-white font-bold rounded-2xl shadow-lg transition-all active:scale-95 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="flex-1 py-3.5 flex items-center justify-center gap-2 text-white font-bold rounded-[4px] shadow-sm transition-all active:scale-95 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                           style={{ background: paymentMethod === 'ONLINE' ? '#1a56db' : '#2E7D32' }}
                         >
                           {isSubmitting ? (

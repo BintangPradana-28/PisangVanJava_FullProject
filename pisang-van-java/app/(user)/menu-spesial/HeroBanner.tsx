@@ -20,7 +20,7 @@ export default function HeroBanner() {
     <section className="pt-28 pb-10 relative overflow-hidden">
       <div className="absolute inset-0 bg-hero-pattern opacity-40 pointer-events-none" />
       <div
-        className="absolute -top-20 -right-20 w-80 h-80 rounded-full opacity-10 pointer-events-none"
+        className="absolute -top-20 -right-20 w-80 h-80 rounded-[4px] opacity-10 pointer-events-none"
         style={{ background: 'radial-gradient(circle,#D4802A,transparent)' }}
       />
       <div className="max-w-[1200px] mx-auto px-6 relative z-10 text-center">
@@ -30,7 +30,7 @@ export default function HeroBanner() {
           transition={{ duration: 0.5 }}
         >
           <span
-            className="inline-block text-xs font-bold tracking-[0.22em] uppercase px-4 py-1.5 rounded-full mb-4"
+            className="inline-block text-xs font-bold tracking-[0.22em] uppercase px-4 py-1.5 rounded-[4px] mb-4"
             style={{ background: 'rgba(212,128,42,0.12)', color: '#D4802A' }}
           >
             {t('nav_menu')}

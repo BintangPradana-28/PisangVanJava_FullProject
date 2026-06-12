@@ -35,10 +35,10 @@ export default function B2BBoard({ initialDeals }: { initialDeals: Deal[] }) {
       {STAGES.map((stage) => {
         const stageDeals = deals.filter((d) => d.stage === stage)
         return (
-          <div key={stage} className="bg-gray-50 rounded-xl p-4 min-w-[280px]">
+          <div key={stage} className="bg-gray-50 rounded-[4px] p-4 min-w-[280px]">
             <h2 className="font-bold mb-4 flex items-center justify-between">
               {stage}
-              <span className="bg-gray-200 text-xs px-2 py-1 rounded-full">
+              <span className="bg-gray-200 text-xs px-2 py-1 rounded-[4px]">
                 {stageDeals.length}
               </span>
             </h2>

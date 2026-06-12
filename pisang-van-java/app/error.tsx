@@ -25,7 +25,7 @@ export default function GlobalError({ error, reset }: ErrorPageProps) {
     >
       <div className="w-full max-w-md text-center space-y-6">
         {/* Warning Icon */}
-        <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-amber-50 border-2 border-amber-200 mx-auto">
+        <div className="inline-flex items-center justify-center w-20 h-20 rounded-[4px] bg-amber-50 border-2 border-amber-200 mx-auto">
           <svg
             className="w-10 h-10 text-amber-500"
             fill="none"
@@ -62,7 +62,7 @@ export default function GlobalError({ error, reset }: ErrorPageProps) {
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <button
             onClick={reset}
-            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full font-semibold text-sm bg-amber-500 hover:bg-amber-600 text-white shadow-md hover:shadow-lg transition-all duration-200 active:scale-95"
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-[4px] font-semibold text-sm bg-amber-500 hover:bg-amber-600 text-white shadow-md hover:shadow-sm transition-all duration-200 active:scale-95"
           >
             <svg
               className="w-4 h-4"
@@ -82,7 +82,7 @@ export default function GlobalError({ error, reset }: ErrorPageProps) {
           </button>
           <Link
             href="/"
-            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full font-semibold text-sm border border-amber-200 dark:border-zinc-700 text-amber-900 dark:text-zinc-300 hover:bg-amber-50 dark:hover:bg-zinc-800 transition-all duration-200 active:scale-95"
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-[4px] font-semibold text-sm border border-amber-200 dark:border-zinc-700 text-amber-900 dark:text-zinc-300 hover:bg-amber-50 dark:hover:bg-zinc-800 transition-all duration-200 active:scale-95"
           >
             ← Kembali ke Beranda
           </Link>

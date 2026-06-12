@@ -84,7 +84,7 @@ export default function MemberForgotPasswordPage() {
     visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' } }
   }
 
-  const inputCls = `w-full px-4 py-3 text-sm rounded-xl outline-none transition-all
+  const inputCls = `w-full px-4 py-3 text-sm rounded-[4px] outline-none transition-all
                     bg-[var(--surface-custom)] border border-zinc-400 dark:border-zinc-600
                     text-[var(--text-custom)] placeholder:text-[var(--on-surface-variant)]
                     focus:ring-2 focus:ring-amber-brand/40 focus:border-amber-brand`
@@ -97,7 +97,7 @@ export default function MemberForgotPasswordPage() {
         position="top-center"
         toastOptions={{
           className:
-            '!bg-[var(--card-bg)] !text-[var(--text-custom)] !border !border-[var(--border-custom)] !shadow-lg'
+            '!bg-[var(--card-bg)] !text-[var(--text-custom)] !border !border-[var(--border-custom)] !shadow-sm'
         }}
       />
       <div className="pointer-events-none fixed inset-0 bg-hero-pattern opacity-40" />
@@ -110,14 +110,14 @@ export default function MemberForgotPasswordPage() {
           className="w-full max-w-[420px]"
         >
           <div
-            className="rounded-2xl px-8 py-10 sm:px-10 shadow-2xl"
+            className="rounded-[4px] px-8 py-10 sm:px-10 shadow-sm"
             style={{ background: 'var(--card-bg)', border: '1px solid var(--border-custom)' }}
           >
             <motion.div variants={stagger} initial="hidden" animate="visible">
               {/* Brand */}
               <motion.div variants={item} className="flex flex-col items-center gap-1 mb-8">
                 <div
-                  className="w-16 h-16 rounded-2xl flex items-center justify-center text-4xl mb-1 shadow-md"
+                  className="w-16 h-16 rounded-[4px] flex items-center justify-center text-4xl mb-1 shadow-md"
                   style={{ background: 'var(--primary-custom)' }}
                 >
                   🍌
@@ -218,7 +218,7 @@ export default function MemberForgotPasswordPage() {
                     <button
                       type="submit"
                       disabled={isSubmitting || countdown > 0}
-                      className="w-full py-3.5 rounded-xl text-sm font-bold tracking-wide transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2 bg-secondary hover:bg-amber-brand text-white shadow-md"
+                      className="w-full py-3.5 rounded-[4px] text-sm font-bold tracking-wide transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2 bg-secondary hover:bg-amber-brand text-white shadow-md"
                     >
                       {isSubmitting ? (
                         <>
@@ -249,7 +249,7 @@ export default function MemberForgotPasswordPage() {
                 <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
                   <Link
                     href="/member-login"
-                    className="block w-full py-3.5 mt-2 rounded-xl text-sm font-bold tracking-wide text-center transition-all bg-secondary hover:bg-amber-brand text-white shadow-md"
+                    className="block w-full py-3.5 mt-2 rounded-[4px] text-sm font-bold tracking-wide text-center transition-all bg-secondary hover:bg-amber-brand text-white shadow-md"
                   >
                     {t('forgot_back_to_login')}
                   </Link>

@@ -17,8 +17,8 @@ export default function HelpCenterPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Chat CS */}
-        <div className="p-6 md:p-8 bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/80 rounded-3xl shadow-sm hover:border-green-500/30 hover:shadow-md transition-all group flex flex-col h-full">
-          <div className="w-14 h-14 bg-green-50 text-green-600 dark:bg-green-900/20 dark:text-green-400 rounded-2xl flex items-center justify-center mb-6 shrink-0 group-hover:scale-110 transition-transform">
+        <div className="p-6 md:p-8 bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/80 rounded-[4px] shadow-sm hover:border-green-500/30 hover:shadow-md transition-all group flex flex-col h-full">
+          <div className="w-14 h-14 bg-green-50 text-green-600 dark:bg-green-900/20 dark:text-green-400 rounded-[4px] flex items-center justify-center mb-6 shrink-0 group-hover:scale-110 transition-transform">
             <MessageCircle className="w-7 h-7" />
           </div>
           <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-3">
@@ -32,7 +32,7 @@ export default function HelpCenterPage() {
             href="https://wa.me/6281234567890" // Ganti dengan nomor asli
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex w-full justify-center items-center gap-2 px-6 py-3.5 bg-green-600 text-white font-bold rounded-2xl hover:bg-green-700 active:scale-95 transition-all shadow-sm hover:shadow"
+            className="inline-flex w-full justify-center items-center gap-2 px-6 py-3.5 bg-green-600 text-white font-bold rounded-[4px] hover:bg-green-700 active:scale-95 transition-all shadow-sm hover:shadow"
           >
             Chat via WhatsApp
             <ExternalLink className="w-4 h-4" />
@@ -40,8 +40,8 @@ export default function HelpCenterPage() {
         </div>
 
         {/* Lapor Masalah */}
-        <div className="p-6 md:p-8 bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/80 rounded-3xl shadow-sm hover:border-red-500/30 hover:shadow-md transition-all group flex flex-col h-full">
-          <div className="w-14 h-14 bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400 rounded-2xl flex items-center justify-center mb-6 shrink-0 group-hover:scale-110 transition-transform">
+        <div className="p-6 md:p-8 bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/80 rounded-[4px] shadow-sm hover:border-red-500/30 hover:shadow-md transition-all group flex flex-col h-full">
+          <div className="w-14 h-14 bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400 rounded-[4px] flex items-center justify-center mb-6 shrink-0 group-hover:scale-110 transition-transform">
             <AlertTriangle className="w-7 h-7" />
           </div>
           <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-3">
@@ -53,7 +53,7 @@ export default function HelpCenterPage() {
           </p>
           <Link
             href="/profile/bantuan/lapor" // Rute form khusus
-            className="inline-flex w-full justify-center items-center gap-2 px-6 py-3.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-bold rounded-2xl hover:bg-zinc-200 dark:hover:bg-zinc-700 active:scale-95 transition-all"
+            className="inline-flex w-full justify-center items-center gap-2 px-6 py-3.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 font-bold rounded-[4px] hover:bg-zinc-200 dark:hover:bg-zinc-700 active:scale-95 transition-all"
           >
             Buat Laporan Baru
           </Link>
@@ -63,7 +63,7 @@ export default function HelpCenterPage() {
       {/* FAQ Cepat */}
       <div className="pt-8">
         <h3 className="font-bold text-lg text-zinc-900 dark:text-zinc-100 mb-6 flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-[#D4802A]/10 text-[#D4802A] flex items-center justify-center">
+          <div className="w-8 h-8 rounded-[4px] bg-[#D4802A]/10 text-[#D4802A] flex items-center justify-center">
             <FileText className="w-4 h-4" />
           </div>
           Pertanyaan Umum (FAQ)
@@ -89,7 +89,7 @@ export default function HelpCenterPage() {
           ].map((faq, i) => (
             <div
               key={i}
-              className="p-5 md:p-6 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm"
+              className="p-5 md:p-6 bg-white dark:bg-zinc-900 rounded-[4px] border border-zinc-200/50 dark:border-zinc-800/50 shadow-sm"
             >
               <p className="font-bold text-zinc-900 dark:text-zinc-100 mb-2 text-base">{faq.q}</p>
               <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">{faq.a}</p>

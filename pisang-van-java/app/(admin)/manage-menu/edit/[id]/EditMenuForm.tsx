@@ -83,7 +83,7 @@ export default function EditMenuForm({ id, initialData }: EditMenuFormProps) {
       <Toaster position="top-right" />
       <form
         onSubmit={handleSubmit}
-        className="bg-white rounded-2xl border border-cream-200 p-6 sm:p-8 space-y-6 shadow-sm"
+        className="bg-white rounded-[4px] border border-cream-200 p-6 sm:p-8 space-y-6 shadow-sm"
       >
         {/* Flavor name */}
         <div>
@@ -147,7 +147,7 @@ export default function EditMenuForm({ id, initialData }: EditMenuFormProps) {
             Gambar Menu
           </label>
           {previewUrl && (
-            <div className="mb-3 relative w-40 h-40 rounded-xl overflow-hidden border border-cream-200">
+            <div className="mb-3 relative w-40 h-40 rounded-[4px] overflow-hidden border border-cream-200">
               <Image src={previewUrl} alt="preview" fill className="object-cover" />
               <button
                 type="button"
@@ -155,7 +155,7 @@ export default function EditMenuForm({ id, initialData }: EditMenuFormProps) {
                   setPreviewUrl('')
                   set('imageUrl', '')
                 }}
-                className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-red-500 text-white text-xs flex items-center justify-center"
+                className="absolute top-1.5 right-1.5 w-6 h-6 rounded-[4px] bg-red-500 text-white text-xs flex items-center justify-center"
               >
                 ✕
               </button>
@@ -169,7 +169,7 @@ export default function EditMenuForm({ id, initialData }: EditMenuFormProps) {
               const f = e.dataTransfer.files[0]
               if (f) handleFileUpload(f)
             }}
-            className="w-full h-28 border-2 border-dashed border-cream-200 rounded-xl flex flex-col items-center
+            className="w-full h-28 border-2 border-dashed border-cream-200 rounded-[4px] flex flex-col items-center
                         justify-center cursor-pointer hover:border-amber-brand hover:bg-cream-100 transition-all gap-1"
           >
             {uploading ? (
@@ -215,10 +215,10 @@ export default function EditMenuForm({ id, initialData }: EditMenuFormProps) {
           <label className="flex items-center gap-2 cursor-pointer">
             <div
               onClick={() => set('isActive', !form.isActive)}
-              className={`w-11 h-6 rounded-full transition-colors relative ${form.isActive ? 'bg-green-wa' : 'bg-cream-200'}`}
+              className={`w-11 h-6 rounded-[4px] transition-colors relative ${form.isActive ? 'bg-green-wa' : 'bg-cream-200'}`}
             >
               <div
-                className={`w-4 h-4 bg-white rounded-full absolute top-1 transition-transform shadow ${form.isActive ? 'translate-x-6' : 'translate-x-1'}`}
+                className={`w-4 h-4 bg-white rounded-[4px] absolute top-1 transition-transform shadow ${form.isActive ? 'translate-x-6' : 'translate-x-1'}`}
               />
             </div>
             <span className="text-sm font-medium text-brown-600">
@@ -244,13 +244,13 @@ export default function EditMenuForm({ id, initialData }: EditMenuFormProps) {
           <button
             type="submit"
             disabled={saving}
-            className="flex-1 py-3 bg-green-wa text-white font-semibold rounded-xl hover:bg-green-wa-light transition-colors disabled:opacity-60"
+            className="flex-1 py-3 bg-green-wa text-white font-semibold rounded-[4px] hover:bg-green-wa-light transition-colors disabled:opacity-60"
           >
             {saving ? 'Menyimpan...' : '✓ Simpan Perubahan'}
           </button>
           <Link
             href="/manage-menu"
-            className="flex-1 py-3 bg-brown-700 text-cream-100 font-semibold rounded-xl hover:bg-brown-600 transition-colors text-center"
+            className="flex-1 py-3 bg-brown-700 text-cream-100 font-semibold rounded-[4px] hover:bg-brown-600 transition-colors text-center"
           >
             ✕ Batal
           </Link>

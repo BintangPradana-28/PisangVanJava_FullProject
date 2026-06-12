@@ -205,7 +205,7 @@ export default function LokasiKontakPage() {
     >
       <Toaster
         position="top-center"
-        toastOptions={{ className: '!rounded-xl !text-sm !font-medium !shadow-xl' }}
+        toastOptions={{ className: '!rounded-[4px] !text-sm !font-medium !shadow-sm' }}
       />
 
       {/* ── Hero — compact ──────────────────────────────────────────────── */}
@@ -213,11 +213,11 @@ export default function LokasiKontakPage() {
         <div className="absolute inset-0 bg-hero-pattern opacity-40 pointer-events-none" />
         {/* decorative blobs */}
         <div
-          className="absolute -top-24 -right-24 w-96 h-96 rounded-full opacity-10 pointer-events-none"
+          className="absolute -top-24 -right-24 w-96 h-96 rounded-[4px] opacity-10 pointer-events-none"
           style={{ background: 'radial-gradient(circle,#D4802A,transparent)' }}
         />
         <div
-          className="absolute -bottom-16 -left-16 w-72 h-72 rounded-full opacity-10 pointer-events-none"
+          className="absolute -bottom-16 -left-16 w-72 h-72 rounded-[4px] opacity-10 pointer-events-none"
           style={{ background: 'radial-gradient(circle,#D4802A,transparent)' }}
         />
 
@@ -230,7 +230,7 @@ export default function LokasiKontakPage() {
           >
             <div>
               <span
-                className="inline-block text-xs font-bold tracking-[0.22em] uppercase px-4 py-1.5 rounded-full mb-5"
+                className="inline-block text-xs font-bold tracking-[0.22em] uppercase px-4 py-1.5 rounded-[4px] mb-5"
                 style={{ background: 'rgba(212,128,42,0.12)', color: '#D4802A' }}
               >
                 {t('kontak_title_section')}
@@ -261,7 +261,7 @@ export default function LokasiKontakPage() {
           >
             {/* Form */}
             <div
-              className="rounded-3xl p-8"
+              className="rounded-[4px] p-8"
               style={{
                 background: 'var(--surface-custom)',
                 border: '1px solid var(--border-custom)'
@@ -291,7 +291,7 @@ export default function LokasiKontakPage() {
                     value={form.nama}
                     onChange={(e) => setForm((p) => ({ ...p, nama: e.target.value }))}
                     placeholder={t('kontak_placeholder_name')}
-                    className="w-full px-4 py-3 text-sm rounded-xl outline-none transition-all"
+                    className="w-full px-4 py-3 text-sm rounded-[4px] outline-none transition-all"
                     style={{
                       background: 'var(--background-custom)',
                       border: '1px solid var(--border-custom)',
@@ -312,7 +312,7 @@ export default function LokasiKontakPage() {
                     value={form.pesan}
                     onChange={(e) => setForm((p) => ({ ...p, pesan: e.target.value }))}
                     placeholder={t('kontak_placeholder_message')}
-                    className="w-full px-4 py-3 text-sm rounded-xl outline-none transition-all resize-none"
+                    className="w-full px-4 py-3 text-sm rounded-[4px] outline-none transition-all resize-none"
                     style={{
                       background: 'var(--background-custom)',
                       border: '1px solid var(--border-custom)',
@@ -341,7 +341,7 @@ export default function LokasiKontakPage() {
                 <button
                   type="submit"
                   disabled={sending}
-                  className="w-full py-3.5 rounded-xl text-sm font-bold tracking-wide transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="w-full py-3.5 rounded-[4px] text-sm font-bold tracking-wide transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2"
                   style={{
                     background: '#D4802A',
                     color: 'white',
@@ -404,7 +404,7 @@ export default function LokasiKontakPage() {
                         })
                       }
                     }}
-                    className={`flex items-center gap-2 px-4 py-2.5 rounded-full transition-all group ${soon ? 'cursor-default opacity-70' : 'hover:-translate-y-0.5 hover:shadow-md'}`}
+                    className={`flex items-center gap-2 px-4 py-2.5 rounded-[4px] transition-all group ${soon ? 'cursor-default opacity-70' : 'hover:-translate-y-0.5 hover:shadow-md'}`}
                     style={{
                       background: 'var(--surface-custom)',
                       border: '1px solid var(--border-custom)'
@@ -430,7 +430,7 @@ export default function LokasiKontakPage() {
           >
             {/* Map */}
             <div
-              className="rounded-3xl overflow-hidden shadow-xl h-[300px]"
+              className="rounded-[4px] overflow-hidden shadow-sm h-[300px]"
               style={{ border: '1px solid var(--border-custom)' }}
             >
               <MapEmbed
@@ -445,7 +445,7 @@ export default function LokasiKontakPage() {
             {infoCards.map(({ id, label, val, svgPath, iconColor, soon }) => (
               <div
                 key={id}
-                className="flex gap-4 items-start p-4 rounded-2xl transition-all hover:shadow-sm"
+                className="flex gap-4 items-start p-4 rounded-[4px] transition-all hover:shadow-sm"
                 style={{
                   background: 'var(--surface-custom)',
                   border: '1px solid var(--border-custom)'
@@ -453,7 +453,7 @@ export default function LokasiKontakPage() {
               >
                 {/* Icon */}
                 <div
-                  className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                  className="w-10 h-10 rounded-[4px] flex items-center justify-center shrink-0"
                   style={{ background: 'rgba(212,128,42,0.1)' }}
                 >
                   <svg className="w-5 h-5" viewBox="0 0 24 24" fill={iconColor} aria-hidden="true">
@@ -470,7 +470,7 @@ export default function LokasiKontakPage() {
                     </span>
                     {soon && (
                       <span
-                        className="text-[9px] font-bold px-2 py-0.5 rounded-full"
+                        className="text-[9px] font-bold px-2 py-0.5 rounded-[4px]"
                         style={{ background: 'rgba(212,128,42,0.12)', color: '#D4802A' }}
                       >
                         {t('kontak_soon')}
@@ -521,7 +521,7 @@ export default function LokasiKontakPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.07 }}
-                className="rounded-2xl overflow-hidden"
+                className="rounded-[4px] overflow-hidden"
                 style={{ background: 'var(--card-bg)', border: '1px solid var(--border-custom)' }}
               >
                 <button
@@ -590,14 +590,14 @@ export default function LokasiKontakPage() {
                     behavior: 'smooth'
                   })
                 }}
-                className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full font-bold text-sm transition-all active:scale-95 hover:shadow-lg"
+                className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-[4px] font-bold text-sm transition-all active:scale-95 hover:shadow-sm"
                 style={{ background: '#25D366', color: 'white' }}
               >
                 <WhatsAppIcon className="w-4 h-4" /> {t('kontak_chat_now')}
               </button>
               <Link
                 href="/menu-spesial"
-                className="px-8 py-3.5 rounded-full font-bold text-sm transition-all active:scale-95 border border-white/30 hover:bg-white/10"
+                className="px-8 py-3.5 rounded-[4px] font-bold text-sm transition-all active:scale-95 border border-white/30 hover:bg-white/10"
               >
                 🍌 {t('hero_menu_btn')}
               </Link>

@@ -29,10 +29,10 @@ export default function ProfileSidebar() {
 
   return (
     <div className="w-full md:w-72 flex-shrink-0">
-      <div className="bg-white dark:bg-zinc-900 rounded-3xl p-4 md:p-6 shadow-sm border border-zinc-200/50 dark:border-zinc-800/80 sticky top-24">
+      <div className="bg-white dark:bg-zinc-900 rounded-[4px] p-4 md:p-6 shadow-sm border border-zinc-200/50 dark:border-zinc-800/80 sticky top-24">
         {/* Profile Info (Desktop) */}
         <div className="hidden md:flex flex-col items-center pb-6 mb-6 border-b border-zinc-100 dark:border-zinc-800">
-          <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden border-4 border-white dark:border-zinc-900 shadow-md relative bg-zinc-100 dark:bg-zinc-800">
+          <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-[4px] overflow-hidden border-4 border-white dark:border-zinc-900 shadow-md relative bg-zinc-100 dark:bg-zinc-800">
             {session?.user?.image ? (
               <Image src={session.user.image} alt="Avatar" fill className="object-cover" />
             ) : (
@@ -57,7 +57,7 @@ export default function ProfileSidebar() {
               <Link
                 key={item.key}
                 href={item.href}
-                className={`flex items-center gap-3 px-4 py-3.5 md:py-3 rounded-2xl whitespace-nowrap transition-all font-medium text-sm ${
+                className={`flex items-center gap-3 px-4 py-3.5 md:py-3 rounded-[4px] whitespace-nowrap transition-all font-medium text-sm ${
                   isActive
                     ? 'bg-[#D4802A] text-white shadow-md'
                     : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800/50'
@@ -89,7 +89,7 @@ export default function ProfileSidebar() {
               <Link
                 key={item.key}
                 href={item.href}
-                className={`flex items-center gap-3 px-4 py-3.5 md:py-3 rounded-2xl whitespace-nowrap transition-all font-medium text-sm ${
+                className={`flex items-center gap-3 px-4 py-3.5 md:py-3 rounded-[4px] whitespace-nowrap transition-all font-medium text-sm ${
                   isActive
                     ? 'bg-orange-50 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400'
                     : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800/50'
@@ -110,7 +110,7 @@ export default function ProfileSidebar() {
               useCartStore.getState().clearCart()
               signOut({ callbackUrl: '/' })
             }}
-            className="flex items-center gap-3 px-4 py-3.5 md:py-3 rounded-2xl whitespace-nowrap transition-all font-medium text-sm text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30"
+            className="flex items-center gap-3 px-4 py-3.5 md:py-3 rounded-[4px] whitespace-nowrap transition-all font-medium text-sm text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30"
           >
             <LogOut className="w-5 h-5 text-red-500 dark:text-red-400" />
             <span>{t('profile_menu_logout')}</span>

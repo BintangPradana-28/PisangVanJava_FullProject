@@ -80,20 +80,20 @@ export default function ManageComplaintsClient({
 
       <div className="grid gap-4">
         {complaints.length === 0 ? (
-          <div className="bg-white rounded-3xl p-8 text-center text-gray-500 border border-cream-200">
+          <div className="bg-white rounded-[4px] p-8 text-center text-gray-500 border border-cream-200">
             Belum ada tiket bantuan.
           </div>
         ) : (
           complaints.map((complaint) => (
             <div
               key={complaint.id}
-              className="bg-white rounded-2xl p-5 shadow-sm border border-cream-200 hover:shadow-md transition-shadow"
+              className="bg-white rounded-[4px] p-5 shadow-sm border border-cream-200 hover:shadow-md transition-shadow"
             >
               <div className="flex justify-between items-start gap-4 mb-3">
                 <div>
                   <div className="flex items-center gap-3 mb-1">
                     <span
-                      className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                      className={`text-[10px] font-bold px-2 py-0.5 rounded-[4px] ${
                         complaint.status === 'OPEN'
                           ? 'bg-red-100 text-red-700'
                           : complaint.status === 'RESOLVED'
@@ -116,14 +116,14 @@ export default function ManageComplaintsClient({
                 {complaint.status === 'OPEN' && (
                   <button
                     onClick={() => setResolvingId(complaint.id)}
-                    className="shrink-0 px-4 py-2 bg-brown-700 text-white text-xs font-bold rounded-xl hover:bg-brown-800"
+                    className="shrink-0 px-4 py-2 bg-brown-700 text-white text-xs font-bold rounded-[4px] hover:bg-brown-800"
                   >
                     Tanggapi Tiket
                   </button>
                 )}
               </div>
 
-              <div className="bg-cream-50 p-3 rounded-xl text-sm text-brown-800 border border-cream-100 whitespace-pre-wrap">
+              <div className="bg-cream-50 p-3 rounded-[4px] text-sm text-brown-800 border border-cream-100 whitespace-pre-wrap">
                 {complaint.description}
               </div>
 
@@ -152,7 +152,7 @@ export default function ManageComplaintsClient({
       {/* Modal Respond */}
       {resolvingId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-white rounded-3xl p-6 w-full max-w-lg shadow-2xl">
+          <div className="bg-white rounded-[4px] p-6 w-full max-w-lg shadow-sm">
             <h3 className="font-bold text-xl mb-4 text-brown-900">Tanggapi Tiket Bantuan</h3>
 
             <form onSubmit={handleResolve} className="space-y-4">
@@ -163,7 +163,7 @@ export default function ManageComplaintsClient({
                 <textarea
                   value={adminResponse}
                   onChange={(e) => setAdminResponse(e.target.value)}
-                  className="w-full border rounded-xl px-4 py-3 focus:ring-2 focus:ring-brown-500 outline-none h-32 resize-none text-sm"
+                  className="w-full border rounded-[4px] px-4 py-3 focus:ring-2 focus:ring-brown-500 outline-none h-32 resize-none text-sm"
                   required
                   placeholder="Ketik tanggapan Anda di sini..."
                 />
@@ -176,7 +176,7 @@ export default function ManageComplaintsClient({
                   type="number"
                   value={compensationKoin}
                   onChange={(e) => setCompensationKoin(Number(e.target.value))}
-                  className="w-full border rounded-xl px-4 py-3 focus:ring-2 focus:ring-orange-500 outline-none"
+                  className="w-full border rounded-[4px] px-4 py-3 focus:ring-2 focus:ring-orange-500 outline-none"
                   min="0"
                 />
                 <p className="text-[10px] text-gray-500 mt-1">
@@ -188,14 +188,14 @@ export default function ManageComplaintsClient({
                 <button
                   type="button"
                   onClick={() => setResolvingId(null)}
-                  className="flex-1 py-3 bg-gray-100 text-gray-700 font-bold rounded-xl"
+                  className="flex-1 py-3 bg-gray-100 text-gray-700 font-bold rounded-[4px]"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
                   disabled={resolveMutation.isPending}
-                  className="flex-1 py-3 bg-brown-700 hover:bg-brown-800 text-white font-bold rounded-xl disabled:opacity-50"
+                  className="flex-1 py-3 bg-brown-700 hover:bg-brown-800 text-white font-bold rounded-[4px] disabled:opacity-50"
                 >
                   {resolveMutation.isPending ? 'Memproses...' : 'Selesaikan Tiket'}
                 </button>

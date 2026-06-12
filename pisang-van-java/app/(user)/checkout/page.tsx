@@ -350,7 +350,7 @@ export default function CheckoutPage() {
   if (authStatus === 'loading') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-zinc-50 dark:bg-zinc-950">
-        <div className="w-10 h-10 rounded-full border-4 border-amber-500 border-t-transparent animate-spin" />
+        <div className="w-10 h-10 rounded-[4px] border-4 border-amber-500 border-t-transparent animate-spin" />
       </div>
     )
   }
@@ -358,7 +358,7 @@ export default function CheckoutPage() {
   if (!storeStatus.isOpen) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-zinc-50 dark:bg-zinc-950 p-4">
-        <div className="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-100 dark:border-zinc-800 shadow-sm p-8 text-center max-w-md">
+        <div className="bg-white dark:bg-zinc-900 rounded-[4px] border border-zinc-100 dark:border-zinc-800 shadow-sm p-8 text-center max-w-md">
           <div className="text-5xl mb-4">🏪</div>
           <h2 className="font-serif text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-2">
             Kedai Tutup
@@ -366,7 +366,7 @@ export default function CheckoutPage() {
           <p className="text-zinc-500 mb-6">{storeStatus.message}</p>
           <Link
             href="/menu-spesial"
-            className="bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-8 rounded-2xl transition-all shadow-md shadow-amber-200"
+            className="bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-8 rounded-[4px] transition-all shadow-md shadow-amber-200"
           >
             Kembali ke Menu
           </Link>
@@ -384,9 +384,9 @@ export default function CheckoutPage() {
             <div key={label} className="flex items-center gap-2">
               <button
                 onClick={() => i < step && setStep(i)}
-                className={`w-8 h-8 rounded-full text-xs font-bold flex items-center justify-center transition-all ${
+                className={`w-8 h-8 rounded-[4px] text-xs font-bold flex items-center justify-center transition-all ${
                   i === step
-                    ? 'bg-amber-500 text-white shadow-lg shadow-amber-200'
+                    ? 'bg-amber-500 text-white shadow-sm shadow-amber-200'
                     : i < step
                       ? 'bg-amber-100 text-amber-700 cursor-pointer hover:bg-amber-200'
                       : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-400'
@@ -422,7 +422,7 @@ export default function CheckoutPage() {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 16 }}
                 >
-                  <div className="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-100 dark:border-zinc-800 shadow-sm p-6">
+                  <div className="bg-white dark:bg-zinc-900 rounded-[4px] border border-zinc-100 dark:border-zinc-800 shadow-sm p-6">
                     <h2 className="font-serif text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-4">
                       🛒 Periksa Pesanan Anda
                     </h2>
@@ -473,7 +473,7 @@ export default function CheckoutPage() {
                       </Link>
                       <button
                         onClick={() => setStep(1)}
-                        className="bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-8 rounded-2xl transition-all active:scale-95 shadow-md shadow-amber-200"
+                        className="bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-8 rounded-[4px] transition-all active:scale-95 shadow-md shadow-amber-200"
                       >
                         Lanjut →
                       </button>
@@ -490,7 +490,7 @@ export default function CheckoutPage() {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 16 }}
                 >
-                  <div className="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-100 dark:border-zinc-800 shadow-sm p-6 space-y-5">
+                  <div className="bg-white dark:bg-zinc-900 rounded-[4px] border border-zinc-100 dark:border-zinc-800 shadow-sm p-6 space-y-5">
                     <h2 className="font-serif text-xl font-bold text-zinc-900 dark:text-zinc-100">
                       👤 Data Pemesan
                     </h2>
@@ -503,7 +503,7 @@ export default function CheckoutPage() {
                         type="text"
                         {...register('customerName')}
                         placeholder="Nama Anda..."
-                        className={`w-full px-4 py-3 rounded-2xl border ${errors.customerName ? 'border-red-400 focus:ring-red-400' : 'border-zinc-200 dark:border-zinc-700 focus:ring-amber-400'} bg-zinc-50 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-100 text-sm focus:outline-none focus:ring-2 transition-all`}
+                        className={`w-full px-4 py-3 rounded-[4px] border ${errors.customerName ? 'border-red-400 focus:ring-red-400' : 'border-zinc-200 dark:border-zinc-700 focus:ring-amber-400'} bg-zinc-50 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-100 text-sm focus:outline-none focus:ring-2 transition-all`}
                       />
                       {errors.customerName && (
                         <p className="text-xs text-red-500 font-semibold mt-1">
@@ -520,7 +520,7 @@ export default function CheckoutPage() {
                         type="tel"
                         {...register('customerPhone', { onChange: handlePhoneChange })}
                         placeholder="Contoh: 081234567890"
-                        className={`w-full px-4 py-3 rounded-2xl border ${errors.customerPhone ? 'border-red-400 focus:ring-red-400' : 'border-zinc-200 dark:border-zinc-700 focus:ring-amber-400'} bg-zinc-50 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-100 text-sm focus:outline-none focus:ring-2 transition-all`}
+                        className={`w-full px-4 py-3 rounded-[4px] border ${errors.customerPhone ? 'border-red-400 focus:ring-red-400' : 'border-zinc-200 dark:border-zinc-700 focus:ring-amber-400'} bg-zinc-50 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-100 text-sm focus:outline-none focus:ring-2 transition-all`}
                       />
                       {errors.customerPhone && (
                         <p className="text-xs text-red-500 font-semibold mt-1">
@@ -553,7 +553,7 @@ export default function CheckoutPage() {
                             key={opt.value}
                             type="button"
                             onClick={() => setDelivery(opt.value)}
-                            className={`py-4 px-4 rounded-2xl border-2 text-left transition-all ${
+                            className={`py-4 px-4 rounded-[4px] border-2 text-left transition-all ${
                               delivery === opt.value
                                 ? 'border-amber-400 bg-amber-50 dark:bg-amber-900/20'
                                 : 'border-zinc-200 dark:border-zinc-700 hover:border-zinc-300'
@@ -580,7 +580,7 @@ export default function CheckoutPage() {
                             type="time"
                             value={pickupTime}
                             onChange={(e) => setPickupTime(e.target.value)}
-                            className="w-full px-4 py-3 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 transition-all"
+                            className="w-full px-4 py-3 rounded-[4px] border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 transition-all"
                           />
                         </div>
                         <div>
@@ -592,7 +592,7 @@ export default function CheckoutPage() {
                             onChange={(e) => setNotes(e.target.value)}
                             placeholder="Catatan untuk penjual..."
                             rows={2}
-                            className="w-full px-4 py-3 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 transition-all resize-none"
+                            className="w-full px-4 py-3 rounded-[4px] border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 transition-all resize-none"
                           />
                         </div>
                       </div>
@@ -614,7 +614,7 @@ export default function CheckoutPage() {
                                   key={addr.id}
                                   type="button"
                                   onClick={() => setSelectedAddressId(addr.id)}
-                                  className={`text-left p-4 rounded-2xl border-2 transition-all ${
+                                  className={`text-left p-4 rounded-[4px] border-2 transition-all ${
                                     selectedAddressId === addr.id
                                       ? 'border-amber-400 bg-amber-50 dark:bg-amber-900/20'
                                       : 'border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600 bg-zinc-50 dark:bg-zinc-800'
@@ -625,7 +625,7 @@ export default function CheckoutPage() {
                                       {addr.label}
                                     </span>
                                     {addr.isDefault && (
-                                      <span className="text-[10px] font-bold bg-amber-200 text-amber-800 px-2 py-0.5 rounded-full">
+                                      <span className="text-[10px] font-bold bg-amber-200 text-amber-800 px-2 py-0.5 rounded-[4px]">
                                         Utama
                                       </span>
                                     )}
@@ -656,7 +656,7 @@ export default function CheckoutPage() {
                               onChange={(e) => setAddress(e.target.value)}
                               placeholder="Jl. Contoh No.1, RT/RW, Kelurahan, Kecamatan, Kota..."
                               rows={3}
-                              className="w-full px-4 py-3 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 transition-all resize-none"
+                              className="w-full px-4 py-3 rounded-[4px] border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 transition-all resize-none"
                             />
                             {authStatus === 'authenticated' && addresses.length > 0 && (
                               <button
@@ -676,7 +676,7 @@ export default function CheckoutPage() {
                     <div className="space-y-4">
                       {/* Poin Toggle */}
                       {koinPisang > 0 && (
-                        <div className="flex items-center justify-between p-3 rounded-2xl border border-amber-200 bg-amber-50 dark:bg-amber-900/20 dark:border-amber-700/50">
+                        <div className="flex items-center justify-between p-3 rounded-[4px] border border-amber-200 bg-amber-50 dark:bg-amber-900/20 dark:border-amber-700/50">
                           <div className="flex items-center gap-3">
                             <div className="text-2xl">🪙</div>
                             <div>
@@ -701,7 +701,7 @@ export default function CheckoutPage() {
                                 }
                               }}
                             />
-                            <div className="w-11 h-6 bg-zinc-200 peer-focus:outline-none rounded-full peer dark:bg-zinc-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-zinc-600 peer-checked:bg-amber-500"></div>
+                            <div className="w-11 h-6 bg-zinc-200 peer-focus:outline-none rounded-[4px] peer dark:bg-zinc-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-[4px] after:h-5 after:w-5 after:transition-all dark:border-zinc-600 peer-checked:bg-amber-500"></div>
                           </label>
                         </div>
                       )}
@@ -722,13 +722,13 @@ export default function CheckoutPage() {
                                 setAppliedVoucher(null)
                             }}
                             placeholder="KODE-PROMO"
-                            className="flex-1 px-4 py-3 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-100 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-amber-400 transition-all uppercase"
+                            className="flex-1 px-4 py-3 rounded-[4px] border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-100 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-amber-400 transition-all uppercase"
                           />
                           <button
                             type="button"
                             onClick={handleApplyVoucher}
                             disabled={isValidating || cartTotal <= 0}
-                            className="px-5 py-3 rounded-2xl bg-amber-100 text-amber-800 font-bold text-sm hover:bg-amber-200 disabled:opacity-50 transition-all"
+                            className="px-5 py-3 rounded-[4px] bg-amber-100 text-amber-800 font-bold text-sm hover:bg-amber-200 disabled:opacity-50 transition-all"
                           >
                             {isValidating ? '...' : 'Pakai'}
                           </button>
@@ -766,7 +766,7 @@ export default function CheckoutPage() {
                             key={opt.value}
                             type="button"
                             onClick={() => setPaymentMethod(opt.value)}
-                            className={`py-4 px-4 rounded-2xl border-2 text-left transition-all ${
+                            className={`py-4 px-4 rounded-[4px] border-2 text-left transition-all ${
                               paymentMethod === opt.value
                                 ? 'border-amber-400 bg-amber-50 dark:bg-amber-900/20'
                                 : 'border-zinc-200 dark:border-zinc-700 hover:border-zinc-300'
@@ -792,7 +792,7 @@ export default function CheckoutPage() {
                       {/* VALIDATED TRANSITION — calls handleNextToConfirm, not setStep(2) directly */}
                       <button
                         onClick={handleNextToConfirm}
-                        className="bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-8 rounded-2xl transition-all active:scale-95 shadow-md shadow-amber-200"
+                        className="bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-8 rounded-[4px] transition-all active:scale-95 shadow-md shadow-amber-200"
                       >
                         Review Pesanan →
                       </button>
@@ -809,14 +809,14 @@ export default function CheckoutPage() {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: 16 }}
                 >
-                  <div className="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-100 dark:border-zinc-800 shadow-sm p-6 space-y-5">
+                  <div className="bg-white dark:bg-zinc-900 rounded-[4px] border border-zinc-100 dark:border-zinc-800 shadow-sm p-6 space-y-5">
                     <h2 className="font-serif text-xl font-bold text-zinc-900 dark:text-zinc-100">
                       ✅ Konfirmasi Pesanan
                     </h2>
 
                     {/* Summary blocks */}
                     <div className="space-y-3">
-                      <div className="bg-zinc-50 dark:bg-zinc-800/50 rounded-2xl p-4 space-y-2 text-sm">
+                      <div className="bg-zinc-50 dark:bg-zinc-800/50 rounded-[4px] p-4 space-y-2 text-sm">
                         <div className="flex justify-between">
                           <span className="text-zinc-500">Nama</span>
                           <span className="font-semibold text-zinc-800 dark:text-zinc-100">
@@ -863,20 +863,20 @@ export default function CheckoutPage() {
 
                       {/* Promo info */}
                       {appliedVoucher && !usePoints && (
-                        <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-900 rounded-2xl px-4 py-3 text-sm text-green-700 dark:text-green-400 font-semibold">
+                        <div className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-900 rounded-[4px] px-4 py-3 text-sm text-green-700 dark:text-green-400 font-semibold">
                           🏷️ Voucher {appliedVoucher.code} — Hemat{' '}
                           {formatPrice(appliedVoucher.discountAmount)}
                         </div>
                       )}
                       {usePoints && pointsToUse > 0 && (
-                        <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900 rounded-2xl px-4 py-3 text-sm text-amber-700 dark:text-amber-400 font-semibold">
+                        <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900 rounded-[4px] px-4 py-3 text-sm text-amber-700 dark:text-amber-400 font-semibold">
                           🪙 Tukar Koin — Hemat {formatPrice(pointsToUse)}
                         </div>
                       )}
                     </div>
 
                     {/* Privacy consent */}
-                    <div className="flex items-start gap-3 bg-zinc-50 dark:bg-zinc-800/50 rounded-2xl p-4">
+                    <div className="flex items-start gap-3 bg-zinc-50 dark:bg-zinc-800/50 rounded-[4px] p-4">
                       <input
                         type="checkbox"
                         id="consent-check"
@@ -910,7 +910,7 @@ export default function CheckoutPage() {
                       <button
                         onClick={handleSubmit}
                         disabled={checkoutMutation.isPending || !consent}
-                        className={`flex items-center gap-2 font-bold py-3.5 px-8 rounded-2xl transition-all active:scale-95 text-white shadow-lg disabled:opacity-50 disabled:cursor-not-allowed ${
+                        className={`flex items-center gap-2 font-bold py-3.5 px-8 rounded-[4px] transition-all active:scale-95 text-white shadow-sm disabled:opacity-50 disabled:cursor-not-allowed ${
                           paymentMethod === 'WHATSAPP'
                             ? 'bg-[#25D366] hover:bg-[#20b857] shadow-green-200'
                             : 'bg-blue-600 hover:bg-blue-700 shadow-blue-200'
@@ -918,7 +918,7 @@ export default function CheckoutPage() {
                       >
                         {checkoutMutation.isPending ? (
                           <>
-                            <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />{' '}
+                            <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-[4px] animate-spin" />{' '}
                             Memproses...
                           </>
                         ) : paymentMethod === 'WHATSAPP' ? (
@@ -936,7 +936,7 @@ export default function CheckoutPage() {
 
           {/* ── Right Panel: Order Summary (sticky) ── */}
           <div className="lg:sticky lg:top-28 h-fit">
-            <div className="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-100 dark:border-zinc-800 shadow-sm p-6">
+            <div className="bg-white dark:bg-zinc-900 rounded-[4px] border border-zinc-100 dark:border-zinc-800 shadow-sm p-6">
               <h3 className="font-serif text-lg font-bold text-zinc-900 dark:text-zinc-100 mb-4 pb-4 border-b border-zinc-100 dark:border-zinc-800">
                 Ringkasan Pesanan
               </h3>
@@ -997,7 +997,7 @@ export default function CheckoutPage() {
               </div>
 
               {/* Security badge */}
-              <div className="mt-4 flex items-center gap-2 text-xs text-zinc-400 bg-zinc-50 dark:bg-zinc-800/50 rounded-xl px-3 py-2.5">
+              <div className="mt-4 flex items-center gap-2 text-xs text-zinc-400 bg-zinc-50 dark:bg-zinc-800/50 rounded-[4px] px-3 py-2.5">
                 <span className="text-green-500 text-base">🔒</span>
                 <span>Data Anda terenkripsi. Harga dikunci server, bebas manipulasi.</span>
               </div>

@@ -267,7 +267,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed top-0 right-0 z-50 h-full w-full max-w-md bg-white dark:bg-zinc-900 shadow-2xl border-l border-cream-200/40 dark:border-zinc-800 flex flex-col"
+            className="fixed top-0 right-0 z-50 h-full w-full max-w-md bg-white dark:bg-zinc-900 shadow-sm border-l border-cream-200/40 dark:border-zinc-800 flex flex-col"
           >
             {/* Header */}
             <div className="p-6 border-b border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between">
@@ -279,7 +279,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
               </div>
               <button
                 onClick={onClose}
-                className="w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-400 flex items-center justify-center transition-colors focus:outline-none"
+                className="w-8 h-8 rounded-[4px] bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-400 flex items-center justify-center transition-colors focus:outline-none"
                 aria-label="Tutup keranjang"
               >
                 ✕
@@ -297,7 +297,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                 cartItems.map((item, index) => (
                   <div
                     key={`${item.cartItemId}`}
-                    className="p-4 border border-zinc-100 dark:border-zinc-850 bg-zinc-50/40 dark:bg-zinc-800/20 rounded-2xl flex flex-col gap-2 relative"
+                    className="p-4 border border-zinc-100 dark:border-zinc-850 bg-zinc-50/40 dark:bg-zinc-800/20 rounded-[4px] flex flex-col gap-2 relative"
                   >
                     <div className="flex justify-between items-start">
                       <div>
@@ -334,7 +334,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                               ? removeFromCart(item.cartItemId)
                               : updateQuantity(item.cartItemId, item.quantity - 1)
                           }
-                          className="w-6 h-6 rounded-full border border-zinc-300 dark:border-zinc-700 flex items-center justify-center text-xs text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors"
+                          className="w-6 h-6 rounded-[4px] border border-zinc-300 dark:border-zinc-700 flex items-center justify-center text-xs text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors"
                         >
                           -
                         </button>
@@ -343,7 +343,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                         </span>
                         <button
                           onClick={() => updateQuantity(item.cartItemId, item.quantity + 1)}
-                          className="w-6 h-6 rounded-full border border-zinc-300 dark:border-zinc-700 flex items-center justify-center text-xs text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors"
+                          className="w-6 h-6 rounded-[4px] border border-zinc-300 dark:border-zinc-700 flex items-center justify-center text-xs text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors"
                         >
                           +
                         </button>
@@ -372,7 +372,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                       value={customerName}
                       onChange={(e) => setCustomerName(e.target.value)}
                       placeholder="Masukkan nama Anda..."
-                      className="w-full p-3 border border-zinc-200 dark:border-zinc-800 bg-transparent rounded-xl text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-secondary/40"
+                      className="w-full p-3 border border-zinc-200 dark:border-zinc-800 bg-transparent rounded-[4px] text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-secondary/40"
                     />
                   </div>
                   <div>
@@ -384,7 +384,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                       value={customerPhone}
                       onChange={(e) => setCustomerPhone(e.target.value)}
                       placeholder="Contoh: 081234567890"
-                      className="w-full p-3 border border-zinc-200 dark:border-zinc-800 bg-transparent rounded-xl text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-secondary/40"
+                      className="w-full p-3 border border-zinc-200 dark:border-zinc-800 bg-transparent rounded-[4px] text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-secondary/40"
                     />
                   </div>
                 </div>
@@ -397,13 +397,13 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                   <div className="flex gap-2 mb-4">
                     <button
                       onClick={() => setDeliveryMethod('DELIVERY')}
-                      className={`flex-1 py-2.5 text-xs font-bold rounded-xl transition-all border ${deliveryMethod === 'DELIVERY' ? 'bg-amber-100/50 text-amber-800 border-amber-300' : 'bg-white dark:bg-zinc-800 text-zinc-500 border-zinc-200 dark:border-zinc-700'}`}
+                      className={`flex-1 py-2.5 text-xs font-bold rounded-[4px] transition-all border ${deliveryMethod === 'DELIVERY' ? 'bg-amber-100/50 text-amber-800 border-amber-300' : 'bg-white dark:bg-zinc-800 text-zinc-500 border-zinc-200 dark:border-zinc-700'}`}
                     >
                       🛵 Pesan Antar
                     </button>
                     <button
                       onClick={() => setDeliveryMethod('PICKUP')}
-                      className={`flex-1 py-2.5 text-xs font-bold rounded-xl transition-all border ${deliveryMethod === 'PICKUP' ? 'bg-amber-100/50 text-amber-800 border-amber-300' : 'bg-white dark:bg-zinc-800 text-zinc-500 border-zinc-200 dark:border-zinc-700'}`}
+                      className={`flex-1 py-2.5 text-xs font-bold rounded-[4px] transition-all border ${deliveryMethod === 'PICKUP' ? 'bg-amber-100/50 text-amber-800 border-amber-300' : 'bg-white dark:bg-zinc-800 text-zinc-500 border-zinc-200 dark:border-zinc-700'}`}
                     >
                       🏪 Ambil Sendiri
                     </button>
@@ -423,7 +423,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                         ? 'Masukkan alamat pengiriman lengkap Anda...'
                         : 'Catatan untuk penjual...'
                     }
-                    className="w-full p-3 border border-zinc-200 dark:border-zinc-800 bg-transparent rounded-xl text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-secondary/40 min-h-[60px]"
+                    className="w-full p-3 border border-zinc-200 dark:border-zinc-800 bg-transparent rounded-[4px] text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-secondary/40 min-h-[60px]"
                   />
                 </div>
 
@@ -448,14 +448,14 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                           }
                         }}
                         placeholder="Masukkan kode promo"
-                        className="w-full p-3 pl-9 border border-zinc-200 dark:border-zinc-800 bg-transparent rounded-xl text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-secondary/40"
+                        className="w-full p-3 pl-9 border border-zinc-200 dark:border-zinc-800 bg-transparent rounded-[4px] text-xs text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-secondary/40"
                       />
                     </div>
                     <button
                       type="button"
                       onClick={handleApplyVoucher}
                       disabled={isValidatingVoucher || cartTotal <= 0}
-                      className="px-4 rounded-xl text-xs font-bold border border-amber-300 bg-amber-100/60 text-amber-800 hover:bg-amber-200/70 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="px-4 rounded-[4px] text-xs font-bold border border-amber-300 bg-amber-100/60 text-amber-800 hover:bg-amber-200/70 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {isValidatingVoucher ? '...' : 'Pakai'}
                     </button>
@@ -470,7 +470,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                     <button
                       type="button"
                       onClick={() => setPaymentMethod('WHATSAPP')}
-                      className={`flex items-center justify-center gap-2 py-2.5 text-xs font-bold rounded-xl transition-all border ${paymentMethod === 'WHATSAPP' ? 'bg-green-100/70 text-green-800 border-green-300' : 'bg-white dark:bg-zinc-800 text-zinc-500 border-zinc-200 dark:border-zinc-700'}`}
+                      className={`flex items-center justify-center gap-2 py-2.5 text-xs font-bold rounded-[4px] transition-all border ${paymentMethod === 'WHATSAPP' ? 'bg-green-100/70 text-green-800 border-green-300' : 'bg-white dark:bg-zinc-800 text-zinc-500 border-zinc-200 dark:border-zinc-700'}`}
                     >
                       <MessageCircle className="h-4 w-4" aria-hidden="true" />
                       COD
@@ -478,7 +478,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                     <button
                       type="button"
                       onClick={() => setPaymentMethod('ONLINE')}
-                      className={`flex items-center justify-center gap-2 py-2.5 text-xs font-bold rounded-xl transition-all border ${paymentMethod === 'ONLINE' ? 'bg-blue-100/70 text-blue-800 border-blue-300' : 'bg-white dark:bg-zinc-800 text-zinc-500 border-zinc-200 dark:border-zinc-700'}`}
+                      className={`flex items-center justify-center gap-2 py-2.5 text-xs font-bold rounded-[4px] transition-all border ${paymentMethod === 'ONLINE' ? 'bg-blue-100/70 text-blue-800 border-blue-300' : 'bg-white dark:bg-zinc-800 text-zinc-500 border-zinc-200 dark:border-zinc-700'}`}
                     >
                       <CreditCard className="h-4 w-4" aria-hidden="true" />
                       Online
@@ -544,7 +544,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                 <button
                   onClick={handleCheckout}
                   disabled={isSubmitting}
-                  className="w-full flex items-center justify-center gap-2 bg-[#2E7D32] hover:bg-[#236026] text-white font-semibold py-3.5 px-4 rounded-xl transition-all duration-200 shadow-md active:scale-95 text-center text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full flex items-center justify-center gap-2 bg-[#2E7D32] hover:bg-[#236026] text-white font-semibold py-3.5 px-4 rounded-[4px] transition-all duration-200 shadow-md active:scale-95 text-center text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isSubmitting ? (
                     'Memproses...'

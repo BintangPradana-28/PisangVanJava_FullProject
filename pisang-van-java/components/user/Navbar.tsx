@@ -148,7 +148,7 @@ export default function Navbar() {
             className="flex items-center gap-3 group focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary rounded-lg"
             aria-label="Kembali ke halaman utama Pisang Goreng Van Java"
           >
-            <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-xl shadow-sm group-hover:scale-105 transition-transform duration-200">
+            <div className="w-10 h-10 rounded-[4px] bg-secondary flex items-center justify-center text-xl shadow-sm group-hover:scale-105 transition-transform duration-200">
               🍌
             </div>
             <div className="leading-tight">
@@ -190,7 +190,7 @@ export default function Navbar() {
                   >
                     {link.label}
                     {isActive && (
-                      <span className="absolute -bottom-1 left-0 right-0 h-0.5 rounded-full bg-secondary" />
+                      <span className="absolute -bottom-1 left-0 right-0 h-0.5 rounded-[4px] bg-secondary" />
                     )}
                   </Link>
                 </li>
@@ -203,7 +203,7 @@ export default function Navbar() {
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
-              className={`p-2 rounded-full transition-all focus:outline-none hover:bg-zinc-100 dark:hover:bg-zinc-800 ${
+              className={`p-2 rounded-[4px] transition-all focus:outline-none hover:bg-zinc-100 dark:hover:bg-zinc-800 ${
                 useSolidHeader ? 'text-zinc-700 dark:text-zinc-200' : 'text-white'
               }`}
               aria-label="Toggle tema gelap/terang"
@@ -226,7 +226,7 @@ export default function Navbar() {
             {/* Cart Badge Button */}
             <button
               onClick={() => setIsCartOpen(true)}
-              className={`relative p-2 rounded-full transition-all focus:outline-none hover:bg-zinc-100 dark:hover:bg-zinc-800 ${
+              className={`relative p-2 rounded-[4px] transition-all focus:outline-none hover:bg-zinc-100 dark:hover:bg-zinc-800 ${
                 useSolidHeader ? 'text-zinc-700 dark:text-zinc-200' : 'text-white'
               }`}
               aria-label="Buka Keranjang Belanja"
@@ -235,7 +235,7 @@ export default function Navbar() {
               {isHydrated && cartCount > 0 && (
                 <span
                   key={cartPopKey}
-                  className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-white dark:border-zinc-950 cart-pop"
+                  className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 rounded-[4px] flex items-center justify-center border-2 border-white dark:border-zinc-950 cart-pop"
                 >
                   {cartCount}
                 </span>
@@ -247,9 +247,9 @@ export default function Navbar() {
               <div className="relative">
                 <button
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  className="flex items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary rounded-full"
+                  className="flex items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary rounded-[4px]"
                 >
-                  <div className="w-9 h-9 rounded-full bg-secondary hover:bg-secondary/95 text-white flex items-center justify-center font-bold text-sm shadow-md transition-all overflow-hidden">
+                  <div className="w-9 h-9 rounded-[4px] bg-secondary hover:bg-secondary/95 text-white flex items-center justify-center font-bold text-sm shadow-md transition-all overflow-hidden">
                     {session.user?.image ? (
                       <img
                         src={session.user.image}
@@ -276,7 +276,7 @@ export default function Navbar() {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 10 }}
-                        className="absolute right-0 mt-2.5 w-48 bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800 rounded-2xl shadow-xl py-2 z-20"
+                        className="absolute right-0 mt-2.5 w-48 bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800 rounded-[4px] shadow-sm py-2 z-20"
                       >
                         <div className="px-4 py-2 border-b border-zinc-100 dark:border-zinc-800">
                           <p className="text-xs text-zinc-400 uppercase tracking-wider font-semibold">
@@ -322,7 +322,7 @@ export default function Navbar() {
             ) : (
               <Link
                 href="/member-login"
-                className={`hidden sm:inline-flex text-xs font-bold px-4 py-2.5 rounded-full transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary ${
+                className={`hidden sm:inline-flex text-xs font-bold px-4 py-2.5 rounded-[4px] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary ${
                   useSolidHeader
                     ? 'bg-secondary text-white hover:bg-secondary/95 shadow-sm'
                     : 'bg-white text-primary hover:bg-white/95 shadow-md'
@@ -399,7 +399,7 @@ export default function Navbar() {
                   <Link
                     href="/member-login"
                     onClick={() => setIsOpen(false)}
-                    className="w-full flex items-center justify-center bg-secondary text-white py-3 rounded-xl font-bold mt-2"
+                    className="w-full flex items-center justify-center bg-secondary text-white py-3 rounded-[4px] font-bold mt-2"
                   >
                     {t('nav_login')}
                   </Link>
@@ -413,14 +413,14 @@ export default function Navbar() {
       {/* Floating Frap CTA Button */}
       <button
         onClick={() => setIsCartOpen(true)}
-        className="fixed bottom-6 right-6 z-[60] w-14 h-14 bg-amber-brand hover:bg-amber-brand/90 text-white rounded-full flex items-center justify-center shadow-sbx-frap transition-all duration-200 active:scale-95 active:shadow-sm focus:outline-none group"
+        className="fixed bottom-6 right-6 z-[60] w-14 h-14 bg-amber-brand hover:bg-amber-brand/90 text-white rounded-[4px] flex items-center justify-center shadow-sbx-frap transition-all duration-200 active:scale-95 active:shadow-sm focus:outline-none group"
         aria-label="Buka Keranjang"
       >
         <ShoppingBagIcon />
         {isHydrated && cartCount > 0 && (
           <span
             key={`frap-${cartPopKey}`}
-            className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-amber-brand cart-pop"
+            className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 rounded-[4px] flex items-center justify-center border-2 border-amber-brand cart-pop"
           >
             {cartCount}
           </span>

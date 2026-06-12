@@ -26,7 +26,7 @@ import { useLanguage } from '@/context/LanguageContext'
 const MapPicker = dynamic(() => import('@/src/components/MapPicker'), {
   ssr: false,
   loading: () => (
-    <div className="h-64 w-full bg-zinc-100 dark:bg-zinc-800 animate-pulse rounded-xl flex flex-col items-center justify-center gap-3">
+    <div className="h-64 w-full bg-zinc-100 dark:bg-zinc-800 animate-pulse rounded-[4px] flex flex-col items-center justify-center gap-3">
       <Loader2 className="w-8 h-8 animate-spin text-zinc-400" />
       <span className="text-sm text-zinc-500 font-medium">Memuat Peta Geospasial...</span>
     </div>
@@ -163,7 +163,7 @@ export default function AlamatPage() {
         </div>
         <button
           onClick={() => handleOpenModal()}
-          className="bg-[#D4802A] hover:bg-[#b56d24] text-white px-5 py-2.5 rounded-full font-bold flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg active:scale-95"
+          className="bg-[#D4802A] hover:bg-[#b56d24] text-white px-5 py-2.5 rounded-[4px] font-bold flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-sm active:scale-95"
         >
           <Plus className="w-5 h-5" />
           {t('address_add_btn')}
@@ -175,13 +175,13 @@ export default function AlamatPage() {
           {[1, 2].map((i) => (
             <div
               key={i}
-              className="h-48 bg-zinc-100 dark:bg-zinc-800/50 rounded-3xl animate-pulse"
+              className="h-48 bg-zinc-100 dark:bg-zinc-800/50 rounded-[4px] animate-pulse"
             ></div>
           ))}
         </div>
       ) : addresses.length === 0 ? (
-        <div className="bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 border-dashed dark:border-zinc-800 rounded-3xl p-12 text-center flex flex-col items-center">
-          <div className="w-20 h-20 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center mb-4">
+        <div className="bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 border-dashed dark:border-zinc-800 rounded-[4px] p-12 text-center flex flex-col items-center">
+          <div className="w-20 h-20 bg-zinc-100 dark:bg-zinc-800 rounded-[4px] flex items-center justify-center mb-4">
             <Navigation className="w-10 h-10 text-zinc-400" />
           </div>
           <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-2">
@@ -202,14 +202,14 @@ export default function AlamatPage() {
           {addresses.map((addr) => (
             <div
               key={addr.id}
-              className={`relative bg-white dark:bg-zinc-900 rounded-3xl p-6 shadow-sm border transition-all duration-300 ${
+              className={`relative bg-white dark:bg-zinc-900 rounded-[4px] p-6 shadow-sm border transition-all duration-300 ${
                 addr.isDefault
                   ? 'border-[#D4802A] ring-1 ring-[#D4802A]/20'
                   : 'border-zinc-200/50 dark:border-zinc-800/80 hover:border-zinc-300 dark:hover:border-zinc-700'
               }`}
             >
               {addr.isDefault && (
-                <div className="absolute top-0 right-6 -translate-y-1/2 bg-[#D4802A] text-white text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1 shadow-sm">
+                <div className="absolute top-0 right-6 -translate-y-1/2 bg-[#D4802A] text-white text-xs font-bold px-3 py-1 rounded-[4px] flex items-center gap-1 shadow-sm">
                   <CheckCircle2 className="w-3.5 h-3.5" />
                   {t('address_default_badge')}
                 </div>
@@ -217,7 +217,7 @@ export default function AlamatPage() {
 
               <div className="flex justify-between items-start mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-orange-50 text-[#D4802A] dark:bg-orange-900/20 flex items-center justify-center shrink-0">
+                  <div className="w-10 h-10 rounded-[4px] bg-orange-50 text-[#D4802A] dark:bg-orange-900/20 flex items-center justify-center shrink-0">
                     <MapPin className="w-5 h-5" />
                   </div>
                   <div>
@@ -238,7 +238,7 @@ export default function AlamatPage() {
                   {addr.fullAddress}
                 </p>
                 {addr.notes && (
-                  <div className="bg-zinc-50 dark:bg-zinc-800/50 p-3 rounded-xl text-xs text-zinc-500 dark:text-zinc-400 flex items-start gap-2">
+                  <div className="bg-zinc-50 dark:bg-zinc-800/50 p-3 rounded-[4px] text-xs text-zinc-500 dark:text-zinc-400 flex items-start gap-2">
                     <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-zinc-400" />
                     <span>
                       <strong className="text-zinc-700 dark:text-zinc-300">{t('address_note_label') ?? 'Catatan:'}</strong>{' '}
@@ -284,7 +284,7 @@ export default function AlamatPage() {
       {/* MODAL FORM */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-zinc-900 w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col animate-in zoom-in-95 duration-300">
+          <div className="bg-white dark:bg-zinc-900 w-full max-w-2xl rounded-[4px] shadow-sm overflow-hidden max-h-[90vh] flex flex-col animate-in zoom-in-95 duration-300">
             <div className="p-6 border-b border-zinc-100 dark:border-zinc-800 flex justify-between items-center bg-zinc-50 dark:bg-zinc-900/80 sticky top-0 z-10">
               <h2 className="text-xl font-bold font-serif text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
                 {editingId ? (
@@ -315,7 +315,7 @@ export default function AlamatPage() {
                       placeholder={t('address_label_placeholder')}
                       value={formData.label}
                       onChange={(e) => setFormData({ ...formData, label: e.target.value })}
-                      className="w-full p-3.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-transparent focus:ring-2 focus:ring-[#D4802A]/50 outline-none transition-all"
+                      className="w-full p-3.5 rounded-[4px] border border-zinc-200 dark:border-zinc-800 bg-transparent focus:ring-2 focus:ring-[#D4802A]/50 outline-none transition-all"
                     />
                   </div>
 
@@ -352,7 +352,7 @@ export default function AlamatPage() {
                       placeholder={t('address_full_placeholder')}
                       value={formData.fullAddress}
                       onChange={(e) => setFormData({ ...formData, fullAddress: e.target.value })}
-                      className="w-full p-3.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-transparent focus:ring-2 focus:ring-[#D4802A]/50 outline-none transition-all resize-none"
+                      className="w-full p-3.5 rounded-[4px] border border-zinc-200 dark:border-zinc-800 bg-transparent focus:ring-2 focus:ring-[#D4802A]/50 outline-none transition-all resize-none"
                     ></textarea>
                   </div>
 
@@ -368,7 +368,7 @@ export default function AlamatPage() {
                       placeholder={t('address_notes_placeholder')}
                       value={formData.notes}
                       onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                      className="w-full p-3.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-transparent focus:ring-2 focus:ring-[#D4802A]/50 outline-none transition-all"
+                      className="w-full p-3.5 rounded-[4px] border border-zinc-200 dark:border-zinc-800 bg-transparent focus:ring-2 focus:ring-[#D4802A]/50 outline-none transition-all"
                     />
                   </div>
 
@@ -385,10 +385,10 @@ export default function AlamatPage() {
                             className="sr-only"
                           />
                           <div
-                            className={`w-11 h-6 bg-zinc-200 dark:bg-zinc-700 rounded-full transition-colors ${formData.isDefault ? 'bg-[#D4802A] dark:bg-[#D4802A]' : ''}`}
+                            className={`w-11 h-6 bg-zinc-200 dark:bg-zinc-700 rounded-[4px] transition-colors ${formData.isDefault ? 'bg-[#D4802A] dark:bg-[#D4802A]' : ''}`}
                           ></div>
                           <div
-                            className={`absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform ${formData.isDefault ? 'translate-x-5' : ''}`}
+                            className={`absolute left-1 top-1 w-4 h-4 bg-white rounded-[4px] transition-transform ${formData.isDefault ? 'translate-x-5' : ''}`}
                           ></div>
                         </div>
                         <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300 group-hover:text-[#D4802A] transition-colors">
@@ -405,7 +405,7 @@ export default function AlamatPage() {
               <button
                 type="button"
                 onClick={() => setIsModalOpen(false)}
-                className="px-6 py-2.5 rounded-full font-bold text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors"
+                className="px-6 py-2.5 rounded-[4px] font-bold text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors"
                 disabled={isSubmitting}
               >
                 {t('address_cancel_btn')}
@@ -414,7 +414,7 @@ export default function AlamatPage() {
                 type="submit"
                 form="addressForm"
                 disabled={isSubmitting}
-                className="bg-[#D4802A] hover:bg-[#b56d24] text-white px-8 py-2.5 rounded-full font-bold flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed min-w-[140px]"
+                className="bg-[#D4802A] hover:bg-[#b56d24] text-white px-8 py-2.5 rounded-[4px] font-bold flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed min-w-[140px]"
               >
                 {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : t('address_save_btn')}
               </button>

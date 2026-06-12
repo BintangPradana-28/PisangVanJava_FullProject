@@ -112,7 +112,7 @@ const formatPaymentMethod = (paymentType: string | null) => {
 const OrderTimeline = ({ currentStatus, t }: { currentStatus: string; t: any }) => {
   if (currentStatus === 'CANCELED') {
     return (
-      <div className="flex items-center gap-2 p-4 bg-red-50 dark:bg-red-900/10 rounded-xl border border-red-100 dark:border-red-900/30">
+      <div className="flex items-center gap-2 p-4 bg-red-50 dark:bg-red-900/10 rounded-[4px] border border-red-100 dark:border-red-900/30">
         <XCircle className="w-5 h-5 text-red-500" />
         <span className="text-sm font-bold text-red-700 dark:text-red-400">
           Pesanan ini telah dibatalkan.
@@ -136,10 +136,10 @@ const OrderTimeline = ({ currentStatus, t }: { currentStatus: string; t: any }) 
       <h4 className="text-sm font-bold text-zinc-800 dark:text-zinc-200 mb-6">{t('orders_detail_status')}</h4>
       <div className="relative flex justify-between items-center w-full">
         {/* Connecting Line Background */}
-        <div className="absolute top-4 left-0 w-full h-1 bg-zinc-200 dark:bg-zinc-800 -z-10 rounded-full"></div>
+        <div className="absolute top-4 left-0 w-full h-1 bg-zinc-200 dark:bg-zinc-800 -z-10 rounded-[4px]"></div>
         {/* Connecting Line Active */}
         <div
-          className="absolute top-4 left-0 h-1 bg-[#D4802A] -z-10 rounded-full transition-all duration-500 ease-in-out"
+          className="absolute top-4 left-0 h-1 bg-[#D4802A] -z-10 rounded-[4px] transition-all duration-500 ease-in-out"
           style={{ width: `${(activeIndex / (stages.length - 1)) * 100}%` }}
         ></div>
 
@@ -150,7 +150,7 @@ const OrderTimeline = ({ currentStatus, t }: { currentStatus: string; t: any }) 
           return (
             <div key={stage.id} className="flex flex-col items-center relative z-10 w-24">
               <div
-                className={`w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 border-4 border-white dark:border-zinc-900 ${
+                className={`w-9 h-9 rounded-[4px] flex items-center justify-center transition-all duration-300 border-4 border-white dark:border-zinc-900 ${
                   isCompleted
                     ? 'bg-[#D4802A] text-white shadow-md scale-110'
                     : 'bg-zinc-200 dark:bg-zinc-800 text-zinc-400'
@@ -248,8 +248,8 @@ export default function PesananPage() {
       className="space-y-6"
     >
       {/* Header */}
-      <div className="flex items-center gap-4 bg-white dark:bg-zinc-900 rounded-3xl p-6 shadow-sm border border-zinc-200/50 dark:border-zinc-800/80">
-        <div className="w-12 h-12 rounded-full bg-orange-50 dark:bg-orange-900/20 flex items-center justify-center">
+      <div className="flex items-center gap-4 bg-white dark:bg-zinc-900 rounded-[4px] p-6 shadow-sm border border-zinc-200/50 dark:border-zinc-800/80">
+        <div className="w-12 h-12 rounded-[4px] bg-orange-50 dark:bg-orange-900/20 flex items-center justify-center">
           <ShoppingBag className="w-6 h-6 text-[#D4802A]" />
         </div>
         <div>
@@ -266,11 +266,11 @@ export default function PesananPage() {
           Array.from({ length: 3 }).map((_, i) => (
             <div
               key={i}
-              className="bg-zinc-100 dark:bg-zinc-800 animate-pulse h-32 rounded-3xl"
+              className="bg-zinc-100 dark:bg-zinc-800 animate-pulse h-32 rounded-[4px]"
             ></div>
           ))
         ) : orders.length === 0 ? (
-          <div className="bg-white dark:bg-zinc-900 rounded-3xl p-8 text-center border border-dashed border-zinc-300 dark:border-zinc-700">
+          <div className="bg-white dark:bg-zinc-900 rounded-[4px] p-8 text-center border border-dashed border-zinc-300 dark:border-zinc-700">
             <Package className="w-12 h-12 text-zinc-300 mx-auto mb-3" />
             <p className="text-zinc-500 font-medium">{t('orders_empty')}</p>
             <p className="text-sm text-zinc-400 mt-1 mb-4">{t('orders_empty_desc')}</p>
@@ -287,7 +287,7 @@ export default function PesananPage() {
             return (
               <div
                 key={order.id}
-                className={`bg-white dark:bg-zinc-900 rounded-2xl border transition-all overflow-hidden ${isExpanded ? 'border-[#D4802A] ring-1 ring-[#D4802A]/20 shadow-md' : 'border-zinc-200 dark:border-zinc-800 shadow-sm'}`}
+                className={`bg-white dark:bg-zinc-900 rounded-[4px] border transition-all overflow-hidden ${isExpanded ? 'border-[#D4802A] ring-1 ring-[#D4802A]/20 shadow-md' : 'border-zinc-200 dark:border-zinc-800 shadow-sm'}`}
               >
                 {/* Card Header (Always Visible) */}
                 <div
@@ -351,7 +351,7 @@ export default function PesananPage() {
                             <div className="space-y-4">
                               {order.items.map((item) => (
                                 <div key={item.id} className="flex items-start gap-4">
-                                  <div className="w-16 h-16 rounded-xl bg-zinc-200 dark:bg-zinc-800 overflow-hidden flex-shrink-0 shadow-sm">
+                                  <div className="w-16 h-16 rounded-[4px] bg-zinc-200 dark:bg-zinc-800 overflow-hidden flex-shrink-0 shadow-sm">
                                     {item.variant?.imageUrl ? (
                                       <img
                                         src={item.variant.imageUrl}
@@ -399,7 +399,7 @@ export default function PesananPage() {
                           {/* Right Column: Payment & Shipping Summary */}
                           <div className="space-y-6">
                             {/* Payment Method Block */}
-                            <div className="bg-white dark:bg-zinc-900 rounded-xl p-4 border border-zinc-200 dark:border-zinc-800 shadow-sm">
+                            <div className="bg-white dark:bg-zinc-900 rounded-[4px] p-4 border border-zinc-200 dark:border-zinc-800 shadow-sm">
                               <h4 className="text-sm font-bold text-zinc-800 dark:text-zinc-200 mb-3 flex items-center gap-2">
                                 <CreditCard className="w-4 h-4 text-blue-500" /> {t('orders_payment_method')}
                               </h4>
@@ -416,7 +416,7 @@ export default function PesananPage() {
                             </div>
 
                             {/* Summary Block */}
-                            <div className="bg-white dark:bg-zinc-900 rounded-xl p-4 border border-zinc-200 dark:border-zinc-800 shadow-sm space-y-3">
+                            <div className="bg-white dark:bg-zinc-900 rounded-[4px] p-4 border border-zinc-200 dark:border-zinc-800 shadow-sm space-y-3">
                               <h4 className="text-sm font-bold text-zinc-800 dark:text-zinc-200 mb-2">
                                 {t('orders_summary')}
                               </h4>
@@ -462,7 +462,7 @@ export default function PesananPage() {
                             {order.status === 'PENDING_PAYMENT' && (
                               <Link
                                 href={`/payment/${order.id}`}
-                                className="block w-full bg-[#D4802A] hover:bg-[#b56d24] text-white px-6 py-3 rounded-xl font-bold text-sm text-center transition-all shadow-md active:scale-95 mb-3"
+                                className="block w-full bg-[#D4802A] hover:bg-[#b56d24] text-white px-6 py-3 rounded-[4px] font-bold text-sm text-center transition-all shadow-md active:scale-95 mb-3"
                               >
                                 {t('orders_payment_btn')}
                               </Link>
@@ -474,14 +474,14 @@ export default function PesananPage() {
                                 href={`/api/orders/${order.id}/invoice`}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="w-full flex items-center justify-center gap-2 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 px-6 py-2.5 rounded-xl font-bold text-sm transition-all shadow-sm active:scale-95 text-center"
+                                className="w-full flex items-center justify-center gap-2 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-300 px-6 py-2.5 rounded-[4px] font-bold text-sm transition-all shadow-sm active:scale-95 text-center"
                               >
                                 <Download className="w-4 h-4" /> {t('orders_invoice_btn')}
                               </a>
 
                               <button
                                 onClick={() => handleReorder(order)}
-                                className="w-full flex items-center justify-center gap-2 bg-[#D4802A] hover:bg-[#b56d24] text-white px-6 py-2.5 rounded-xl font-bold text-sm transition-all shadow-md active:scale-95"
+                                className="w-full flex items-center justify-center gap-2 bg-[#D4802A] hover:bg-[#b56d24] text-white px-6 py-2.5 rounded-[4px] font-bold text-sm transition-all shadow-md active:scale-95"
                               >
                                 <Repeat className="w-4 h-4" /> {t('orders_reorder_btn')}
                               </button>

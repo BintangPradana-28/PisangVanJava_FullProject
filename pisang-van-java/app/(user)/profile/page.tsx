@@ -334,7 +334,7 @@ export default function ProfileDataDiriPage() {
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
           >
-            <div className="bg-white dark:bg-zinc-900 rounded-3xl w-full max-w-md overflow-hidden shadow-2xl flex flex-col">
+            <div className="bg-white dark:bg-zinc-900 rounded-[4px] w-full max-w-md overflow-hidden shadow-sm flex flex-col">
               <div className="p-4 border-b border-zinc-100 dark:border-zinc-800 flex justify-between items-center">
                 <h3 className="font-bold text-zinc-900 dark:text-zinc-100">Sesuaikan Foto</h3>
                 <button
@@ -373,7 +373,7 @@ export default function ProfileDataDiriPage() {
                 <button
                   onClick={handleCropSave}
                   disabled={isUploading}
-                  className="w-full bg-[#D4802A] hover:bg-[#b56d24] text-white font-bold py-3 rounded-xl transition-all flex justify-center items-center gap-2"
+                  className="w-full bg-[#D4802A] hover:bg-[#b56d24] text-white font-bold py-3 rounded-[4px] transition-all flex justify-center items-center gap-2"
                 >
                   {isUploading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Simpan Foto'}
                 </button>
@@ -384,9 +384,9 @@ export default function ProfileDataDiriPage() {
       </AnimatePresence>
 
       {/* DATA DIRI SECTION */}
-      <section className="bg-white dark:bg-zinc-900 rounded-3xl p-6 md:p-8 shadow-sm border border-zinc-200/50 dark:border-zinc-800/80">
+      <section className="bg-white dark:bg-zinc-900 rounded-[4px] p-6 md:p-8 shadow-sm border border-zinc-200/50 dark:border-zinc-800/80">
         <div className="flex items-center gap-4 mb-6 pb-6 border-b border-zinc-100 dark:border-zinc-800">
-          <div className="w-12 h-12 rounded-full bg-[#D4802A]/10 text-[#D4802A] flex items-center justify-center">
+          <div className="w-12 h-12 rounded-[4px] bg-[#D4802A]/10 text-[#D4802A] flex items-center justify-center">
             <User className="w-6 h-6" />
           </div>
           <div>
@@ -401,9 +401,9 @@ export default function ProfileDataDiriPage() {
 
         <form onSubmit={handleProfileSubmit(onProfileSubmit)} className="space-y-5">
           {/* Avatar Upload */}
-          <div className="flex flex-col md:flex-row items-center md:items-start gap-6 mb-8 bg-zinc-50 dark:bg-zinc-800/30 p-6 rounded-2xl border border-zinc-100 dark:border-zinc-800">
+          <div className="flex flex-col md:flex-row items-center md:items-start gap-6 mb-8 bg-zinc-50 dark:bg-zinc-800/30 p-6 rounded-[4px] border border-zinc-100 dark:border-zinc-800">
             <div className="relative group shrink-0">
-              <div className="w-24 h-24 md:w-28 md:h-28 rounded-full overflow-hidden bg-zinc-200 dark:bg-zinc-800 border-4 border-white dark:border-zinc-900 shadow-md relative">
+              <div className="w-24 h-24 md:w-28 md:h-28 rounded-[4px] overflow-hidden bg-zinc-200 dark:bg-zinc-800 border-4 border-white dark:border-zinc-900 shadow-md relative">
                 {avatarUrl || session?.user?.image ? (
                   <Image
                     src={avatarUrl || session?.user?.image || ''}
@@ -420,7 +420,7 @@ export default function ProfileDataDiriPage() {
                   </div>
                 )}
               </div>
-              <label className="absolute bottom-0 right-0 p-2.5 bg-[#D4802A] text-white rounded-full cursor-pointer shadow-lg hover:bg-[#b56d24] transition-all hover:scale-105 active:scale-95 group-hover:ring-4 ring-white dark:ring-zinc-900">
+              <label className="absolute bottom-0 right-0 p-2.5 bg-[#D4802A] text-white rounded-[4px] cursor-pointer shadow-sm hover:bg-[#b56d24] transition-all hover:scale-105 active:scale-95 group-hover:ring-4 ring-white dark:ring-zinc-900">
                 <Camera className="w-4 h-4" />
                 <input
                   type="file"
@@ -458,7 +458,7 @@ export default function ProfileDataDiriPage() {
               <input
                 type="text"
                 {...registerProfile('name')}
-                className="w-full p-3.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-transparent focus:ring-2 focus:ring-[#D4802A]/50 outline-none transition-all"
+                className="w-full p-3.5 rounded-[4px] border border-zinc-200 dark:border-zinc-800 bg-transparent focus:ring-2 focus:ring-[#D4802A]/50 outline-none transition-all"
                 placeholder={t('profile_name_placeholder')}
               />
               {profileErrors.name && (
@@ -473,7 +473,7 @@ export default function ProfileDataDiriPage() {
               <input
                 type="tel"
                 {...registerProfile('phone')}
-                className="w-full p-3.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-transparent focus:ring-2 focus:ring-[#D4802A]/50 outline-none transition-all"
+                className="w-full p-3.5 rounded-[4px] border border-zinc-200 dark:border-zinc-800 bg-transparent focus:ring-2 focus:ring-[#D4802A]/50 outline-none transition-all"
                 placeholder={t('profile_phone_placeholder')}
               />
               {profileErrors.phone && (
@@ -486,7 +486,7 @@ export default function ProfileDataDiriPage() {
             <button
               type="submit"
               disabled={profileMutation.isPending || !isProfileValid}
-              className="bg-[#D4802A] hover:bg-[#b56d24] text-white font-bold py-3 px-8 rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              className="bg-[#D4802A] hover:bg-[#b56d24] text-white font-bold py-3 px-8 rounded-[4px] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
               {profileMutation.isPending ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
@@ -500,9 +500,9 @@ export default function ProfileDataDiriPage() {
 
       {/* CONDITIONAL RENDER: EMAIL & PASSWORD OR OAUTH INFO */}
       {isOAuth ? (
-        <section className="bg-white dark:bg-zinc-900 rounded-3xl p-6 md:p-8 shadow-sm border border-zinc-200/50 dark:border-zinc-800/80">
+        <section className="bg-white dark:bg-zinc-900 rounded-[4px] p-6 md:p-8 shadow-sm border border-zinc-200/50 dark:border-zinc-800/80">
           <div className="flex items-center gap-4 mb-6 pb-6 border-b border-zinc-100 dark:border-zinc-800">
-            <div className="w-12 h-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-[4px] bg-blue-100 text-blue-600 flex items-center justify-center">
               <ShieldCheck className="w-6 h-6" />
             </div>
             <div>
@@ -515,8 +515,8 @@ export default function ProfileDataDiriPage() {
             </div>
           </div>
 
-          <div className="bg-blue-50 dark:bg-blue-900/10 p-6 rounded-2xl border border-blue-100 dark:border-blue-900/50 flex flex-col md:flex-row items-center gap-6">
-            <div className="w-16 h-16 bg-white dark:bg-zinc-800 rounded-2xl shadow-sm flex items-center justify-center shrink-0">
+          <div className="bg-blue-50 dark:bg-blue-900/10 p-6 rounded-[4px] border border-blue-100 dark:border-blue-900/50 flex flex-col md:flex-row items-center gap-6">
+            <div className="w-16 h-16 bg-white dark:bg-zinc-800 rounded-[4px] shadow-sm flex items-center justify-center shrink-0">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-8 h-8">
                 <path
                   d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -550,9 +550,9 @@ export default function ProfileDataDiriPage() {
       ) : (
         <>
           {/* GANTI EMAIL SECTION (ZERO-TRUST OTP) */}
-          <section className="bg-white dark:bg-zinc-900 rounded-3xl p-6 md:p-8 shadow-sm border border-zinc-200/50 dark:border-zinc-800/80">
+          <section className="bg-white dark:bg-zinc-900 rounded-[4px] p-6 md:p-8 shadow-sm border border-zinc-200/50 dark:border-zinc-800/80">
             <div className="flex items-center gap-4 mb-6 pb-6 border-b border-zinc-100 dark:border-zinc-800">
-              <div className="w-12 h-12 rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-[4px] bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 flex items-center justify-center">
                 <Mail className="w-6 h-6" />
               </div>
               <div>
@@ -577,12 +577,12 @@ export default function ProfileDataDiriPage() {
                         type="email"
                         value={session?.user?.email || ''}
                         disabled
-                        className="flex-1 p-3.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/50 text-zinc-500 cursor-not-allowed outline-none"
+                        className="flex-1 p-3.5 rounded-[4px] border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/50 text-zinc-500 cursor-not-allowed outline-none"
                       />
                       <button
                         onClick={handleRequestEmailOTP}
                         disabled={isEmailLoading}
-                        className="px-6 py-3 bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 font-bold rounded-xl transition-all disabled:opacity-50 whitespace-nowrap"
+                        className="px-6 py-3 bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 font-bold rounded-[4px] transition-all disabled:opacity-50 whitespace-nowrap"
                       >
                         {isEmailLoading ? (
                           <Loader2 className="w-5 h-5 animate-spin mx-auto" />
@@ -599,7 +599,7 @@ export default function ProfileDataDiriPage() {
                 <motion.div
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  className="space-y-4 bg-blue-50 dark:bg-blue-900/10 p-5 rounded-2xl border border-blue-100 dark:border-blue-900/50"
+                  className="space-y-4 bg-blue-50 dark:bg-blue-900/10 p-5 rounded-[4px] border border-blue-100 dark:border-blue-900/50"
                 >
                   <div className="flex gap-3 text-blue-700 dark:text-blue-400 mb-2">
                     <ShieldCheck className="w-5 h-5 shrink-0" />
@@ -611,21 +611,21 @@ export default function ProfileDataDiriPage() {
                       maxLength={6}
                       value={otpValue}
                       onChange={(e) => setOtpValue(e.target.value.replace(/\D/g, ''))}
-                      className="w-full text-center tracking-[0.5em] font-mono text-2xl p-4 rounded-xl border border-blue-200 dark:border-blue-800 bg-white dark:bg-zinc-950 focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                      className="w-full text-center tracking-[0.5em] font-mono text-2xl p-4 rounded-[4px] border border-blue-200 dark:border-blue-800 bg-white dark:bg-zinc-950 focus:ring-2 focus:ring-blue-500 outline-none transition-all"
                       placeholder="------"
                     />
                   </div>
                   <div className="flex gap-3">
                     <button
                       onClick={() => setEmailMode('idle')}
-                      className="flex-1 p-3 text-zinc-600 dark:text-zinc-400 font-bold hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl transition-colors"
+                      className="flex-1 p-3 text-zinc-600 dark:text-zinc-400 font-bold hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-[4px] transition-colors"
                     >
                       {t('address_cancel_btn')}
                     </button>
                     <button
                       onClick={() => setEmailMode('newEmail')}
                       disabled={otpValue.length !== 6}
-                      className="flex-1 p-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all disabled:opacity-50"
+                      className="flex-1 p-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-[4px] transition-all disabled:opacity-50"
                     >
                       {t('profile_email_otp_verify_btn')}
                     </button>
@@ -656,7 +656,7 @@ export default function ProfileDataDiriPage() {
                       <input
                         type="email"
                         {...registerEmail('newEmail')}
-                        className="w-full p-3.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-transparent focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                        className="w-full p-3.5 rounded-[4px] border border-zinc-200 dark:border-zinc-800 bg-transparent focus:ring-2 focus:ring-blue-500 outline-none transition-all"
                         placeholder={t('profile_email_new_placeholder')}
                       />
                       {emailErrors.newEmail && (
@@ -669,14 +669,14 @@ export default function ProfileDataDiriPage() {
                       <button
                         type="button"
                         onClick={() => setEmailMode('idle')}
-                        className="flex-1 p-3 text-zinc-600 dark:text-zinc-400 font-bold hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl transition-colors"
+                        className="flex-1 p-3 text-zinc-600 dark:text-zinc-400 font-bold hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-[4px] transition-colors"
                       >
                         {t('address_cancel_btn')}
                       </button>
                       <button
                         type="submit"
                         disabled={isEmailLoading || !isEmailValid}
-                        className="flex-1 p-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all disabled:opacity-50 flex justify-center"
+                        className="flex-1 p-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-[4px] transition-all disabled:opacity-50 flex justify-center"
                       >
                         {isEmailLoading ? (
                           <Loader2 className="w-5 h-5 animate-spin" />
@@ -692,9 +692,9 @@ export default function ProfileDataDiriPage() {
           </section>
 
           {/* GANTI PASSWORD SECTION */}
-          <section className="bg-white dark:bg-zinc-900 rounded-3xl p-6 md:p-8 shadow-sm border border-zinc-200/50 dark:border-zinc-800/80">
+          <section className="bg-white dark:bg-zinc-900 rounded-[4px] p-6 md:p-8 shadow-sm border border-zinc-200/50 dark:border-zinc-800/80">
             <div className="flex items-center gap-4 mb-6 pb-6 border-b border-zinc-100 dark:border-zinc-800">
-              <div className="w-12 h-12 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-[4px] bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 flex items-center justify-center">
                 <KeyRound className="w-6 h-6" />
               </div>
               <div>
@@ -715,7 +715,7 @@ export default function ProfileDataDiriPage() {
                 <input
                   type="password"
                   {...registerPassword('currentPassword')}
-                  className="w-full p-3.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-transparent focus:ring-2 focus:ring-[#D4802A]/50 outline-none transition-all"
+                  className="w-full p-3.5 rounded-[4px] border border-zinc-200 dark:border-zinc-800 bg-transparent focus:ring-2 focus:ring-[#D4802A]/50 outline-none transition-all"
                   placeholder={t('profile_password_current_placeholder')}
                 />
                 {passwordErrors.currentPassword && (
@@ -732,7 +732,7 @@ export default function ProfileDataDiriPage() {
                 <input
                   type="password"
                   {...registerPassword('newPassword')}
-                  className="w-full p-3.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-transparent focus:ring-2 focus:ring-[#D4802A]/50 outline-none transition-all"
+                  className="w-full p-3.5 rounded-[4px] border border-zinc-200 dark:border-zinc-800 bg-transparent focus:ring-2 focus:ring-[#D4802A]/50 outline-none transition-all"
                   placeholder={t('profile_password_new_placeholder')}
                 />
                 {passwordErrors.newPassword && (
@@ -749,7 +749,7 @@ export default function ProfileDataDiriPage() {
                 <input
                   type="password"
                   {...registerPassword('confirmPassword')}
-                  className="w-full p-3.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-transparent focus:ring-2 focus:ring-[#D4802A]/50 outline-none transition-all"
+                  className="w-full p-3.5 rounded-[4px] border border-zinc-200 dark:border-zinc-800 bg-transparent focus:ring-2 focus:ring-[#D4802A]/50 outline-none transition-all"
                   placeholder={t('profile_password_confirm_placeholder')}
                 />
                 {passwordErrors.confirmPassword && (
@@ -763,7 +763,7 @@ export default function ProfileDataDiriPage() {
                 <button
                   type="submit"
                   disabled={passwordMutation.isPending || !isPasswordValid}
-                  className="bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 font-bold py-3 px-8 rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  className="bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 font-bold py-3 px-8 rounded-[4px] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                 >
                   {passwordMutation.isPending ? (
                     <Loader2 className="w-4 h-4 animate-spin" />

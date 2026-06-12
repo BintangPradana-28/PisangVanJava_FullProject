@@ -141,7 +141,7 @@ export default function ReportsClient({
           <p className="text-sm text-brown-400 mt-0.5">Ringkasan performa penjualan</p>
         </div>
 
-        <div className="flex bg-white border border-cream-200 rounded-xl p-1 shadow-sm">
+        <div className="flex bg-white border border-cream-200 rounded-[4px] p-1 shadow-sm">
           {[
             { value: '7', label: '7 Hari' },
             { value: '30', label: '30 Hari' },
@@ -191,7 +191,7 @@ export default function ReportsClient({
             sub: `+ ${totalToppings} topping`
           }
         ].map(({ label, value, icon, sub }) => (
-          <div key={label} className="bg-white rounded-2xl p-5 border border-cream-200 shadow-sm">
+          <div key={label} className="bg-white rounded-[4px] p-5 border border-cream-200 shadow-sm">
             <div className="text-2xl mb-2">{icon}</div>
             <div className="font-serif text-2xl font-bold text-brown-700">{value}</div>
             <div className="text-xs font-semibold text-brown-500 mt-1">{label}</div>
@@ -202,7 +202,7 @@ export default function ReportsClient({
 
       <div className="grid lg:grid-cols-2 gap-6 mb-6">
         {/* Revenue Bar Chart (7 days) */}
-        <div className="bg-white rounded-2xl border border-cream-200 p-6 shadow-sm">
+        <div className="bg-white rounded-[4px] border border-cream-200 p-6 shadow-sm">
           <h3 className="font-serif text-lg font-bold text-brown-700 mb-4">📈 Pendapatan 7 Hari</h3>
           <div className="flex items-end gap-2 h-40">
             {stats.days.map(({ label, revenue }) => (
@@ -229,7 +229,7 @@ export default function ReportsClient({
         </div>
 
         {/* Order Status Breakdown */}
-        <div className="bg-white rounded-2xl border border-cream-200 p-6 shadow-sm">
+        <div className="bg-white rounded-[4px] border border-cream-200 p-6 shadow-sm">
           <h3 className="font-serif text-lg font-bold text-brown-700 mb-4">📋 Status Order</h3>
           <div className="space-y-3">
             {stats.byStatus.map(({ s, count }) => {
@@ -242,9 +242,9 @@ export default function ReportsClient({
                       {count} ({pct}%)
                     </span>
                   </div>
-                  <div className="h-2 bg-cream-200 rounded-full overflow-hidden">
+                  <div className="h-2 bg-cream-200 rounded-[4px] overflow-hidden">
                     <div
-                      className={`h-full rounded-full transition-all duration-500 ${STATUS_COLORS[s]}`}
+                      className={`h-full rounded-[4px] transition-all duration-500 ${STATUS_COLORS[s]}`}
                       style={{ width: `${pct}%` }}
                     />
                   </div>
@@ -257,7 +257,7 @@ export default function ReportsClient({
 
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Top Flavors */}
-        <div className="bg-white rounded-2xl border border-cream-200 p-6 shadow-sm">
+        <div className="bg-white rounded-[4px] border border-cream-200 p-6 shadow-sm">
           <h3 className="font-serif text-lg font-bold text-brown-700 mb-4">🍌 Rasa Terpopuler</h3>
           {stats.topFlavors.length === 0 ? (
             <p className="text-sm text-brown-300">Belum ada data</p>
@@ -273,9 +273,9 @@ export default function ReportsClient({
                       <span className="font-medium text-brown-700">{name}</span>
                       <span className="text-brown-400">{count} order</span>
                     </div>
-                    <div className="h-1.5 bg-cream-200 rounded-full overflow-hidden">
+                    <div className="h-1.5 bg-cream-200 rounded-[4px] overflow-hidden">
                       <div
-                        className="h-full bg-amber-brand rounded-full"
+                        className="h-full bg-amber-brand rounded-[4px]"
                         style={{ width: `${(count / (stats.topFlavors[0]?.[1] || 1)) * 100}%` }}
                       />
                     </div>
@@ -287,7 +287,7 @@ export default function ReportsClient({
         </div>
 
         {/* Order Source */}
-        <div className="bg-white rounded-2xl border border-cream-200 p-6 shadow-sm">
+        <div className="bg-white rounded-[4px] border border-cream-200 p-6 shadow-sm">
           <h3 className="font-serif text-lg font-bold text-brown-700 mb-4">📱 Sumber Order</h3>
           <div className="space-y-4">
             {[
@@ -307,9 +307,9 @@ export default function ReportsClient({
                         {count} ({pct}%)
                       </span>
                     </div>
-                    <div className="h-2 bg-cream-200 rounded-full overflow-hidden">
+                    <div className="h-2 bg-cream-200 rounded-[4px] overflow-hidden">
                       <div
-                        className={`h-full rounded-full ${color}`}
+                        className={`h-full rounded-[4px] ${color}`}
                         style={{ width: `${pct}%` }}
                       />
                     </div>
@@ -334,7 +334,7 @@ export default function ReportsClient({
 
       <div className="grid lg:grid-cols-3 gap-6 mb-8">
         <div className="lg:col-span-1 flex flex-col gap-4">
-          <div className="bg-white rounded-2xl p-5 border border-cream-200 shadow-sm flex items-center justify-between">
+          <div className="bg-white rounded-[4px] p-5 border border-cream-200 shadow-sm flex items-center justify-between">
             <div>
               <div className="text-xs font-semibold text-brown-500 uppercase tracking-wider mb-1">
                 Total Klik WA
@@ -344,7 +344,7 @@ export default function ReportsClient({
             <div className="text-3xl">🖱️</div>
           </div>
 
-          <div className="bg-white rounded-2xl p-5 border border-green-200 shadow-sm flex items-center justify-between bg-green-50/30">
+          <div className="bg-white rounded-[4px] p-5 border border-green-200 shadow-sm flex items-center justify-between bg-green-50/30">
             <div>
               <div className="text-xs font-semibold text-green-700 uppercase tracking-wider mb-1">
                 Berhasil (Konversi)
@@ -353,7 +353,7 @@ export default function ReportsClient({
                 <div className="font-serif text-3xl font-bold text-green-600">
                   {stats.waSuccessCount}
                 </div>
-                <div className="text-sm font-bold text-green-500 bg-green-100 px-2 py-0.5 rounded-full">
+                <div className="text-sm font-bold text-green-500 bg-green-100 px-2 py-0.5 rounded-[4px]">
                   {stats.waConversionRate}%
                 </div>
               </div>
@@ -361,7 +361,7 @@ export default function ReportsClient({
             <div className="text-3xl">🎉</div>
           </div>
 
-          <div className="bg-white rounded-2xl p-5 border border-red-200 shadow-sm flex items-center justify-between bg-red-50/30">
+          <div className="bg-white rounded-[4px] p-5 border border-red-200 shadow-sm flex items-center justify-between bg-red-50/30">
             <div>
               <div className="text-xs font-semibold text-red-700 uppercase tracking-wider mb-1">
                 Potensi Hilang (Ghosting)
@@ -374,7 +374,7 @@ export default function ReportsClient({
           </div>
         </div>
 
-        <div className="lg:col-span-2 bg-white rounded-2xl border border-cream-200 p-6 shadow-sm">
+        <div className="lg:col-span-2 bg-white rounded-[4px] border border-cream-200 p-6 shadow-sm">
           <h3 className="font-serif text-lg font-bold text-brown-700 mb-4">
             🎯 Konversi per Varian Menu
           </h3>
@@ -391,9 +391,9 @@ export default function ReportsClient({
                       <span className="text-green-600 w-16 text-right">{v.rate}% Sukses</span>
                     </div>
                   </div>
-                  <div className="h-3 bg-cream-200 rounded-full overflow-hidden flex relative">
+                  <div className="h-3 bg-cream-200 rounded-[4px] overflow-hidden flex relative">
                     <div
-                      className="h-full bg-green-500 rounded-full z-10 transition-all duration-500"
+                      className="h-full bg-green-500 rounded-[4px] z-10 transition-all duration-500"
                       style={{ width: `${v.rate}%` }}
                     />
                     <div

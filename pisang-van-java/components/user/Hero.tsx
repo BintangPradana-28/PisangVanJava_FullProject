@@ -81,7 +81,7 @@ export default function Hero({
         <div className="text-left">
           {badge && (
             <div className="inline-flex items-center gap-2 mb-6">
-              <span className="bg-amber-500/20 border border-amber-500/40 text-amber-400 text-xs font-semibold tracking-[0.25em] uppercase px-4 py-1.5 rounded-full">
+              <span className="bg-amber-500/20 border border-amber-500/40 text-amber-400 text-xs font-semibold tracking-[0.25em] uppercase px-4 py-1.5 rounded-[4px]">
                 {badge}
               </span>
             </div>
@@ -89,7 +89,7 @@ export default function Hero({
 
           <h1
             // PERBAIKAN: Pastikan text selalu white
-            className="font-serif text-5xl sm:text-6xl lg:text-7xl font-bold text-white leading-[1.1] tracking-tight mb-4 drop-shadow-lg"
+            className="font-serif text-5xl sm:text-6xl lg:text-7xl font-bold text-white leading-[1.1] tracking-tight mb-4 drop-shadow-sm"
           >
             {renderTitle()}
           </h1>
@@ -98,7 +98,7 @@ export default function Hero({
             {totalReviews >= 5 && (
               <>
                 <Link href="/ulasan" className="group">
-                  <div className="flex items-center gap-1.5 bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 rounded-full backdrop-blur-sm transition-all duration-200 hover:bg-amber-500/20">
+                  <div className="flex items-center gap-1.5 bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 rounded-[4px] backdrop-blur-sm transition-all duration-200 hover:bg-amber-500/20">
                     <div className="flex gap-0.5">
                       {Array.from({ length: 5 }).map((_, i) => (
                         <Star
@@ -141,7 +141,7 @@ export default function Hero({
           <div className="flex flex-wrap gap-4 items-center">
             <Link
               href={ctaLink}
-              className="inline-flex items-center gap-3 bg-amber-brand hover:bg-amber-brand/90 text-[#1a0f0a] font-bold text-base px-10 py-4 rounded-full shadow-sbx-card hover:shadow-lg transition-all duration-200 active:scale-95 group focus:outline-none focus:ring-4 focus:ring-amber-brand/40"
+              className="inline-flex items-center gap-3 bg-amber-brand hover:bg-amber-brand/90 text-[#1a0f0a] font-bold text-base px-10 py-4 rounded-[4px] shadow-sbx-card hover:shadow-sm transition-all duration-200 active:scale-95 group focus:outline-none focus:ring-4 focus:ring-amber-brand/40"
             >
               <ShoppingBagIcon />
               <span>{t('hero_order_btn')}</span>
@@ -176,7 +176,7 @@ export default function Hero({
               className="object-cover"
             />
             {badge && (
-              <div className="absolute top-5 right-5 bg-amber-800 text-amber-50 text-xs font-bold px-4 py-2 rounded-full shadow-md">
+              <div className="absolute top-5 right-5 bg-amber-800 text-amber-50 text-xs font-bold px-4 py-2 rounded-[4px] shadow-md">
                 {badge}
               </div>
             )}

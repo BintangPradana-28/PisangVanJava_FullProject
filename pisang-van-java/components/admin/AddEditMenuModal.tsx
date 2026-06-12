@@ -120,7 +120,7 @@ export default function AddEditMenuModal({ open, editItem, onClose, onSaved }: P
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.92, y: 20 }}
             transition={{ duration: 0.25 }}
-            className="bg-cream-100 rounded-3xl p-6 sm:p-8 w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto"
+            className="bg-cream-100 rounded-[4px] p-6 sm:p-8 w-full max-w-lg shadow-sm max-h-[90vh] overflow-y-auto"
           >
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
@@ -129,7 +129,7 @@ export default function AddEditMenuModal({ open, editItem, onClose, onSaved }: P
               </h2>
               <button
                 onClick={onClose}
-                className="w-8 h-8 rounded-full bg-cream-200 hover:bg-cream-300 flex items-center justify-center
+                className="w-8 h-8 rounded-[4px] bg-cream-200 hover:bg-cream-300 flex items-center justify-center
                            text-brown-500 text-lg transition-colors"
               >
                 ✕
@@ -209,7 +209,7 @@ export default function AddEditMenuModal({ open, editItem, onClose, onSaved }: P
                 />
                 {/* Upload placeholder box */}
                 <div
-                  className="mt-2 w-full h-24 border-2 border-dashed border-cream-200 rounded-xl
+                  className="mt-2 w-full h-24 border-2 border-dashed border-cream-200 rounded-[4px]
                                 flex flex-col items-center justify-center text-brown-300 cursor-pointer
                                 hover:border-amber-brand hover:text-amber-brand transition-colors text-sm"
                 >
@@ -223,12 +223,12 @@ export default function AddEditMenuModal({ open, editItem, onClose, onSaved }: P
                 <label className="flex items-center gap-2 cursor-pointer">
                   <div
                     onClick={() => set('isActive', !form.isActive)}
-                    className={`w-11 h-6 rounded-full transition-colors relative ${
+                    className={`w-11 h-6 rounded-[4px] transition-colors relative ${
                       form.isActive ? 'bg-green-wa' : 'bg-cream-200'
                     }`}
                   >
                     <div
-                      className={`w-4 h-4 bg-white rounded-full absolute top-1 transition-transform shadow ${
+                      className={`w-4 h-4 bg-white rounded-[4px] absolute top-1 transition-transform shadow ${
                         form.isActive ? 'translate-x-6' : 'translate-x-1'
                       }`}
                     />
@@ -257,7 +257,7 @@ export default function AddEditMenuModal({ open, editItem, onClose, onSaved }: P
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 py-3 bg-green-wa text-white font-semibold rounded-xl
+                  className="flex-1 py-3 bg-green-wa text-white font-semibold rounded-[4px]
                              hover:bg-green-wa-light transition-colors active:scale-95
                              disabled:opacity-60 disabled:cursor-not-allowed"
                 >
@@ -266,7 +266,7 @@ export default function AddEditMenuModal({ open, editItem, onClose, onSaved }: P
                 <button
                   type="button"
                   onClick={onClose}
-                  className="flex-1 py-3 bg-brown-700 text-cream-100 font-semibold rounded-xl
+                  className="flex-1 py-3 bg-brown-700 text-cream-100 font-semibold rounded-[4px]
                              hover:bg-brown-600 transition-colors active:scale-95"
                 >
                   ✕ Batal

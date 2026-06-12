@@ -76,7 +76,7 @@ export default async function PaymentPage({ params, searchParams }: PaymentPageP
                     Secure Checkout
                   </p>
                   {process.env.NEXT_PUBLIC_MIDTRANS_IS_PRODUCTION !== 'true' && (
-                    <span className="px-2 py-0.5 rounded-full bg-red-100 text-red-700 text-[10px] font-bold tracking-widest border border-red-200 dark:bg-red-900/30 dark:border-red-800 dark:text-red-400">
+                    <span className="px-2 py-0.5 rounded-[4px] bg-red-100 text-red-700 text-[10px] font-bold tracking-widest border border-red-200 dark:bg-red-900/30 dark:border-red-800 dark:text-red-400">
                       🔴 SANDBOX MODE
                     </span>
                   )}
@@ -85,7 +85,7 @@ export default async function PaymentPage({ params, searchParams }: PaymentPageP
                   Pembayaran Pesanan
                 </h1>
               </div>
-              <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#D4802A]/10 text-[#D4802A]">
+              <div className="flex h-11 w-11 items-center justify-center rounded-[4px] bg-[#D4802A]/10 text-[#D4802A]">
                 <CreditCard className="h-5 w-5" aria-hidden="true" />
               </div>
             </div>
@@ -164,7 +164,7 @@ export default async function PaymentPage({ params, searchParams }: PaymentPageP
 
           <aside className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
             <div className="mb-5 flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300">
+              <div className="flex h-10 w-10 items-center justify-center rounded-[4px] bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300">
                 <ReceiptText className="h-5 w-5" aria-hidden="true" />
               </div>
               <div>
@@ -185,7 +185,7 @@ export default async function PaymentPage({ params, searchParams }: PaymentPageP
               <div className="flex justify-between gap-4">
                 <span className="text-zinc-500 dark:text-zinc-400">Status</span>
                 <span
-                  className={`text-right text-xs font-bold px-2.5 py-1 rounded-full ${
+                  className={`text-right text-xs font-bold px-2.5 py-1 rounded-[4px] ${
                     order.status === 'PROCESSING' ||
                     order.status === 'READY' ||
                     order.status === 'COMPLETED'

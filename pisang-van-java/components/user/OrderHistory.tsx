@@ -152,7 +152,7 @@ export default function OrderHistory({ phone = '', useAuth = false }: Props) {
     return (
       <div className="space-y-3">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="h-20 rounded-2xl bg-zinc-100 dark:bg-zinc-800 animate-pulse" />
+          <div key={i} className="h-20 rounded-[4px] bg-zinc-100 dark:bg-zinc-800 animate-pulse" />
         ))}
       </div>
     )
@@ -160,7 +160,7 @@ export default function OrderHistory({ phone = '', useAuth = false }: Props) {
 
   if (error) {
     return (
-      <div className="bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/50 rounded-2xl p-6 text-center">
+      <div className="bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/50 rounded-[4px] p-6 text-center">
         <p className="text-red-600 dark:text-red-400 font-medium text-sm mb-3">{error}</p>
         <button onClick={fetchOrders} className="text-xs font-bold text-red-600 hover:underline">
           Coba Lagi
@@ -171,7 +171,7 @@ export default function OrderHistory({ phone = '', useAuth = false }: Props) {
 
   if (orders.length === 0) {
     return (
-      <div className="bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-8 sm:p-12 text-center">
+      <div className="bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-[4px] p-8 sm:p-12 text-center">
         <div className="text-5xl mb-4">📋</div>
         <h3 className="font-bold text-zinc-800 dark:text-zinc-200 mb-2 text-lg">
           Belum Ada Pesanan
@@ -181,14 +181,14 @@ export default function OrderHistory({ phone = '', useAuth = false }: Props) {
         </p>
 
         {/* Sprint 5: Visual loyalty progress placeholder */}
-        <div className="max-w-xs mx-auto mb-8 p-4 bg-white dark:bg-zinc-800 rounded-xl border border-zinc-100 dark:border-zinc-700 shadow-sm text-left">
+        <div className="max-w-xs mx-auto mb-8 p-4 bg-white dark:bg-zinc-800 rounded-[4px] border border-zinc-100 dark:border-zinc-700 shadow-sm text-left">
           <div className="flex justify-between items-center mb-2">
             <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">Member Emas</span>
             <span className="text-[10px] font-medium text-zinc-400 dark:text-zinc-500">
               0/3 Pesanan
             </span>
           </div>
-          <div className="h-2 w-full bg-zinc-100 dark:bg-zinc-700 rounded-full overflow-hidden">
+          <div className="h-2 w-full bg-zinc-100 dark:bg-zinc-700 rounded-[4px] overflow-hidden">
             <div className="h-full bg-amber-400 w-[5%]" />
           </div>
           <p className="text-[10px] text-zinc-500 mt-2">Pesan 3x lagi untuk membuka Member Emas!</p>
@@ -213,7 +213,7 @@ export default function OrderHistory({ phone = '', useAuth = false }: Props) {
 
         <Link
           href="/menu-spesial"
-          className="inline-flex items-center gap-2 bg-[#D4802A] hover:bg-[#b56d24] text-white font-bold text-sm px-8 py-3.5 rounded-full transition-all active:scale-95 shadow-md shadow-[#D4802A]/20"
+          className="inline-flex items-center gap-2 bg-[#D4802A] hover:bg-[#b56d24] text-white font-bold text-sm px-8 py-3.5 rounded-[4px] transition-all active:scale-95 shadow-md shadow-[#D4802A]/20"
         >
           🍌 Pesan Sekarang
         </Link>
@@ -234,7 +234,7 @@ export default function OrderHistory({ phone = '', useAuth = false }: Props) {
             layout
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800 rounded-2xl overflow-hidden hover:border-zinc-300 dark:hover:border-zinc-700 transition-all shadow-sm hover:shadow-md"
+            className="bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800 rounded-[4px] overflow-hidden hover:border-zinc-300 dark:hover:border-zinc-700 transition-all shadow-sm hover:shadow-md"
           >
             {/* Header Row */}
             <div
@@ -243,7 +243,7 @@ export default function OrderHistory({ phone = '', useAuth = false }: Props) {
             >
               {/* Status badge */}
               <div
-                className={`flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-lg ${cfg.bg}`}
+                className={`flex-shrink-0 w-10 h-10 rounded-[4px] flex items-center justify-center text-lg ${cfg.bg}`}
               >
                 {cfg.icon}
               </div>
@@ -255,7 +255,7 @@ export default function OrderHistory({ phone = '', useAuth = false }: Props) {
                     #{order.id.slice(-8)}
                   </span>
                   <span
-                    className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${cfg.bg} ${cfg.color}`}
+                    className={`text-[10px] font-bold px-2 py-0.5 rounded-[4px] ${cfg.bg} ${cfg.color}`}
                   >
                     {cfg.label}
                   </span>
@@ -292,7 +292,7 @@ export default function OrderHistory({ phone = '', useAuth = false }: Props) {
                   className="overflow-hidden"
                 >
                   <div className="border-t border-zinc-100 dark:border-zinc-800 px-4 pt-3 pb-4">
-                    <div className="space-y-2 bg-zinc-50 dark:bg-zinc-800/40 rounded-xl p-3">
+                    <div className="space-y-2 bg-zinc-50 dark:bg-zinc-800/40 rounded-[4px] p-3">
                       {order.items.map((item) => (
                         <div key={item.id} className="flex justify-between text-sm gap-2">
                           <span className="text-zinc-600 dark:text-zinc-400">
@@ -323,7 +323,7 @@ export default function OrderHistory({ phone = '', useAuth = false }: Props) {
 
                     {/* Action for done orders → review CTA */}
                     {order.status === 'done' && (
-                      <div className="mt-3 p-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/40 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-3">
+                      <div className="mt-3 p-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/40 rounded-[4px] flex flex-col sm:flex-row items-center justify-between gap-3">
                         <p className="text-xs text-amber-700 dark:text-amber-400 font-medium">
                           🌟 Pesanan selesai! Bagikan pengalaman atau pesan lagi.
                         </p>
@@ -353,7 +353,7 @@ export default function OrderHistory({ phone = '', useAuth = false }: Props) {
                       order.status === 'ready' ||
                       order.status === 'processing' ||
                       order.status === 'paid') && (
-                      <div className="mt-3 bg-amber-50/50 dark:bg-amber-950/10 border border-amber-100/50 dark:border-amber-900/30 rounded-xl p-3 text-center">
+                      <div className="mt-3 bg-amber-50/50 dark:bg-amber-950/10 border border-amber-100/50 dark:border-amber-900/30 rounded-[4px] p-3 text-center">
                         <p className="text-xs text-zinc-500 mb-1">
                           Pesanan Anda sedang diproses. Kami akan segera menghubungi Anda.
                         </p>

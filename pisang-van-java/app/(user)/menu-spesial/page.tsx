@@ -159,7 +159,7 @@ export default async function MenuSpesialPage(props: {
           </p>
           <Link
             href="/lokasi-kontak"
-            className="inline-block px-8 py-3.5 rounded-full font-bold text-sm transition-all active:scale-95"
+            className="inline-block px-8 py-3.5 rounded-[4px] font-bold text-sm transition-all active:scale-95"
             style={{ background: '#D4802A', color: 'white' }}
           >
             Lihat Lokasi Outlet

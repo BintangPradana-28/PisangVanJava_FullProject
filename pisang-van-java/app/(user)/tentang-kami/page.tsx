@@ -92,11 +92,11 @@ export default function TentangKamiPage() {
       <section className="relative pt-28 pb-12 overflow-hidden bg-cream-50 dark:bg-zinc-900 border-b border-outline-variant/20 dark:border-zinc-800">
         <div className="absolute inset-0 opacity-40 pointer-events-none" />
         {/* Decorative blobs - Tailwind purely */}
-        <div className="absolute -top-24 -right-16 w-96 h-96 rounded-full opacity-10 pointer-events-none bg-[radial-gradient(circle,_var(--tw-gradient-stops))] from-amber-600 to-transparent" />
+        <div className="absolute -top-24 -right-16 w-96 h-96 rounded-[4px] opacity-10 pointer-events-none bg-[radial-gradient(circle,_var(--tw-gradient-stops))] from-amber-600 to-transparent" />
         <div className="max-w-[1200px] mx-auto px-6 relative z-10">
           <motion.div variants={stagger} initial="hidden" animate="visible" className="max-w-3xl">
             <motion.div variants={item}>
-              <span className="inline-block text-xs font-bold tracking-[0.22em] uppercase px-4 py-1.5 rounded-full mb-5 bg-amber-600/10 text-amber-700 dark:text-amber-500">
+              <span className="inline-block text-xs font-bold tracking-[0.22em] uppercase px-4 py-1.5 rounded-[4px] mb-5 bg-amber-600/10 text-amber-700 dark:text-amber-500">
                 {t('about_hero_badge')}
               </span>
             </motion.div>
@@ -130,7 +130,7 @@ export default function TentangKamiPage() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
-              className="relative aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl border border-cream-200 dark:border-zinc-800"
+              className="relative aspect-[4/3] rounded-[4px] overflow-hidden shadow-sm border border-cream-200 dark:border-zinc-800"
             >
               <Image
                 src="/kitchen.png"
@@ -139,7 +139,7 @@ export default function TentangKamiPage() {
                 sizes="(max-width: 1024px) 100vw, 560px"
                 className="object-cover"
               />
-              <div className="absolute bottom-6 right-6 rounded-2xl p-5 shadow-2xl bg-brown-900 text-white">
+              <div className="absolute bottom-6 right-6 rounded-[4px] p-5 shadow-sm bg-brown-900 text-white">
                 <div className="font-serif text-xl font-bold text-amber-500">
                   {t('about_since')}
                 </div>
@@ -199,7 +199,7 @@ export default function TentangKamiPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.08 }}
-                className="rounded-2xl p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 bg-white dark:bg-zinc-900 border border-cream-200 dark:border-zinc-800"
+                className="rounded-[4px] p-6 transition-all duration-300 hover:shadow-sm hover:-translate-y-1 bg-white dark:bg-zinc-900 border border-cream-200 dark:border-zinc-800"
               >
                 <div className="text-4xl mb-4">{icon}</div>
                 <h3 className="font-serif text-lg font-bold mb-2 text-brown-900 dark:text-zinc-100">
@@ -232,7 +232,7 @@ export default function TentangKamiPage() {
             </h2>
           </motion.div>
           <div className="relative">
-            <div className="absolute left-[28px] top-2 bottom-2 w-0.5 rounded-full bg-cream-200 dark:bg-zinc-800" />
+            <div className="absolute left-[28px] top-2 bottom-2 w-0.5 rounded-[4px] bg-cream-200 dark:bg-zinc-800" />
             <div className="space-y-8">
               {milestones.map(({ year, event }, i) => (
                 <motion.div
@@ -243,10 +243,10 @@ export default function TentangKamiPage() {
                   transition={{ delay: i * 0.08 }}
                   className="flex gap-6 items-start"
                 >
-                  <div className="w-14 h-14 rounded-2xl shrink-0 flex items-center justify-center text-xs font-bold z-10 bg-amber-600 text-white shadow-md">
+                  <div className="w-14 h-14 rounded-[4px] shrink-0 flex items-center justify-center text-xs font-bold z-10 bg-amber-600 text-white shadow-md">
                     {year}
                   </div>
-                  <div className="rounded-2xl p-5 flex-1 bg-cream-50 dark:bg-zinc-900 border border-cream-200 dark:border-zinc-800">
+                  <div className="rounded-[4px] p-5 flex-1 bg-cream-50 dark:bg-zinc-900 border border-cream-200 dark:border-zinc-800">
                     <p className="text-sm leading-relaxed text-brown-800 dark:text-zinc-300">
                       {event}
                     </p>
@@ -285,10 +285,10 @@ export default function TentangKamiPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="rounded-3xl p-6 text-center transition-all duration-300 hover:shadow-xl hover:-translate-y-1 bg-white dark:bg-zinc-900 border border-cream-200 dark:border-zinc-800 group"
+                className="rounded-[4px] p-6 text-center transition-all duration-300 hover:shadow-sm hover:-translate-y-1 bg-white dark:bg-zinc-900 border border-cream-200 dark:border-zinc-800 group"
               >
                 <div
-                  className="relative w-32 h-32 mx-auto mb-6 rounded-full overflow-hidden border-4 border-cream-100 dark:border-zinc-800 group-hover:border-amber-500 transition-colors flex items-center justify-center"
+                  className="relative w-32 h-32 mx-auto mb-6 rounded-[4px] overflow-hidden border-4 border-cream-100 dark:border-zinc-800 group-hover:border-amber-500 transition-colors flex items-center justify-center"
                   style={{ backgroundColor: color }}
                 >
                   <span className="font-serif text-4xl font-bold text-white select-none">
@@ -332,13 +332,13 @@ export default function TentangKamiPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
                 href={`https://wa.me/${getSetting('nomor_wa', '6281312167554')}`}
-                className="px-8 py-3.5 rounded-full font-bold text-sm transition-all active:scale-95 bg-amber-600 hover:bg-amber-500 text-white shadow-lg"
+                className="px-8 py-3.5 rounded-[4px] font-bold text-sm transition-all active:scale-95 bg-amber-600 hover:bg-amber-500 text-white shadow-sm"
               >
                 💼 Hubungi Kami untuk Kemitraan
               </a>
               <Link
                 href="/lokasi-kontak"
-                className="px-8 py-3.5 rounded-full font-bold text-sm transition-all active:scale-95 border border-white/30 hover:bg-white/10"
+                className="px-8 py-3.5 rounded-[4px] font-bold text-sm transition-all active:scale-95 border border-white/30 hover:bg-white/10"
               >
                 📍 {t('about_cta_find')}
               </Link>

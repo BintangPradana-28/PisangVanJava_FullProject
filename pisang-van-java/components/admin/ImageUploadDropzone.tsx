@@ -63,7 +63,7 @@ export default function ImageUploadDropzone({
 
       <div className="flex flex-col gap-3">
         {value && (
-          <div className="relative w-32 h-32 rounded-xl overflow-hidden border border-cream-300">
+          <div className="relative w-32 h-32 rounded-[4px] overflow-hidden border border-cream-300">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={value} alt="Preview" className="w-full h-full object-cover" />
             <button
@@ -88,7 +88,7 @@ export default function ImageUploadDropzone({
           />
           <label
             htmlFor={`file-upload-${label.replace(/\s+/g, '-')}`}
-            className={`cursor-pointer px-4 py-2 border border-dashed rounded-xl font-semibold text-sm transition-all
+            className={`cursor-pointer px-4 py-2 border border-dashed rounded-[4px] font-semibold text-sm transition-all
               ${
                 isUploading
                   ? 'bg-cream-100 border-cream-300 text-brown-300 cursor-not-allowed'
@@ -106,7 +106,7 @@ export default function ImageUploadDropzone({
           <input
             type="url"
             placeholder="https://..."
-            className="w-full border border-cream-300 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-brown-500 transition-all mt-1"
+            className="w-full border border-cream-300 rounded-[4px] p-3 text-sm focus:outline-none focus:ring-2 focus:ring-brown-500 transition-all mt-1"
             value={value}
             onChange={(e) => onChange(e.target.value)}
           />

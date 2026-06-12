@@ -38,7 +38,7 @@ export default function AdminSidebar() {
   return (
     <>
       {/* Top Bar Khusus Mobile */}
-      <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-brown-700 flex items-center justify-between px-4 z-40 shadow-lg border-b border-white/10">
+      <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-brown-700 flex items-center justify-between px-4 z-40 shadow-sm border-b border-white/10">
         <div className="flex items-center gap-3">
           <button
             onClick={() => setIsOpen(true)}
@@ -70,7 +70,7 @@ export default function AdminSidebar() {
 
       <aside
         className={`
-        fixed top-0 left-0 z-50 h-full w-60 bg-brown-700 flex flex-col flex-shrink-0 transition-transform duration-300 ease-in-out shadow-2xl
+        fixed top-0 left-0 z-50 h-full w-60 bg-brown-700 flex flex-col flex-shrink-0 transition-transform duration-300 ease-in-out shadow-sm
         md:relative md:translate-x-0 md:shadow-none
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
       `}

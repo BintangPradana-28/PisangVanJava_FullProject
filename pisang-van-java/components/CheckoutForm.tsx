@@ -48,7 +48,7 @@ export default function CheckoutForm() {
   // 4. ANTARMUKA PENGGUNA (UI)
   // =========================================================================
   return (
-    <div className="max-w-md mx-auto p-6 bg-white dark:bg-[#1a0f0a] rounded-2xl shadow-xl border border-gray-100 dark:border-gray-800">
+    <div className="max-w-md mx-auto p-6 bg-white dark:bg-[#1a0f0a] rounded-[4px] shadow-sm border border-gray-100 dark:border-gray-800">
       <h2 className="text-2xl font-serif font-bold text-gray-900 dark:text-white mb-6">
         Detail Pesanan
       </h2>
@@ -63,7 +63,7 @@ export default function CheckoutForm() {
             {...register('nama')}
             type="text"
             placeholder="Ketik nama Anda..."
-            className={`w-full px-4 py-2 rounded-xl border bg-gray-50 dark:bg-black/50 text-gray-900 dark:text-white focus:outline-none focus:ring-2 transition-all ${
+            className={`w-full px-4 py-2 rounded-[4px] border bg-gray-50 dark:bg-black/50 text-gray-900 dark:text-white focus:outline-none focus:ring-2 transition-all ${
               errors.nama
                 ? 'border-red-500 focus:ring-red-500/20'
                 : 'border-gray-200 dark:border-gray-700 focus:border-amber-500 focus:ring-amber-500/20'
@@ -83,7 +83,7 @@ export default function CheckoutForm() {
             {...register('whatsapp')}
             type="text"
             placeholder="08123456789"
-            className={`w-full px-4 py-2 rounded-xl border bg-gray-50 dark:bg-black/50 text-gray-900 dark:text-white focus:outline-none focus:ring-2 transition-all ${
+            className={`w-full px-4 py-2 rounded-[4px] border bg-gray-50 dark:bg-black/50 text-gray-900 dark:text-white focus:outline-none focus:ring-2 transition-all ${
               errors.whatsapp
                 ? 'border-red-500 focus:ring-red-500/20'
                 : 'border-gray-200 dark:border-gray-700 focus:border-amber-500 focus:ring-amber-500/20'
@@ -103,7 +103,7 @@ export default function CheckoutForm() {
             {...register('catatan')}
             rows={3}
             placeholder="Misal: Pisangnya digoreng agak kering ya..."
-            className={`w-full px-4 py-2 rounded-xl border bg-gray-50 dark:bg-black/50 text-gray-900 dark:text-white focus:outline-none focus:ring-2 transition-all ${
+            className={`w-full px-4 py-2 rounded-[4px] border bg-gray-50 dark:bg-black/50 text-gray-900 dark:text-white focus:outline-none focus:ring-2 transition-all ${
               errors.catatan
                 ? 'border-red-500 focus:ring-red-500/20'
                 : 'border-gray-200 dark:border-gray-700 focus:border-amber-500 focus:ring-amber-500/20'
@@ -118,7 +118,7 @@ export default function CheckoutForm() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full bg-[#D4802A] hover:bg-[#b56d24] disabled:bg-gray-400 text-white font-bold py-3 px-4 rounded-xl shadow-lg transition-all active:scale-95 flex justify-center items-center gap-2"
+          className="w-full bg-[#D4802A] hover:bg-[#b56d24] disabled:bg-gray-400 text-white font-bold py-3 px-4 rounded-[4px] shadow-sm transition-all active:scale-95 flex justify-center items-center gap-2"
         >
           {isSubmitting ? (
             <>

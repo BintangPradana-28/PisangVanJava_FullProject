@@ -113,7 +113,7 @@ export default function SearchFilterBar({ totalItems }: SearchFilterBarProps) {
             onChange={(e) => setSearch(e.target.value)}
             placeholder={t('menu_search_placeholder')}
             aria-label="Cari varian menu"
-            className="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl outline-none transition-all"
+            className="w-full pl-10 pr-4 py-2.5 text-sm rounded-[4px] outline-none transition-all"
             style={{
               background: 'var(--surface-custom)',
               border: '1px solid var(--border-custom)',
@@ -148,7 +148,7 @@ export default function SearchFilterBar({ totalItems }: SearchFilterBarProps) {
               key={tab.key}
               onClick={() => setBaseFilter(tab.key)}
               aria-pressed={active}
-              className="flex-shrink-0 text-xs font-bold px-4 py-2 rounded-full transition-all duration-200 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-amber-400"
+              className="flex-shrink-0 text-xs font-bold px-4 py-2 rounded-[4px] transition-all duration-200 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-amber-400"
               style={
                 active
                   ? {
@@ -188,7 +188,7 @@ export default function SearchFilterBar({ totalItems }: SearchFilterBarProps) {
               key={chip.key}
               onClick={() => !isDragging && setFlavorFilter(chip.key)}
               aria-pressed={active}
-              className="flex-shrink-0 text-[11px] font-semibold px-3.5 py-1.5 rounded-full transition-all duration-200 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
+              className="flex-shrink-0 text-[11px] font-semibold px-3.5 py-1.5 rounded-[4px] transition-all duration-200 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
               style={
                 active
                   ? {

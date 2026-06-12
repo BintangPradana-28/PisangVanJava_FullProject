@@ -39,8 +39,8 @@ export default function PaymentError({ error, reset }: PaymentErrorProps) {
 
   return (
     <div className="min-h-screen bg-[#FAF7F2] flex items-center justify-center px-4">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center">
-        <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
+      <div className="w-full max-w-md bg-white rounded-[4px] shadow-sm border border-gray-100 p-8 text-center">
+        <div className="w-16 h-16 bg-blue-50 rounded-[4px] flex items-center justify-center mx-auto mb-6">
           <CreditCard className="w-8 h-8 text-blue-500" />
         </div>
 
@@ -48,7 +48,7 @@ export default function PaymentError({ error, reset }: PaymentErrorProps) {
           Halaman Pembayaran Gagal Dimuat
         </h1>
 
-        <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-3 mb-4">
+        <div className="bg-green-50 border border-green-200 rounded-[4px] px-4 py-3 mb-4">
           <p className="text-green-800 text-sm font-medium">
             ✅ Pesanan Anda sudah berhasil dibuat
           </p>
@@ -70,7 +70,7 @@ export default function PaymentError({ error, reset }: PaymentErrorProps) {
         <div className="flex flex-col gap-3">
           <Button
             onClick={handleRecover}
-            className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-full py-3 font-medium flex items-center justify-center gap-2"
+            className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-[4px] py-3 font-medium flex items-center justify-center gap-2"
           >
             <RefreshCw className="w-4 h-4" />
             Muat Ulang Pembayaran
@@ -79,7 +79,7 @@ export default function PaymentError({ error, reset }: PaymentErrorProps) {
           <Button
             asChild
             variant="outline"
-            className="w-full rounded-full py-3 font-medium flex items-center justify-center gap-2 border-gray-200 text-gray-700"
+            className="w-full rounded-[4px] py-3 font-medium flex items-center justify-center gap-2 border-gray-200 text-gray-700"
           >
             <Link
               href={orderId ? `/profile?tab=orders&highlight=${orderId}` : '/profile?tab=orders'}

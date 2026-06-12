@@ -103,16 +103,16 @@ export default function ToppingsClient({ initialToppings }: { initialToppings: T
         {toppings.map((t) => (
           <div
             key={t.id}
-            className="bg-white rounded-2xl border border-cream-200 p-5 shadow-sm flex items-center gap-4"
+            className="bg-white rounded-[4px] border border-cream-200 p-5 shadow-sm flex items-center gap-4"
           >
-            <div className="w-14 h-14 rounded-xl bg-cream-100 flex items-center justify-center text-3xl flex-shrink-0">
+            <div className="w-14 h-14 rounded-[4px] bg-cream-100 flex items-center justify-center text-3xl flex-shrink-0">
               {t.emoji || '✨'}
             </div>
             <div className="flex-1 min-w-0">
               <div className="font-semibold text-brown-700 truncate">{t.name}</div>
               <div className="text-sm text-amber-brand font-medium">+{formatPrice(t.price)}</div>
               <span
-                className={`text-xs font-medium px-2 py-0.5 rounded-full mt-1 inline-block ${
+                className={`text-xs font-medium px-2 py-0.5 rounded-[4px] mt-1 inline-block ${
                   t.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'
                 }`}
               >
@@ -138,7 +138,7 @@ export default function ToppingsClient({ initialToppings }: { initialToppings: T
       </div>
 
       {/* Info box */}
-      <div className="bg-amber-brand/10 border border-amber-brand/30 rounded-2xl p-4 text-sm text-brown-600">
+      <div className="bg-amber-brand/10 border border-amber-brand/30 rounded-[4px] p-4 text-sm text-brown-600">
         <strong>ℹ️ Info:</strong> Semua topping dikenakan harga flat <strong>+Rp 2.000</strong> untuk
         setiap varian menu. Topping yang nonaktif tidak akan muncul di halaman customer.
       </div>
@@ -151,7 +151,7 @@ export default function ToppingsClient({ initialToppings }: { initialToppings: T
               initial={{ opacity: 0, scale: 0.92 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.92 }}
-              className="bg-cream-100 rounded-3xl p-6 w-full max-w-sm shadow-2xl"
+              className="bg-cream-100 rounded-[4px] p-6 w-full max-w-sm shadow-sm"
             >
               <div className="flex justify-between items-center mb-5">
                 <h2 className="font-serif text-lg font-bold text-brown-700">
@@ -159,7 +159,7 @@ export default function ToppingsClient({ initialToppings }: { initialToppings: T
                 </h2>
                 <button
                   onClick={() => setModalOpen(false)}
-                  className="w-8 h-8 rounded-full bg-cream-200 flex items-center justify-center text-brown-500"
+                  className="w-8 h-8 rounded-[4px] bg-cream-200 flex items-center justify-center text-brown-500"
                 >
                   ✕
                 </button>
@@ -210,10 +210,10 @@ export default function ToppingsClient({ initialToppings }: { initialToppings: T
                   onClick={() => setForm((f) => ({ ...f, isActive: !f.isActive }))}
                 >
                   <div
-                    className={`w-11 h-6 rounded-full transition-colors relative ${form.isActive ? 'bg-green-wa' : 'bg-cream-200'}`}
+                    className={`w-11 h-6 rounded-[4px] transition-colors relative ${form.isActive ? 'bg-green-wa' : 'bg-cream-200'}`}
                   >
                     <div
-                      className={`w-4 h-4 bg-white rounded-full absolute top-1 shadow transition-transform ${form.isActive ? 'translate-x-6' : 'translate-x-1'}`}
+                      className={`w-4 h-4 bg-white rounded-[4px] absolute top-1 shadow transition-transform ${form.isActive ? 'translate-x-6' : 'translate-x-1'}`}
                     />
                   </div>
                   <span className="text-sm font-medium text-brown-600">
@@ -224,13 +224,13 @@ export default function ToppingsClient({ initialToppings }: { initialToppings: T
                   <button
                     onClick={handleSave}
                     disabled={saving}
-                    className="flex-1 py-3 bg-green-wa text-white font-semibold rounded-xl hover:bg-green-wa-light disabled:opacity-60"
+                    className="flex-1 py-3 bg-green-wa text-white font-semibold rounded-[4px] hover:bg-green-wa-light disabled:opacity-60"
                   >
                     {saving ? 'Menyimpan...' : '✓ Simpan'}
                   </button>
                   <button
                     onClick={() => setModalOpen(false)}
-                    className="flex-1 py-3 bg-brown-700 text-white font-semibold rounded-xl hover:bg-brown-600"
+                    className="flex-1 py-3 bg-brown-700 text-white font-semibold rounded-[4px] hover:bg-brown-600"
                   >
                     ✕ Batal
                   </button>

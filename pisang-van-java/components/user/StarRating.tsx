@@ -111,7 +111,7 @@ export default function StarRating({ variantId, existingRating, onSubmit }: Star
 
   if (success) {
     return (
-      <div className="bg-orange-50 border border-amber-100 rounded-2xl p-6 text-center shadow-sm">
+      <div className="bg-orange-50 border border-amber-100 rounded-[4px] p-6 text-center shadow-sm">
         <div className="text-4xl mb-2">🌟</div>
         <p className="font-semibold text-neutral-800">Terima kasih atas ulasan Anda!</p>
         <p className="text-sm text-neutral-500 mt-1">Penilaian Anda sangat berarti bagi kami.</p>
@@ -120,7 +120,7 @@ export default function StarRating({ variantId, existingRating, onSubmit }: Star
   }
 
   return (
-    <div className="bg-orange-50 border border-amber-100 rounded-2xl p-6 shadow-sm space-y-4">
+    <div className="bg-orange-50 border border-amber-100 rounded-[4px] p-6 shadow-sm space-y-4">
       <h3 className="font-semibold text-neutral-800 text-base">
         {existingRating ? '✏️ Perbarui Ulasan Anda' : '⭐ Tulis Ulasan'}
       </h3>
@@ -156,12 +156,12 @@ export default function StarRating({ variantId, existingRating, onSubmit }: Star
         onChange={(e) => setComment(e.target.value)}
         placeholder="Ceritakan pengalaman Anda mencicipi menu ini... (opsional)"
         rows={3}
-        className="w-full rounded-xl border border-amber-100 bg-white px-4 py-2.5 text-sm text-neutral-700 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-amber-300 transition-all duration-200 ease-in-out resize-none shadow-sm"
+        className="w-full rounded-[4px] border border-amber-100 bg-white px-4 py-2.5 text-sm text-neutral-700 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-amber-300 transition-all duration-200 ease-in-out resize-none shadow-sm"
       />
 
       {/* Photo Upload */}
       <div>
-        <label className="flex items-center gap-2 cursor-pointer border border-dashed border-amber-300 rounded-xl p-3 hover:bg-amber-100/50 transition-colors text-sm text-amber-700 font-medium w-max">
+        <label className="flex items-center gap-2 cursor-pointer border border-dashed border-amber-300 rounded-[4px] p-3 hover:bg-amber-100/50 transition-colors text-sm text-amber-700 font-medium w-max">
           <span>📸</span>
           <span>{photo ? 'Ganti Foto' : 'Unggah Foto (Opsional)'}</span>
           <input
@@ -177,14 +177,14 @@ export default function StarRating({ variantId, existingRating, onSubmit }: Star
             <img
               src={photoPreview}
               alt="Preview"
-              className="w-24 h-24 object-cover rounded-xl border border-amber-200 shadow-sm"
+              className="w-24 h-24 object-cover rounded-[4px] border border-amber-200 shadow-sm"
             />
             <button
               onClick={() => {
                 setPhoto(null)
                 setPhotoPreview(null)
               }}
-              className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs shadow-md hover:bg-red-600"
+              className="absolute -top-2 -right-2 bg-red-500 text-white rounded-[4px] w-6 h-6 flex items-center justify-center text-xs shadow-md hover:bg-red-600"
             >
               ✕
             </button>
@@ -202,7 +202,7 @@ export default function StarRating({ variantId, existingRating, onSubmit }: Star
         type="button"
         onClick={handleSubmit}
         disabled={isPending || isUploading}
-        className="w-full bg-amber-400 hover:bg-amber-500 disabled:bg-neutral-200 disabled:cursor-not-allowed text-white font-semibold py-2.5 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 ease-in-out active:scale-95"
+        className="w-full bg-amber-400 hover:bg-amber-500 disabled:bg-neutral-200 disabled:cursor-not-allowed text-white font-semibold py-2.5 rounded-[4px] shadow-sm hover:shadow-md transition-all duration-200 ease-in-out active:scale-95"
       >
         {isUploading ? 'Mengunggah Foto...' : isPending ? 'Mengirim...' : 'Kirim Ulasan'}
       </button>

@@ -121,7 +121,7 @@ export default function MemberRegisterPage() {
     visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' } }
   }
 
-  const inputCls = `w-full px-4 py-3 text-sm rounded-xl outline-none transition-all
+  const inputCls = `w-full px-4 py-3 text-sm rounded-[4px] outline-none transition-all
     bg-[var(--surface-custom)] border border-zinc-400 dark:border-zinc-600
     text-[var(--text-custom)] placeholder:text-[var(--on-surface-variant)]
     focus:ring-2 focus:ring-amber-brand/40 focus:border-amber-brand`
@@ -134,7 +134,7 @@ export default function MemberRegisterPage() {
         position="top-center"
         toastOptions={{
           className:
-            '!bg-[var(--card-bg)] !text-[var(--text-custom)] !border !border-[var(--border-custom)] !shadow-lg'
+            '!bg-[var(--card-bg)] !text-[var(--text-custom)] !border !border-[var(--border-custom)] !shadow-sm'
         }}
       />
       <div className="pointer-events-none fixed inset-0 bg-hero-pattern opacity-40" />
@@ -147,14 +147,14 @@ export default function MemberRegisterPage() {
           className="w-full max-w-[420px]"
         >
           <div
-            className="rounded-2xl px-8 py-10 sm:px-10 shadow-2xl"
+            className="rounded-[4px] px-8 py-10 sm:px-10 shadow-sm"
             style={{ background: 'var(--card-bg)', border: '1px solid var(--border-custom)' }}
           >
             <motion.div variants={stagger} initial="hidden" animate="visible">
               {/* Brand */}
               <motion.div variants={item} className="flex flex-col items-center gap-1 mb-8">
                 <div
-                  className="w-16 h-16 rounded-2xl flex items-center justify-center text-4xl mb-1 shadow-md"
+                  className="w-16 h-16 rounded-[4px] flex items-center justify-center text-4xl mb-1 shadow-md"
                   style={{ background: 'var(--primary-custom)' }}
                 >
                   🍌
@@ -287,16 +287,16 @@ export default function MemberRegisterPage() {
                   {passwordValue.length > 0 && (
                     <div className="flex gap-1 mt-2 h-1.5">
                       <div
-                        className={`flex-1 rounded-full ${strengthScore >= 1 ? 'bg-red-500' : 'bg-zinc-300 dark:bg-zinc-700'}`}
+                        className={`flex-1 rounded-[4px] ${strengthScore >= 1 ? 'bg-red-500' : 'bg-zinc-300 dark:bg-zinc-700'}`}
                       />
                       <div
-                        className={`flex-1 rounded-full ${strengthScore >= 2 ? 'bg-orange-500' : 'bg-zinc-300 dark:bg-zinc-700'}`}
+                        className={`flex-1 rounded-[4px] ${strengthScore >= 2 ? 'bg-orange-500' : 'bg-zinc-300 dark:bg-zinc-700'}`}
                       />
                       <div
-                        className={`flex-1 rounded-full ${strengthScore >= 3 ? 'bg-yellow-500' : 'bg-zinc-300 dark:bg-zinc-700'}`}
+                        className={`flex-1 rounded-[4px] ${strengthScore >= 3 ? 'bg-yellow-500' : 'bg-zinc-300 dark:bg-zinc-700'}`}
                       />
                       <div
-                        className={`flex-1 rounded-full ${strengthScore >= 4 ? 'bg-green-500' : 'bg-zinc-300 dark:bg-zinc-700'}`}
+                        className={`flex-1 rounded-[4px] ${strengthScore >= 4 ? 'bg-green-500' : 'bg-zinc-300 dark:bg-zinc-700'}`}
                       />
                     </div>
                   )}
@@ -354,7 +354,7 @@ export default function MemberRegisterPage() {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full py-3.5 rounded-xl text-sm font-bold tracking-wide transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2 bg-secondary hover:bg-amber-brand text-white shadow-md"
+                    className="w-full py-3.5 rounded-[4px] text-sm font-bold tracking-wide transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-2 bg-secondary hover:bg-amber-brand text-white shadow-md"
                   >
                     {isSubmitting ? (
                       <>

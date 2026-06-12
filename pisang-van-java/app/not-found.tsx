@@ -45,13 +45,13 @@ export default function NotFound() {
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Link
             href="/menu-spesial"
-            className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full font-bold text-sm bg-amber-500 hover:bg-amber-400 text-white shadow-lg hover:shadow-amber-500/30 hover:shadow-xl transition-all duration-200 active:scale-95"
+            className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-[4px] font-bold text-sm bg-amber-500 hover:bg-amber-400 text-white shadow-sm hover:shadow-amber-500/30 hover:shadow-sm transition-all duration-200 active:scale-95"
           >
             🍌 Kembali ke Menu Utama
           </Link>
           <Link
             href="/"
-            className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full font-bold text-sm border border-white/20 text-white/80 hover:bg-white/10 transition-all duration-200 active:scale-95"
+            className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-[4px] font-bold text-sm border border-white/20 text-white/80 hover:bg-white/10 transition-all duration-200 active:scale-95"
           >
             ← Beranda
           </Link>

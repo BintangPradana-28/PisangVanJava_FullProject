@@ -58,12 +58,12 @@ function ReviewCard({ review }: { review: ReviewItem }) {
     : '?'
 
   return (
-    <div className="bg-white border border-amber-100 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all duration-200 ease-in-out space-y-3">
+    <div className="bg-white border border-amber-100 rounded-[4px] p-5 shadow-sm hover:shadow-md transition-all duration-200 ease-in-out space-y-3">
       {/* Header: Avatar + Name + Date */}
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           {/* Avatar circle */}
-          <div className="w-9 h-9 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center text-sm font-semibold shrink-0">
+          <div className="w-9 h-9 rounded-[4px] bg-amber-100 text-amber-700 flex items-center justify-center text-sm font-semibold shrink-0">
             {initials}
           </div>
           <div>
@@ -74,7 +74,7 @@ function ReviewCard({ review }: { review: ReviewItem }) {
               {review.isVerifiedBuyer && (
                 <span
                   title="Pembeli Terverifikasi"
-                  className="bg-green-100 text-green-700 text-[10px] px-1.5 py-0.5 rounded-full font-bold flex items-center gap-1"
+                  className="bg-green-100 text-green-700 text-[10px] px-1.5 py-0.5 rounded-[4px] font-bold flex items-center gap-1"
                 >
                   ✓ <span className="hidden sm:inline">Pembeli Terverifikasi</span>
                 </span>
@@ -100,7 +100,7 @@ function ReviewCard({ review }: { review: ReviewItem }) {
             href={review.imageUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="block max-w-xs rounded-xl overflow-hidden border border-zinc-200"
+            className="block max-w-xs rounded-[4px] overflow-hidden border border-zinc-200"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -118,7 +118,7 @@ function ReviewCard({ review }: { review: ReviewItem }) {
 function AverageSummary({ average, total }: { average: number; total: number }) {
   const rounded = Math.round(average * 10) / 10
   return (
-    <div className="bg-orange-50 border border-amber-100 rounded-2xl px-5 py-4 flex items-center gap-4 shadow-sm">
+    <div className="bg-orange-50 border border-amber-100 rounded-[4px] px-5 py-4 flex items-center gap-4 shadow-sm">
       <div className="text-center">
         <p className="text-4xl font-semibold text-neutral-800 leading-none">{rounded.toFixed(1)}</p>
         <p className="text-xs text-neutral-500 mt-1">dari 5 bintang</p>
@@ -134,7 +134,7 @@ function AverageSummary({ average, total }: { average: number; total: number }) 
 export default function ReviewList({ reviews, averageRating }: ReviewListProps) {
   if (reviews.length === 0) {
     return (
-      <div className="bg-orange-50 border border-amber-100 rounded-2xl p-10 text-center shadow-sm space-y-3">
+      <div className="bg-orange-50 border border-amber-100 rounded-[4px] p-10 text-center shadow-sm space-y-3">
         <div className="text-5xl">🍌</div>
         <p className="font-semibold text-neutral-800">Belum Ada Ulasan</p>
         <p className="text-sm text-neutral-500 max-w-xs mx-auto">

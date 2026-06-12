@@ -300,10 +300,10 @@ export default function KitchenClient({ initialOrders }: KitchenClientProps) {
           <div className="flex items-center gap-2 text-xs">
             <span className="relative flex h-2.5 w-2.5">
               {connectionStatus === 'connected' && (
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-[4px] bg-green-400 opacity-75" />
               )}
               <span
-                className={`relative inline-flex rounded-full h-2.5 w-2.5 ${
+                className={`relative inline-flex rounded-[4px] h-2.5 w-2.5 ${
                   connectionStatus === 'connected'
                     ? 'bg-green-500'
                     : connectionStatus === 'connecting'
@@ -429,9 +429,9 @@ function OrderCard({
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.8, y: -20 }}
       transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-      className={`rounded-2xl border-2 ${statusColor} ${
+      className={`rounded-[4px] border-2 ${statusColor} ${
         isUrgent ? 'ring-2 ring-red-500 animate-pulse' : ''
-      } shadow-lg overflow-hidden`}
+      } shadow-sm overflow-hidden`}
     >
       {/* Card Header */}
       <div className="px-4 py-3 flex items-center justify-between border-b border-gray-200/30">
@@ -455,7 +455,7 @@ function OrderCard({
       <div className="px-4 py-3 space-y-2">
         {order.items.map((item) => (
           <div key={item.id} className="flex items-start gap-2">
-            <span className="bg-amber-100 text-amber-800 text-xs font-black rounded-full w-6 h-6 flex items-center justify-center shrink-0">
+            <span className="bg-amber-100 text-amber-800 text-xs font-black rounded-[4px] w-6 h-6 flex items-center justify-center shrink-0">
               {item.quantity}
             </span>
             <div className="flex-1 min-w-0">
@@ -485,7 +485,7 @@ function OrderCard({
           <button
             onClick={() => onStatusUpdate(order.id, order.status)}
             disabled={isUpdating}
-            className={`w-full py-3 rounded-xl font-bold text-sm transition-all active:scale-95 disabled:opacity-50 disabled:cursor-wait ${
+            className={`w-full py-3 rounded-[4px] font-bold text-sm transition-all active:scale-95 disabled:opacity-50 disabled:cursor-wait ${
               order.status === 'READY'
                 ? 'bg-green-600 hover:bg-green-700 text-white'
                 : 'bg-amber-500 hover:bg-amber-600 text-white'

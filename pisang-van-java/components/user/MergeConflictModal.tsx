@@ -60,7 +60,7 @@ export function MergeConflictModal() {
     title: string
     total: number
   }) => (
-    <div className="bg-neutral-50 rounded-xl p-4 border border-neutral-200">
+    <div className="bg-neutral-50 rounded-[4px] p-4 border border-neutral-200">
       <h3 className="font-semibold text-neutral-800 mb-3">{title}</h3>
       <div className="space-y-2 max-h-32 overflow-y-auto pr-2">
         {items.length === 0 ? (
@@ -91,7 +91,7 @@ export function MergeConflictModal() {
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+      <div className="bg-white rounded-[4px] shadow-sm w-full max-w-2xl overflow-hidden animate-in zoom-in-95 duration-200">
         {/* Header */}
         <div className="bg-amber-50 px-6 py-5 border-b border-amber-100">
           <h2 className="text-xl font-bold text-amber-900">Gabungkan Keranjang?</h2>
@@ -112,7 +112,7 @@ export function MergeConflictModal() {
           <div className="space-y-3">
             <button
               onClick={() => resolveConflict('MERGED', merged)}
-              className="w-full py-3 px-4 bg-amber-500 hover:bg-amber-600 text-white font-semibold rounded-xl transition-colors shadow-sm flex items-center justify-between"
+              className="w-full py-3 px-4 bg-amber-500 hover:bg-amber-600 text-white font-semibold rounded-[4px] transition-colors shadow-sm flex items-center justify-between"
             >
               <span>Gabungkan Keduanya (Rekomendasi)</span>
               <span>Total: {formatRupiah(mergedTotal)}</span>
@@ -121,13 +121,13 @@ export function MergeConflictModal() {
             <div className="grid grid-cols-2 gap-3">
               <button
                 onClick={() => resolveConflict('LOCAL')}
-                className="py-2.5 px-4 bg-white border border-neutral-300 hover:bg-neutral-50 text-neutral-700 font-medium rounded-xl transition-colors"
+                className="py-2.5 px-4 bg-white border border-neutral-300 hover:bg-neutral-50 text-neutral-700 font-medium rounded-[4px] transition-colors"
               >
                 Gunakan Saat Ini
               </button>
               <button
                 onClick={() => resolveConflict('DB')}
-                className="py-2.5 px-4 bg-white border border-neutral-300 hover:bg-neutral-50 text-neutral-700 font-medium rounded-xl transition-colors"
+                className="py-2.5 px-4 bg-white border border-neutral-300 hover:bg-neutral-50 text-neutral-700 font-medium rounded-[4px] transition-colors"
               >
                 Gunakan Tersimpan
               </button>

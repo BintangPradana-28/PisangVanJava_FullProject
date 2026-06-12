@@ -53,9 +53,9 @@ export default function AdminLoginPage() {
     >
       <Toaster position="top-center" />
 
-      <div className="w-full max-w-sm bg-cream-100 rounded-3xl p-8 shadow-2xl text-center">
+      <div className="w-full max-w-sm bg-cream-100 rounded-[4px] p-8 shadow-sm text-center">
         {/* Logo */}
-        <div className="w-20 h-20 bg-brown-700 rounded-full mx-auto flex items-center justify-center text-4xl mb-4 shadow-lg">
+        <div className="w-20 h-20 bg-brown-700 rounded-[4px] mx-auto flex items-center justify-center text-4xl mb-4 shadow-sm">
           🍌
         </div>
         <h1 className="font-serif text-lg font-bold text-brown-700 mb-1">Pisang Goreng Van Java</h1>
@@ -106,7 +106,7 @@ export default function AdminLoginPage() {
             onClick={handleLogin}
             disabled={loading}
             className="w-full py-3.5 bg-brown-700 text-cream-100 font-serif font-bold text-base
-                       rounded-xl hover:bg-brown-600 transition-all active:scale-95 mt-2
+                       rounded-[4px] hover:bg-brown-600 transition-all active:scale-95 mt-2
                        disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {loading ? 'Memproses...' : 'LOGIN'}

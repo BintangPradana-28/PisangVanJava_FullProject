@@ -37,13 +37,13 @@ export default function Gallery() {
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
-              className="group relative aspect-square rounded-2xl overflow-hidden cursor-pointer"
+              className="group relative aspect-square rounded-[4px] overflow-hidden cursor-pointer"
             >
               <div
                 className={`w-full h-full bg-gradient-to-br ${bg} flex items-center justify-center
                                transition-transform duration-300 group-hover:scale-105`}
               >
-                <span className="text-7xl sm:text-8xl filter drop-shadow-lg">{emoji}</span>
+                <span className="text-7xl sm:text-8xl filter drop-shadow-sm">{emoji}</span>
               </div>
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
               <div className="absolute bottom-3 left-3 text-white font-semibold text-sm drop-shadow">

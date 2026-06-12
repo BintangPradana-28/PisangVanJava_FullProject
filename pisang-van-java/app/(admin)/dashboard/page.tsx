@@ -107,7 +107,7 @@ export default async function DashboardPage() {
     <div className="flex">
       <AdminSidebar />
       <main className="flex-1 p-6 sm:p-8 overflow-y-auto min-h-screen bg-cream-100">
-        <div className="bg-brown-700 rounded-2xl p-6 mb-6 flex items-center justify-between text-white shadow-sm">
+        <div className="bg-brown-700 rounded-[4px] p-6 mb-6 flex items-center justify-between text-white shadow-sm">
           <div>
             <h2 className="font-serif text-xl font-bold">
               Selamat datang, {session.user?.name || 'Admin'}! 👋
@@ -125,10 +125,10 @@ export default async function DashboardPage() {
           {metrics.map(({ label, value, icon, sub }) => (
             <div
               key={label}
-              className="bg-white rounded-2xl p-5 border border-cream-200 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow"
+              className="bg-white rounded-[4px] p-5 border border-cream-200 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow"
             >
               <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 rounded-full bg-cream-100 flex items-center justify-center text-xl">
+                <div className="w-10 h-10 rounded-[4px] bg-cream-100 flex items-center justify-center text-xl">
                   {icon}
                 </div>
                 <div className="text-xs font-bold text-brown-400 uppercase tracking-wider">
@@ -144,7 +144,7 @@ export default async function DashboardPage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-          <div className="lg:col-span-2 bg-white rounded-2xl border border-cream-200 shadow-sm p-6">
+          <div className="lg:col-span-2 bg-white rounded-[4px] border border-cream-200 shadow-sm p-6">
             <h3 className="font-serif text-lg font-bold text-brown-700 mb-6">
               Grafik Penjualan 7 Hari Terakhir
             </h3>
@@ -172,7 +172,7 @@ export default async function DashboardPage() {
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl border border-cream-200 shadow-sm p-6 flex flex-col">
+          <div className="bg-white rounded-[4px] border border-cream-200 shadow-sm p-6 flex flex-col">
             <h3 className="font-serif text-lg font-bold text-brown-700 mb-4">Aktivitas Terkini</h3>
             <div className="flex-1 space-y-4 overflow-y-auto max-h-[220px] pr-2 custom-scrollbar">
               {data.recentOrders.length === 0 ? (
@@ -185,7 +185,7 @@ export default async function DashboardPage() {
                     key={order.id}
                     className="flex items-start gap-3 border-b border-cream-100 pb-3 last:border-0 last:pb-0"
                   >
-                    <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center text-xs shrink-0 mt-0.5">
+                    <div className="w-8 h-8 rounded-[4px] bg-blue-50 text-blue-500 flex items-center justify-center text-xs shrink-0 mt-0.5">
                       {order.source === 'whatsapp' ? '💬' : '🚶'}
                     </div>
                     <div>

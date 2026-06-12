@@ -38,7 +38,7 @@ export default async function KontakLeadsPage() {
           Daftar pesan pelanggan dari halaman Lokasi & Kontak (Terenkripsi & Compliant PDP).
         </p>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-brown-200 overflow-hidden">
+        <div className="bg-white rounded-[4px] shadow-sm border border-brown-200 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm text-brown-700">
               <thead className="bg-brown-50 border-b border-brown-200 text-brown-800">
@@ -94,11 +94,11 @@ export default async function KontakLeadsPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         {lead.isConsent ? (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-[4px] text-xs font-medium bg-green-100 text-green-800">
                             Disetujui
                           </span>
                         ) : (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-[4px] text-xs font-medium bg-red-100 text-red-800">
                             Ditolak
                           </span>
                         )}

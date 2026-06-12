@@ -109,7 +109,7 @@ export default function PosClient({ products, toppings }: PosClientProps) {
             <button
               onClick={handleRefreshMenu}
               disabled={isRefreshing}
-              className="flex items-center gap-2 bg-gray-50 hover:bg-orange-50 text-gray-600 hover:text-orange-600 px-4 py-2 rounded-xl font-bold text-sm transition-colors border border-gray-200"
+              className="flex items-center gap-2 bg-gray-50 hover:bg-orange-50 text-gray-600 hover:text-orange-600 px-4 py-2 rounded-[4px] font-bold text-sm transition-colors border border-gray-200"
             >
               <span className={isRefreshing ? 'animate-spin' : ''}>🔄</span>
               <span className="hidden sm:inline">Sync Menu</span>
@@ -118,11 +118,11 @@ export default function PosClient({ products, toppings }: PosClientProps) {
             {/* Mobile Cart Toggle Button */}
             <button
               onClick={() => setIsCartOpenOnMobile(true)}
-              className="lg:hidden relative bg-[#D4802A] text-white p-3 rounded-xl shadow-md active:scale-95"
+              className="lg:hidden relative bg-[#D4802A] text-white p-3 rounded-[4px] shadow-md active:scale-95"
             >
               🛒
               {totalCartItems > 0 && (
-                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold w-6 h-6 flex items-center justify-center rounded-full border-2 border-white">
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold w-6 h-6 flex items-center justify-center rounded-[4px] border-2 border-white">
                   {totalCartItems}
                 </span>
               )}
@@ -150,12 +150,12 @@ export default function PosClient({ products, toppings }: PosClientProps) {
         />
 
         {/* Cart Container */}
-        <div className="absolute right-0 top-0 bottom-0 w-[90%] sm:w-[400px] lg:w-full lg:static h-full bg-white shadow-2xl lg:shadow-none flex flex-col">
+        <div className="absolute right-0 top-0 bottom-0 w-[90%] sm:w-[400px] lg:w-full lg:static h-full bg-white shadow-sm lg:shadow-none flex flex-col">
           {/* Mobile Close Button inside Cart */}
           <div className="lg:hidden bg-gray-50 p-4 border-b border-gray-100 flex justify-end">
             <button
               onClick={() => setIsCartOpenOnMobile(false)}
-              className="text-gray-500 font-bold bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-xl"
+              className="text-gray-500 font-bold bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-[4px]"
             >
               Tutup Keranjang ➔
             </button>

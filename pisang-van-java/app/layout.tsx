@@ -1,6 +1,6 @@
 // app/layout.tsx
 import type { Metadata } from 'next'
-import { Be_Vietnam_Pro, Newsreader } from 'next/font/google'
+import { Plus_Jakarta_Sans, Fraunces } from 'next/font/google'
 import '../styles/globals.css'
 import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
@@ -8,17 +8,17 @@ import { headers } from 'next/headers'
 import Script from 'next/script'
 import { Providers } from './providers'
 
-const beVietnamPro = Be_Vietnam_Pro({
+const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ['latin'],
   weight: ['400', '500', '600'],
   variable: '--font-sans',
   display: 'swap'
 })
 
-const newsreader = Newsreader({
+const fraunces = Fraunces({
   subsets: ['latin'],
   style: ['normal', 'italic'],
-  weight: ['600', '700'],
+  weight: ['400', '600', '700'],
   variable: '--font-serif',
   display: 'swap',
   adjustFontFallback: false
@@ -77,7 +77,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html
       lang="id"
-      className={`${beVietnamPro.variable} ${newsreader.variable}`}
+      className={`${plusJakartaSans.variable} ${fraunces.variable}`}
       suppressHydrationWarning
     >
       <head></head>

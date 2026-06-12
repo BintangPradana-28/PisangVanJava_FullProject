@@ -9,7 +9,7 @@ export default function PrivacyPolicyPage() {
   return (
     <div className="min-h-screen bg-cream-50 py-24 sm:py-32">
       <div className="max-w-[800px] mx-auto px-6">
-        <div className="bg-white rounded-3xl p-8 sm:p-12 shadow-sm border border-cream-200">
+        <div className="bg-white rounded-[4px] p-8 sm:p-12 shadow-sm border border-cream-200">
           <div className="mb-12 border-b border-cream-200 pb-8">
             <h1 className="font-serif text-3xl sm:text-4xl font-bold text-brown-700 mb-4">
               Kebijakan Privasi
@@ -92,7 +92,7 @@ export default function PrivacyPolicyPage() {
               Jika Anda memiliki pertanyaan terkait Kebijakan Privasi ini atau pengelolaan data
               Anda, silakan hubungi kami di:
             </p>
-            <div className="bg-cream-100 p-6 rounded-xl mt-4">
+            <div className="bg-cream-100 p-6 rounded-[4px] mt-4">
               <p className="font-bold">Pisang Goreng Van Java</p>
               <p>
                 Jl. Raya Cilangkap l Rt.2/Rw.5, Cilangkap, Kec. Cipayung, Kota Jakarta Timur 13870

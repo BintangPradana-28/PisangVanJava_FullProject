@@ -23,7 +23,7 @@ export default function MapEmbed({ address }: { address: string }) {
   return (
     <div
       ref={ref}
-      className="relative w-full h-full min-h-[300px] bg-zinc-100 dark:bg-zinc-800 animate-pulse rounded-2xl overflow-hidden"
+      className="relative w-full h-full min-h-[300px] bg-zinc-100 dark:bg-zinc-800 animate-pulse rounded-[4px] overflow-hidden"
     >
       {isVisible && (
         <iframe

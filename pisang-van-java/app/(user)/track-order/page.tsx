@@ -183,7 +183,7 @@ function ReorderButton({ order }: { order: Order }) {
       title={
         order.status === 'CANCELED' ? 'Pesanan dibatalkan' : 'Tambahkan semua item ke keranjang'
       }
-      className="flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-full transition-all duration-200 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+      className="flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-[4px] transition-all duration-200 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
       style={{
         background: order.status === 'CANCELED' ? 'var(--surface-custom)' : '#D4802A',
         color: order.status === 'CANCELED' ? 'var(--text-custom)' : 'white'
@@ -324,7 +324,7 @@ export default function TrackOrderPage() {
         </div>
 
         {/* Search box */}
-        <div className="bg-white dark:bg-zinc-900 rounded-2xl p-6 border border-zinc-200/60 dark:border-zinc-800 shadow-sm mb-6">
+        <div className="bg-white dark:bg-zinc-900 rounded-[4px] p-6 border border-zinc-200/60 dark:border-zinc-800 shadow-sm mb-6">
           <div className="flex gap-2">
             <input
               type="tel"
@@ -332,13 +332,13 @@ export default function TrackOrderPage() {
               onChange={(e) => setPhone(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               placeholder={t('track_placeholder')}
-              className="flex-1 px-4 py-2.5 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-transparent text-sm outline-none focus:ring-2 focus:ring-amber-400 transition-all"
+              className="flex-1 px-4 py-2.5 rounded-[4px] border border-zinc-200 dark:border-zinc-800 bg-transparent text-sm outline-none focus:ring-2 focus:ring-amber-400 transition-all"
               style={{ color: 'var(--text-custom)' }}
             />
             <button
               onClick={handleSearch}
               disabled={loading}
-              className="px-5 py-2.5 rounded-xl font-bold text-sm text-white disabled:opacity-60 transition-all active:scale-95"
+              className="px-5 py-2.5 rounded-[4px] font-bold text-sm text-white disabled:opacity-60 transition-all active:scale-95"
               style={{ background: '#D4802A' }}
             >
               {loading ? '...' : t('track_btn_check')}
@@ -361,10 +361,10 @@ export default function TrackOrderPage() {
                   <div className="flex items-center gap-2 text-xs">
                     <span className="relative flex h-2.5 w-2.5">
                       {connectionStatus === 'connected' && (
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-[4px] bg-green-400 opacity-75"></span>
                       )}
                       <span
-                        className={`relative inline-flex rounded-full h-2.5 w-2.5 ${
+                        className={`relative inline-flex rounded-[4px] h-2.5 w-2.5 ${
                           connectionStatus === 'connected'
                             ? 'bg-green-500'
                             : connectionStatus === 'connecting'
@@ -408,7 +408,7 @@ export default function TrackOrderPage() {
                   return (
                     <div
                       key={order.id}
-                      className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800 p-5 shadow-sm"
+                      className="bg-white dark:bg-zinc-900 rounded-[4px] border border-zinc-200/60 dark:border-zinc-800 p-5 shadow-sm"
                     >
                       {/* Order header */}
                       <div className="flex justify-between items-start mb-4">
@@ -438,7 +438,7 @@ export default function TrackOrderPage() {
                           {STATUS_STEPS.map((step, i) => (
                             <div key={step} className="flex items-center flex-1 last:flex-none">
                               <div
-                                className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 transition-colors ${i <= stepIdx ? 'bg-amber-500 text-white' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-400'}`}
+                                className={`w-7 h-7 rounded-[4px] flex items-center justify-center text-xs font-bold flex-shrink-0 transition-colors ${i <= stepIdx ? 'bg-amber-500 text-white' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-400'}`}
                               >
                                 {i + 1}
                               </div>
@@ -502,7 +502,7 @@ export default function TrackOrderPage() {
                             href={`/api/orders/${order.id}/invoice`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-full transition-all duration-200 active:scale-95 border border-zinc-300 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800"
+                            className="flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-[4px] transition-all duration-200 active:scale-95 border border-zinc-300 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800"
                           >
                             📄 Invoice
                           </a>
@@ -510,7 +510,7 @@ export default function TrackOrderPage() {
                         {order.status === 'COMPLETED' && (
                           <Link
                             href={`/ulasan?orderId=${order.id}`}
-                            className="flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-full transition-all duration-200 active:scale-95 border border-amber-500 text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20"
+                            className="flex items-center gap-1.5 text-xs font-bold px-4 py-2 rounded-[4px] transition-all duration-200 active:scale-95 border border-amber-500 text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20"
                           >
                             ⭐ Beri Ulasan
                           </Link>

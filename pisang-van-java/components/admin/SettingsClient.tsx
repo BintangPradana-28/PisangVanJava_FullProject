@@ -151,7 +151,7 @@ export default function SettingsClient({ settings, adminName }: Props) {
             <button
               key={g}
               onClick={() => setActiveTab(g)}
-              className={`w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition-all flex items-center gap-2 ${
+              className={`w-full text-left px-4 py-3 rounded-[4px] text-sm font-medium transition-all flex items-center gap-2 ${
                 activeTab === g ? 'bg-brown-700 text-white' : 'text-brown-600 hover:bg-cream-200'
               }`}
             >
@@ -161,7 +161,7 @@ export default function SettingsClient({ settings, adminName }: Props) {
           ))}
           <button
             onClick={() => setActiveTab('password')}
-            className={`w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition-all flex items-center gap-2 ${
+            className={`w-full text-left px-4 py-3 rounded-[4px] text-sm font-medium transition-all flex items-center gap-2 ${
               activeTab === 'password'
                 ? 'bg-brown-700 text-white'
                 : 'text-brown-600 hover:bg-cream-200'
@@ -173,7 +173,7 @@ export default function SettingsClient({ settings, adminName }: Props) {
         </div>
 
         {/* Content */}
-        <div className="bg-white rounded-2xl border border-cream-200 p-6 shadow-sm">
+        <div className="bg-white rounded-[4px] border border-cream-200 p-6 shadow-sm">
           {activeTab === 'password' ? (
             <>
               <h2 className="font-serif text-lg font-bold text-brown-700 mb-1">
@@ -204,7 +204,7 @@ export default function SettingsClient({ settings, adminName }: Props) {
                 <button
                   onClick={handlePasswordChange}
                   disabled={passwordMutation.isPending}
-                  className="w-full py-3 bg-brown-700 text-white font-semibold rounded-xl hover:bg-brown-600 transition-colors disabled:opacity-60"
+                  className="w-full py-3 bg-brown-700 text-white font-semibold rounded-[4px] hover:bg-brown-600 transition-colors disabled:opacity-60"
                 >
                   {passwordMutation.isPending ? 'Menyimpan...' : '🔐 Ubah Password'}
                 </button>
@@ -444,14 +444,14 @@ export default function SettingsClient({ settings, adminName }: Props) {
                               [s.key]: v[s.key] === 'true' ? 'false' : 'true'
                             }))
                           }
-                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
+                          className={`relative inline-flex h-6 w-11 items-center rounded-[4px] transition-colors focus:outline-none ${
                             values[s.key] === 'true'
                               ? 'bg-secondary'
                               : 'bg-zinc-300 dark:bg-zinc-700'
                           }`}
                         >
                           <span
-                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                            className={`inline-block h-4 w-4 transform rounded-[4px] bg-white transition-transform ${
                               values[s.key] === 'true' ? 'translate-x-6' : 'translate-x-1'
                             }`}
                           />

@@ -81,7 +81,7 @@ export default function MidtransPayButton({ snapToken }: Props) {
 
   if (hasError) {
     return (
-      <div className="w-full text-center p-3 border border-red-200 bg-red-50 text-red-600 rounded-xl text-sm shadow-sm">
+      <div className="w-full text-center p-3 border border-red-200 bg-red-50 text-red-600 rounded-[4px] text-sm shadow-sm">
         <p className="font-bold flex items-center justify-center gap-2">
           <span className="text-lg">⚠️</span> Sistem Pembayaran Terblokir
         </p>
@@ -103,7 +103,7 @@ export default function MidtransPayButton({ snapToken }: Props) {
     <button
       onClick={handlePay}
       disabled={!isReady || isPaying}
-      className="flex w-full items-center justify-center gap-2 rounded-xl bg-amber-brand px-4 py-3.5 text-sm font-bold text-white transition-all hover:bg-amber-600 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
+      className="flex w-full items-center justify-center gap-2 rounded-[4px] bg-amber-brand px-4 py-3.5 text-sm font-bold text-white transition-all hover:bg-amber-600 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]"
     >
       {isPaying ? (
         <>

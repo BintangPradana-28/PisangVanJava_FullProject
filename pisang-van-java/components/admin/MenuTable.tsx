@@ -109,7 +109,7 @@ export default function MenuTable({ initialVariants }: Props) {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-2xl border border-cream-200 overflow-hidden shadow-sm">
+      <div className="bg-white rounded-[4px] border border-cream-200 overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -170,7 +170,7 @@ export default function MenuTable({ initialVariants }: Props) {
                     <td className="px-4 py-3 text-center">
                       <button
                         onClick={() => toggleActive(v)}
-                        className={`text-xs font-semibold px-2.5 py-1 rounded-full transition-colors ${
+                        className={`text-xs font-semibold px-2.5 py-1 rounded-[4px] transition-colors ${
                           v.isActive
                             ? 'bg-green-100 text-green-700 hover:bg-green-200'
                             : 'bg-red-100 text-red-600 hover:bg-red-200'

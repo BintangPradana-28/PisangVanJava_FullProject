@@ -147,7 +147,7 @@ export default function ResellerClient({
               <motion.div
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-100 dark:border-zinc-800 p-8 shadow-sm space-y-6"
+                className="bg-white dark:bg-zinc-900 rounded-[4px] border border-zinc-100 dark:border-zinc-800 p-8 shadow-sm space-y-6"
               >
                 <div className="text-4xl text-amber-500">💰</div>
                 <h2 className="font-serif text-2xl font-bold text-zinc-900 dark:text-zinc-100">
@@ -159,13 +159,13 @@ export default function ResellerClient({
                 <div className="flex gap-4">
                   <Link
                     href="/member-login?callbackUrl=/reseller"
-                    className="bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-6 rounded-2xl transition-all shadow-md shadow-amber-200 dark:shadow-none text-sm"
+                    className="bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-6 rounded-[4px] transition-all shadow-md shadow-amber-200 dark:shadow-none text-sm"
                   >
                     Masuk Akun
                   </Link>
                   <Link
                     href="/member-register?callbackUrl=/reseller"
-                    className="bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-100 font-bold py-3 px-6 rounded-2xl transition-all text-sm"
+                    className="bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-800 dark:text-zinc-100 font-bold py-3 px-6 rounded-[4px] transition-all text-sm"
                   >
                     Daftar Sekarang
                   </Link>
@@ -180,7 +180,7 @@ export default function ResellerClient({
                   <motion.div
                     initial={{ opacity: 0, y: 15 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="bg-amber-500/10 border-2 border-amber-300 dark:border-amber-700/50 rounded-3xl p-6 text-center space-y-4"
+                    className="bg-amber-500/10 border-2 border-amber-300 dark:border-amber-700/50 rounded-[4px] p-6 text-center space-y-4"
                   >
                     <div className="text-5xl">⏳</div>
                     <h2 className="font-serif text-2xl font-bold text-amber-800 dark:text-amber-400">
@@ -198,14 +198,14 @@ export default function ResellerClient({
                   <motion.div
                     initial={{ opacity: 0, y: 15 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-100 dark:border-zinc-800 p-8 shadow-sm"
+                    className="bg-white dark:bg-zinc-900 rounded-[4px] border border-zinc-100 dark:border-zinc-800 p-8 shadow-sm"
                   >
                     <h2 className="font-serif text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-6">
                       📝 Ajukan Pendaftaran Reseller
                     </h2>
 
                     {!userPhone ? (
-                      <div className="bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/50 rounded-2xl p-5 space-y-3">
+                      <div className="bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/50 rounded-[4px] p-5 space-y-3">
                         <div className="text-lg font-bold text-red-700 dark:text-red-400">
                           ⚠️ Nomor WhatsApp Diperlukan
                         </div>
@@ -214,7 +214,7 @@ export default function ResellerClient({
                         </p>
                         <Link
                           href="/profile/keamanan"
-                          className="inline-block text-xs font-bold text-white bg-red-655 bg-red-600 hover:bg-red-750 hover:bg-red-700 px-4 py-2.5 rounded-xl transition-all"
+                          className="inline-block text-xs font-bold text-white bg-red-655 bg-red-600 hover:bg-red-750 hover:bg-red-700 px-4 py-2.5 rounded-[4px] transition-all"
                         >
                           Lengkapi Profil Akun →
                         </Link>
@@ -230,7 +230,7 @@ export default function ResellerClient({
                               type="text"
                               value={session.user.name || ''}
                               disabled
-                              className="w-full px-4 py-3 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 text-sm focus:outline-none"
+                              className="w-full px-4 py-3 rounded-[4px] border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 text-sm focus:outline-none"
                             />
                           </div>
                           <div>
@@ -241,7 +241,7 @@ export default function ResellerClient({
                               type="text"
                               value={userPhone}
                               disabled
-                              className="w-full px-4 py-3 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 text-sm focus:outline-none"
+                              className="w-full px-4 py-3 rounded-[4px] border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 text-sm focus:outline-none"
                             />
                           </div>
                         </div>
@@ -255,7 +255,7 @@ export default function ResellerClient({
                             value={companyName}
                             onChange={(e) => setCompanyName(e.target.value)}
                             placeholder="Contoh: Toko Berkah, Catering Sinar, Koperasi..."
-                            className="w-full px-4 py-3 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 transition-all"
+                            className="w-full px-4 py-3 rounded-[4px] border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 transition-all"
                           />
                         </div>
 
@@ -268,7 +268,7 @@ export default function ResellerClient({
                             onChange={(e) => setAddress(e.target.value)}
                             placeholder="Jl. Raya Kemitraan No. 5, RT 02/03, Kelurahan, Kecamatan, Kota..."
                             rows={3}
-                            className="w-full px-4 py-3 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 transition-all resize-none"
+                            className="w-full px-4 py-3 rounded-[4px] border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 transition-all resize-none"
                           />
                         </div>
 
@@ -281,14 +281,14 @@ export default function ResellerClient({
                             onChange={(e) => setNotes(e.target.value)}
                             placeholder="Tuliskan pengalaman bisnis Anda atau rencana pemesanan harian..."
                             rows={2}
-                            className="w-full px-4 py-3 rounded-2xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 transition-all resize-none"
+                            className="w-full px-4 py-3 rounded-[4px] border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 transition-all resize-none"
                           />
                         </div>
 
                         <button
                           type="submit"
                           disabled={isSubmitting}
-                          className="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3.5 rounded-2xl transition-all active:scale-[0.98] shadow-lg shadow-amber-200 dark:shadow-none text-sm disabled:opacity-50"
+                          className="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3.5 rounded-[4px] transition-all active:scale-[0.98] shadow-sm shadow-amber-200 dark:shadow-none text-sm disabled:opacity-50"
                         >
                           {isSubmitting ? 'Mengirimkan Pendaftaran...' : 'Kirim Pendaftaran Reseller 🚀'}
                         </button>
@@ -307,7 +307,7 @@ export default function ResellerClient({
                 className="space-y-6"
               >
                 {/* Welcome Card */}
-                <div className="bg-amber-500/10 border-2 border-amber-300 dark:border-amber-700/40 rounded-3xl p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="bg-amber-500/10 border-2 border-amber-300 dark:border-amber-700/40 rounded-[4px] p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div>
                     <h2 className="text-xl font-bold text-amber-800 dark:text-amber-400 font-serif">
                       Selamat Datang, Reseller Resmi! 🍌
@@ -318,7 +318,7 @@ export default function ResellerClient({
                   </div>
                   <Link
                     href="/menu-spesial"
-                    className="bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-6 rounded-2xl transition-all text-center text-sm shadow-md shadow-amber-200 dark:shadow-none whitespace-nowrap"
+                    className="bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-6 rounded-[4px] transition-all text-center text-sm shadow-md shadow-amber-200 dark:shadow-none whitespace-nowrap"
                   >
                     Belanja Grosir 🛍️
                   </Link>
@@ -326,13 +326,13 @@ export default function ResellerClient({
 
                 {/* Stats */}
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800 p-5 shadow-xs">
+                  <div className="bg-white dark:bg-zinc-900 rounded-[4px] border border-zinc-100 dark:border-zinc-800 p-5 shadow-xs">
                     <span className="text-xs text-zinc-400 block mb-1">Total Pesanan</span>
                     <span className="text-2xl font-black text-zinc-800 dark:text-zinc-100">
                       {totalOrdersCount}
                     </span>
                   </div>
-                  <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800 p-5 shadow-xs">
+                  <div className="bg-white dark:bg-zinc-900 rounded-[4px] border border-zinc-100 dark:border-zinc-800 p-5 shadow-xs">
                     <span className="text-xs text-zinc-400 block mb-1">Total Belanja (Selesai)</span>
                     <span className="text-2xl font-black text-amber-600 dark:text-amber-400">
                       {formatPrice(totalSpent)}
@@ -341,7 +341,7 @@ export default function ResellerClient({
                 </div>
 
                 {/* Reseller Orders History */}
-                <div className="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-100 dark:border-zinc-800 p-6 shadow-sm">
+                <div className="bg-white dark:bg-zinc-900 rounded-[4px] border border-zinc-100 dark:border-zinc-800 p-6 shadow-sm">
                   <h3 className="font-serif text-lg font-bold text-zinc-800 dark:text-zinc-200 mb-4">
                     Riwayat Pembelian Grosir
                   </h3>
@@ -382,7 +382,7 @@ export default function ResellerClient({
                                   {formatPrice(order.totalPrice)}
                                 </td>
                                 <td className="py-3.5 text-right">
-                                  <span className={`px-2 py-1 rounded-full text-[10px] font-bold ${badge.style}`}>
+                                  <span className={`px-2 py-1 rounded-[4px] text-[10px] font-bold ${badge.style}`}>
                                     {badge.label}
                                   </span>
                                 </td>
@@ -398,7 +398,7 @@ export default function ResellerClient({
             )}
 
             {/* Price list grid for reference */}
-            <div className="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-100 dark:border-zinc-800 p-6 shadow-sm">
+            <div className="bg-white dark:bg-zinc-900 rounded-[4px] border border-zinc-100 dark:border-zinc-800 p-6 shadow-sm">
               <h3 className="font-serif text-lg font-bold text-zinc-800 dark:text-zinc-200 mb-2">
                 📋 Daftar Harga Grosir & Retail
               </h3>
@@ -414,7 +414,7 @@ export default function ResellerClient({
                     </h4>
                     <div className="grid grid-cols-3 gap-2 text-center text-xs">
                       {/* Kembung */}
-                      <div className="bg-zinc-50 dark:bg-zinc-800/30 p-2.5 rounded-xl border border-zinc-100/50 dark:border-zinc-800/20">
+                      <div className="bg-zinc-50 dark:bg-zinc-800/30 p-2.5 rounded-[4px] border border-zinc-100/50 dark:border-zinc-800/20">
                         <span className="font-bold text-zinc-400 block text-[9px] uppercase tracking-wider mb-1">Base Kembung</span>
                         <span className="text-[10px] text-zinc-500 line-through block">{formatPrice(prod.priceKembung)}</span>
                         <span className="font-bold text-amber-600 dark:text-amber-400 block">{formatPrice(prod.wholesaleKembung)}</span>
@@ -426,7 +426,7 @@ export default function ResellerClient({
                       </div>
 
                       {/* Lumpia */}
-                      <div className="bg-zinc-50 dark:bg-zinc-800/30 p-2.5 rounded-xl border border-zinc-100/50 dark:border-zinc-800/20">
+                      <div className="bg-zinc-50 dark:bg-zinc-800/30 p-2.5 rounded-[4px] border border-zinc-100/50 dark:border-zinc-800/20">
                         <span className="font-bold text-zinc-400 block text-[9px] uppercase tracking-wider mb-1">Base Lumpia</span>
                         <span className="text-[10px] text-zinc-500 line-through block">{formatPrice(prod.priceLumpia)}</span>
                         <span className="font-bold text-amber-600 dark:text-amber-400 block">{formatPrice(prod.wholesaleLumpia)}</span>
@@ -438,7 +438,7 @@ export default function ResellerClient({
                       </div>
 
                       {/* Krispy */}
-                      <div className="bg-zinc-50 dark:bg-zinc-800/30 p-2.5 rounded-xl border border-zinc-100/50 dark:border-zinc-800/20">
+                      <div className="bg-zinc-50 dark:bg-zinc-800/30 p-2.5 rounded-[4px] border border-zinc-100/50 dark:border-zinc-800/20">
                         <span className="font-bold text-zinc-400 block text-[9px] uppercase tracking-wider mb-1">Base Krispy</span>
                         <span className="text-[10px] text-zinc-500 line-through block">{formatPrice(prod.priceKrispy)}</span>
                         <span className="font-bold text-amber-600 dark:text-amber-400 block">{formatPrice(prod.wholesaleKrispy)}</span>
@@ -456,7 +456,7 @@ export default function ResellerClient({
           </div>
 
           {/* Right panel: Benefits list */}
-          <aside className="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-100 dark:border-zinc-800 p-6 shadow-sm space-y-6">
+          <aside className="bg-white dark:bg-zinc-900 rounded-[4px] border border-zinc-100 dark:border-zinc-800 p-6 shadow-sm space-y-6">
             <h3 className="font-serif text-lg font-bold text-zinc-800 dark:text-zinc-200">
               💎 Keuntungan Reseller PVJ
             </h3>

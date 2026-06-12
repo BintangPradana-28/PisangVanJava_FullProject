@@ -85,8 +85,8 @@ export default function ReferralPage() {
       </div>
 
       {/* Box Kode Sendiri */}
-      <div className="bg-gradient-to-r from-[#D4802A] to-[#b56d24] rounded-3xl p-6 md:p-8 text-white shadow-lg relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4"></div>
+      <div className="bg-gradient-to-r from-[#D4802A] to-[#b56d24] rounded-[4px] p-6 md:p-8 text-white shadow-sm relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-[4px] blur-3xl -translate-y-1/2 translate-x-1/4"></div>
         <div className="relative flex flex-col md:flex-row justify-between items-center gap-6">
           <div>
             <h2 className="text-xl font-bold">Kode Referral Anda</h2>
@@ -95,11 +95,11 @@ export default function ReferralPage() {
             </p>
           </div>
           {stats?.myCode ? (
-            <div className="flex items-center gap-3 bg-white/20 p-2 pl-6 rounded-2xl backdrop-blur-md border border-white/20 shadow-inner">
+            <div className="flex items-center gap-3 bg-white/20 p-2 pl-6 rounded-[4px] backdrop-blur-md border border-white/20 shadow-inner">
               <span className="font-mono text-2xl font-bold tracking-widest">{stats.myCode}</span>
               <button
                 onClick={copyToClipboard}
-                className="p-3 bg-white text-[#D4802A] rounded-xl hover:bg-orange-50 active:scale-95 transition-all shadow-sm"
+                className="p-3 bg-white text-[#D4802A] rounded-[4px] hover:bg-orange-50 active:scale-95 transition-all shadow-sm"
               >
                 <Copy className="w-5 h-5" />
               </button>
@@ -107,7 +107,7 @@ export default function ReferralPage() {
           ) : (
             <button
               onClick={handleGenerateCode}
-              className="px-8 py-3.5 bg-white text-[#D4802A] font-bold rounded-full hover:bg-orange-50 active:scale-95 transition-all shadow-md"
+              className="px-8 py-3.5 bg-white text-[#D4802A] font-bold rounded-[4px] hover:bg-orange-50 active:scale-95 transition-all shadow-md"
             >
               Buat Kode Saya
             </button>
@@ -117,8 +117,8 @@ export default function ReferralPage() {
 
       {/* Statistik */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="p-6 bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/80 rounded-3xl flex items-center gap-5 shadow-sm">
-          <div className="p-4 bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400 rounded-2xl shrink-0">
+        <div className="p-6 bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/80 rounded-[4px] flex items-center gap-5 shadow-sm">
+          <div className="p-4 bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400 rounded-[4px] shrink-0">
             <Users className="w-7 h-7" />
           </div>
           <div>
@@ -128,8 +128,8 @@ export default function ReferralPage() {
             </p>
           </div>
         </div>
-        <div className="p-6 bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/80 rounded-3xl flex items-center gap-5 shadow-sm">
-          <div className="p-4 bg-green-50 text-green-600 dark:bg-green-900/20 dark:text-green-400 rounded-2xl shrink-0">
+        <div className="p-6 bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/80 rounded-[4px] flex items-center gap-5 shadow-sm">
+          <div className="p-4 bg-green-50 text-green-600 dark:bg-green-900/20 dark:text-green-400 rounded-[4px] shrink-0">
             <CheckCircle className="w-7 h-7" />
           </div>
           <div>
@@ -144,7 +144,7 @@ export default function ReferralPage() {
       </div>
 
       {/* Box Input Kode Teman */}
-      <div className="bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/80 rounded-3xl p-6 md:p-8 shadow-sm">
+      <div className="bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/80 rounded-[4px] p-6 md:p-8 shadow-sm">
         <h3 className="font-bold text-lg text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
           Punya Kode Undangan?
         </h3>
@@ -158,12 +158,12 @@ export default function ReferralPage() {
             value={referralInput}
             onChange={(e) => setReferralInput(e.target.value.toUpperCase())}
             placeholder="CONTOH: PVJ-X9A2"
-            className="flex-1 px-5 py-3.5 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-transparent focus:ring-2 focus:ring-[#D4802A]/50 outline-none transition-all font-mono tracking-widest text-lg"
+            className="flex-1 px-5 py-3.5 rounded-[4px] border border-zinc-200 dark:border-zinc-800 bg-transparent focus:ring-2 focus:ring-[#D4802A]/50 outline-none transition-all font-mono tracking-widest text-lg"
           />
           <button
             onClick={handleApplyCode}
             disabled={isApplying || !referralInput}
-            className="px-8 py-3.5 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-bold rounded-2xl hover:bg-zinc-800 dark:hover:bg-zinc-200 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed min-w-[140px] flex justify-center items-center"
+            className="px-8 py-3.5 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 font-bold rounded-[4px] hover:bg-zinc-800 dark:hover:bg-zinc-200 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed min-w-[140px] flex justify-center items-center"
           >
             {isApplying ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Terapkan'}
           </button>

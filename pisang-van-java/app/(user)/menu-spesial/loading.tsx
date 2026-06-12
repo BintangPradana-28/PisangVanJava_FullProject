@@ -21,21 +21,21 @@ export default function Loading() {
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <div
                 key={i}
-                className="relative rounded-3xl overflow-hidden flex flex-col bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800"
+                className="relative rounded-[4px] overflow-hidden flex flex-col bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800"
               >
                 {/* Image Skeleton (16:9) */}
                 <div className="w-full aspect-[16/9] bg-zinc-200 dark:bg-zinc-800 skeleton-shimmer" />
 
                 {/* Content Skeleton */}
                 <div className="p-6 flex flex-col items-center text-center flex-grow">
-                  <div className="w-2/3 h-6 rounded-full bg-zinc-200 dark:bg-zinc-800 skeleton-shimmer mb-4" />
-                  <div className="w-full h-4 rounded-full bg-zinc-200 dark:bg-zinc-800 skeleton-shimmer mb-2" />
-                  <div className="w-4/5 h-4 rounded-full bg-zinc-200 dark:bg-zinc-800 skeleton-shimmer mb-6" />
+                  <div className="w-2/3 h-6 rounded-[4px] bg-zinc-200 dark:bg-zinc-800 skeleton-shimmer mb-4" />
+                  <div className="w-full h-4 rounded-[4px] bg-zinc-200 dark:bg-zinc-800 skeleton-shimmer mb-2" />
+                  <div className="w-4/5 h-4 rounded-[4px] bg-zinc-200 dark:bg-zinc-800 skeleton-shimmer mb-6" />
 
                   <div className="w-full border-t border-zinc-200 dark:border-zinc-800 pt-4 flex flex-col items-center gap-3">
-                    <div className="w-1/2 h-4 rounded-full bg-zinc-200 dark:bg-zinc-800 skeleton-shimmer mb-1" />
-                    <div className="w-1/3 h-6 rounded-full bg-zinc-200 dark:bg-zinc-800 skeleton-shimmer mb-3" />
-                    <div className="w-3/4 h-10 rounded-full bg-zinc-200 dark:bg-zinc-800 skeleton-shimmer" />
+                    <div className="w-1/2 h-4 rounded-[4px] bg-zinc-200 dark:bg-zinc-800 skeleton-shimmer mb-1" />
+                    <div className="w-1/3 h-6 rounded-[4px] bg-zinc-200 dark:bg-zinc-800 skeleton-shimmer mb-3" />
+                    <div className="w-3/4 h-10 rounded-[4px] bg-zinc-200 dark:bg-zinc-800 skeleton-shimmer" />
                   </div>
                 </div>
               </div>

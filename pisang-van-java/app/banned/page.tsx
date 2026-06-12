@@ -5,8 +5,8 @@ import { Button } from '@/components/ui/button'
 export default function BannedPage() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-neutral-900 text-neutral-100 p-4">
-      <div className="max-w-md w-full bg-neutral-800 rounded-2xl p-8 shadow-xl text-center border border-red-900/50">
-        <div className="w-16 h-16 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
+      <div className="max-w-md w-full bg-neutral-800 rounded-[4px] p-8 shadow-sm text-center border border-red-900/50">
+        <div className="w-16 h-16 bg-red-500/10 text-red-500 rounded-[4px] flex items-center justify-center mx-auto mb-6">
           <ShieldAlert className="w-8 h-8" />
         </div>
         <h1 className="text-2xl font-bold mb-4 text-white">Akses Ditolak</h1>

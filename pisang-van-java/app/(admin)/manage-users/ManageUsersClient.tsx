@@ -134,19 +134,19 @@ export default function ManageUsersClient() {
       <div className="flex gap-4">
         <button
           onClick={() => setFilterDeleted(false)}
-          className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${!filterDeleted ? 'bg-brown-700 text-white' : 'bg-white text-brown-700 border border-brown-200'}`}
+          className={`px-4 py-2 rounded-[4px] text-sm font-bold transition-all ${!filterDeleted ? 'bg-brown-700 text-white' : 'bg-white text-brown-700 border border-brown-200'}`}
         >
           Pengguna Aktif
         </button>
         <button
           onClick={() => setFilterDeleted(true)}
-          className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${filterDeleted ? 'bg-red-600 text-white' : 'bg-white text-red-600 border border-red-200'}`}
+          className={`px-4 py-2 rounded-[4px] text-sm font-bold transition-all ${filterDeleted ? 'bg-red-600 text-white' : 'bg-white text-red-600 border border-red-200'}`}
         >
           Pengguna Terhapus
         </button>
       </div>
 
-      <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-cream-200">
+      <div className="bg-white rounded-[4px] shadow-sm overflow-hidden border border-cream-200">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse whitespace-nowrap">
             <thead>
@@ -189,7 +189,7 @@ export default function ManageUsersClient() {
                     <div className="flex flex-col items-center gap-2">
                       <div className="flex items-center gap-2">
                         <span
-                          className={`px-3 py-1 rounded-full text-[10px] font-bold ${
+                          className={`px-3 py-1 rounded-[4px] text-[10px] font-bold ${
                             user.role === 'ADMIN'
                               ? 'bg-red-100 text-red-700'
                               : user.role === 'RESELLER'
@@ -200,7 +200,7 @@ export default function ManageUsersClient() {
                           {user.role}
                         </span>
                         {user.isBanned && (
-                          <span className="px-2 py-1 rounded-full text-[10px] font-bold bg-black text-white">
+                          <span className="px-2 py-1 rounded-[4px] text-[10px] font-bold bg-black text-white">
                             BANNED
                           </span>
                         )}
@@ -247,7 +247,7 @@ export default function ManageUsersClient() {
       {/* Modal Edit Coin */}
       {editingCoinUser && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl">
+          <div className="bg-white rounded-[4px] p-6 w-full max-w-md shadow-sm">
             <h3 className="font-bold text-xl mb-1 text-brown-900">Sesuaikan Koin Pisang</h3>
             <p className="text-sm text-gray-500 mb-6">User: {editingCoinUser.email}</p>
 
@@ -260,7 +260,7 @@ export default function ManageUsersClient() {
                   type="number"
                   value={coinAdjustment}
                   onChange={(e) => setCoinAdjustment(Number(e.target.value))}
-                  className="w-full border rounded-xl px-4 py-3 focus:ring-2 focus:ring-orange-500 outline-none"
+                  className="w-full border rounded-[4px] px-4 py-3 focus:ring-2 focus:ring-orange-500 outline-none"
                   required
                 />
               </div>
@@ -273,7 +273,7 @@ export default function ManageUsersClient() {
                   value={coinReason}
                   onChange={(e) => setCoinReason(e.target.value)}
                   placeholder="Misal: Kompensasi pesanan lambat"
-                  className="w-full border rounded-xl px-4 py-3 focus:ring-2 focus:ring-orange-500 outline-none"
+                  className="w-full border rounded-[4px] px-4 py-3 focus:ring-2 focus:ring-orange-500 outline-none"
                   required
                   minLength={5}
                 />
@@ -282,14 +282,14 @@ export default function ManageUsersClient() {
                 <button
                   type="button"
                   onClick={() => setEditingCoinUser(null)}
-                  className="flex-1 py-3 bg-gray-100 text-gray-700 font-bold rounded-xl"
+                  className="flex-1 py-3 bg-gray-100 text-gray-700 font-bold rounded-[4px]"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
                   disabled={coinMutation.isPending}
-                  className="flex-1 py-3 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-xl disabled:opacity-50"
+                  className="flex-1 py-3 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-[4px] disabled:opacity-50"
                 >
                   {coinMutation.isPending ? 'Menyimpan...' : 'Simpan Koin'}
                 </button>

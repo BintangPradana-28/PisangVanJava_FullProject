@@ -169,7 +169,7 @@ export default function ManageVouchersClient() {
         </div>
         <button
           onClick={() => setIsModalOpen(true)}
-          className="px-4 py-2 bg-[#2E7D32] hover:bg-[#236026] text-white rounded-xl text-sm font-semibold transition-colors flex items-center gap-2"
+          className="px-4 py-2 bg-[#2E7D32] hover:bg-[#236026] text-white rounded-[4px] text-sm font-semibold transition-colors flex items-center gap-2"
         >
           <span>+</span> Tambah Voucher
         </button>
@@ -177,20 +177,20 @@ export default function ManageVouchersClient() {
 
       {isLoading ? (
         <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brown"></div>
+          <div className="animate-spin rounded-[4px] h-8 w-8 border-b-2 border-brown"></div>
         </div>
       ) : vouchers.length === 0 ? (
-        <div className="bg-white p-8 rounded-2xl border border-zinc-200 text-center">
+        <div className="bg-white p-8 rounded-[4px] border border-zinc-200 text-center">
           <p className="text-zinc-500 mb-4">Belum ada voucher yang dibuat.</p>
           <button
             onClick={() => setIsModalOpen(true)}
-            className="px-4 py-2 bg-secondary/10 hover:bg-secondary/20 text-secondary rounded-xl text-sm font-semibold transition-colors"
+            className="px-4 py-2 bg-secondary/10 hover:bg-secondary/20 text-secondary rounded-[4px] text-sm font-semibold transition-colors"
           >
             Buat Voucher Pertama
           </button>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl border border-zinc-200 overflow-hidden">
+        <div className="bg-white rounded-[4px] border border-zinc-200 overflow-hidden">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-zinc-50 border-b border-zinc-200">
@@ -242,7 +242,7 @@ export default function ManageVouchersClient() {
                       {v.minPurchase.toLocaleString('id-ID')}
                     </div>
                     <span
-                      className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                      className={`inline-flex items-center px-2 py-0.5 rounded-[4px] text-xs font-medium ${
                         v.applicableTo === 'ALL'
                           ? 'bg-blue-100 text-blue-800'
                           : v.applicableTo === 'RESELLER'
@@ -274,12 +274,12 @@ export default function ManageVouchersClient() {
                   <td className="p-4">
                     <button
                       onClick={() => handleToggleStatus(v.id, v.isActive)}
-                      className={`relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                      className={`relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-[4px] border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
                         v.isActive ? 'bg-[#2E7D32]' : 'bg-zinc-200'
                       }`}
                     >
                       <span
-                        className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                        className={`pointer-events-none inline-block h-4 w-4 transform rounded-[4px] bg-white shadow ring-0 transition duration-200 ease-in-out ${
                           v.isActive ? 'translate-x-4' : 'translate-x-0'
                         }`}
                       />
@@ -315,7 +315,7 @@ export default function ManageVouchersClient() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-white rounded-2xl shadow-xl max-w-lg w-full relative z-10 max-h-[90vh] overflow-y-auto"
+              className="bg-white rounded-[4px] shadow-sm max-w-lg w-full relative z-10 max-h-[90vh] overflow-y-auto"
             >
               <div className="p-6 border-b border-zinc-100 flex justify-between items-center sticky top-0 bg-white z-20">
                 <h3 className="text-lg font-bold font-serif text-brown">Buat Voucher Baru</h3>
@@ -340,7 +340,7 @@ export default function ManageVouchersClient() {
                       setFormData({ ...formData, code: e.target.value.toUpperCase() })
                     }
                     placeholder="Contoh: PROMO50"
-                    className="w-full p-3 border border-zinc-200 rounded-xl font-mono uppercase"
+                    className="w-full p-3 border border-zinc-200 rounded-[4px] font-mono uppercase"
                   />
                 </div>
 
@@ -352,7 +352,7 @@ export default function ManageVouchersClient() {
                     <select
                       value={formData.discountType}
                       onChange={(e) => setFormData({ ...formData, discountType: e.target.value })}
-                      className="w-full p-3 border border-zinc-200 rounded-xl"
+                      className="w-full p-3 border border-zinc-200 rounded-[4px]"
                     >
                       <option value="PERCENTAGE">Persentase (%)</option>
                       <option value="FIXED">Nominal (Rp)</option>
@@ -371,7 +371,7 @@ export default function ManageVouchersClient() {
                       placeholder={
                         formData.discountType === 'PERCENTAGE' ? 'Contoh: 10' : 'Contoh: 15000'
                       }
-                      className="w-full p-3 border border-zinc-200 rounded-xl"
+                      className="w-full p-3 border border-zinc-200 rounded-[4px]"
                     />
                   </div>
                 </div>
@@ -386,7 +386,7 @@ export default function ManageVouchersClient() {
                       min="0"
                       value={formData.minPurchase}
                       onChange={(e) => setFormData({ ...formData, minPurchase: e.target.value })}
-                      className="w-full p-3 border border-zinc-200 rounded-xl"
+                      className="w-full p-3 border border-zinc-200 rounded-[4px]"
                     />
                   </div>
                   <div>
@@ -399,7 +399,7 @@ export default function ManageVouchersClient() {
                       value={formData.maxDiscount}
                       onChange={(e) => setFormData({ ...formData, maxDiscount: e.target.value })}
                       placeholder="Kosongkan jika tak terbatas"
-                      className="w-full p-3 border border-zinc-200 rounded-xl"
+                      className="w-full p-3 border border-zinc-200 rounded-[4px]"
                       disabled={formData.discountType === 'FIXED'}
                     />
                   </div>
@@ -415,7 +415,7 @@ export default function ManageVouchersClient() {
                       required
                       value={formData.startDate}
                       onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                      className="w-full p-3 border border-zinc-200 rounded-xl"
+                      className="w-full p-3 border border-zinc-200 rounded-[4px]"
                     />
                   </div>
                   <div>
@@ -427,7 +427,7 @@ export default function ManageVouchersClient() {
                       required
                       value={formData.endDate}
                       onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                      className="w-full p-3 border border-zinc-200 rounded-xl"
+                      className="w-full p-3 border border-zinc-200 rounded-[4px]"
                     />
                   </div>
                 </div>
@@ -443,7 +443,7 @@ export default function ManageVouchersClient() {
                       value={formData.usageLimit}
                       onChange={(e) => setFormData({ ...formData, usageLimit: e.target.value })}
                       placeholder="0 = Tak terbatas"
-                      className="w-full p-3 border border-zinc-200 rounded-xl"
+                      className="w-full p-3 border border-zinc-200 rounded-[4px]"
                     />
                   </div>
                   <div>
@@ -453,7 +453,7 @@ export default function ManageVouchersClient() {
                     <select
                       value={formData.applicableTo}
                       onChange={(e) => setFormData({ ...formData, applicableTo: e.target.value })}
-                      className="w-full p-3 border border-zinc-200 rounded-xl"
+                      className="w-full p-3 border border-zinc-200 rounded-[4px]"
                     >
                       <option value="ALL">Semua Pelanggan</option>
                       <option value="CUSTOMER">Customer Biasa Saja</option>
@@ -466,14 +466,14 @@ export default function ManageVouchersClient() {
                   <button
                     type="button"
                     onClick={() => setIsModalOpen(false)}
-                    className="px-5 py-2.5 text-zinc-600 font-medium hover:bg-zinc-100 rounded-xl transition-colors"
+                    className="px-5 py-2.5 text-zinc-600 font-medium hover:bg-zinc-100 rounded-[4px] transition-colors"
                   >
                     Batal
                   </button>
                   <button
                     type="submit"
                     disabled={createMutation.isPending}
-                    className="px-5 py-2.5 bg-brown text-white font-medium hover:bg-brown/90 rounded-xl transition-colors disabled:opacity-50"
+                    className="px-5 py-2.5 bg-brown text-white font-medium hover:bg-brown/90 rounded-[4px] transition-colors disabled:opacity-50"
                   >
                     {createMutation.isPending ? 'Menyimpan...' : 'Simpan Voucher'}
                   </button>

@@ -89,7 +89,7 @@ export default function ReviewSection({ variantId }: ReviewSectionProps) {
         <StarRating variantId={variantId} existingRating={myRating} onSubmit={handleSubmit} />
       )}
       {status === 'unauthenticated' && (
-        <div className="bg-orange-50 border border-amber-100 rounded-2xl p-4 text-sm text-neutral-600 text-center">
+        <div className="bg-orange-50 border border-amber-100 rounded-[4px] p-4 text-sm text-neutral-600 text-center">
           <Link href="/member-login" className="text-amber-600 font-semibold hover:underline">
             Masuk / Daftar
           </Link>{' '}
@@ -106,7 +106,7 @@ export default function ReviewSection({ variantId }: ReviewSectionProps) {
               setFilterRating(null)
               setFilterPhoto(false)
             }}
-            className={`px-4 py-1.5 rounded-full text-sm font-semibold border transition-colors ${!filterRating && !filterPhoto ? 'bg-amber-100 border-amber-300 text-amber-800' : 'bg-white border-zinc-200 text-neutral-600 hover:bg-neutral-50'}`}
+            className={`px-4 py-1.5 rounded-[4px] text-sm font-semibold border transition-colors ${!filterRating && !filterPhoto ? 'bg-amber-100 border-amber-300 text-amber-800' : 'bg-white border-zinc-200 text-neutral-600 hover:bg-neutral-50'}`}
           >
             Semua
           </button>
@@ -115,7 +115,7 @@ export default function ReviewSection({ variantId }: ReviewSectionProps) {
               setFilterRating(null)
               setFilterPhoto(true)
             }}
-            className={`px-4 py-1.5 rounded-full text-sm font-semibold border transition-colors ${filterPhoto ? 'bg-amber-100 border-amber-300 text-amber-800' : 'bg-white border-zinc-200 text-neutral-600 hover:bg-neutral-50'}`}
+            className={`px-4 py-1.5 rounded-[4px] text-sm font-semibold border transition-colors ${filterPhoto ? 'bg-amber-100 border-amber-300 text-amber-800' : 'bg-white border-zinc-200 text-neutral-600 hover:bg-neutral-50'}`}
           >
             📸 Dengan Foto
           </button>
@@ -126,7 +126,7 @@ export default function ReviewSection({ variantId }: ReviewSectionProps) {
                 setFilterRating(star)
                 setFilterPhoto(false)
               }}
-              className={`px-4 py-1.5 rounded-full text-sm font-semibold border transition-colors flex items-center gap-1 ${filterRating === star ? 'bg-amber-100 border-amber-300 text-amber-800' : 'bg-white border-zinc-200 text-neutral-600 hover:bg-neutral-50'}`}
+              className={`px-4 py-1.5 rounded-[4px] text-sm font-semibold border transition-colors flex items-center gap-1 ${filterRating === star ? 'bg-amber-100 border-amber-300 text-amber-800' : 'bg-white border-zinc-200 text-neutral-600 hover:bg-neutral-50'}`}
             >
               ⭐ {star}
             </button>

@@ -34,8 +34,8 @@ export default function CheckoutError({ error, reset }: CheckoutErrorProps) {
 
   return (
     <div className="min-h-screen bg-[#FAF7F2] flex items-center justify-center px-4">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center">
-        <div className="w-16 h-16 bg-amber-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
+      <div className="w-full max-w-md bg-white rounded-[4px] shadow-sm border border-gray-100 p-8 text-center">
+        <div className="w-16 h-16 bg-amber-50 rounded-[4px] flex items-center justify-center mx-auto mb-6">
           <ShoppingCart className="w-8 h-8 text-amber-500" />
         </div>
 
@@ -55,7 +55,7 @@ export default function CheckoutError({ error, reset }: CheckoutErrorProps) {
         <div className="flex flex-col gap-3">
           <Button
             onClick={handleRecover}
-            className="w-full bg-amber-500 hover:bg-amber-600 text-white rounded-full py-3 font-medium flex items-center justify-center gap-2"
+            className="w-full bg-amber-500 hover:bg-amber-600 text-white rounded-[4px] py-3 font-medium flex items-center justify-center gap-2"
           >
             <RefreshCw className="w-4 h-4" />
             Coba Lagi
@@ -64,7 +64,7 @@ export default function CheckoutError({ error, reset }: CheckoutErrorProps) {
           <Button
             asChild
             variant="outline"
-            className="w-full rounded-full py-3 font-medium flex items-center justify-center gap-2 border-gray-200 text-gray-700"
+            className="w-full rounded-[4px] py-3 font-medium flex items-center justify-center gap-2 border-gray-200 text-gray-700"
           >
             <Link href="/keranjang">
               <ArrowLeft className="w-4 h-4" />

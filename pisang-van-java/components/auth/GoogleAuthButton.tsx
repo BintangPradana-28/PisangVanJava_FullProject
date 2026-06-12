@@ -48,7 +48,7 @@ export default function GoogleAuthButton({ label }: GoogleAuthButtonProps) {
       type="button"
       onClick={handleGoogleLogin}
       disabled={isLoading}
-      className="w-full py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-3 transition-all active:scale-[0.98] border bg-[var(--surface-custom)] border-[var(--border-custom)] text-[var(--text-custom)] hover:border-amber-brand disabled:opacity-70 shadow-sm"
+      className="w-full py-3 rounded-[4px] text-sm font-semibold flex items-center justify-center gap-3 transition-all active:scale-[0.98] border bg-[var(--surface-custom)] border-[var(--border-custom)] text-[var(--text-custom)] hover:border-amber-brand disabled:opacity-70 shadow-sm"
     >
       {isLoading ? (
         <svg

@@ -106,7 +106,7 @@ export default function KeranjangPage() {
             animate={{ opacity: 1, y: 0 }}
             className="text-center py-20"
           >
-            <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-amber-100 dark:bg-amber-900/20 flex items-center justify-center">
+            <div className="w-24 h-24 mx-auto mb-6 rounded-[4px] bg-amber-100 dark:bg-amber-900/20 flex items-center justify-center">
               <ShoppingBag className="h-10 w-10 text-amber-500" />
             </div>
             <h2 className="font-serif text-xl font-bold text-zinc-800 dark:text-zinc-200 mb-2">
@@ -117,7 +117,7 @@ export default function KeranjangPage() {
             </p>
             <Link
               href="/menu-spesial"
-              className="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-8 rounded-2xl transition-all active:scale-95 shadow-md shadow-amber-200"
+              className="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-8 rounded-[4px] transition-all active:scale-95 shadow-md shadow-amber-200"
             >
               🍌 Lihat Menu
             </Link>
@@ -135,7 +135,7 @@ export default function KeranjangPage() {
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: 20, height: 0 }}
                     transition={{ duration: 0.2 }}
-                    className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800 p-4 sm:p-5 shadow-sm"
+                    className="bg-white dark:bg-zinc-900 rounded-[4px] border border-zinc-100 dark:border-zinc-800 p-4 sm:p-5 shadow-sm"
                   >
                     <div className="flex items-start gap-4">
                       {/* Info */}
@@ -204,7 +204,7 @@ export default function KeranjangPage() {
             </div>
 
             {/* Summary + CTA */}
-            <div className="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-100 dark:border-zinc-800 shadow-sm p-6 sticky bottom-4">
+            <div className="bg-white dark:bg-zinc-900 rounded-[4px] border border-zinc-100 dark:border-zinc-800 shadow-sm p-6 sticky bottom-4">
               <div className="flex justify-between items-center mb-4">
                 <span className="text-sm text-zinc-500">Subtotal ({cartCount} item)</span>
                 <span className="font-serif text-2xl font-bold text-amber-600 dark:text-amber-400">
@@ -214,13 +214,13 @@ export default function KeranjangPage() {
               <div className="space-y-2">
                 <button
                   onClick={() => router.push('/checkout')}
-                  className="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3.5 rounded-2xl transition-all active:scale-[0.98] shadow-lg shadow-amber-200 dark:shadow-amber-900/30 text-sm"
+                  className="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3.5 rounded-[4px] transition-all active:scale-[0.98] shadow-sm shadow-amber-200 dark:shadow-amber-900/30 text-sm"
                 >
                   Lanjut ke Checkout →
                 </button>
                 <button
                   onClick={handleWhatsAppOrder}
-                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-2xl transition-all active:scale-[0.98] shadow-lg shadow-emerald-200 dark:shadow-emerald-900/30 text-sm flex items-center justify-center gap-2"
+                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-[4px] transition-all active:scale-[0.98] shadow-sm shadow-emerald-200 dark:shadow-emerald-900/30 text-sm flex items-center justify-center gap-2"
                 >
                   <span>💬</span> Pesan via WhatsApp (Tanpa Form)
                 </button>

@@ -9,7 +9,7 @@ export default function TermsOfServicePage() {
   return (
     <div className="min-h-screen bg-cream-50 py-24 sm:py-32">
       <div className="max-w-[800px] mx-auto px-6">
-        <div className="bg-white rounded-3xl p-8 sm:p-12 shadow-sm border border-cream-200">
+        <div className="bg-white rounded-[4px] p-8 sm:p-12 shadow-sm border border-cream-200">
           <div className="mb-12 border-b border-cream-200 pb-8">
             <h1 className="font-serif text-3xl sm:text-4xl font-bold text-brown-700 mb-4">
               Syarat & Ketentuan
@@ -103,7 +103,7 @@ export default function TermsOfServicePage() {
               Jika Anda memiliki keluhan atau pertanyaan terkait pesanan Anda, tim layanan pelanggan
               kami siap membantu Anda di:
             </p>
-            <div className="bg-cream-100 p-6 rounded-xl mt-4">
+            <div className="bg-cream-100 p-6 rounded-[4px] mt-4">
               <p className="font-bold">Pisang Goreng Van Java</p>
               <p>WhatsApp: +62 813-1216-7554</p>
               <p>Email: support@pisanggorengvanjava.com</p>

@@ -51,7 +51,7 @@ export default function MapPicker({ position, setPosition, setAddressName }: Map
 
   if (!mounted) {
     return (
-      <div className="w-full h-[300px] bg-zinc-100 dark:bg-zinc-800 animate-pulse rounded-xl flex items-center justify-center text-zinc-400">
+      <div className="w-full h-[300px] bg-zinc-100 dark:bg-zinc-800 animate-pulse rounded-[4px] flex items-center justify-center text-zinc-400">
         Loading Map...
       </div>
     )
@@ -60,7 +60,7 @@ export default function MapPicker({ position, setPosition, setAddressName }: Map
   const defaultCenter: [number, number] = [-6.914744, 107.60981] // Bandung center
 
   return (
-    <div className="w-full h-[300px] rounded-xl overflow-hidden shadow-sm z-0 relative">
+    <div className="w-full h-[300px] rounded-[4px] overflow-hidden shadow-sm z-0 relative">
       <MapContainer
         center={position || defaultCenter}
         zoom={13}
@@ -77,7 +77,7 @@ export default function MapPicker({ position, setPosition, setAddressName }: Map
           setAddressName={setAddressName}
         />
       </MapContainer>
-      <div className="absolute top-2 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur dark:bg-zinc-900/90 px-4 py-2 rounded-full text-xs font-semibold shadow z-[400] pointer-events-none text-zinc-700 dark:text-zinc-200">
+      <div className="absolute top-2 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur dark:bg-zinc-900/90 px-4 py-2 rounded-[4px] text-xs font-semibold shadow z-[400] pointer-events-none text-zinc-700 dark:text-zinc-200">
         Klik peta untuk memilih lokasi
       </div>
     </div>

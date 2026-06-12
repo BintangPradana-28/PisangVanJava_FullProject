@@ -185,10 +185,10 @@ export default function QuickViewModal({
     >
       <Drawer.Portal>
         <Drawer.Overlay className="fixed inset-0 z-50 bg-black/40 backdrop-blur-[2px] animate-fade-in" />
-        <Drawer.Content className="fixed inset-x-0 bottom-0 z-50 flex flex-col w-full max-w-lg mx-auto h-[70vh] md:h-auto md:max-h-[85vh] md:top-0 md:bottom-0 md:my-auto md:!transform-none bg-white dark:bg-zinc-900 rounded-t-3xl md:rounded-3xl overflow-hidden outline-none shadow-[0_-10px_40px_rgba(0,0,0,0.15)] md:animate-in md:fade-in md:zoom-in-95">
+        <Drawer.Content className="fixed inset-x-0 bottom-0 z-50 flex flex-col w-full max-w-lg mx-auto h-[70vh] md:h-auto md:max-h-[85vh] md:top-0 md:bottom-0 md:my-auto md:!transform-none bg-white dark:bg-zinc-900 rounded-t-3xl md:rounded-[4px] overflow-hidden outline-none shadow-[0_-10px_40px_rgba(0,0,0,0.15)] md:animate-in md:fade-in md:zoom-in-95">
           {/* Drag Handle — mobile bottom sheet indicator */}
           <div className="md:hidden flex justify-center pt-3 pb-2 shrink-0 bg-white dark:bg-zinc-900 rounded-t-3xl">
-            <div className="w-12 h-1.5 rounded-full bg-zinc-300 dark:bg-zinc-600" />
+            <div className="w-12 h-1.5 rounded-[4px] bg-zinc-300 dark:bg-zinc-600" />
           </div>
 
           {/* Header Modal (Text Only - 60% viewport design) */}
@@ -204,7 +204,7 @@ export default function QuickViewModal({
             </div>
             <button
               onClick={onClose}
-              className="w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 text-zinc-600 dark:text-zinc-300 flex items-center justify-center transition-colors focus:outline-none shrink-0 ml-4 mt-1"
+              className="w-8 h-8 rounded-[4px] bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 text-zinc-600 dark:text-zinc-300 flex items-center justify-center transition-colors focus:outline-none shrink-0 ml-4 mt-1"
               aria-label="Tutup modal"
             >
               ✕
@@ -230,7 +230,7 @@ export default function QuickViewModal({
                     <button
                       key={type}
                       onClick={() => setSelectedType(type)}
-                      className={`py-2.5 px-2 rounded-xl border-2 text-sm font-bold transition-all ${
+                      className={`py-2.5 px-2 rounded-[4px] border-2 text-sm font-bold transition-all ${
                         isSelected
                           ? 'border-[#D4802A] bg-[#D4802A]/10 text-[#D4802A]'
                           : 'border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:border-zinc-300'
@@ -257,7 +257,7 @@ export default function QuickViewModal({
                     return (
                       <label
                         key={topping.id}
-                        className={`flex flex-col p-3.5 min-h-[44px] min-w-[44px] border-2 rounded-xl cursor-pointer transition-all select-none active:scale-[0.97] ${
+                        className={`flex flex-col p-3.5 min-h-[44px] min-w-[44px] border-2 rounded-[4px] cursor-pointer transition-all select-none active:scale-[0.97] ${
                           isSelected
                             ? 'border-[#D4802A] bg-[#D4802A]/5'
                             : 'border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-800/50'
@@ -269,7 +269,7 @@ export default function QuickViewModal({
                             name="topping"
                             checked={isSelected}
                             onChange={() => handleToppingToggle(topping.id)}
-                            className="accent-[#D4802A] w-5 h-5 rounded-full cursor-pointer shrink-0"
+                            className="accent-[#D4802A] w-5 h-5 rounded-[4px] cursor-pointer shrink-0"
                           />
                           <span className="text-sm font-bold text-zinc-800 dark:text-zinc-200 truncate flex items-center gap-1.5">
                             ⭐ {topping.emoji} {topping.name}{' '}
@@ -302,7 +302,7 @@ export default function QuickViewModal({
                           return (
                             <label
                               key={topping.id}
-                              className={`flex flex-col p-3.5 min-h-[44px] min-w-[44px] border-2 rounded-xl cursor-pointer transition-all select-none active:scale-[0.97] ${
+                              className={`flex flex-col p-3.5 min-h-[44px] min-w-[44px] border-2 rounded-[4px] cursor-pointer transition-all select-none active:scale-[0.97] ${
                                 isSelected
                                   ? 'border-[#D4802A] bg-[#D4802A]/5'
                                   : 'border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-800/50'
@@ -314,7 +314,7 @@ export default function QuickViewModal({
                                   name="topping"
                                   checked={isSelected}
                                   onChange={() => handleToppingToggle(topping.id)}
-                                  className="accent-[#D4802A] w-5 h-5 rounded-full cursor-pointer shrink-0"
+                                  className="accent-[#D4802A] w-5 h-5 rounded-[4px] cursor-pointer shrink-0"
                                 />
                                 <span className="text-sm font-bold text-zinc-800 dark:text-zinc-200 truncate">
                                   {topping.emoji} {topping.name}
@@ -354,7 +354,7 @@ export default function QuickViewModal({
                           setNotes((prev) => (prev ? `${prev} [${tag}]` : `[${tag}]`).trim())
                         }
                       }}
-                      className={`px-3 py-1.5 rounded-full text-xs font-bold border transition-colors ${
+                      className={`px-3 py-1.5 rounded-[4px] text-xs font-bold border transition-colors ${
                         isSelected
                           ? 'bg-[#D4802A]/10 text-[#D4802A] border-[#D4802A]'
                           : 'bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700 hover:border-[#D4802A]/50'
@@ -371,7 +371,7 @@ export default function QuickViewModal({
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Tambahan khusus lainnya (opsional)..."
-                className="w-full p-4 border-2 border-zinc-200 dark:border-zinc-800 rounded-xl text-sm bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-[#D4802A] transition-colors min-h-[80px]"
+                className="w-full p-4 border-2 border-zinc-200 dark:border-zinc-800 rounded-[4px] text-sm bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-[#D4802A] transition-colors min-h-[80px]"
               />
             </div>
           </div>
@@ -379,11 +379,11 @@ export default function QuickViewModal({
           {/* Footer (Sticky Bottom) */}
           <div className="p-4 shrink-0 bg-white dark:bg-zinc-900 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-between gap-4 w-full shadow-[0_-4px_15px_rgba(0,0,0,0.05)]">
             {/* Kontrol Kuantitas */}
-            <div className="flex items-center gap-3 bg-zinc-100 dark:bg-zinc-800 rounded-full p-1 border border-zinc-200 dark:border-zinc-700">
+            <div className="flex items-center gap-3 bg-zinc-100 dark:bg-zinc-800 rounded-[4px] p-1 border border-zinc-200 dark:border-zinc-700">
               <button
                 type="button"
                 onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                className="w-10 h-10 rounded-full bg-white dark:bg-zinc-700 shadow-sm flex items-center justify-center font-bold text-zinc-600 dark:text-zinc-300 hover:text-[#D4802A] transition-colors active:scale-95"
+                className="w-10 h-10 rounded-[4px] bg-white dark:bg-zinc-700 shadow-sm flex items-center justify-center font-bold text-zinc-600 dark:text-zinc-300 hover:text-[#D4802A] transition-colors active:scale-95"
               >
                 -
               </button>
@@ -393,7 +393,7 @@ export default function QuickViewModal({
               <button
                 type="button"
                 onClick={() => setQuantity((q) => q + 1)}
-                className="w-10 h-10 rounded-full bg-white dark:bg-zinc-700 shadow-sm flex items-center justify-center font-bold text-zinc-600 dark:text-zinc-300 hover:text-[#D4802A] transition-colors active:scale-95"
+                className="w-10 h-10 rounded-[4px] bg-white dark:bg-zinc-700 shadow-sm flex items-center justify-center font-bold text-zinc-600 dark:text-zinc-300 hover:text-[#D4802A] transition-colors active:scale-95"
               >
                 +
               </button>
@@ -403,7 +403,7 @@ export default function QuickViewModal({
             <button
               onClick={handleAddToCart}
               disabled={!isFormValid || !isStoreOpen}
-              className={`flex-1 py-3.5 px-4 rounded-full font-bold text-sm transition-all duration-200 shadow-md flex items-center justify-center gap-2 ${
+              className={`flex-1 py-3.5 px-4 rounded-[4px] font-bold text-sm transition-all duration-200 shadow-md flex items-center justify-center gap-2 ${
                 isFormValid && isStoreOpen
                   ? 'bg-[#D4802A] hover:bg-[#b56d24] text-white active:scale-95 shadow-[#D4802A]/30'
                   : 'bg-zinc-300 dark:bg-zinc-800 text-zinc-500 cursor-not-allowed shadow-none'
