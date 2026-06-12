@@ -3,7 +3,6 @@
 import { ChevronRight, Clock, Star } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { preload } from 'react-dom'
 import { useLanguage } from '@/context/LanguageContext'
 
 const ShoppingBagIcon = () => (
@@ -36,7 +35,7 @@ export default function Hero({
   const title = t('hero_title')
   const subtitle = t('hero_desc')
   const badge = t('hero_badge')
-  const bgImage = banner?.imageUrl || '/kitchen.png' // Fix 400 Bad Request caused by expired external aida-public images
+  const bgImage = banner?.imageUrl || '/kitchen.png?v=hero' // Fix 400 Bad Request caused by expired external aida-public images
   const ctaLink = banner?.linkUrl || '/menu-spesial'
 
   // REMOVED LEAK 2: Manual preload(bgImage) removed because it forces a direct download of unoptimized external assets (bypassing /_next/image). Next.js <Image priority /> handles this automatically.
@@ -68,6 +67,7 @@ export default function Hero({
           alt="Banner Promosi Van Java"
           fill
           priority
+          loading="eager"
           fetchPriority="high"
           sizes="100vw"
           className="object-cover opacity-40"
@@ -168,10 +168,11 @@ export default function Hero({
         <div className="hidden lg:flex justify-end">
           <div className="relative w-full aspect-[4/3] rounded-[12px] overflow-hidden shadow-sbx-card border-8 border-white/10 bg-black/50">
             <Image
-              src={banner?.imageUrl || '/kitchen.png'}
+              src={banner?.imageUrl || '/kitchen.png?v=hero'}
               alt="Visual Promosi"
               fill
               priority
+              loading="eager"
               sizes="(max-width: 1024px) 100vw, 450px"
               className="object-cover"
             />

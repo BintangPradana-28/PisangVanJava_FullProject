@@ -184,13 +184,10 @@ const authMiddleware = auth(async (req) => {
 export default async function middleware(req: NextRequest, event: NextFetchEvent) {
   const nonce = btoa(crypto.randomUUID())
 
-  // KNOWN GAP: style-src masih menggunakan 'unsafe-inline'
-  // karena Next.js font optimization inject inline styles.
-  // Mitigasi: style injection tidak bisa eksekusi JavaScript,
-  // risiko terbatas pada UI manipulation, bukan code execution.
+  const isDev = process.env.NODE_ENV === 'development'
   const cspHeader = `
     default-src 'self';
-    script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https://maps.googleapis.com https://challenges.cloudflare.com;
+    script-src 'self' ${isDev ? "'unsafe-eval'" : ''} 'nonce-${nonce}' 'strict-dynamic' https://maps.googleapis.com https://challenges.cloudflare.com;
     style-src 'self' 'unsafe-inline';
     img-src 'self' blob: data: https://res.cloudinary.com https://lh3.googleusercontent.com https://vamxyslzeimlsofhgmry.supabase.co https://maps.gstatic.com https://maps.googleapis.com;
     font-src 'self' data:;
