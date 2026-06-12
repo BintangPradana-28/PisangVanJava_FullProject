@@ -32,11 +32,13 @@ const getFallbackImage = (name: string) => {
 const ProductImage = ({
   src,
   alt,
-  available
+  available,
+  priority = false
 }: {
   src: string
   alt: string
   available: boolean
+  priority?: boolean
 }) => {
   const [imgSrc, setImgSrc] = useState(src)
   const { t } = useLanguage()
@@ -48,6 +50,7 @@ const ProductImage = ({
         alt={alt}
         fill
         sizes="(max-width: 640px) 360px, 360px"
+        priority={priority}
         className="object-cover group-hover:scale-105 transition-transform duration-500"
         onError={() => setImgSrc('/kitchen.png')}
         placeholder="blur"
@@ -204,7 +207,7 @@ export default function MenuGrid({ products }: { products: ProductType[] }) {
                     </button>
 
                     {/* Image */}
-                    <ProductImage src={img} alt={product.flavorName} available={available} />
+                    <ProductImage src={img} alt={product.flavorName} available={available} priority={i < 3} />
 
                     {/* Content */}
                     <div className="p-6 flex flex-col items-center text-center flex-grow">

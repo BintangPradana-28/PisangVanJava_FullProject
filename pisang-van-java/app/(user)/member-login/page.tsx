@@ -5,7 +5,7 @@ import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { signIn, useSession } from 'next-auth/react'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, startTransition } from 'react'
 import { useForm } from 'react-hook-form'
 import toast, { Toaster } from 'react-hot-toast'
 import type { z } from 'zod'
@@ -56,6 +56,7 @@ export default function MemberLoginPage() {
   const { t } = useLanguage()
   const [showPass, setShowPass] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [isSubmitted, setIsSubmitted] = useState(false)
 
   const {
     register,
@@ -68,8 +69,19 @@ export default function MemberLoginPage() {
 
   useEffect(() => setMounted(true), [])
   useEffect(() => {
-    if (status === 'authenticated') router.replace('/#menu')
-  }, [status, router])
+    if (status === 'authenticated') {
+      if (isSubmitted) {
+        const timer = setTimeout(() => {
+          startTransition(() => {
+            router.replace('/#menu')
+          })
+        }, 800)
+        return () => clearTimeout(timer)
+      } else {
+        router.replace('/#menu')
+      }
+    }
+  }, [status, router, isSubmitted])
 
   const onSubmit = async (data: LoginFormData) => {
     const tid = toast.loading(t('login_toast_verifying'))
@@ -86,9 +98,7 @@ export default function MemberLoginPage() {
         toast.error(res.error)
       } else {
         toast.success(t('login_toast_success'), { duration: 3000 })
-        setTimeout(() => {
-          router.push('/#menu')
-        }, 700)
+        setIsSubmitted(true)
       }
     } catch {
       toast.dismiss(tid)

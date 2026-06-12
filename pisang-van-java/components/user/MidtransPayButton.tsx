@@ -60,23 +60,32 @@ export default function MidtransPayButton({ snapToken }: Props) {
     window.navigator.vibrate?.(50) // Haptic feedback
     setIsPaying(true)
 
-    window.snap.pay(snapToken, {
-      onSuccess: (result: MidtransResult) => {
+    // Defer the heavy Midtrans iframe load to the next event loop tick
+    // This allows React to complete the paint of 'isPaying' state (loading spinner)
+    // reducing the Interaction to Next Paint (INP) latency significantly.
+    setTimeout(() => {
+      if (!window.snap) {
         setIsPaying(false)
-        router.push('/thanks')
-      },
-      onPending: (result: MidtransResult) => {
-        setIsPaying(false)
-        router.push('/thanks')
-      },
-      onError: (result: MidtransResult) => {
-        setIsPaying(false)
-        console.error('Payment failed', result)
-      },
-      onClose: () => {
-        setIsPaying(false)
+        return
       }
-    })
+      window.snap.pay(snapToken, {
+        onSuccess: (result: MidtransResult) => {
+          setIsPaying(false)
+          router.push('/thanks')
+        },
+        onPending: (result: MidtransResult) => {
+          setIsPaying(false)
+          router.push('/thanks')
+        },
+        onError: (result: MidtransResult) => {
+          setIsPaying(false)
+          console.error('Payment failed', result)
+        },
+        onClose: () => {
+          setIsPaying(false)
+        }
+      })
+    }, 50)
   }
 
   if (hasError) {
