@@ -14,14 +14,16 @@ function optimizeImage(filePath, maxWidth, quality) {
       const newSize = fs.statSync(tempPath).size;
       fs.renameSync(tempPath, filePath);
       console.log(
-        `Optimized: ${path.basename(filePath)} | ` +
-        `Size: ${(originalSize / 1024).toFixed(1)}KB -> ${(newSize / 1024).toFixed(1)}KB | ` +
-        `Reduction: ${((originalSize - newSize) / originalSize * 100).toFixed(1)}%`
+        'Optimized: %s | Size: %sKB -> %sKB | Reduction: %s%',
+        path.basename(filePath),
+        (originalSize / 1024).toFixed(1),
+        (newSize / 1024).toFixed(1),
+        ((originalSize - newSize) / originalSize * 100).toFixed(1)
       );
     })
     .catch(err => {
       if (fs.existsSync(tempPath)) fs.unlinkSync(tempPath);
-      console.error(`Failed to optimize ${filePath}:`, err.message);
+      console.error('Failed to optimize file:', filePath, 'Error:', err.message);
     });
 }
 
