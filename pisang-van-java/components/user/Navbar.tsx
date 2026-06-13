@@ -8,8 +8,8 @@ import { useEffect, useRef, useState } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSettings } from '@/context/SettingsContext'
 import { useTheme } from '@/context/ThemeContext'
-import { selectCartItemCount, selectCartDisplayTotal, useCartStore } from '@/src/stores/cart.store'
 import { formatPrice } from '@/lib/utils'
+import { selectCartDisplayTotal, selectCartItemCount, useCartStore } from '@/src/stores/cart.store'
 import CartModal from './CartModal'
 
 const ShoppingBagIcon = () => (
@@ -112,7 +112,7 @@ export default function Navbar() {
   return (
     <>
       {/* Scroll Progress Indicator */}
-      <div id="scroll-progress" style={{ width: `${scrollProgress}%` }} />
+      <div id="scroll-progress" style={{ transform: `scaleX(${scrollProgress / 100})` }} />
 
       {/* Global Store Closed Banner */}
       {getSetting('store_open', 'true') === 'false' && (
@@ -227,6 +227,7 @@ export default function Navbar() {
 
             {/* Cart Badge Button */}
             <button
+              id="navbar-cart"
               onClick={() => setIsCartOpen(true)}
               className={`relative p-2 rounded-[4px] transition-all focus:outline-none hover:bg-zinc-100 dark:hover:bg-zinc-800 ${
                 useSolidHeader ? 'text-zinc-700 dark:text-zinc-200' : 'text-white'
@@ -235,12 +236,15 @@ export default function Navbar() {
             >
               <span className="text-lg">🛒</span>
               {isHydrated && cartCount > 0 && (
-                <span
-                  key={cartPopKey}
-                  className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 rounded-[4px] flex items-center justify-center border-2 border-white dark:border-zinc-950 cart-pop"
+                <motion.span
+                  key={cartCount}
+                  initial={{ scale: 0.5, rotate: -10 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  transition={{ type: 'spring', stiffness: 500, damping: 12 }}
+                  className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 rounded-[4px] flex items-center justify-center border-2 border-white dark:border-zinc-950"
                 >
                   {cartCount}
-                </span>
+                </motion.span>
               )}
             </button>
 
@@ -248,6 +252,7 @@ export default function Navbar() {
             {session ? (
               <div className="relative">
                 <button
+                  id="navbar-profile"
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                   className="flex items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary rounded-[4px]"
                 >
@@ -331,6 +336,7 @@ export default function Navbar() {
               </div>
             ) : (
               <Link
+                id="navbar-login"
                 href="/member-login"
                 className={`hidden sm:inline-flex text-xs font-bold px-4 py-2.5 rounded-[4px] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary ${
                   useSolidHeader
@@ -423,6 +429,7 @@ export default function Navbar() {
       {/* Floating/Sticky Cart Button */}
       {isHydrated && cartCount > 0 && (
         <button
+          id="floating-cart"
           onClick={() => setIsCartOpen(true)}
           className="fixed z-[60] bg-amber-brand hover:bg-amber-brand/90 text-white shadow-2xl transition-all duration-200 active:scale-[0.98] focus:outline-none
             /* Mobile Sticky Bar layout */
@@ -450,12 +457,15 @@ export default function Navbar() {
           {/* Desktop view content */}
           <div className="hidden sm:flex items-center justify-center relative">
             <ShoppingBagIcon />
-            <span
-              key={`frap-${cartPopKey}`}
-              className="absolute -top-3.5 -right-3.5 bg-red-500 text-white text-[10px] font-bold w-5 h-5 rounded-[4px] flex items-center justify-center border-2 border-amber-brand cart-pop"
+            <motion.span
+              key={cartCount}
+              initial={{ scale: 0.5, rotate: -10 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ type: 'spring', stiffness: 500, damping: 12 }}
+              className="absolute -top-3.5 -right-3.5 bg-red-500 text-white text-[10px] font-bold w-5 h-5 rounded-[4px] flex items-center justify-center border-2 border-amber-brand"
             >
               {cartCount}
-            </span>
+            </motion.span>
           </div>
         </button>
       )}
@@ -463,6 +473,7 @@ export default function Navbar() {
       {/* Floating empty cart button (desktop only) */}
       {(!isHydrated || cartCount === 0) && (
         <button
+          id="floating-cart-empty"
           onClick={() => setIsCartOpen(true)}
           className="fixed bottom-6 right-6 z-[60] w-14 h-14 bg-amber-brand hover:bg-amber-brand/90 text-white rounded-[4px] flex items-center justify-center shadow-sbx-frap transition-all duration-200 active:scale-95 active:shadow-sm focus:outline-none group"
           aria-label="Buka Keranjang"
