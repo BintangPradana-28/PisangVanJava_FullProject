@@ -294,7 +294,15 @@ export default function Navbar() {
                           className="flex items-center gap-2 px-4 py-2.5 text-sm text-zinc-700 dark:text-zinc-350 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors"
                           onClick={() => setIsDropdownOpen(false)}
                         >
-                          👤 Profil Saya
+                          👤 {locale === 'id' ? 'Profil Saya' : 'My Profile'}
+                        </Link>
+
+                        <Link
+                          href="/track-order"
+                          className="flex items-center gap-2 px-4 py-2.5 text-sm text-zinc-700 dark:text-zinc-350 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors"
+                          onClick={() => setIsDropdownOpen(false)}
+                        >
+                          📦 {locale === 'id' ? 'Lacak Pesanan' : 'Track Order'}
                         </Link>
 
                         {session.user.role === 'ADMIN' && (

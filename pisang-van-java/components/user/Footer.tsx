@@ -62,7 +62,7 @@ const TikTokIcon = () => (
 )
 
 export default function Footer() {
-  const { t } = useLanguage()
+  const { t, locale } = useLanguage()
   const { getSetting } = useSettings()
   const year = new Date().getFullYear()
 
@@ -109,15 +109,23 @@ export default function Footer() {
             </ul>
 
             <h4 className="text-secondary-container text-xs font-bold tracking-[0.2em] uppercase mt-8 mb-4">
-              Legal
+              {locale === 'id' ? 'Layanan & Legal' : 'Services & Legal'}
             </h4>
             <ul className="space-y-2.5 text-sm">
+              <li>
+                <Link
+                  href="/track-order"
+                  className="text-cream-50/75 hover:text-white transition-colors duration-200 flex items-center gap-1.5"
+                >
+                  📦 {locale === 'id' ? 'Lacak Pesanan' : 'Track Order'}
+                </Link>
+              </li>
               <li>
                 <Link
                   href="/privacy"
                   className="text-cream-50/75 hover:text-white transition-colors duration-200"
                 >
-                  Kebijakan Privasi
+                  {locale === 'id' ? 'Kebijakan Privasi' : 'Privacy Policy'}
                 </Link>
               </li>
               <li>
@@ -125,7 +133,7 @@ export default function Footer() {
                   href="/terms"
                   className="text-cream-50/75 hover:text-white transition-colors duration-200"
                 >
-                  Syarat & Ketentuan
+                  {locale === 'id' ? 'Syarat & Ketentuan' : 'Terms & Conditions'}
                 </Link>
               </li>
             </ul>
