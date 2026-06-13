@@ -80,7 +80,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       className={`${plusJakartaSans.variable} ${fraunces.variable}`}
       suppressHydrationWarning
     >
-      <head></head>
+      <head>
+        <link rel="preconnect" href="https://o4511473006084096.ingest.sentry.io" crossOrigin="anonymous" />
+      </head>
       <body className="min-h-screen flex flex-col">
         <Providers>{children}</Providers>
 

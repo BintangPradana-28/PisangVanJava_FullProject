@@ -71,6 +71,7 @@ export default function Hero({
           priority
           fetchPriority="high"
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 1200px"
+          quality={70}
           className="object-cover opacity-40"
         />
         {/* PERBAIKAN: Gradient hitam pekat yang dikunci mati (tidak terpengaruh tema) */}
@@ -173,8 +174,8 @@ export default function Hero({
               src={banner?.imageUrl || '/kitchen.png?v=hero'}
               alt="Visual Promosi"
               fill
-              priority
-              sizes="(max-width: 1024px) 100vw, 450px"
+              sizes="(max-width: 1024px) 1px, 450px"
+              quality={70}
               className="object-cover"
             />
             {badge && (

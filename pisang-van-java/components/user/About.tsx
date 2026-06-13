@@ -49,7 +49,8 @@ export default function About() {
               src="/kitchen.png"
               alt="Konsep Kedai Modern Tradisional Pisang Goreng Van Java"
               fill
-              sizes="(max-width: 1024px) 100vw, 550px"
+              sizes="(max-width: 640px) calc(100vw - 3rem), (max-width: 1024px) 50vw, 550px"
+              quality={70}
               loading="lazy"
               className="object-cover"
             />

@@ -40,14 +40,21 @@ export default function Navbar() {
 
   const [isOpen, setIsOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
-  const [scrollProgress, setScrollProgress] = useState(0)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [isCartOpen, setIsCartOpen] = useState(false)
+  
+  // High Performance: DOM refs to bypass React Virtual DOM re-renders on scroll
+  const progressBarRef = useRef<HTMLDivElement>(null)
+  const totalScrollRef = useRef<number>(0)
   // Sprint 3: Cart badge pop animation — track count changes
   const [cartPopKey, setCartPopKey] = useState(0)
   const prevCartCountRef = useRef(cartCount)
 
   useEffect(() => {
+    const calculateHeight = () => {
+      totalScrollRef.current = document.documentElement.scrollHeight - window.innerHeight
+    }
+
     const handleScroll = () => {
       // Scrolled state
       if (window.scrollY > 50) {
@@ -56,18 +63,26 @@ export default function Navbar() {
         setScrolled(false)
       }
 
-      // Scroll progress
-      const totalScroll = document.documentElement.scrollHeight - window.innerHeight
-      if (totalScroll > 0) {
-        setScrollProgress((window.scrollY / totalScroll) * 100)
+      // High Performance: Mutate DOM transform directly via ref
+      const totalScroll = totalScrollRef.current
+      if (totalScroll > 0 && progressBarRef.current) {
+        const progress = window.scrollY / totalScroll
+        progressBarRef.current.style.transform = `scaleX(${progress})`
       }
     }
+
+    // Initial calculation and listeners
+    calculateHeight()
     window.addEventListener('scroll', handleScroll, { passive: true })
+    window.addEventListener('resize', calculateHeight, { passive: true })
 
     // Sprint 4: Rehydrate zustand store manually to avoid hydration mismatch
     useCartStore.persist.rehydrate()
 
-    return () => window.removeEventListener('scroll', handleScroll)
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      window.removeEventListener('resize', calculateHeight)
+    }
   }, [])
 
   // Sprint 3: Trigger cart-pop animation when cartCount increases
@@ -112,7 +127,7 @@ export default function Navbar() {
   return (
     <>
       {/* Scroll Progress Indicator */}
-      <div id="scroll-progress" style={{ transform: `scaleX(${scrollProgress / 100})` }} />
+      <div id="scroll-progress" ref={progressBarRef} style={{ transform: 'scaleX(0)' }} />
 
       {/* Global Store Closed Banner */}
       {getSetting('store_open', 'true') === 'false' && (

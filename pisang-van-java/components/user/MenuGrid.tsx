@@ -52,6 +52,7 @@ const ProductImage = ({
         fill
         sizes="(max-width: 640px) 360px, 360px"
         priority={priority}
+        quality={70}
         className="object-cover group-hover:scale-105 transition-transform duration-500"
         onError={() => setImgSrc('/kitchen.png')}
         placeholder="blur"

@@ -74,6 +74,7 @@ const ProductImage = ({
         alt={alt}
         fill
         sizes="(max-width: 640px) 360px, 360px"
+        quality={70}
         loading="lazy"
         className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
         onError={() => setImgSrc('/kitchen.png')}
