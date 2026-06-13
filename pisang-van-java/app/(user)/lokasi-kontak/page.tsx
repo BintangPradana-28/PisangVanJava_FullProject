@@ -199,7 +199,7 @@ export default function LokasiKontakPage() {
   }
 
   return (
-    <div className="min-h-screen bg-surface-container-lowest dark:bg-zinc-950 text-primary dark:text-zinc-100 transition-colors duration-300">
+    <div className="min-h-screen bg-[var(--background-custom)] text-primary dark:text-zinc-100 transition-colors duration-300">
       <Toaster
         position="top-center"
         toastOptions={{ className: '!rounded-[4px] !text-sm !font-medium !shadow-sm' }}

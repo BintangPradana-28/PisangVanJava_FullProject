@@ -87,7 +87,7 @@ export default function TentangKamiPage() {
   const storySubtitle = getSetting('about_story_subtitle', t('about_story_subtitle'))
 
   return (
-    <div className="min-h-screen bg-surface-container-lowest dark:bg-zinc-950 text-primary dark:text-zinc-100">
+    <div className="min-h-screen bg-[var(--background-custom)] text-primary dark:text-zinc-100">
       {/* ── Hero ── */}
       <section className="relative pt-28 pb-12 overflow-hidden bg-cream-50 dark:bg-zinc-900 border-b border-outline-variant/20 dark:border-zinc-800">
         <div className="absolute inset-0 opacity-40 pointer-events-none" />
