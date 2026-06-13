@@ -1,14 +1,15 @@
 import type { MetadataRoute } from 'next'
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://pisanggorengvanjava.com'
+  // RAG Source: Lighthouse 400/400 Enterprise Optimization Plan
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://pisanggorengvanjava.com'
 
   return [
     {
       url: baseUrl,
       lastModified: new Date(),
       changeFrequency: 'weekly',
-      priority: 1
+      priority: 1.0
     },
     {
       url: `${baseUrl}/tentang-kami`,
@@ -27,6 +28,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.8
+    },
+    {
+      url: `${baseUrl}/track-order`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.6
     }
   ]
 }

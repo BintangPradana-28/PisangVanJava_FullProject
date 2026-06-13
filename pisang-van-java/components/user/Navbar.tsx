@@ -204,6 +204,7 @@ export default function Navbar() {
           <div className="flex items-center gap-4">
             {/* Theme Toggle */}
             <button
+              type="button"
               onClick={toggleTheme}
               className={`p-2 rounded-[4px] transition-all focus:outline-none hover:bg-zinc-100 dark:hover:bg-zinc-800 ${
                 useSolidHeader ? 'text-zinc-700 dark:text-zinc-200' : 'text-white'
@@ -215,6 +216,7 @@ export default function Navbar() {
 
             {/* Language Switcher */}
             <button
+              type="button"
               onClick={() => setLocale(locale === 'id' ? 'en' : 'id')}
               className={`text-xs font-bold px-2.5 py-1.5 rounded-lg border transition-all hover:bg-zinc-100 dark:hover:bg-zinc-800 ${
                 useSolidHeader
@@ -227,6 +229,7 @@ export default function Navbar() {
 
             {/* Cart Badge Button */}
             <button
+              type="button"
               id="navbar-cart"
               onClick={() => setIsCartOpen(true)}
               className={`relative p-2 rounded-[4px] transition-all focus:outline-none hover:bg-zinc-100 dark:hover:bg-zinc-800 ${
@@ -252,6 +255,7 @@ export default function Navbar() {
             {session ? (
               <div className="relative">
                 <button
+                  type="button"
                   id="navbar-profile"
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                   className="flex items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary rounded-[4px]"
@@ -321,6 +325,7 @@ export default function Navbar() {
                         )}
 
                         <button
+                          type="button"
                           onClick={() => {
                             setIsDropdownOpen(false)
                             handleSignOut()
@@ -429,6 +434,7 @@ export default function Navbar() {
       {/* Floating/Sticky Cart Button */}
       {isHydrated && cartCount > 0 && (
         <button
+          type="button"
           id="floating-cart"
           onClick={() => setIsCartOpen(true)}
           className="fixed z-[60] bg-amber-brand hover:bg-amber-brand/90 text-white shadow-2xl transition-all duration-200 active:scale-[0.98] focus:outline-none
@@ -473,6 +479,7 @@ export default function Navbar() {
       {/* Floating empty cart button (desktop only) */}
       {(!isHydrated || cartCount === 0) && (
         <button
+          type="button"
           id="floating-cart-empty"
           onClick={() => setIsCartOpen(true)}
           className="fixed bottom-6 right-6 z-[60] w-14 h-14 bg-amber-brand hover:bg-amber-brand/90 text-white rounded-[4px] flex items-center justify-center shadow-sbx-frap transition-all duration-200 active:scale-95 active:shadow-sm focus:outline-none group"

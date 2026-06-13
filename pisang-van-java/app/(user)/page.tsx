@@ -5,6 +5,23 @@ import nextDynamic from 'next/dynamic'
 import Hero from '@/components/user/Hero'
 import { prisma } from '@/lib/prisma'
 import MenuCards, { type ProductType } from '@/src/features/menu/components/MenuCards'
+import type { Metadata } from 'next'
+
+const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://pisanggorengvanjava.com'
+
+export const metadata: Metadata = {
+  metadataBase: new URL(baseUrl),
+  title: 'Pisang Van Java | Premium Crispy Banana',
+  description: 'Nikmati kelezatan Pisang Goreng Krispy premium dengan aneka topping lezat. Pesan online sekarang tanpa antre!',
+  openGraph: {
+    title: 'Pisang Van Java | Premium Crispy Banana',
+    description: 'Pesan Pisang Goreng Krispy premium dengan aneka topping lezat.',
+    url: baseUrl,
+    siteName: 'Pisang Van Java',
+    locale: 'id_ID',
+    type: 'website'
+  }
+}
 
 // REMOVED force-dynamic to allow ISR and static shell generation
 const About = nextDynamic(() => import('@/components/user/About'))
@@ -222,7 +239,10 @@ export default async function HomePage() {
   }
 
   return (
-    <>
+    <main className="flex min-h-screen flex-col items-center justify-start w-full">
+      {/* H1 Tunggal Wajib untuk SEO & Aksesibilitas (Disembunyikan secara visual) */}
+      <h1 className="sr-only">Pisang Van Java - Pisang Goreng Premium Jakarta</h1>
+
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -233,6 +253,6 @@ export default async function HomePage() {
       {/* Gallery bisa disembunyikan atau dipertahankan tergantung kebutuhan */}
       <LocationMap />
       <Footer />
-    </>
+    </main>
   )
 }

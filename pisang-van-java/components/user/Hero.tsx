@@ -63,19 +63,18 @@ export default function Hero({
       className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#1a0f0a]"
     >
       {/* Background Image with Overlay */}
-      <div className="absolute inset-0 z-0">
+      <div className="absolute inset-0 z-0" aria-hidden="true">
         <Image
           src={bgImage}
           alt="Banner Promosi Van Java"
           fill
           priority
-          loading="eager"
           fetchPriority="high"
-          sizes="100vw"
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 1200px"
           className="object-cover opacity-40"
         />
         {/* PERBAIKAN: Gradient hitam pekat yang dikunci mati (tidak terpengaruh tema) */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#1a0f0a] via-[#1a0f0a]/80 to-black/30" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#1a0f0a] via-[#1a0f0a]/80 to-black/30" aria-hidden="true" />
       </div>
 
       <div className="relative z-10 max-w-[1200px] w-full mx-auto px-6 py-24 md:py-32 grid lg:grid-cols-[3fr_2fr] gap-12 items-center">
@@ -175,7 +174,6 @@ export default function Hero({
               alt="Visual Promosi"
               fill
               priority
-              loading="eager"
               sizes="(max-width: 1024px) 100vw, 450px"
               className="object-cover"
             />
