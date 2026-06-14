@@ -1,9 +1,9 @@
 'use client'
 import { AnimatePresence, motion } from 'framer-motion'
+import { useRouter, useSearchParams } from 'next/navigation'
 // components/admin/OrdersClient.tsx — COMMAND CENTER v2 (Real-time + Bulk + CSV)
 import { useCallback, useEffect, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
-import { useRouter, useSearchParams } from 'next/navigation'
 import { formatPrice } from '@/lib/utils'
 import { supabaseBrowserClient } from '@/src/lib/supabase-client'
 
@@ -512,6 +512,8 @@ export default function OrdersClient({
               value={bulkStatus}
               onChange={(e) => setBulkStatus(e.target.value as OrderStatus)}
               className="text-xs px-3 py-2 rounded-[4px] border border-amber-300 bg-white text-brown-700 focus:outline-none"
+              aria-label="Status Bulk Update"
+              title="Status Bulk Update"
             >
               {STATUS_ORDER.map((s) => (
                 <option key={s} value={s}>
@@ -574,12 +576,24 @@ export default function OrdersClient({
                     onChange={() => toggleBulkSelect(order.id)}
                     className="w-4 h-4 accent-amber-600 shrink-0 cursor-pointer"
                     onClick={(e) => e.stopPropagation()}
+                    aria-label={`Pilih pesanan ${order.customerName}`}
+                    title={`Pilih pesanan ${order.customerName}`}
                   />
 
                   {/* Main info — click to expand */}
+                  {/* biome-ignore lint/a11y/useSemanticElements: interactive div is preferred here to prevent button default alignment side effects */}
                   <div
-                    className="flex-1 min-w-0 cursor-pointer"
+                    className="flex-1 min-w-0 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded"
                     onClick={() => setExpandedId(isEx ? null : order.id)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault()
+                        setExpandedId(isEx ? null : order.id)
+                      }
+                    }}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`Lihat detail pesanan ${order.customerName}`}
                   >
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-semibold text-brown-700 text-sm">
@@ -730,6 +744,8 @@ export default function OrdersClient({
                               }
                               className="text-xs px-2 py-2 rounded-[4px] border border-cream-200 text-brown-600 bg-white focus:outline-none"
                               onClick={(e) => e.stopPropagation()}
+                              aria-label="Ubah Status Pesanan"
+                              title="Ubah Status Pesanan"
                             >
                               {STATUS_ORDER.map((s) => (
                                 <option key={s} value={s}>
@@ -775,6 +791,8 @@ export default function OrdersClient({
                 value={limit}
                 onChange={(e) => handleLimitChange(Number(e.target.value))}
                 className="text-xs px-2 py-1 rounded-[4px] border border-cream-200 text-brown-600 bg-white focus:outline-none"
+                aria-label="Batas Tampilan Pesanan"
+                title="Batas Tampilan Pesanan"
               >
                 {[20, 50, 100].map((size) => (
                   <option key={size} value={size}>

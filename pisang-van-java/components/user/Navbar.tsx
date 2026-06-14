@@ -21,10 +21,12 @@ const ShoppingBagIcon = () => (
     strokeWidth="2.5"
     strokeLinecap="round"
     strokeLinejoin="round"
+    aria-hidden="true"
   >
-    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
-    <line x1="3" y1="6" x2="21" y2="6"></line>
-    <path d="M16 10a4 4 0 0 1-8 0"></path>
+    <title>Shopping Bag</title>
+    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+    <line x1="3" y1="6" x2="21" y2="6" />
+    <path d="M16 10a4 4 0 0 1-8 0" />
   </svg>
 )
 
@@ -42,7 +44,7 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [isCartOpen, setIsCartOpen] = useState(false)
-  
+
   // High Performance: DOM refs to bypass React Virtual DOM re-renders on scroll
   const progressBarRef = useRef<HTMLDivElement>(null)
   const totalScrollRef = useRef<number>(0)
@@ -127,7 +129,7 @@ export default function Navbar() {
   return (
     <>
       {/* Scroll Progress Indicator */}
-      <div id="scroll-progress" ref={progressBarRef} style={{ transform: 'scaleX(0)' }} />
+      <div id="scroll-progress" ref={progressBarRef} />
 
       {/* Global Store Closed Banner */}
       {getSetting('store_open', 'true') === 'false' && (
@@ -147,7 +149,6 @@ export default function Navbar() {
       )}
 
       <header
-        role="banner"
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           useSolidHeader
             ? 'bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md border-b border-zinc-200/40 dark:border-zinc-800/40 shadow-sbx-nav py-3'
@@ -155,7 +156,6 @@ export default function Navbar() {
         }`}
       >
         <nav
-          role="navigation"
           aria-label="Navigasi Utama"
           className="max-w-[1200px] mx-auto px-6 flex items-center justify-between"
         >
@@ -294,8 +294,10 @@ export default function Navbar() {
                 <AnimatePresence>
                   {isDropdownOpen && (
                     <>
-                      <div
-                        className="fixed inset-0 z-10"
+                      <button
+                        type="button"
+                        aria-label="Tutup dropdown"
+                        className="fixed inset-0 z-10 w-full h-full cursor-default bg-transparent"
                         onClick={() => setIsDropdownOpen(false)}
                       />
                       <motion.div
@@ -370,13 +372,14 @@ export default function Navbar() {
 
             {/* Mobile Hamburger Drawer Trigger */}
             <button
+              type="button"
               onClick={() => setIsOpen(!isOpen)}
               className={`md:hidden p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary ${
                 useSolidHeader ? 'text-zinc-700 dark:text-zinc-200' : 'text-white'
               }`}
               aria-label={isOpen ? 'Tutup navigasi' : 'Buka navigasi'}
-              aria-expanded={isOpen}
-              aria-controls="mobile-menu"
+              aria-expanded={isOpen ? 'true' : 'false'}
+              aria-controls={isOpen ? 'mobile-menu' : undefined}
             >
               <div className="space-y-1.5 w-6">
                 <span

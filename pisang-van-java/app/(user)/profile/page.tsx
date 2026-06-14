@@ -338,6 +338,7 @@ export default function ProfileDataDiriPage() {
               <div className="p-4 border-b border-zinc-100 dark:border-zinc-800 flex justify-between items-center">
                 <h3 className="font-bold text-zinc-900 dark:text-zinc-100">Sesuaikan Foto</h3>
                 <button
+                  type="button"
                   onClick={() => setImageToCrop(null)}
                   className="text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200"
                 >
@@ -367,10 +368,13 @@ export default function ProfileDataDiriPage() {
                   value={zoom}
                   onChange={(e) => setZoom(Number(e.target.value))}
                   className="w-full accent-[#D4802A]"
+                  aria-label="Zoom"
+                  title="Zoom"
                 />
               </div>
               <div className="p-4 bg-zinc-50 dark:bg-zinc-800/50">
                 <button
+                  type="button"
                   onClick={handleCropSave}
                   disabled={isUploading}
                   className="w-full bg-[#D4802A] hover:bg-[#b56d24] text-white font-bold py-3 rounded-[4px] transition-all flex justify-center items-center gap-2"
@@ -418,14 +422,20 @@ export default function ProfileDataDiriPage() {
                   </div>
                 )}
               </div>
-              <label className="absolute bottom-0 right-0 p-2.5 bg-[#D4802A] text-white rounded-full cursor-pointer shadow-sm hover:bg-[#b56d24] transition-all hover:scale-105 active:scale-95 group-hover:ring-4 ring-white dark:ring-zinc-900">
+              <label
+                htmlFor="avatar-input"
+                className="absolute bottom-0 right-0 p-2.5 bg-[#D4802A] text-white rounded-full cursor-pointer shadow-sm hover:bg-[#b56d24] transition-all hover:scale-105 active:scale-95 group-hover:ring-4 ring-white dark:ring-zinc-900"
+              >
                 <Camera className="w-4 h-4" />
                 <input
+                  id="avatar-input"
                   type="file"
                   className="hidden"
                   accept="image/jpeg,image/png,image/webp"
                   onChange={onFileChange}
                   disabled={isUploading}
+                  aria-label="Upload Avatar"
+                  title="Upload Avatar"
                 />
               </label>
             </div>
@@ -569,17 +579,25 @@ export default function ProfileDataDiriPage() {
               {emailMode === 'idle' && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
                   <div>
-                    <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">
+                    <label
+                      htmlFor="current-email-input"
+                      className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2"
+                    >
                       {t('profile_email_current')}
                     </label>
                     <div className="flex flex-col sm:flex-row gap-3">
                       <input
+                        id="current-email-input"
                         type="email"
                         value={session?.user?.email || ''}
                         disabled
+                        placeholder="Current Email"
+                        title="Current Email"
+                        aria-label="Current Email"
                         className="flex-1 p-3.5 rounded-[4px] border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/50 text-zinc-500 cursor-not-allowed outline-none w-full"
                       />
                       <button
+                        type="button"
                         onClick={handleRequestEmailOTP}
                         disabled={isEmailLoading}
                         className="w-full sm:w-auto px-6 py-3.5 bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 font-bold rounded-[4px] transition-all disabled:opacity-50 whitespace-nowrap flex items-center justify-center"
@@ -625,12 +643,14 @@ export default function ProfileDataDiriPage() {
                   </div>
                   <div className="flex gap-3">
                     <button
+                      type="button"
                       onClick={() => setEmailMode('idle')}
                       className="flex-1 p-3 text-zinc-600 dark:text-zinc-400 font-bold hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-[4px] transition-colors"
                     >
                       {t('address_cancel_btn')}
                     </button>
                     <button
+                      type="button"
                       onClick={() => setEmailMode('newEmail')}
                       disabled={otpValue.length !== 6}
                       className="flex-1 p-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-[4px] transition-all disabled:opacity-50"
@@ -656,14 +676,20 @@ export default function ProfileDataDiriPage() {
                     className="space-y-4"
                   >
                     <div>
-                      <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">
+                      <label
+                        htmlFor="new-email-input"
+                        className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2"
+                      >
                         {t('profile_email_new_label')}
                       </label>
                       <input
+                        id="new-email-input"
                         type="email"
                         {...registerEmail('newEmail')}
                         className="w-full p-3.5 rounded-[4px] border border-zinc-200 dark:border-zinc-800 bg-transparent focus:ring-2 focus:ring-blue-500 outline-none transition-all"
                         placeholder={t('profile_email_new_placeholder')}
+                        title={t('profile_email_new_label')}
+                        aria-label={t('profile_email_new_label')}
                       />
                       {emailErrors.newEmail && (
                         <p className="text-xs text-red-500 mt-1.5">
