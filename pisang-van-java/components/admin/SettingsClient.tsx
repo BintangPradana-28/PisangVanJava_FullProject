@@ -35,6 +35,11 @@ const GROUP_LABELS: Record<string, string> = {
   home: 'Beranda (Home)'
 }
 
+const cleanLabel = (label: string | null, key: string) => {
+  if (!label) return key
+  return label.replace(/\s*\(true\s*=.*?,?\s*false\s*=.*?\)/gi, '')
+}
+
 export default function SettingsClient({ settings, adminName }: Props) {
   const [values, setValues] = useState<Record<string, string>>(
     Object.fromEntries(settings.map((s) => [s.key, s.value]))
@@ -195,9 +200,9 @@ export default function SettingsClient({ settings, adminName }: Props) {
                     <input
                       type="password"
                       value={pwForm[key as keyof typeof pwForm]}
-                      onChange={(e) => setPwForm((p) => ({ ...p, [key]: e.target.value }))}
+                      onChange={(e) => setValues((p) => ({ ...p, [key]: e.target.value }))}
                       placeholder={placeholder}
-                      className="form-input"
+                      className="form-input text-brown-900 font-sans"
                     />
                   </div>
                 ))}
@@ -228,7 +233,7 @@ export default function SettingsClient({ settings, adminName }: Props) {
                     type="text"
                     value={values['about_hero_title'] || ''}
                     onChange={(e) => setValues({ ...values, ['about_hero_title']: e.target.value })}
-                    className="w-full bg-cream-50 border border-cream-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-brand/50 transition-all"
+                    className="w-full bg-cream-50 border border-cream-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-brand/50 transition-all text-brown-900"
                     placeholder="Contoh: Pisang Goreng"
                   />
                 </div>
@@ -242,7 +247,7 @@ export default function SettingsClient({ settings, adminName }: Props) {
                     onChange={(e) =>
                       setValues({ ...values, ['about_hero_subtitle']: e.target.value })
                     }
-                    className="w-full bg-cream-50 border border-cream-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-brand/50 transition-all"
+                    className="w-full bg-cream-50 border border-cream-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-brand/50 transition-all text-brown-900"
                     placeholder="Contoh: Van Java"
                   />
                 </div>
@@ -253,7 +258,7 @@ export default function SettingsClient({ settings, adminName }: Props) {
                   <textarea
                     value={values['about_desc1'] || ''}
                     onChange={(e) => setValues({ ...values, ['about_desc1']: e.target.value })}
-                    className="w-full bg-cream-50 border border-cream-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-brand/50 transition-all"
+                    className="w-full bg-cream-50 border border-cream-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-brand/50 transition-all text-brown-900"
                     rows={3}
                   />
                 </div>
@@ -264,7 +269,7 @@ export default function SettingsClient({ settings, adminName }: Props) {
                   <textarea
                     value={values['about_desc2'] || ''}
                     onChange={(e) => setValues({ ...values, ['about_desc2']: e.target.value })}
-                    className="w-full bg-cream-50 border border-cream-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-brand/50 transition-all"
+                    className="w-full bg-cream-50 border border-cream-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-brand/50 transition-all text-brown-900"
                     rows={3}
                   />
                 </div>
@@ -278,7 +283,7 @@ export default function SettingsClient({ settings, adminName }: Props) {
                     onChange={(e) =>
                       setValues({ ...values, ['about_story_title']: e.target.value })
                     }
-                    className="w-full bg-cream-50 border border-cream-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-brand/50 transition-all"
+                    className="w-full bg-cream-50 border border-cream-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-brand/50 transition-all text-brown-900"
                   />
                 </div>
                 <div>
@@ -291,7 +296,7 @@ export default function SettingsClient({ settings, adminName }: Props) {
                     onChange={(e) =>
                       setValues({ ...values, ['about_story_subtitle']: e.target.value })
                     }
-                    className="w-full bg-cream-50 border border-cream-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-brand/50 transition-all"
+                    className="w-full bg-cream-50 border border-cream-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-brand/50 transition-all text-brown-900"
                   />
                 </div>
               </div>
@@ -313,7 +318,7 @@ export default function SettingsClient({ settings, adminName }: Props) {
                     type="text"
                     value={values['home_hero_title'] || ''}
                     onChange={(e) => setValues({ ...values, ['home_hero_title']: e.target.value })}
-                    className="w-full bg-cream-50 border border-cream-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-brand/50 transition-all"
+                    className="w-full bg-cream-50 border border-cream-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-brand/50 transition-all text-brown-900"
                   />
                 </div>
                 <div>
@@ -326,7 +331,7 @@ export default function SettingsClient({ settings, adminName }: Props) {
                     onChange={(e) =>
                       setValues({ ...values, ['home_hero_subtitle']: e.target.value })
                     }
-                    className="w-full bg-cream-50 border border-cream-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-brand/50 transition-all"
+                    className="w-full bg-cream-50 border border-cream-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-brand/50 transition-all text-brown-900"
                   />
                 </div>
               </div>
@@ -348,7 +353,7 @@ export default function SettingsClient({ settings, adminName }: Props) {
                     type="text"
                     value={values['nomor_wa'] || ''}
                     onChange={(e) => setValues({ ...values, ['nomor_wa']: e.target.value })}
-                    className="w-full bg-cream-50 border border-cream-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-brand/50 transition-all"
+                    className="w-full bg-cream-50 border border-cream-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-brand/50 transition-all text-brown-900"
                     placeholder="628123456789"
                   />
                 </div>
@@ -359,7 +364,7 @@ export default function SettingsClient({ settings, adminName }: Props) {
                   <textarea
                     value={values['alamat'] || ''}
                     onChange={(e) => setValues({ ...values, ['alamat']: e.target.value })}
-                    className="w-full bg-cream-50 border border-cream-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-brand/50 transition-all"
+                    className="w-full bg-cream-50 border border-cream-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-brand/50 transition-all text-brown-900"
                     rows={3}
                   />
                 </div>
@@ -371,7 +376,7 @@ export default function SettingsClient({ settings, adminName }: Props) {
                     type="text"
                     value={values['jam_operasional'] || ''}
                     onChange={(e) => setValues({ ...values, ['jam_operasional']: e.target.value })}
-                    className="w-full bg-cream-50 border border-cream-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-brand/50 transition-all"
+                    className="w-full bg-cream-50 border border-cream-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-brand/50 transition-all text-brown-900"
                     placeholder="Setiap Hari: 10.00-21.00 WIB"
                   />
                 </div>
@@ -396,7 +401,7 @@ export default function SettingsClient({ settings, adminName }: Props) {
                     onChange={(e) =>
                       setValues({ ...values, ['store_delivery_fee']: e.target.value })
                     }
-                    className="w-full bg-cream-50 border border-cream-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-brand/50 transition-all"
+                    className="w-full bg-cream-50 border border-cream-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-brand/50 transition-all text-brown-900"
                     placeholder="Contoh: 10000"
                   />
                   <div className="text-xs text-brown-400 mt-1">
@@ -424,13 +429,13 @@ export default function SettingsClient({ settings, adminName }: Props) {
                   return (
                     <div key={s.key}>
                       <label className="block text-xs font-semibold text-brown-400 uppercase tracking-wider mb-1.5">
-                        {s.label || s.key}
+                        {cleanLabel(s.label, s.key)}
                       </label>
                       {s.key === 'store_status' ? (
                         <select
                           value={values[s.key] || 'AUTO'}
                           onChange={(e) => setValues((v) => ({ ...v, [s.key]: e.target.value }))}
-                          className="w-full bg-cream-50 border border-cream-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-brand/50 transition-all"
+                          className="w-full bg-cream-50 border border-cream-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-brand/50 transition-all text-brown-900"
                         >
                           <option value="AUTO">Otomatis (Ikuti Jam Operasional)</option>
                           <option value="OPEN">Buka Paksa (Selalu Buka)</option>
@@ -461,17 +466,16 @@ export default function SettingsClient({ settings, adminName }: Props) {
                           value={values[s.key] || ''}
                           onChange={(e) => setValues((v) => ({ ...v, [s.key]: e.target.value }))}
                           rows={3}
-                          className="form-input resize-none"
+                          className="form-input resize-none text-brown-900"
                         />
                       ) : (
                         <input
                           type="text"
                           value={values[s.key] || ''}
                           onChange={(e) => setValues((v) => ({ ...v, [s.key]: e.target.value }))}
-                          className="form-input"
+                          className="form-input text-brown-900"
                         />
                       )}
-                      <div className="text-xs text-brown-300 mt-1 font-mono">{s.key}</div>
                     </div>
                   )
                 })}
