@@ -120,13 +120,6 @@ export default function MemberLoginPage() {
 
   return (
     <div className="fixed inset-0 z-[200] overflow-y-auto bg-[var(--background-custom)] transition-colors duration-300">
-      <Toaster
-        position="top-center"
-        toastOptions={{
-          className:
-            '!bg-[var(--card-bg)] !text-[var(--text-custom)] !border !border-[var(--border-custom)] !shadow-sm'
-        }}
-      />
       <div className="pointer-events-none fixed inset-0 bg-hero-pattern opacity-40" />
 
       <div className="relative min-h-screen flex flex-col items-center justify-center px-4 py-16">
