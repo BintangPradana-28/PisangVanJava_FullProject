@@ -1,5 +1,10 @@
 import { ImageResponse } from 'next/og'
-import { type NextRequest } from 'next/server'
+import type { NextRequest } from 'next/server'
+
+// @vercel/og (Satori) requires inline styles to compile JSX elements into an SVG image.
+// External CSS files, CSS modules, and global styles are NOT supported/loaded in the isolated Edge Runtime.
+// Consequently, inline styles are a strict structural constraint for this route.
+// nosonar
 
 export const runtime = 'edge'
 
