@@ -31,105 +31,82 @@ const LocationMap = nextDynamic(() => import('@/src/features/settings/components
 const Footer = nextDynamic(() => import('@/components/user/Footer'))
 
 // Server Component — fetches data at request time using SWR Caching
-const getCachedMenu = unstable_cache(
+// Server Component — fetches data at request time using SWR Caching
+const getCachedMenuRaw = unstable_cache(
   async (): Promise<ProductType[]> => {
-    try {
-      // Zero Trust & Flawless DB: Mengambil produk yang belum dihapus (Soft Delete)
-      const dbProducts = await prisma.menuVariant.findMany({
-        where: { isDeleted: false, isActive: true },
-        orderBy: { createdAt: 'desc' }
-      })
+    // Zero Trust & Flawless DB: Mengambil produk yang belum dihapus (Soft Delete)
+    const dbProducts = await prisma.menuVariant.findMany({
+      where: { isDeleted: false, isActive: true },
+      orderBy: { createdAt: 'desc' }
+    })
 
-      // THE CISO FIX: Aggregation Queries Instead of Massive Joins
-      const reviewAggregates = await prisma.review.groupBy({
-        by: ['variantId'],
-        _avg: { rating: true },
-        _count: { rating: true }
-      })
-      const aggregateMap = new Map(reviewAggregates.map((r: any) => [r.variantId, r]))
+    // THE CISO FIX: Aggregation Queries Instead of Massive Joins
+    const reviewAggregates = await prisma.review.groupBy({
+      by: ['variantId'],
+      _avg: { rating: true },
+      _count: { rating: true }
+    })
+    const aggregateMap = new Map(reviewAggregates.map((r: any) => [r.variantId, r]))
 
-      const products: ProductType[] = dbProducts.map((p: any) => {
-        const agg = aggregateMap.get(p.id) as any
-        return {
-          id: p.id,
-          flavorName: p.flavorName,
-          priceKembung: p.priceKembung,
-          priceLumpia: p.priceLumpia,
-          priceKrispy: p.priceKrispy,
-          imageUrl: p.imageUrl,
-          isAvailable: p.isAvailable,
-          stock: p.stock,
-          soldCount: p.soldCount,
-          tags: p.tags || [],
-          deskripsi_topping: p.deskripsi_topping,
-          wholesaleKembung: p.wholesaleKembung,
-          wholesaleLumpia: p.wholesaleLumpia,
-          wholesaleKrispy: p.wholesaleKrispy,
-          rating: agg && agg._avg.rating ? Math.round(agg._avg.rating * 10) / 10 : undefined,
-          reviewCount: agg && agg._count.rating > 0 ? agg._count.rating : undefined,
-          isActive: p.isActive
-        }
-      })
-
-      // Data cadangan sementara jika DB masih kosong (Mock data)
-      if (products.length === 0) {
-        return [
-          {
-            id: '1',
-            flavorName: 'Cokelat',
-            priceKembung: 10000,
-            priceLumpia: 12000,
-            priceKrispy: 14000,
-            imageUrl: '',
-            isAvailable: true,
-            stock: 999,
-            tags: ['Manis', 'Best Seller'],
-            wholesaleKembung: 0,
-            wholesaleLumpia: 0,
-            wholesaleKrispy: 0,
-            isActive: true
-          },
-          {
-            id: '2',
-            flavorName: 'Keju',
-            priceKembung: 10000,
-            priceLumpia: 12000,
-            priceKrispy: 15000,
-            imageUrl: null,
-            isAvailable: true,
-            stock: 999,
-            tags: [],
-            wholesaleKembung: 0,
-            wholesaleLumpia: 0,
-            wholesaleKrispy: 0,
-            isActive: true
-          },
-          {
-            id: '3',
-            flavorName: 'Susu',
-            priceKembung: 10000,
-            priceLumpia: 12000,
-            priceKrispy: 15000,
-            imageUrl: null,
-            isAvailable: true,
-            stock: 999,
-            tags: [],
-            wholesaleKembung: 0,
-            wholesaleLumpia: 0,
-            wholesaleKrispy: 0,
-            isActive: true
-          }
-        ]
+    const products: ProductType[] = dbProducts.map((p: any) => {
+      const agg = aggregateMap.get(p.id) as any
+      return {
+        id: p.id,
+        flavorName: p.flavorName,
+        priceKembung: p.priceKembung,
+        priceLumpia: p.priceLumpia,
+        priceKrispy: p.priceKrispy,
+        imageUrl: p.imageUrl,
+        isAvailable: p.isAvailable,
+        stock: p.stock,
+        soldCount: p.soldCount,
+        tags: p.tags || [],
+        deskripsi_topping: p.deskripsi_topping,
+        wholesaleKembung: p.wholesaleKembung,
+        wholesaleLumpia: p.wholesaleLumpia,
+        wholesaleKrispy: p.wholesaleKrispy,
+        rating: agg?._avg.rating ? Math.round(agg._avg.rating * 10) / 10 : undefined,
+        reviewCount: agg?._count.rating > 0 ? agg._count.rating : undefined,
+        isActive: p.isActive
       }
+    })
 
-      return products
-    } catch (error) {
-      // Global Error Handling: Jika terjadi gagal koneksi, tampilkan mock data saja agar tidak crash (Graceful Degradation)
-      console.warn('[Safe Log] Database connection error during menu fetch')
+    // Data cadangan sementara jika DB masih kosong (Mock data)
+    if (products.length === 0) {
       return [
         {
           id: '1',
-          flavorName: 'Cokelat (Mock)',
+          flavorName: 'Cokelat',
+          priceKembung: 10000,
+          priceLumpia: 12000,
+          priceKrispy: 14000,
+          imageUrl: '',
+          isAvailable: true,
+          stock: 999,
+          tags: ['Manis', 'Best Seller'],
+          wholesaleKembung: 0,
+          wholesaleLumpia: 0,
+          wholesaleKrispy: 0,
+          isActive: true
+        },
+        {
+          id: '2',
+          flavorName: 'Keju',
+          priceKembung: 10000,
+          priceLumpia: 12000,
+          priceKrispy: 15000,
+          imageUrl: null,
+          isAvailable: true,
+          stock: 999,
+          tags: [],
+          wholesaleKembung: 0,
+          wholesaleLumpia: 0,
+          wholesaleKrispy: 0,
+          isActive: true
+        },
+        {
+          id: '3',
+          flavorName: 'Susu',
           priceKembung: 10000,
           priceLumpia: 12000,
           priceKrispy: 15000,
@@ -144,52 +121,87 @@ const getCachedMenu = unstable_cache(
         }
       ]
     }
+
+    return products
   },
   ['home-menu-data'],
   { revalidate: 60, tags: ['menu'] }
 )
 
+const getCachedMenu = async (): Promise<ProductType[]> => {
+  try {
+    return await getCachedMenuRaw()
+  } catch {
+    console.warn('[Safe Log] Database connection error during menu fetch')
+    return [
+      {
+        id: '1',
+        flavorName: 'Cokelat (Mock)',
+        priceKembung: 10000,
+        priceLumpia: 12000,
+        priceKrispy: 15000,
+        imageUrl: null,
+        isAvailable: true,
+        stock: 999,
+        tags: [],
+        wholesaleKembung: 0,
+        wholesaleLumpia: 0,
+        wholesaleKrispy: 0,
+        isActive: true
+      }
+    ]
+  }
+}
+
 // 🛡️ CISO FIX: Absolute Quarantine & DoS Protection
-// Jangan biarkan kueri Prisma telanjang di halaman publik. Bungkus dengan cache dan try-catch.
-const getCachedBanner = unstable_cache(
+// Jangan biarkan kueri Prisma telanjang di halaman publik. Bungkus dengan cache dan try-catch di wrapper.
+const getCachedBannerRaw = unstable_cache(
   async () => {
-    try {
-      return await prisma.banner.findFirst({
-        where: { isActive: true },
-        orderBy: { updatedAt: 'desc' },
-        select: {
-          id: true,
-          title: true,
-          subtitle: true,
-          badge: true,
-          imageUrl: true,
-          linkUrl: true
-        }
-      })
-    } catch (error) {
-      console.warn('[Safe Log] Database connection error during banner fetch')
-      return null
-    }
+    return await prisma.banner.findFirst({
+      where: { isActive: true },
+      orderBy: { updatedAt: 'desc' },
+      select: {
+        id: true,
+        title: true,
+        subtitle: true,
+        badge: true,
+        imageUrl: true,
+        linkUrl: true
+      }
+    })
   },
   ['home-active-banner'],
   { revalidate: 300, tags: ['banner'] }
 )
 
-const getCachedReviews = unstable_cache(
+const getCachedBanner = async () => {
+  try {
+    return await getCachedBannerRaw()
+  } catch {
+    console.warn('[Safe Log] Database connection error during banner fetch')
+    return null
+  }
+}
+
+const getCachedReviewsRaw = unstable_cache(
   async () => {
-    try {
-      return await prisma.review.aggregate({
-        _avg: { rating: true },
-        _count: { rating: true }
-      })
-    } catch (error) {
-      console.warn('[Safe Log] Database connection error during review aggregate fetch')
-      return { _avg: { rating: null }, _count: { rating: 0 } }
-    }
+    return await prisma.review.aggregate({
+      _avg: { rating: true },
+      _count: { rating: true }
+    })
   },
   ['home-review-aggregates'],
   { revalidate: 3600, tags: ['reviews'] }
 )
+
+const getCachedReviews = async () => {
+  try {
+    return await getCachedReviewsRaw()
+  } catch {
+    console.warn('[Safe Log] Database connection error during review aggregate fetch')
+    return { _avg: { rating: null }, _count: { rating: 0 } }
+  }
+}
 
 export default async function HomePage() {
   const products = await getCachedMenu()

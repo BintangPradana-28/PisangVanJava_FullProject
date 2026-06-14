@@ -10,27 +10,31 @@ import HeroBanner from './HeroBanner' // We'll extract the hero part to a small 
 // Removing force-dynamic to allow Next.js optimizations
 export const dynamic = 'force-dynamic'
 
-const getCachedProducts = unstable_cache(
+const getCachedProductsRaw = unstable_cache(
   async () => {
-    try {
-      return await prisma.menuVariant.findMany({
-        where: { isDeleted: false },
-        orderBy: { flavorName: 'asc' },
-        include: {
-          reviews: { select: { rating: true } }
-        }
-      })
-    } catch (e) {
-      console.warn(
-        '[Safe Log] DB fetch failed for menu-spesial',
-        e instanceof Error ? e.message : String(e)
-      )
-      return []
-    }
+    return await prisma.menuVariant.findMany({
+      where: { isDeleted: false },
+      orderBy: { flavorName: 'asc' },
+      include: {
+        reviews: { select: { rating: true } }
+      }
+    })
   },
   ['menu-spesial-all-products'],
   { revalidate: 3600, tags: ['menu'] }
 )
+
+const getCachedProducts = async () => {
+  try {
+    return await getCachedProductsRaw()
+  } catch (e) {
+    console.warn(
+      '[Safe Log] DB fetch failed for menu-spesial',
+      e instanceof Error ? e.message : String(e)
+    )
+    return []
+  }
+}
 
 export default async function MenuSpesialPage(props: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
