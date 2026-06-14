@@ -113,12 +113,7 @@ export default function SearchFilterBar({ totalItems }: SearchFilterBarProps) {
             onChange={(e) => setSearch(e.target.value)}
             placeholder={t('menu_search_placeholder')}
             aria-label="Cari varian menu"
-            className="w-full pl-10 pr-4 py-2.5 text-sm rounded-[4px] outline-none transition-all"
-            style={{
-              background: 'var(--surface-custom)',
-              border: '1px solid var(--border-custom)',
-              color: 'var(--text-custom)'
-            }}
+            className="w-full pl-10 pr-4 py-2.5 text-sm rounded-[4px] outline-none transition-all bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100"
           />
           {search && (
             <button
@@ -148,20 +143,11 @@ export default function SearchFilterBar({ totalItems }: SearchFilterBarProps) {
               key={tab.key}
               onClick={() => setBaseFilter(tab.key)}
               aria-pressed={active}
-              className="flex-shrink-0 text-xs font-bold px-4 py-2 rounded-[4px] transition-all duration-200 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-amber-400"
-              style={
+              className={`flex-shrink-0 text-xs font-bold px-4 py-2 rounded-[4px] transition-all duration-200 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-amber-400 ${
                 active
-                  ? {
-                      background: '#D4802A',
-                      color: 'white',
-                      boxShadow: '0 4px 14px rgba(212,128,42,0.35)'
-                    }
-                  : {
-                      background: 'var(--surface-custom)',
-                      border: '1px solid var(--border-custom)',
-                      color: 'var(--text-custom)'
-                    }
-              }
+                  ? 'bg-[#D4802A] text-white shadow-[0_4px_14px_rgba(212,128,42,0.35)]'
+                  : 'bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300'
+              }`}
             >
               {tab.label}
             </button>
@@ -188,21 +174,11 @@ export default function SearchFilterBar({ totalItems }: SearchFilterBarProps) {
               key={chip.key}
               onClick={() => !isDragging && setFlavorFilter(chip.key)}
               aria-pressed={active}
-              className="flex-shrink-0 text-[11px] font-semibold px-3.5 py-1.5 rounded-[4px] transition-all duration-200 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
-              style={
+              className={`flex-shrink-0 text-[11px] font-semibold px-3.5 py-1.5 rounded-[4px] transition-all duration-200 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 ${
                 active
-                  ? {
-                      background: 'rgba(212,128,42,0.15)',
-                      border: '1.5px solid #D4802A',
-                      color: '#D4802A'
-                    }
-                  : {
-                      background: 'var(--surface-custom)',
-                      border: '1px solid var(--border-custom)',
-                      color: 'var(--text-custom)',
-                      opacity: 0.75
-                    }
-              }
+                  ? 'bg-amber-500/15 border-[1.5px] border-[#D4802A] text-[#D4802A]'
+                  : 'bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 opacity-75'
+              }`}
             >
               {chip.label}
             </button>

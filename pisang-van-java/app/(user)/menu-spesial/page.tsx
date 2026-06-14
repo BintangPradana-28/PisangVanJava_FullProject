@@ -157,7 +157,7 @@ export default async function MenuSpesialPage(props: {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--background-custom)] text-[var(--text-custom)]">
+    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(menuJsonLd) }}

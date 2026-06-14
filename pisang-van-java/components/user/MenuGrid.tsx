@@ -151,10 +151,10 @@ export default function MenuGrid({ products }: { products: ProductType[] }) {
         {products.length === 0 ? (
           <div className="text-center py-24">
             <div className="text-6xl mb-4">🍌</div>
-            <p className="text-lg font-serif font-bold mb-2 text-[var(--text-custom)]">
+            <p className="text-lg font-serif font-bold mb-2 text-zinc-900 dark:text-zinc-100">
               {t('menu_empty_title')}
             </p>
-            <p className="text-sm text-[var(--text-custom)]">{t('menu_empty_desc')}</p>
+            <p className="text-sm text-zinc-900 dark:text-zinc-100">{t('menu_empty_desc')}</p>
             <button
               onClick={() => router.push('?', { scroll: false })}
               className="mt-6 text-xs font-bold px-6 py-3 rounded-[4px] shadow-sm hover:shadow-md transition-all active:scale-95 flex items-center gap-1.5 focus:outline-none bg-[#D4802A] text-white"
@@ -178,11 +178,7 @@ export default function MenuGrid({ products }: { products: ProductType[] }) {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95 }}
                     transition={{ duration: 0.4, delay: i * 0.04 }}
-                    className={`relative rounded-[4px] overflow-hidden flex flex-col group transition-all duration-300 ${available ? 'hover:shadow-sm hover:-translate-y-1' : 'opacity-80 grayscale-[50%]'}`}
-                    style={{
-                      background: 'var(--card-bg)',
-                      border: '1px solid var(--border-custom)'
-                    }}
+                    className={`relative rounded-[4px] overflow-hidden flex flex-col group transition-all duration-300 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 ${available ? 'hover:shadow-sm hover:-translate-y-1' : 'opacity-80 grayscale-[50%]'}`}
                   >
                     {/* Favorite Button */}
                     <button
@@ -216,7 +212,7 @@ export default function MenuGrid({ products }: { products: ProductType[] }) {
                     {/* Content */}
                     <div className="p-6 flex flex-col items-center text-center flex-grow">
                       <h3
-                        className={`font-serif text-2xl font-bold mb-1 ${available ? 'text-[var(--text-custom)]' : 'text-zinc-500'}`}
+                        className={`font-serif text-2xl font-bold mb-1 ${available ? 'text-zinc-900 dark:text-zinc-100' : 'text-zinc-500'}`}
                       >
                         {product.flavorName}
                       </h3>
@@ -275,16 +271,16 @@ export default function MenuGrid({ products }: { products: ProductType[] }) {
                         )}
                       </div>
 
-                      <p className="text-sm leading-relaxed mb-6 flex-grow text-[var(--text-custom)]">
+                      <p className="text-sm leading-relaxed mb-6 flex-grow text-zinc-800 dark:text-zinc-300">
                         {product.deskripsi_topping ||
                           (() => {
                             const key = getFlavorDescriptionKey(product.flavorName)
                             return key ? t(key) : t('menu_default_desc')
                           })()}
                       </p>
-                      <div className="w-full border-t border-[var(--border-custom)] pt-6 pb-8 flex flex-col items-center gap-3 mt-auto">
+                      <div className="w-full border-t border-zinc-200 dark:border-zinc-800 pt-6 pb-8 flex flex-col items-center gap-3 mt-auto">
                         <div className="text-center">
-                          <div className="text-[10px] uppercase tracking-wider font-semibold mb-0.5 text-[var(--text-custom)] opacity-80">
+                          <div className="text-[10px] uppercase tracking-wider font-semibold mb-0.5 text-zinc-500 dark:text-zinc-400">
                             {session?.user.role === 'RESELLER'
                               ? 'Harga Grosir (Mulai)'
                               : t('menu_price_label')}
