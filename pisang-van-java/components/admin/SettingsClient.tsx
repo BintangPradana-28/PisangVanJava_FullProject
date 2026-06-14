@@ -60,7 +60,7 @@ export default function SettingsClient({ settings, adminName }: Props) {
         const payload = Object.fromEntries(
           Object.entries(values).filter(
             ([key]) =>
-              key.startsWith(activeTab + '_') ||
+              key.startsWith(`${activeTab}_`) ||
               (activeTab === 'contact' &&
                 ['nomor_wa', 'alamat', 'jam_operasional'].includes(key)) ||
               (activeTab === 'store' && key === 'store_delivery_fee')
@@ -141,9 +141,12 @@ export default function SettingsClient({ settings, adminName }: Props) {
           <p className="text-sm text-brown-400 mt-0.5">Kelola konfigurasi website dan akun admin</p>
         </div>
         <button
+          type="button"
           onClick={handleSave}
           disabled={saveMutation.isPending}
           className="btn-brown disabled:opacity-60"
+          title="Simpan Semua Pengaturan"
+          aria-label="Simpan Semua Pengaturan"
         >
           {saveMutation.isPending ? 'Menyimpan...' : '💾 Simpan Semua'}
         </button>
@@ -155,22 +158,28 @@ export default function SettingsClient({ settings, adminName }: Props) {
           {groups.map((g) => (
             <button
               key={g}
+              type="button"
               onClick={() => setActiveTab(g)}
               className={`w-full text-left px-4 py-3 rounded-[4px] text-sm font-medium transition-all flex items-center gap-2 ${
                 activeTab === g ? 'bg-brown-700 text-white' : 'text-brown-600 hover:bg-cream-200'
               }`}
+              title={GROUP_LABELS[g] || g}
+              aria-label={GROUP_LABELS[g] || g}
             >
               <span>{GROUP_ICONS[g] || '⚙️'}</span>
               <span>{GROUP_LABELS[g] || g}</span>
             </button>
           ))}
           <button
+            type="button"
             onClick={() => setActiveTab('password')}
             className={`w-full text-left px-4 py-3 rounded-[4px] text-sm font-medium transition-all flex items-center gap-2 ${
               activeTab === 'password'
                 ? 'bg-brown-700 text-white'
                 : 'text-brown-600 hover:bg-cream-200'
             }`}
+            title="Ubah Password Admin"
+            aria-label="Ubah Password Admin"
           >
             <span>🔐</span>
             <span>Ubah Password</span>
@@ -194,22 +203,32 @@ export default function SettingsClient({ settings, adminName }: Props) {
                   { label: 'Konfirmasi', key: 'confirm', placeholder: 'Ulangi password baru' }
                 ].map(({ label, key, placeholder }) => (
                   <div key={key}>
-                    <label className="block text-xs font-semibold text-brown-400 uppercase tracking-wider mb-1.5">
+                    <label
+                      htmlFor={`pw_${key}`}
+                      className="block text-xs font-semibold text-brown-400 uppercase tracking-wider mb-1.5"
+                    >
                       {label}
                     </label>
                     <input
+                      id={`pw_${key}`}
+                      name={`pw_${key}`}
                       type="password"
+                      title={label}
+                      aria-label={label}
                       value={pwForm[key as keyof typeof pwForm]}
-                      onChange={(e) => setValues((p) => ({ ...p, [key]: e.target.value }))}
+                      onChange={(e) => setPwForm((p) => ({ ...p, [key]: e.target.value }))}
                       placeholder={placeholder}
                       className="form-input text-brown-900 font-sans"
                     />
                   </div>
                 ))}
                 <button
+                  type="button"
                   onClick={handlePasswordChange}
                   disabled={passwordMutation.isPending}
                   className="w-full py-3 bg-brown-700 text-white font-semibold rounded-[4px] hover:bg-brown-600 transition-colors disabled:opacity-60"
+                  title="Ubah Password"
+                  aria-label="Ubah Password"
                 >
                   {passwordMutation.isPending ? 'Menyimpan...' : '🔐 Ubah Password'}
                 </button>
@@ -226,76 +245,116 @@ export default function SettingsClient({ settings, adminName }: Props) {
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-semibold text-brown-700 mb-1">
+                  <label
+                    htmlFor="about_hero_title"
+                    className="block text-sm font-semibold text-brown-700 mb-1"
+                  >
                     Hero Title
                   </label>
                   <input
+                    id="about_hero_title"
+                    name="about_hero_title"
                     type="text"
-                    value={values['about_hero_title'] || ''}
-                    onChange={(e) => setValues({ ...values, ['about_hero_title']: e.target.value })}
+                    title="Hero Title"
+                    aria-label="Hero Title"
+                    value={values.about_hero_title || ''}
+                    onChange={(e) => setValues({ ...values, about_hero_title: e.target.value })}
                     className="w-full bg-cream-50 border border-cream-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-brand/50 transition-all text-brown-900"
                     placeholder="Contoh: Pisang Goreng"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-brown-700 mb-1">
+                  <label
+                    htmlFor="about_hero_subtitle"
+                    className="block text-sm font-semibold text-brown-700 mb-1"
+                  >
                     Hero Subtitle
                   </label>
                   <input
+                    id="about_hero_subtitle"
+                    name="about_hero_subtitle"
                     type="text"
-                    value={values['about_hero_subtitle'] || ''}
-                    onChange={(e) =>
-                      setValues({ ...values, ['about_hero_subtitle']: e.target.value })
-                    }
+                    title="Hero Subtitle"
+                    aria-label="Hero Subtitle"
+                    value={values.about_hero_subtitle || ''}
+                    onChange={(e) => setValues({ ...values, about_hero_subtitle: e.target.value })}
                     className="w-full bg-cream-50 border border-cream-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-brand/50 transition-all text-brown-900"
                     placeholder="Contoh: Van Java"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-brown-700 mb-1">
+                  <label
+                    htmlFor="about_desc1"
+                    className="block text-sm font-semibold text-brown-700 mb-1"
+                  >
                     Deskripsi Utama 1
                   </label>
                   <textarea
-                    value={values['about_desc1'] || ''}
-                    onChange={(e) => setValues({ ...values, ['about_desc1']: e.target.value })}
+                    id="about_desc1"
+                    name="about_desc1"
+                    title="Deskripsi Utama 1"
+                    aria-label="Deskripsi Utama 1"
+                    placeholder="Masukkan deskripsi utama 1..."
+                    value={values.about_desc1 || ''}
+                    onChange={(e) => setValues({ ...values, about_desc1: e.target.value })}
                     className="w-full bg-cream-50 border border-cream-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-brand/50 transition-all text-brown-900"
                     rows={3}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-brown-700 mb-1">
+                  <label
+                    htmlFor="about_desc2"
+                    className="block text-sm font-semibold text-brown-700 mb-1"
+                  >
                     Deskripsi Utama 2
                   </label>
                   <textarea
-                    value={values['about_desc2'] || ''}
-                    onChange={(e) => setValues({ ...values, ['about_desc2']: e.target.value })}
+                    id="about_desc2"
+                    name="about_desc2"
+                    title="Deskripsi Utama 2"
+                    aria-label="Deskripsi Utama 2"
+                    placeholder="Masukkan deskripsi utama 2..."
+                    value={values.about_desc2 || ''}
+                    onChange={(e) => setValues({ ...values, about_desc2: e.target.value })}
                     className="w-full bg-cream-50 border border-cream-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-brand/50 transition-all text-brown-900"
                     rows={3}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-brown-700 mb-1">
+                  <label
+                    htmlFor="about_story_title"
+                    className="block text-sm font-semibold text-brown-700 mb-1"
+                  >
                     Story Title
                   </label>
                   <input
+                    id="about_story_title"
+                    name="about_story_title"
+                    title="Story Title"
+                    aria-label="Story Title"
+                    placeholder="Masukkan judul cerita..."
                     type="text"
-                    value={values['about_story_title'] || ''}
-                    onChange={(e) =>
-                      setValues({ ...values, ['about_story_title']: e.target.value })
-                    }
+                    value={values.about_story_title || ''}
+                    onChange={(e) => setValues({ ...values, about_story_title: e.target.value })}
                     className="w-full bg-cream-50 border border-cream-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-brand/50 transition-all text-brown-900"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-brown-700 mb-1">
+                  <label
+                    htmlFor="about_story_subtitle"
+                    className="block text-sm font-semibold text-brown-700 mb-1"
+                  >
                     Story Subtitle
                   </label>
                   <input
+                    id="about_story_subtitle"
+                    name="about_story_subtitle"
+                    title="Story Subtitle"
+                    aria-label="Story Subtitle"
+                    placeholder="Masukkan sub-judul cerita..."
                     type="text"
-                    value={values['about_story_subtitle'] || ''}
-                    onChange={(e) =>
-                      setValues({ ...values, ['about_story_subtitle']: e.target.value })
-                    }
+                    value={values.about_story_subtitle || ''}
+                    onChange={(e) => setValues({ ...values, about_story_subtitle: e.target.value })}
                     className="w-full bg-cream-50 border border-cream-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-brand/50 transition-all text-brown-900"
                   />
                 </div>
@@ -311,26 +370,40 @@ export default function SettingsClient({ settings, adminName }: Props) {
               </p>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-semibold text-brown-700 mb-1">
+                  <label
+                    htmlFor="home_hero_title"
+                    className="block text-sm font-semibold text-brown-700 mb-1"
+                  >
                     Hero Title
                   </label>
                   <input
+                    id="home_hero_title"
+                    name="home_hero_title"
+                    title="Hero Title"
+                    aria-label="Hero Title"
+                    placeholder="Masukkan judul utama beranda..."
                     type="text"
-                    value={values['home_hero_title'] || ''}
-                    onChange={(e) => setValues({ ...values, ['home_hero_title']: e.target.value })}
+                    value={values.home_hero_title || ''}
+                    onChange={(e) => setValues({ ...values, home_hero_title: e.target.value })}
                     className="w-full bg-cream-50 border border-cream-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-brand/50 transition-all text-brown-900"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-brown-700 mb-1">
+                  <label
+                    htmlFor="home_hero_subtitle"
+                    className="block text-sm font-semibold text-brown-700 mb-1"
+                  >
                     Hero Subtitle
                   </label>
                   <input
+                    id="home_hero_subtitle"
+                    name="home_hero_subtitle"
+                    title="Hero Subtitle"
+                    aria-label="Hero Subtitle"
+                    placeholder="Masukkan sub-judul beranda..."
                     type="text"
-                    value={values['home_hero_subtitle'] || ''}
-                    onChange={(e) =>
-                      setValues({ ...values, ['home_hero_subtitle']: e.target.value })
-                    }
+                    value={values.home_hero_subtitle || ''}
+                    onChange={(e) => setValues({ ...values, home_hero_subtitle: e.target.value })}
                     className="w-full bg-cream-50 border border-cream-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-brand/50 transition-all text-brown-900"
                   />
                 </div>
@@ -346,36 +419,58 @@ export default function SettingsClient({ settings, adminName }: Props) {
               </p>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-semibold text-brown-700 mb-1">
+                  <label
+                    htmlFor="nomor_wa"
+                    className="block text-sm font-semibold text-brown-700 mb-1"
+                  >
                     WhatsApp CS
                   </label>
                   <input
+                    id="nomor_wa"
+                    name="nomor_wa"
+                    title="WhatsApp CS"
+                    aria-label="WhatsApp CS"
                     type="text"
-                    value={values['nomor_wa'] || ''}
-                    onChange={(e) => setValues({ ...values, ['nomor_wa']: e.target.value })}
+                    value={values.nomor_wa || ''}
+                    onChange={(e) => setValues({ ...values, nomor_wa: e.target.value })}
                     className="w-full bg-cream-50 border border-cream-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-brand/50 transition-all text-brown-900"
                     placeholder="628123456789"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-brown-700 mb-1">
+                  <label
+                    htmlFor="alamat"
+                    className="block text-sm font-semibold text-brown-700 mb-1"
+                  >
                     Alamat Lengkap
                   </label>
                   <textarea
-                    value={values['alamat'] || ''}
-                    onChange={(e) => setValues({ ...values, ['alamat']: e.target.value })}
+                    id="alamat"
+                    name="alamat"
+                    title="Alamat Lengkap"
+                    aria-label="Alamat Lengkap"
+                    placeholder="Masukkan alamat lengkap toko..."
+                    value={values.alamat || ''}
+                    onChange={(e) => setValues({ ...values, alamat: e.target.value })}
                     className="w-full bg-cream-50 border border-cream-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-brand/50 transition-all text-brown-900"
                     rows={3}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-brown-700 mb-1">
+                  <label
+                    htmlFor="jam_operasional"
+                    className="block text-sm font-semibold text-brown-700 mb-1"
+                  >
                     Jam Operasional
                   </label>
                   <input
+                    id="jam_operasional"
+                    name="jam_operasional"
+                    title="Jam Operasional"
+                    aria-label="Jam Operasional"
                     type="text"
-                    value={values['jam_operasional'] || ''}
-                    onChange={(e) => setValues({ ...values, ['jam_operasional']: e.target.value })}
+                    value={values.jam_operasional || ''}
+                    onChange={(e) => setValues({ ...values, jam_operasional: e.target.value })}
                     className="w-full bg-cream-50 border border-cream-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-brand/50 transition-all text-brown-900"
                     placeholder="Setiap Hari: 10.00-21.00 WIB"
                   />
@@ -392,15 +487,20 @@ export default function SettingsClient({ settings, adminName }: Props) {
               </p>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-semibold text-brown-700 mb-1">
+                  <label
+                    htmlFor="store_delivery_fee"
+                    className="block text-sm font-semibold text-brown-700 mb-1"
+                  >
                     Biaya Pengiriman / Delivery Fee (Flat Rate)
                   </label>
                   <input
+                    id="store_delivery_fee"
+                    name="store_delivery_fee"
+                    title="Biaya Pengiriman"
+                    aria-label="Biaya Pengiriman"
                     type="number"
-                    value={values['store_delivery_fee'] || '0'}
-                    onChange={(e) =>
-                      setValues({ ...values, ['store_delivery_fee']: e.target.value })
-                    }
+                    value={values.store_delivery_fee || '0'}
+                    onChange={(e) => setValues({ ...values, store_delivery_fee: e.target.value })}
                     className="w-full bg-cream-50 border border-cream-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-brand/50 transition-all text-brown-900"
                     placeholder="Contoh: 10000"
                   />
@@ -426,13 +526,21 @@ export default function SettingsClient({ settings, adminName }: Props) {
                     values[s.key] === 'false' ||
                     s.value === 'true' ||
                     s.value === 'false'
+                  const cleanLabelText = cleanLabel(s.label, s.key)
                   return (
                     <div key={s.key}>
-                      <label className="block text-xs font-semibold text-brown-400 uppercase tracking-wider mb-1.5">
-                        {cleanLabel(s.label, s.key)}
+                      <label
+                        htmlFor={s.key}
+                        className="block text-xs font-semibold text-brown-400 uppercase tracking-wider mb-1.5"
+                      >
+                        {cleanLabelText}
                       </label>
                       {s.key === 'store_status' ? (
                         <select
+                          id={s.key}
+                          name={s.key}
+                          title={cleanLabelText}
+                          aria-label={cleanLabelText}
                           value={values[s.key] || 'AUTO'}
                           onChange={(e) => setValues((v) => ({ ...v, [s.key]: e.target.value }))}
                           className="w-full bg-cream-50 border border-cream-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-brand/50 transition-all text-brown-900"
@@ -443,6 +551,11 @@ export default function SettingsClient({ settings, adminName }: Props) {
                         </select>
                       ) : isBoolean ? (
                         <button
+                          id={s.key}
+                          name={s.key}
+                          type="button"
+                          title={cleanLabelText}
+                          aria-label={cleanLabelText}
                           onClick={() =>
                             setValues((v) => ({
                               ...v,
@@ -463,6 +576,11 @@ export default function SettingsClient({ settings, adminName }: Props) {
                         </button>
                       ) : (values[s.key] || '').length > 80 ? (
                         <textarea
+                          id={s.key}
+                          name={s.key}
+                          title={cleanLabelText}
+                          aria-label={cleanLabelText}
+                          placeholder={cleanLabelText}
                           value={values[s.key] || ''}
                           onChange={(e) => setValues((v) => ({ ...v, [s.key]: e.target.value }))}
                           rows={3}
@@ -470,6 +588,11 @@ export default function SettingsClient({ settings, adminName }: Props) {
                         />
                       ) : (
                         <input
+                          id={s.key}
+                          name={s.key}
+                          title={cleanLabelText}
+                          aria-label={cleanLabelText}
+                          placeholder={cleanLabelText}
                           type="text"
                           value={values[s.key] || ''}
                           onChange={(e) => setValues((v) => ({ ...v, [s.key]: e.target.value }))}
