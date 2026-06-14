@@ -401,6 +401,7 @@ export const dictionaries: Record<Locale, Translations> = {
     address_save_btn: 'Simpan',
     address_map_loading: 'Memuat Peta Geospasial...',
     address_delete_confirm: 'Apakah Anda yakin ingin menghapus alamat ini?',
+    address_pin_saved: 'Pin Peta Tersimpan',
     // Pesanan Translations
     orders_title: 'Riwayat Pesanan',
     orders_subtitle: 'Pantau status pesanan dan rincian pembelian Anda',
@@ -835,6 +836,7 @@ export const dictionaries: Record<Locale, Translations> = {
     address_save_btn: 'Save',
     address_map_loading: 'Loading Geospatial Map...',
     address_delete_confirm: 'Are you sure you want to delete this address?',
+    address_pin_saved: 'Map Pin Saved',
     // Pesanan Translations
     orders_title: 'Order History',
     orders_subtitle: 'Track order statuses and view purchase details',

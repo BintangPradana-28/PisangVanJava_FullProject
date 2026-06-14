@@ -42,6 +42,7 @@
     scroll-behavior: smooth;
     scroll-padding-top: 80px;
     -webkit-font-smoothing: antialiased;
+    background-color: var(--background-custom);
   }
 
   body {
@@ -220,7 +221,7 @@
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--background-custom);
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
   background: var(--secondary-custom);

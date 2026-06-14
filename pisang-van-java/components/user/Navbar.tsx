@@ -233,7 +233,7 @@ export default function Navbar() {
             <button
               type="button"
               onClick={() => setLocale(locale === 'id' ? 'en' : 'id')}
-              className={`text-xs font-bold px-2.5 py-1.5 rounded-lg border transition-all hover:bg-zinc-100 dark:hover:bg-zinc-800 ${
+              className={`text-xs font-bold px-2.5 py-1.5 rounded-[4px] border transition-all hover:bg-zinc-100 dark:hover:bg-zinc-800 ${
                 useSolidHeader
                   ? 'text-zinc-700 dark:text-zinc-200 border-zinc-300 dark:border-zinc-700'
                   : 'text-white border-white/40'
@@ -273,9 +273,9 @@ export default function Navbar() {
                   type="button"
                   id="navbar-profile"
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  className="flex items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary rounded-[4px]"
+                  className="flex items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary rounded-full"
                 >
-                  <div className="w-9 h-9 rounded-[4px] bg-secondary hover:bg-secondary/95 text-white flex items-center justify-center font-bold text-sm shadow-md transition-all overflow-hidden">
+                  <div className="w-9 h-9 rounded-full bg-secondary hover:bg-secondary/95 text-white flex items-center justify-center font-bold text-sm shadow-md transition-all overflow-hidden">
                     {session.user?.image ? (
                       <img
                         src={session.user.image}

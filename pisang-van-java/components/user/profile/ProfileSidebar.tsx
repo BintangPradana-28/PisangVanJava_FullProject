@@ -41,7 +41,7 @@ export default function ProfileSidebar() {
       <div className="bg-white dark:bg-zinc-900 rounded-[4px] p-4 md:p-6 shadow-sm border border-zinc-200/50 dark:border-zinc-800/80 sticky top-24">
         {/* Profile Info (Desktop) */}
         <div className="hidden md:flex flex-col items-center pb-6 mb-6 border-b border-zinc-100 dark:border-zinc-800">
-          <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-[4px] overflow-hidden border-4 border-white dark:border-zinc-900 shadow-md relative bg-zinc-100 dark:bg-zinc-800">
+          <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden border-4 border-white dark:border-zinc-900 shadow-md relative bg-zinc-100 dark:bg-zinc-800">
             {session?.user?.image ? (
               <Image src={session.user.image} alt="Avatar" fill className="object-cover" />
             ) : (

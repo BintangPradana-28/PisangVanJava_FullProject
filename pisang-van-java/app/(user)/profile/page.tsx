@@ -401,7 +401,7 @@ export default function ProfileDataDiriPage() {
           {/* Avatar Upload */}
           <div className="flex flex-col md:flex-row items-center md:items-start gap-6 mb-8 bg-zinc-50 dark:bg-zinc-800/30 p-6 rounded-[4px] border border-zinc-100 dark:border-zinc-800">
             <div className="relative group shrink-0">
-              <div className="w-24 h-24 md:w-28 md:h-28 rounded-[4px] overflow-hidden bg-zinc-200 dark:bg-zinc-800 border-4 border-white dark:border-zinc-900 shadow-md relative">
+              <div className="w-24 h-24 md:w-28 md:h-28 rounded-full overflow-hidden bg-zinc-200 dark:bg-zinc-800 border-4 border-white dark:border-zinc-900 shadow-md relative">
                 {avatarUrl || session?.user?.image ? (
                   <Image
                     src={avatarUrl || session?.user?.image || ''}
@@ -418,7 +418,7 @@ export default function ProfileDataDiriPage() {
                   </div>
                 )}
               </div>
-              <label className="absolute bottom-0 right-0 p-2.5 bg-[#D4802A] text-white rounded-[4px] cursor-pointer shadow-sm hover:bg-[#b56d24] transition-all hover:scale-105 active:scale-95 group-hover:ring-4 ring-white dark:ring-zinc-900">
+              <label className="absolute bottom-0 right-0 p-2.5 bg-[#D4802A] text-white rounded-full cursor-pointer shadow-sm hover:bg-[#b56d24] transition-all hover:scale-105 active:scale-95 group-hover:ring-4 ring-white dark:ring-zinc-900">
                 <Camera className="w-4 h-4" />
                 <input
                   type="file"
