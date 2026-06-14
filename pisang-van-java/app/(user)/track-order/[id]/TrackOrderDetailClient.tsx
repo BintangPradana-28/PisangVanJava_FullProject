@@ -8,8 +8,8 @@ import { AnimatePresence, motion } from 'framer-motion'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import toast, { Toaster } from 'react-hot-toast'
-import { supabaseBrowserClient } from '@/src/lib/supabase-client'
 import { formatPrice } from '@/lib/utils'
+import { supabaseBrowserClient } from '@/src/lib/supabase-client'
 
 interface TrackOrderDetailClientProps {
   order: {

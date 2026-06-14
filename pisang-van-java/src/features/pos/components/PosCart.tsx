@@ -172,7 +172,11 @@ export default function PosCart(): React.JSX.Element {
       items: items.map((item) => ({
         variantId: item.product.id,
         toppingId: item.topping?.id || null,
-        toppingIds: item.toppings ? item.toppings.map((t) => t.id) : item.topping ? [item.topping.id] : [],
+        toppingIds: item.toppings
+          ? item.toppings.map((t) => t.id)
+          : item.topping
+            ? [item.topping.id]
+            : [],
         baseType: item.baseType,
         quantity: item.quantity,
         unitPrice: item.subtotal / item.quantity,

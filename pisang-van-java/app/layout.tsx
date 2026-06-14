@@ -81,7 +81,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       suppressHydrationWarning
     >
       <head>
-        <link rel="preconnect" href="https://o4511473006084096.ingest.sentry.io" crossOrigin="anonymous" />
+        <link
+          rel="preconnect"
+          href="https://o4511473006084096.ingest.sentry.io"
+          crossOrigin="anonymous"
+        />
       </head>
       <body className="min-h-screen flex flex-col">
         <Providers>{children}</Providers>

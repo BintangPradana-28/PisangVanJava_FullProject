@@ -11,8 +11,8 @@ import QuickViewModal from '@/components/user/QuickViewModal'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSettings } from '@/context/SettingsContext'
 import type { ProductType } from '@/src/features/menu/components/MenuCards'
-import { isStoreOpen as checkStoreOpen } from '@/src/lib/time'
 import { animateFlyHeart } from '@/src/lib/animations'
+import { isStoreOpen as checkStoreOpen } from '@/src/lib/time'
 
 const formatPrice = (price: number) =>
   new Intl.NumberFormat('id-ID', {

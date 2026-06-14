@@ -75,7 +75,10 @@ export default function Hero({
           className="object-cover opacity-40"
         />
         {/* PERBAIKAN: Gradient hitam pekat yang dikunci mati (tidak terpengaruh tema) */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#1a0f0a] via-[#1a0f0a]/80 to-black/30" aria-hidden="true" />
+        <div
+          className="absolute inset-0 bg-gradient-to-t from-[#1a0f0a] via-[#1a0f0a]/80 to-black/30"
+          aria-hidden="true"
+        />
       </div>
 
       <div className="relative z-10 max-w-[1200px] w-full mx-auto px-6 py-24 md:py-32 grid lg:grid-cols-[3fr_2fr] gap-12 items-center">

@@ -1,17 +1,18 @@
 'use client'
 
+import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
-import React, { useEffect, useMemo, useState } from 'react'
+import type React from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
 import { Drawer } from 'vaul'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSettings } from '@/context/SettingsContext'
 import type { ProductType } from '@/src/features/menu/components/MenuCards'
+import { animateFlyToCart } from '@/src/lib/animations'
 import { isStoreOpen as checkStoreOpen } from '@/src/lib/time'
 import { type CartTopping, useCartStore } from '@/src/stores/cart.store'
-import { motion } from 'framer-motion'
-import { animateFlyToCart } from '@/src/lib/animations'
 
 interface QuickViewModalProps {
   product: ProductType | null

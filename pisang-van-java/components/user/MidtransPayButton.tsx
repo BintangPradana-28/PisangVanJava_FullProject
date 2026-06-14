@@ -1,9 +1,9 @@
 'use client'
 
-import { env } from '@/src/env'
 import { CreditCard, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import { env } from '@/src/env'
 
 interface Props {
   snapToken: string

@@ -17,8 +17,8 @@ import {
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { toast } from 'react-hot-toast'
-import { useCartStore } from '@/src/stores/cart.store'
 import { formatPrice } from '@/lib/utils'
+import { useCartStore } from '@/src/stores/cart.store'
 
 interface ProfileOrderDetailClientProps {
   order: {

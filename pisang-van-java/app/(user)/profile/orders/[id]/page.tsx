@@ -4,8 +4,8 @@
 // RAG Source: prisma/schema.prisma (Order, OrderItem, Payment, User)
 
 import type { Metadata } from 'next'
-import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/src/auth'
 import ProfileOrderDetailClient from './ProfileOrderDetailClient'

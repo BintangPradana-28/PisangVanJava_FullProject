@@ -1,11 +1,11 @@
+import { OrderStatus, PaymentStatus, Prisma } from '@prisma/client'
 import * as Sentry from '@sentry/nextjs'
 import { type NextRequest, NextResponse } from 'next/server'
-import { OrderStatus, PaymentStatus, Prisma } from '@prisma/client'
 import { prisma } from '@/lib/prisma'
 import { redis } from '@/lib/redis'
 import { sendOrderConfirmationEmail } from '@/src/features/payment/email'
-import { verifyMidtransSignature } from '@/src/features/payment/service'
 import { mapMidtransStatusToPaymentStatus } from '@/src/features/payment/payment-status.mapper'
+import { verifyMidtransSignature } from '@/src/features/payment/service'
 
 export async function POST(req: NextRequest) {
   try {

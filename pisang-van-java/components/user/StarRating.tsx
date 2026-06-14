@@ -3,8 +3,8 @@
 // components/user/StarRating.tsx
 // Interactive 5-star rating input with optimistic feedback and server action support.
 
-import { useState, useTransition } from 'react'
 import { motion } from 'framer-motion'
+import { useState, useTransition } from 'react'
 
 interface StarRatingProps {
   variantId: string
