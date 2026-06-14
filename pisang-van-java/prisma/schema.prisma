@@ -150,6 +150,7 @@ model MenuVariant {
   isActive          Boolean     @default(true)
   isAvailable       Boolean     @default(true) // Untuk stok harian
   stock             Int         @default(999) // Pessimistic Locking / OCC
+  soldCount         Int         @default(0) // Jumlah produk yang sudah terjual
   version           Int         @default(1) // Optimistic Concurrency Control
   isDeleted         Boolean     @default(false) // Untuk Soft Delete
   tags              String[]    @default([]) // Array of string for tagging (e.g., "Manis", "Gurih")

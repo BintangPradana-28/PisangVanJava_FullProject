@@ -64,6 +64,10 @@ export async function generateSnapToken(params: GenerateSnapTokenParams): Promis
         order_id: params.orderId,
         gross_amount: Math.round(params.grossAmount) // Midtrans expects integer
       },
+      custom_expiry: {
+        expiry_duration: 15,
+        unit: 'minute'
+      },
       customer_details: {
         first_name: params.customerName.slice(0, 255), // Midtrans max len
         phone: params.customerPhone.slice(0, 255)

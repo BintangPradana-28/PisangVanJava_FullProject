@@ -59,6 +59,7 @@ const getCachedMenu = unstable_cache(
           imageUrl: p.imageUrl,
           isAvailable: p.isAvailable,
           stock: p.stock,
+          soldCount: p.soldCount,
           tags: p.tags || [],
           deskripsi_topping: p.deskripsi_topping,
           wholesaleKembung: p.wholesaleKembung,

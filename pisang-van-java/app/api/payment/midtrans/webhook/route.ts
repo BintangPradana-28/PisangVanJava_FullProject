@@ -1,5 +1,6 @@
 import { OrderStatus, PaymentStatus, Prisma } from '@prisma/client'
 import * as Sentry from '@sentry/nextjs'
+import { revalidatePath, revalidateTag } from 'next/cache'
 import { type NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { redis } from '@/lib/redis'
@@ -165,6 +166,20 @@ export async function POST(req: NextRequest) {
         })
         if (updateCount.count > 0) {
           sendEmail = true
+          
+          // Increment soldCount for all items in the order
+          const orderWithItems = await tx.order.findUnique({
+            where: { id: realOrderId },
+            include: { items: true }
+          })
+          for (const item of orderWithItems?.items || []) {
+            if (item.variantId) {
+              await tx.menuVariant.update({
+                where: { id: item.variantId },
+                data: { soldCount: { increment: item.quantity } }
+              })
+            }
+          }
         }
       } else if (targetOrderStatus === OrderStatus.CANCELED) {
         // Zero-Trust: Only restore stock IF the order is transitioning from PENDING_PAYMENT to CANCELED.
@@ -196,6 +211,18 @@ export async function POST(req: NextRequest) {
     if (sendEmail) {
       // Trigger order confirmation email in the background
       sendOrderConfirmationEmail(realOrderId).catch(console.error)
+    }
+
+    // Force real-time Edge Cache purge for Storefront and Dashboard 
+    // This allows UI to show accurate stock and soldCount instantly without a hard reload.
+    try {
+      revalidatePath('/', 'layout')
+      revalidatePath('/(user)/menu-spesial', 'page')
+      revalidatePath('/(admin)', 'layout')
+      revalidateTag('menu')
+      revalidateTag('menu-spesial-all-products')
+    } catch (e) {
+      console.warn('[Midtrans Webhook] Failed to revalidate Next.js cache', e)
     }
 
     return NextResponse.json({ success: true, message: 'Webhook processed successfully' })

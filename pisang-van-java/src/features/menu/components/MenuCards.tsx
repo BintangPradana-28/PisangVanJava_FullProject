@@ -27,6 +27,7 @@ export interface ProductType {
   rating?: number
   reviewCount?: number
   stock: number
+  soldCount?: number
   isActive: boolean
 }
 
@@ -239,26 +240,39 @@ export default function MenuCards({ products }: Props) {
                     </div>
 
                     {/* Rating UI / Sales Magnet */}
-                    <Link
-                      href="/ulasan"
-                      className="flex items-center gap-1.5 mb-3 text-sm text-zinc-500 hover:text-[#D4802A] transition-colors cursor-pointer active:scale-95"
-                    >
-                      {product.rating ? (
-                        <>
-                          <span className="text-amber-400">⭐</span>
-                          <span className="font-semibold text-zinc-700 dark:text-zinc-300">
-                            {product.rating}
+                    <div className="flex items-center gap-3 mb-3 w-full justify-center">
+                      <Link
+                        href="/ulasan"
+                        className="flex items-center gap-1.5 text-sm text-zinc-500 hover:text-[#D4802A] transition-colors cursor-pointer active:scale-95"
+                      >
+                        {product.rating ? (
+                          <>
+                            <span className="text-amber-400">⭐</span>
+                            <span className="font-semibold text-zinc-700 dark:text-zinc-300">
+                              {product.rating}
+                            </span>
+                            {product.reviewCount ? (
+                              <span className="text-xs">({product.reviewCount})</span>
+                            ) : null}
+                          </>
+                        ) : (
+                          <span className="font-bold text-[#D4802A] bg-[#D4802A]/10 px-2 py-0.5 rounded-[4px] text-xs">
+                            {getSalesMagnetTag(product.flavorName)}
                           </span>
-                          {product.reviewCount ? (
-                            <span className="text-xs">({product.reviewCount}) &rarr;</span>
-                          ) : null}
-                        </>
-                      ) : (
-                        <span className="font-bold text-[#D4802A] bg-[#D4802A]/10 px-2 py-0.5 rounded-[4px] text-xs">
-                          {getSalesMagnetTag(product.flavorName)}
-                        </span>
+                        )}
+                      </Link>
+
+                      {product.soldCount !== undefined && product.soldCount > 0 && (
+                        <div className="flex items-center gap-1 text-xs font-medium text-zinc-500 bg-zinc-100 dark:bg-zinc-800/50 px-2 py-0.5 rounded-[4px]">
+                          {product.soldCount > 50 && <span className="text-orange-500">🔥</span>}
+                          <span>
+                            {product.soldCount >= 1000 
+                              ? `${(product.soldCount / 1000).toFixed(1)}k+` 
+                              : product.soldCount} Terjual
+                          </span>
+                        </div>
                       )}
-                    </Link>
+                    </div>
 
                     <p className="text-on-surface-variant dark:text-zinc-400 text-sm leading-relaxed mb-6 flex-grow font-sans w-full text-center">
                       {product.deskripsi_topping ||

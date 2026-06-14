@@ -42,6 +42,7 @@ async function main() {
     const files = fs.readdirSync(flavorsDir)
     for (const file of files) {
       if (file.toLowerCase().endsWith('.png')) {
+        // nosemgrep: path-join-resolve-traversal — 'file' is from fs.readdirSync, not user input
         const filePath = path.join(flavorsDir, file)
         await optimizeImage(filePath, 500, 60)
       }

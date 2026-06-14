@@ -73,6 +73,7 @@ export default async function MenuSpesialPage(props: {
     imageUrl: p.imageUrl,
     isAvailable: p.isAvailable,
     stock: p.stock,
+    soldCount: p.soldCount,
     tags: p.tags || [],
     rating:
       p.reviews.length > 0

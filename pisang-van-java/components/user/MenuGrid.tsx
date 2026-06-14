@@ -248,19 +248,32 @@ export default function MenuGrid({ products }: { products: ProductType[] }) {
                         )}
                       </div>
 
-                      {/* Rating UI */}
-                      <Link
-                        href="/ulasan"
-                        className="flex items-center gap-1.5 mb-3 text-sm text-zinc-500 hover:text-[#D4802A] transition-colors cursor-pointer active:scale-95"
-                      >
-                        <span className="text-amber-400">⭐</span>
-                        <span className="font-semibold text-zinc-700 dark:text-zinc-300">
-                          {product.rating ? product.rating : 'Baru'}
-                        </span>
-                        {product.reviewCount ? (
-                          <span className="text-xs">({product.reviewCount}) &rarr;</span>
-                        ) : null}
-                      </Link>
+                      {/* Rating & Sales UI */}
+                      <div className="flex items-center gap-3 mb-3">
+                        <Link
+                          href="/ulasan"
+                          className="flex items-center gap-1.5 text-sm text-zinc-500 hover:text-[#D4802A] transition-colors cursor-pointer active:scale-95"
+                        >
+                          <span className="text-amber-400">⭐</span>
+                          <span className="font-semibold text-zinc-700 dark:text-zinc-300">
+                            {product.rating ? product.rating : 'Baru'}
+                          </span>
+                          {product.reviewCount ? (
+                            <span className="text-xs">({product.reviewCount})</span>
+                          ) : null}
+                        </Link>
+                        
+                        {product.soldCount !== undefined && product.soldCount > 0 && (
+                          <div className="flex items-center gap-1 text-xs font-medium text-zinc-500 bg-zinc-100 dark:bg-zinc-800/50 px-2 py-0.5 rounded-[4px]">
+                            {product.soldCount > 50 && <span className="text-orange-500">🔥</span>}
+                            <span>
+                              {product.soldCount >= 1000 
+                                ? `${(product.soldCount / 1000).toFixed(1)}k+` 
+                                : product.soldCount} Terjual
+                            </span>
+                          </div>
+                        )}
+                      </div>
 
                       <p className="text-sm leading-relaxed mb-6 flex-grow text-[var(--text-custom)]">
                         {product.deskripsi_topping ||

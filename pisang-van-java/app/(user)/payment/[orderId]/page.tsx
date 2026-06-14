@@ -62,8 +62,8 @@ export default async function PaymentPage({ params, searchParams }: PaymentPageP
 
   let snapToken = order.midtransToken
 
-  // Check if token has expired (older than 24 hours) or is missing
-  const TOKEN_EXPIRY_MS = 24 * 60 * 60 * 1000 // 24 hours
+  // Check if token has expired (older than 15 minutes) or is missing
+  const TOKEN_EXPIRY_MS = 15 * 60 * 1000 // 15 minutes
   const isExpired =
     !order.midtransToken ||
     new Date().getTime() - new Date(order.createdAt).getTime() > TOKEN_EXPIRY_MS
