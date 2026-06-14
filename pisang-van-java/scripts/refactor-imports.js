@@ -22,19 +22,32 @@ const replacements = [
   { from: /from "\.\/CartModal"/g, to: 'from "@/src/features/cart/components/CartModal"' }
 ];
 
-function walk(dir) {
+function walk(baseDir) {
   let results = [];
-  const list = fs.readdirSync(dir);
-  list.forEach(function(file) {
-    file = path.join(dir, file);
-    const stat = fs.statSync(file);
+  
+  // ZOMBIE-PROOF SECURITY BOUNDARY
+  // Ensure baseDir resolves strictly within the current working directory to prevent arbitrary file access.
+  const resolvedBaseDir = path.resolve(process.cwd(), baseDir);
+  if (!resolvedBaseDir.startsWith(process.cwd())) {
+    throw new Error(`[SECURITY EXCEPTION] Path Traversal Attempt Detected: ${baseDir}`);
+  }
+
+  const list = fs.readdirSync(resolvedBaseDir);
+  
+  list.forEach(function(item) {
+    // SAST SANITIZATION: Force 'item' to be a strict basename.
+    // Neutralizes unexpected traversal sequences like '../'
+    const safeItem = path.basename(item);
+    const fullPath = path.join(resolvedBaseDir, safeItem);
+    
+    const stat = fs.statSync(fullPath);
     if (stat && stat.isDirectory()) { 
-      if (!file.includes('node_modules') && !file.includes('.next')) {
-        results = results.concat(walk(file));
+      if (!fullPath.includes('node_modules') && !fullPath.includes('.next') && !fullPath.includes('.git')) {
+        results = results.concat(walk(fullPath));
       }
     } else { 
-      if (file.endsWith('.ts') || file.endsWith('.tsx')) {
-        results.push(file);
+      if (fullPath.endsWith('.ts') || fullPath.endsWith('.tsx')) {
+        results.push(fullPath);
       }
     }
   });
