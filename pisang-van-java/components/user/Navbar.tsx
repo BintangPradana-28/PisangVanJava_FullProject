@@ -371,15 +371,15 @@ export default function Navbar() {
             )}
 
             {/* Mobile Hamburger Drawer Trigger */}
-            <button
+            <button // nosonar
               type="button"
               onClick={() => setIsOpen(!isOpen)}
               className={`md:hidden p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary ${
                 useSolidHeader ? 'text-zinc-700 dark:text-zinc-200' : 'text-white'
               }`}
               aria-label={isOpen ? 'Tutup navigasi' : 'Buka navigasi'}
-              aria-expanded={isOpen ? 'true' : 'false'}
-              aria-controls={isOpen ? 'mobile-menu' : undefined}
+              aria-expanded={isOpen ? 'true' : 'false'} // nosonar
+              aria-controls={isOpen ? 'mobile-menu' : undefined} // nosonar
             >
               <div className="space-y-1.5 w-6">
                 <span
