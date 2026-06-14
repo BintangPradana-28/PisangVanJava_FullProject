@@ -208,6 +208,8 @@ export default function ManageUsersClient() {
                       {user.role !== 'ADMIN' && user.role !== 'SUPER_ADMIN' && (
                         <div className="flex items-center gap-2">
                           <select
+                            aria-label="Ubah peran pengguna"
+                            title="Ubah peran pengguna"
                             className="border border-cream-300 rounded-lg px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-brown-500 max-w-[120px]"
                             value={user.role}
                             onChange={(e) => handleRoleChange(user.id, e.target.value)}
@@ -253,11 +255,14 @@ export default function ManageUsersClient() {
 
             <form onSubmit={handleAdjustCoin} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">
+                <label htmlFor="coinAdjustment" className="block text-xs font-bold text-gray-700 mb-1">
                   Jumlah (Gunakan minus untuk mengurangi)
                 </label>
                 <input
+                  id="coinAdjustment"
                   type="number"
+                  title="Jumlah penyesuaian koin"
+                  placeholder="0"
                   value={coinAdjustment}
                   onChange={(e) => setCoinAdjustment(Number(e.target.value))}
                   className="w-full border rounded-[4px] px-4 py-3 focus:ring-2 focus:ring-orange-500 outline-none"
@@ -265,11 +270,13 @@ export default function ManageUsersClient() {
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">
+                <label htmlFor="coinReason" className="block text-xs font-bold text-gray-700 mb-1">
                   Alasan (Untuk Audit)
                 </label>
                 <input
+                  id="coinReason"
                   type="text"
+                  title="Alasan penyesuaian koin"
                   value={coinReason}
                   onChange={(e) => setCoinReason(e.target.value)}
                   placeholder="Misal: Kompensasi pesanan lambat"

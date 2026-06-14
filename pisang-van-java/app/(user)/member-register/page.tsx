@@ -119,14 +119,14 @@ export default function MemberRegisterPage() {
   }
 
   const inputCls = `w-full px-4 py-3 text-sm rounded-[4px] outline-none transition-all
-    bg-[var(--surface-custom)] border border-zinc-400 dark:border-zinc-600
-    text-[var(--text-custom)] placeholder:text-[var(--on-surface-variant)]
+    bg-white dark:bg-zinc-950 border border-zinc-400 dark:border-zinc-600
+    text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-500
     focus:ring-2 focus:ring-amber-brand/40 focus:border-amber-brand`
 
   if (!mounted) return null
 
   return (
-    <div className="fixed inset-0 z-[200] overflow-y-auto bg-[var(--background-custom)] transition-colors duration-300">
+    <div className="fixed inset-0 z-[200] overflow-y-auto bg-amber-50 dark:bg-zinc-950 transition-colors duration-300">
       <Toaster
         position="top-center"
         toastOptions={{
@@ -143,32 +143,23 @@ export default function MemberRegisterPage() {
           transition={{ duration: 0.5, ease: 'easeOut' }}
           className="w-full max-w-[420px]"
         >
-          <div
-            className="rounded-[4px] px-8 py-10 sm:px-10 shadow-sm"
-            style={{ background: 'var(--card-bg)', border: '1px solid var(--border-custom)' }}
-          >
+          <div className="rounded-[4px] px-8 py-10 sm:px-10 shadow-sm bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
             <motion.div variants={stagger} initial="hidden" animate="visible">
               {/* Brand */}
               <motion.div variants={item} className="flex flex-col items-center gap-1 mb-8">
                 <div
-                  className="w-16 h-16 rounded-[4px] flex items-center justify-center text-4xl mb-1 shadow-md"
-                  style={{ background: 'var(--primary-custom)' }}
-                >
+                  className="w-16 h-16 rounded-[4px] flex items-center justify-center text-4xl mb-1 shadow-md bg-zinc-900 dark:bg-white"
                   🍌
                 </div>
                 <p
-                  className="font-serif text-xl font-bold leading-none tracking-tight"
-                  style={{ color: 'var(--text-custom)' }}
-                >
+                  className="font-serif text-xl font-bold leading-none tracking-tight text-zinc-900 dark:text-zinc-100"
                   Pisang Goreng
                 </p>
-                <p className="font-serif text-lg font-bold" style={{ color: '#D4802A' }}>
+                <p className="font-serif text-lg font-bold text-[#D4802A]">
                   Van Java
                 </p>
                 <p
-                  className="text-[9px] font-bold tracking-[0.35em] uppercase mt-0.5"
-                  style={{ color: 'var(--on-surface-variant, #504440)' }}
-                >
+                  className="text-[9px] font-bold tracking-[0.35em] uppercase mt-0.5 text-zinc-500 dark:text-zinc-400"
                   {t('login_brand_subtitle')}
                 </p>
               </motion.div>
@@ -176,12 +167,10 @@ export default function MemberRegisterPage() {
               {/* Heading */}
               <motion.div variants={item} className="text-center mb-8">
                 <h1
-                  className="font-serif text-2xl sm:text-3xl font-bold mb-1"
-                  style={{ color: 'var(--text-custom)' }}
-                >
+                  className="font-serif text-2xl sm:text-3xl font-bold mb-1 text-zinc-900 dark:text-zinc-100"
                   {t('register_title')}
                 </h1>
-                <p className="text-sm" style={{ color: 'var(--on-surface-variant, #504440)' }}>
+                <p className="text-sm text-zinc-500 dark:text-zinc-400">
                   {t('register_subtitle')}
                 </p>
               </motion.div>
@@ -194,9 +183,7 @@ export default function MemberRegisterPage() {
               >
                 <motion.div variants={item}>
                   <label
-                    className="block text-[11px] font-bold tracking-widest uppercase mb-1.5"
-                    style={{ color: '#D4802A' }}
-                  >
+                    className="block text-[11px] font-bold tracking-widest uppercase mb-1.5 text-[#D4802A]"
                     {t('register_name_label')}
                   </label>
                   <input
@@ -213,9 +200,7 @@ export default function MemberRegisterPage() {
 
                 <motion.div variants={item}>
                   <label
-                    className="block text-[11px] font-bold tracking-widest uppercase mb-1.5"
-                    style={{ color: '#D4802A' }}
-                  >
+                    className="block text-[11px] font-bold tracking-widest uppercase mb-1.5 text-[#D4802A]"
                     {t('register_email_label')}
                   </label>
                   <input
@@ -232,9 +217,7 @@ export default function MemberRegisterPage() {
 
                 <motion.div variants={item}>
                   <label
-                    className="block text-[11px] font-bold tracking-widest uppercase mb-1.5"
-                    style={{ color: '#D4802A' }}
-                  >
+                    className="block text-[11px] font-bold tracking-widest uppercase mb-1.5 text-[#D4802A]"
                     Nomor WhatsApp
                   </label>
                   <input
@@ -253,9 +236,7 @@ export default function MemberRegisterPage() {
 
                 <motion.div variants={item}>
                   <label
-                    className="block text-[11px] font-bold tracking-widest uppercase mb-1.5"
-                    style={{ color: '#D4802A' }}
-                  >
+                    className="block text-[11px] font-bold tracking-widest uppercase mb-1.5 text-[#D4802A]"
                     {t('register_password_label')}
                   </label>
                   <div className="relative">
@@ -268,8 +249,9 @@ export default function MemberRegisterPage() {
                     />
                     <button
                       type="button"
+                      title="Lihat password"
                       onClick={() => setShowPass((v) => !v)}
-                      className="absolute right-3.5 top-1/2 -translate-y-1/2 transition-colors text-[var(--on-surface-variant)] hover:text-amber-brand"
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 transition-colors text-zinc-500 hover:text-amber-brand"
                     >
                       <EyeIcon open={showPass} />
                     </button>
@@ -301,9 +283,7 @@ export default function MemberRegisterPage() {
 
                 <motion.div variants={item}>
                   <label
-                    className="block text-[11px] font-bold tracking-widest uppercase mb-1.5"
-                    style={{ color: '#D4802A' }}
-                  >
+                    className="block text-[11px] font-bold tracking-widest uppercase mb-1.5 text-[#D4802A]"
                     Kode Referral (Opsional)
                   </label>
                   <input
@@ -327,9 +307,7 @@ export default function MemberRegisterPage() {
                     {...register('consent')}
                   />
                   <label
-                    htmlFor="consent"
-                    className="text-[10px] text-[var(--on-surface-variant)] cursor-pointer leading-tight"
-                  >
+                    className="text-[10px] text-zinc-500 dark:text-zinc-400 cursor-pointer leading-tight"
                     Dengan mendaftar, saya menyetujui{' '}
                     <a href="#" className="text-amber-brand hover:underline">
                       Syarat & Ketentuan
@@ -380,10 +358,7 @@ export default function MemberRegisterPage() {
 
                 <motion.div variants={item} className="flex items-center gap-3 py-2">
                   <div className="flex-1 h-px bg-[var(--border-custom)]" />
-                  <span
-                    className="text-xs font-medium"
-                    style={{ color: 'var(--on-surface-variant, #504440)' }}
-                  >
+                    className="text-xs font-medium text-zinc-500 dark:text-zinc-400"
                     {t('login_or_divider')}
                   </span>
                   <div className="flex-1 h-px bg-[var(--border-custom)]" />
@@ -396,17 +371,13 @@ export default function MemberRegisterPage() {
 
               {/* Footer */}
               <motion.div variants={item} className="mt-7 text-center space-y-2.5">
-                <p className="text-sm" style={{ color: 'var(--on-surface-variant, #504440)' }}>
+                <p className="text-sm text-zinc-500 dark:text-zinc-400">
                   {t('register_has_account')}{' '}
                   <Link href="/member-login" className="font-bold text-amber-brand hover:underline">
                     {t('register_login_now')}
                   </Link>
                 </p>
-                <Link
-                  href="/"
-                  className="block text-xs font-medium transition-colors"
-                  style={{ color: 'var(--on-surface-variant, #504440)' }}
-                >
+                  className="block text-xs font-medium transition-colors text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200"
                   {t('login_back_to_web')}
                 </Link>
               </motion.div>

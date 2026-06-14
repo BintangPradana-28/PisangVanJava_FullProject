@@ -95,26 +95,26 @@ export async function GET(req: NextRequest) {
 
     return new ImageResponse(
       // NOSONAR — Satori (Edge Runtime) requires inline styles; CSS files/Tailwind NOT supported in this sandbox
-      <div style={styles.container}>
+      <div style={styles.container} /* NOSONAR */>
         {/* Logo */}
-        <div style={styles.logoWrapper}>
-          <div style={styles.logoBadge}>🍌</div>
-          <div style={styles.logoTextWrapper}>
-            <span style={styles.logoTitle}>Van Java</span>
-            <span style={styles.logoSubtitle}>Premium Heritage</span>
+        <div style={styles.logoWrapper} /* NOSONAR */>
+          <div style={styles.logoBadge} /* NOSONAR */>🍌</div>
+          <div style={styles.logoTextWrapper} /* NOSONAR */>
+            <span style={styles.logoTitle} /* NOSONAR */>Van Java</span>
+            <span style={styles.logoSubtitle} /* NOSONAR */>Premium Heritage</span>
           </div>
         </div>
 
         {/* Product details */}
-        <div style={styles.detailsWrapper}>
+        <div style={styles.detailsWrapper} /* NOSONAR */>
           {/* Title */}
-          <h1 style={styles.title}>{title}</h1>
+          <h1 style={styles.title} /* NOSONAR */>{title}</h1>
 
           {/* Description */}
-          <p style={styles.desc}>{desc}</p>
+          <p style={styles.desc} /* NOSONAR */>{desc}</p>
 
           {/* Price Badge */}
-          {price && <div style={styles.priceBadge}>{price}</div>}
+          {price && <div style={styles.priceBadge} /* NOSONAR */>{price}</div>}
         </div>
       </div>,
       {

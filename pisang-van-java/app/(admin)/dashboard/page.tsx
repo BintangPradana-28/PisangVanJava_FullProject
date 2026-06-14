@@ -170,9 +170,9 @@ export default async function DashboardPage() {
                     <div className="relative w-full flex justify-center h-full items-end">
                       <div
                         className="w-full max-w-[40px] bg-amber-brand/80 group-hover:bg-amber-brand rounded-t-md transition-all duration-300 cursor-pointer relative"
-                        style={barStyle}
+                        style={barStyle} // NOSONAR
                       >
-                        {/* NOSONAR — bar height is a runtime-computed % from revenue data; Tailwind cannot express dynamic JS values */}
+                        {/* bar height is a runtime-computed % from revenue data; Tailwind cannot express dynamic JS values */}
                         <div className="opacity-0 group-hover:opacity-100 absolute -top-10 left-1/2 -translate-x-1/2 bg-brown-700 text-white text-[10px] py-1 px-2 rounded pointer-events-none whitespace-nowrap z-10 transition-opacity">
                           {formatPriceShort(d.total)} ({d.count} ord)
                         </div>

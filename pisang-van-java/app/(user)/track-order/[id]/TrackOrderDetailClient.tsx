@@ -189,8 +189,13 @@ export default function TrackOrderDetailClient({ order, storePhone }: TrackOrder
 
   const stepIdx = ORDER_STEPS.findIndex((s) => s.status === currentStatus)
   const isCanceled = currentStatus === 'CANCELED'
-  const progressHeightStyle = {
-    height: `${stepIdx <= 0 ? 0 : (stepIdx / (ORDER_STEPS.length - 1)) * 90}%`
+  const heightClassMap: Record<number, string> = {
+    [-1]: 'h-0',
+    0: 'h-0',
+    1: 'h-[22.5%]',
+    2: 'h-[45%]',
+    3: 'h-[67.5%]',
+    4: 'h-[90%]'
   }
 
   // Pre-filled WhatsApp link construction
@@ -284,9 +289,8 @@ export default function TrackOrderDetailClient({ order, storePhone }: TrackOrder
               {/* Stepper Connecting Line */}
               <div className="absolute left-3.5 top-5 bottom-5 w-0.5 bg-zinc-100 dark:bg-zinc-800 -translate-x-1/2" />
               <div
-                className="absolute left-3.5 top-5 w-0.5 bg-amber-500 -translate-x-1/2 transition-all duration-700 ease-in-out"
-                style={progressHeightStyle}
-              >{/* NOSONAR — dynamic height requires runtime JS value; cannot use Tailwind for computed % */}</div>
+                className={`absolute left-3.5 top-5 w-0.5 bg-amber-500 -translate-x-1/2 transition-all duration-700 ease-in-out ${heightClassMap[stepIdx] || 'h-0'}`}
+              ></div>
 
               {ORDER_STEPS.map((step, index) => {
                 const isCompleted = index <= stepIdx
