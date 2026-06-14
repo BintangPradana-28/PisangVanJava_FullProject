@@ -130,29 +130,25 @@ export default function MemberLoginPage() {
           <div className="rounded-[4px] px-8 py-10 sm:px-10 shadow-sm bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
             <motion.div variants={stagger} initial="hidden" animate="visible">
               <motion.div variants={item} className="flex flex-col items-center gap-1 mb-8">
-                <div
-                  className="w-16 h-16 rounded-[4px] flex items-center justify-center text-4xl mb-1 shadow-md bg-zinc-900 dark:bg-white"
+                <div className="w-16 h-16 rounded-[4px] flex items-center justify-center text-4xl mb-1 shadow-md bg-zinc-900 dark:bg-white">
                   🍌
                 </div>
-                <p
-                  className="font-serif text-xl font-bold leading-none tracking-tight text-zinc-900 dark:text-zinc-100"
+                <p className="font-serif text-xl font-bold leading-none tracking-tight text-zinc-900 dark:text-zinc-100">
                   Pisang Goreng
                 </p>
                 <p className="font-serif text-lg font-bold text-[#D4802A]">
                   Van Java
                 </p>
-                <p
-                  className="text-[9px] font-bold tracking-[0.35em] uppercase mt-0.5 text-zinc-500 dark:text-zinc-400"
+                <p className="text-[9px] font-bold tracking-[0.35em] uppercase mt-0.5 text-zinc-500 dark:text-zinc-400">
                   {t('login_brand_subtitle')}
                 </p>
               </motion.div>
 
               <motion.div variants={item} className="text-center mb-8">
-                <h1
-                  className="font-serif text-2xl sm:text-3xl font-bold mb-1 text-zinc-900 dark:text-zinc-100"
+                <h1 className="font-serif text-2xl sm:text-3xl font-bold mb-1 text-zinc-900 dark:text-zinc-100">
                   {t('login_title')}
                 </h1>
-                <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                <p className="text-sm text-zinc-600 dark:text-zinc-400">
                   {t('login_subtitle')}
                 </p>
               </motion.div>
@@ -165,6 +161,7 @@ export default function MemberLoginPage() {
                 <motion.div variants={item}>
                   <label
                     className="block text-[11px] font-bold tracking-widest uppercase mb-1.5 text-[#D4802A]"
+                  >
                     {t('login_email_label')}
                   </label>
                   <input
@@ -184,6 +181,7 @@ export default function MemberLoginPage() {
                 <motion.div variants={item}>
                   <label
                     className="block text-[11px] font-bold tracking-widest uppercase mb-1.5 text-[#D4802A]"
+                  >
                     {t('login_password_label')}
                   </label>
                   <div className="relative">
@@ -198,7 +196,7 @@ export default function MemberLoginPage() {
                       type="button"
                       title="Lihat password"
                       onClick={() => setShowPass((v) => !v)}
-                      className="absolute right-3.5 top-1/2 -translate-y-1/2 transition-colors text-zinc-500 hover:text-amber-brand"
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 transition-colors text-zinc-500 dark:text-zinc-400 hover:text-amber-brand dark:hover:text-amber-brand"
                     >
                       <EyeIcon open={showPass} />
                     </button>
@@ -252,7 +250,7 @@ export default function MemberLoginPage() {
 
                 <motion.div variants={item} className="flex items-center gap-3">
                   <div className="flex-1 h-px bg-[var(--border-custom)]" />
-                    className="text-xs font-medium text-zinc-500 dark:text-zinc-400"
+                  <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
                     {t('login_or_divider')}
                   </span>
                   <div className="flex-1 h-px bg-[var(--border-custom)]" />
@@ -273,7 +271,10 @@ export default function MemberLoginPage() {
                     {t('login_register_now')}
                   </Link>
                 </p>
+                <Link
+                  href="/"
                   className="block text-xs font-medium transition-colors text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200"
+                >
                   {t('login_back_to_web')}
                 </Link>
               </motion.div>

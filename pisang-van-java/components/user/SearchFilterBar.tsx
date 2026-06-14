@@ -88,7 +88,11 @@ export default function SearchFilterBar({ totalItems }: SearchFilterBarProps) {
         {/* Search input */}
         <div className="relative flex-1 max-w-sm">
           <svg
-            className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none text-zinc-500 dark:text-zinc-400 opacity-50"
+            className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none text-zinc-400 dark:text-zinc-500"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -115,7 +119,7 @@ export default function SearchFilterBar({ totalItems }: SearchFilterBarProps) {
           )}
         </div>
 
-        <span className="text-xs shrink-0 font-medium tabular-nums text-zinc-500 dark:text-zinc-400 opacity-55">
+        <span className="text-xs shrink-0 font-medium tabular-nums text-zinc-500 dark:text-zinc-400">
           {totalItems} {t('menu_count_suffix')}
         </span>
       </div>
@@ -128,7 +132,6 @@ export default function SearchFilterBar({ totalItems }: SearchFilterBarProps) {
             <button
               key={tab.key}
               onClick={() => setBaseFilter(tab.key)}
-              aria-pressed={active ? 'true' : 'false'}
               className={`flex-shrink-0 text-xs font-bold px-4 py-2 rounded-[4px] transition-all duration-200 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-amber-400 ${
                 active
                   ? 'bg-[#D4802A] text-white shadow-[0_4px_14px_rgba(212,128,42,0.35)]'
@@ -142,6 +145,8 @@ export default function SearchFilterBar({ totalItems }: SearchFilterBarProps) {
       </div>
 
       {/* ── Row 3: Flavor Family Chips (drag-scrollable) ────────────────────── */}
+      <div
+        ref={chipRowRef}
         className="max-w-[1200px] mx-auto px-4 sm:px-6 pb-4 pt-1 flex gap-2 overflow-x-auto scrollbar-none select-none cursor-grab"
         onMouseDown={onMouseDown}
         onMouseLeave={onMouseLeave}
@@ -156,7 +161,6 @@ export default function SearchFilterBar({ totalItems }: SearchFilterBarProps) {
             <button
               key={chip.key}
               onClick={() => !isDragging && setFlavorFilter(chip.key)}
-              aria-pressed={active ? 'true' : 'false'}
               className={`flex-shrink-0 text-[11px] font-semibold px-3.5 py-1.5 rounded-[4px] transition-all duration-200 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 ${
                 active
                   ? 'bg-amber-500/15 border-[1.5px] border-[#D4802A] text-[#D4802A]'

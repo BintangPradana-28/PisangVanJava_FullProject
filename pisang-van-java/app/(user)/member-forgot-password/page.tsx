@@ -111,19 +111,16 @@ export default function MemberForgotPasswordPage() {
             <motion.div variants={stagger} initial="hidden" animate="visible">
               {/* Brand */}
               <motion.div variants={item} className="flex flex-col items-center gap-1 mb-8">
-                <div
-                  className="w-16 h-16 rounded-[4px] flex items-center justify-center text-4xl mb-1 shadow-md bg-zinc-900 dark:bg-white"
+                <div className="w-16 h-16 rounded-[4px] flex items-center justify-center text-4xl mb-1 shadow-md bg-zinc-900 dark:bg-white">
                   🍌
                 </div>
-                <p
-                  className="font-serif text-xl font-bold leading-none tracking-tight text-zinc-900 dark:text-zinc-100"
+                <p className="font-serif text-xl font-bold leading-none tracking-tight text-zinc-900 dark:text-zinc-100">
                   Pisang Goreng
                 </p>
                 <p className="font-serif text-lg font-bold text-[#D4802A]">
                   Van Java
                 </p>
-                <p
-                  className="text-[9px] font-bold tracking-[0.35em] uppercase mt-0.5 text-zinc-500 dark:text-zinc-400"
+                <p className="text-[9px] font-bold tracking-[0.35em] uppercase mt-0.5 text-zinc-500 dark:text-zinc-400">
                   {t('login_brand_subtitle')}
                 </p>
               </motion.div>
@@ -133,12 +130,10 @@ export default function MemberForgotPasswordPage() {
                 {sent ? (
                   <>
                     <div className="text-5xl mb-4">📬</div>
-                    <h1
-                      className="font-serif text-2xl font-bold mb-2 text-zinc-900 dark:text-zinc-100"
+                    <h1 className="font-serif text-2xl font-bold mb-2 text-zinc-900 dark:text-zinc-100">
                       {t('forgot_email_sent_title')}
                     </h1>
-                    <p
-                      className="text-sm leading-relaxed mb-2 text-zinc-500 dark:text-zinc-400"
+                    <p className="text-sm leading-relaxed mb-2 text-zinc-500 dark:text-zinc-400">
                       Jika {getValues('email')} terdaftar di sistem kami, kami telah mengirimkan
                       tautan reset password.
                     </p>
@@ -158,11 +153,12 @@ export default function MemberForgotPasswordPage() {
                   </>
                 ) : (
                   <>
-                    <h1
-                      className="font-serif text-2xl sm:text-3xl font-bold mb-1 text-zinc-900 dark:text-zinc-100"
+                    <h1 className="font-serif text-2xl sm:text-3xl font-bold mb-1 text-zinc-900 dark:text-zinc-100">
                       {t('forgot_title')}
                     </h1>
                     <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                      {t('forgot_subtitle')}
+                    </p>
                   </>
                 )}
               </motion.div>
@@ -175,8 +171,7 @@ export default function MemberForgotPasswordPage() {
                   className="space-y-5"
                 >
                   <motion.div variants={item}>
-                    <label
-                      className="block text-[11px] font-bold tracking-widest uppercase mb-1.5 text-[#D4802A]"
+                    <label className="block text-[11px] font-bold tracking-widest uppercase mb-1.5 text-[#D4802A]">
                       {t('forgot_email_label')}
                     </label>
                     <input
@@ -245,7 +240,10 @@ export default function MemberForgotPasswordPage() {
                     {t('forgot_back_to_login')}
                   </Link>
                 )}
+                <Link
+                  href="/"
                   className="block text-xs font-medium transition-colors text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200"
+                >
                   {t('login_back_to_web')}
                 </Link>
               </motion.div>
