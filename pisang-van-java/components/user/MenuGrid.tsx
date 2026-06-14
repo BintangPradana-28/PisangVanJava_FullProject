@@ -164,7 +164,7 @@ export default function MenuGrid({ products }: { products: ProductType[] }) {
           </div>
         ) : (
           <AnimatePresence mode="popLayout">
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 items-start">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
               {products.map((product, i) => {
                 const img = product.imageUrl || getFallbackImage(product.flavorName)
                 const available = product.isAvailable && product.stock > 0
