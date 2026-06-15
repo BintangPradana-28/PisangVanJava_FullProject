@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import toast from 'react-hot-toast'
 import type { ProductType } from '@/src/features/menu/components/MenuCards'
 
 // We define an explicit structure for Topping as retrieved from DB
@@ -136,12 +137,20 @@ export default function PosModifierModal({
                 .filter((t) => t.isActive)
                 .map((topping) => {
                   const isSelected = selectedToppings.some((t) => t.id === topping.id)
+                  // RAG Source:
+                  // src/features/checkout/schemas.ts
+                  // Enforce maximum 5 toppings limit in cashier POS modal
                   const handleToppingClick = () => {
-                    setSelectedToppings((prev) =>
-                      prev.some((t) => t.id === topping.id)
-                        ? prev.filter((t) => t.id !== topping.id)
-                        : [...prev, topping]
-                    )
+                    setSelectedToppings((prev) => {
+                      if (prev.some((t) => t.id === topping.id)) {
+                        return prev.filter((t) => t.id !== topping.id)
+                      }
+                      if (prev.length >= 5) {
+                        toast.error('Maksimal 5 topping per porsi.')
+                        return prev
+                      }
+                      return [...prev, topping]
+                    })
                   }
                   return (
                     <button

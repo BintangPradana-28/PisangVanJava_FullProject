@@ -12,16 +12,14 @@ import {
   Trash2,
   X
 } from 'lucide-react'
-import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
+import { useSession } from 'next-auth/react'
 import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import { z } from 'zod'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSettings } from '@/context/SettingsContext'
-import { validateVoucher } from '@/src/features/checkout/actions'
-import { isStoreOpen } from '@/src/lib/time'
 import {
   type CartItem,
   selectCartDisplayTotal,
@@ -29,6 +27,8 @@ import {
   selectItemSubtotal,
   useCartStore
 } from '@/src/features/cart/stores/cart.store'
+import { validateVoucher } from '@/src/features/checkout/actions'
+import { isStoreOpen } from '@/src/lib/time'
 
 // ============================================================
 // ZOD SCHEMA — Client-side Quarantine (VP Engineering mandate)
@@ -141,6 +141,7 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors }
   } = useForm<CustomerInfoValues>({
     resolver: zodResolver(customerInfoSchema),
@@ -162,6 +163,32 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
   useEffect(() => {
     setAppliedVoucher(null)
   }, [cartTotal])
+
+  // RAG Source:
+  // app/api/user/profile/route.ts
+  // app/(user)/checkout/page.tsx
+  // Hydrate user data from session & profile API when the modal is opened
+  useEffect(() => {
+    if (!isOpen) return
+    if (session?.user?.name) {
+      setValue('customerName', session.user.name, { shouldValidate: true })
+    }
+    if (session) {
+      fetch('/api/user/profile')
+        .then((res) => res.json())
+        .then((res) => {
+          if (res.success && res.data) {
+            if (res.data.name) {
+              setValue('customerName', res.data.name, { shouldValidate: true })
+            }
+            if (res.data.phone) {
+              setValue('customerPhone', res.data.phone, { shouldValidate: true })
+            }
+          }
+        })
+        .catch((err) => console.error('Failed to fetch user profile in CartModal:', err))
+    }
+  }, [isOpen, session, setValue])
 
   // Auto-switch ke tab 'cart' dan reset tab saat keranjang jadi kosong
   useEffect(() => {

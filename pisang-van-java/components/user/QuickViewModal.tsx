@@ -9,10 +9,10 @@ import toast from 'react-hot-toast'
 import { Drawer } from 'vaul'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSettings } from '@/context/SettingsContext'
+import { type CartTopping, useCartStore } from '@/src/features/cart/stores/cart.store'
 import type { ProductType } from '@/src/features/menu/components/MenuCards'
 import { animateFlyToCart } from '@/src/lib/animations'
 import { isStoreOpen as checkStoreOpen } from '@/src/lib/time'
-import { type CartTopping, useCartStore } from '@/src/features/cart/stores/cart.store'
 
 interface QuickViewModalProps {
   product: ProductType | null
@@ -133,10 +133,26 @@ export default function QuickViewModal({
     }).format(amount)
   }
 
+  // RAG Source:
+  // src/features/checkout/schemas.ts
+  // Enforce the maximum limit of 5 toppings per product
   const handleToppingToggle = (toppingId: string) => {
-    setSelectedToppings((prev) =>
-      prev.includes(toppingId) ? prev.filter((id) => id !== toppingId) : [...prev, toppingId]
-    )
+    setSelectedToppings((prev) => {
+      if (prev.includes(toppingId)) {
+        return prev.filter((id) => id !== toppingId)
+      }
+      if (prev.length >= 5) {
+        toast.error('Maksimal 5 topping per porsi.', {
+          style: {
+            background: '#ef4444',
+            color: '#fff',
+            borderRadius: '16px'
+          }
+        })
+        return prev
+      }
+      return [...prev, toppingId]
+    })
   }
 
   const isFormValid = !!selectedType && !!selectedFlavor
