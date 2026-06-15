@@ -1,6 +1,7 @@
 /**
  * @vitest-environment node
  */
+import { randomUUID } from 'node:crypto'
 import { describe, expect, it, vi } from 'vitest'
 
 vi.mock('server-only', () => {
@@ -43,9 +44,11 @@ describe('app/api/orders POST Route Integration', () => {
     console.log('=== DB TOPPINGS ===')
     console.log(dbToppings.map((t: any) => ({ id: t.id, name: t.name, price: t.price })))
 
-    // Construct the payload exactly like CartModal does
+    // RAG Source:
+    // app/api/orders/route.ts
+    // Use dynamically generated randomUUID to avoid hardcoding strings flagged by Gitleaks
     const payload = {
-      idempotencyKey: 'd3b07384-d113-4ec2-a5d6-c0c5b52f51e1',
+      idempotencyKey: randomUUID(),
       customerName: 'Ahmad Budi',
       customerPhone: '081234567890',
       notes: 'kebayoranbarujaksel',
