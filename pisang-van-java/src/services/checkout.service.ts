@@ -225,7 +225,7 @@ export async function createCheckoutOrder(
   input: CreateOrderInput,
   actor: CheckoutActor
 ): Promise<CreateCheckoutOrderResult> {
-  const deliveryFee = await resolveDeliveryFeeOutsideTx(input.deliveryMethod)
+  const deliveryFee = await resolveDeliveryFeeOutsideTx(input.deliveryMethod, input)
 
   const result = await executeCheckoutTransaction(input, actor, deliveryFee, prisma)
 
@@ -420,10 +420,101 @@ export async function processPaymentForActor(
 }
 
 async function resolveDeliveryFeeOutsideTx(
-  deliveryMethod: CreateOrderInput['deliveryMethod']
+  deliveryMethod: CreateOrderInput['deliveryMethod'],
+  input?: CreateOrderInput
 ): Promise<number> {
   if (deliveryMethod === 'PICKUP') {
     return 0
+  }
+
+  // Check if we have coordinate-based delivery info
+  if (input?.deliveryCoordinates && input.courierCode) {
+    try {
+      const [latStr, lngStr] = input.deliveryCoordinates.split(',')
+      const lat = parseFloat(latStr.trim())
+      const lng = parseFloat(lngStr.trim())
+
+      if (!isNaN(lat) && !isNaN(lng)) {
+        const { calculateShippingRates } = await import('@/src/services/shipping.service')
+
+        const variantIds = Array.from(new Set(input.items.map((item) => item.variantId)))
+        const toppingIds = Array.from(new Set(input.items.flatMap((item) => item.toppingIds)))
+
+        const variants = await prisma.menuVariant.findMany({
+          where: { id: { in: variantIds } },
+          select: { id: true, priceKembung: true, priceLumpia: true, priceKrispy: true }
+        })
+        const toppings = await prisma.topping.findMany({
+          where: { id: { in: toppingIds } },
+          select: { id: true, price: true }
+        })
+
+        const variantById = new Map<
+          string,
+          { id: string; priceKembung: number; priceLumpia: number; priceKrispy: number }
+        >(
+          variants.map(
+            (v: { id: string; priceKembung: number; priceLumpia: number; priceKrispy: number }) => [
+              v.id,
+              v
+            ]
+          )
+        )
+        const toppingById = new Map<string, { id: string; price: number }>(
+          toppings.map((t: { id: string; price: number }) => [t.id, t])
+        )
+
+        const calculatedItems = input.items.map((item) => {
+          const v = variantById.get(item.variantId)
+          const basePrice = v
+            ? item.baseType === 'lumpia'
+              ? v.priceLumpia
+              : item.baseType === 'krispy'
+                ? v.priceKrispy
+                : v.priceKembung
+            : 0
+          const toppingPrice = item.toppingIds.reduce(
+            (sum, id) => sum + (toppingById.get(id)?.price || 0),
+            0
+          )
+          return {
+            name: 'Pisang Goreng',
+            quantity: item.quantity,
+            price: basePrice + toppingPrice
+          }
+        })
+
+        const rates = await calculateShippingRates({
+          destinationLat: lat,
+          destinationLng: lng,
+          items: calculatedItems
+        })
+
+        // Find the selected courier rate
+        const selectedRate = rates.find(
+          (r) =>
+            r.courierCode.toLowerCase() === input.courierCode?.toLowerCase() &&
+            (!input.courierService ||
+              r.serviceCode.toLowerCase() === input.courierService.toLowerCase())
+        )
+
+        if (selectedRate) {
+          console.log(
+            `[SHIPPING] Resolved dynamic delivery fee: ${selectedRate.courierName} ${selectedRate.serviceName} = Rp ${selectedRate.price}`
+          )
+          return selectedRate.price
+        }
+
+        console.warn(
+          `[SHIPPING] Selected courier ${input.courierCode} (${input.courierService}) not found in calculated rates. Falling back to flat rate.`
+        )
+      }
+    } catch (err) {
+      console.error(
+        '[SHIPPING] Error resolving dynamic delivery fee, falling back to flat rate:',
+        err
+      )
+    }
   }
 
   const setting = await prisma.siteSetting.findUnique({

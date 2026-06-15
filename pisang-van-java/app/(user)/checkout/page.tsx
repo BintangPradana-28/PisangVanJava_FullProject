@@ -12,10 +12,13 @@ import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import { z } from 'zod'
 import { useSettings } from '@/context/SettingsContext'
-import { validateVoucher } from '@/src/features/checkout/actions'
+import { validateVoucher, getShippingRates } from '@/src/features/checkout/actions'
 import { api } from '@/src/lib/api'
 import { isStoreOpen } from '@/src/lib/time'
 import { selectCartDisplayTotal, useCartStore } from '@/src/features/cart/stores/cart.store'
+import dynamic from 'next/dynamic'
+
+const MapPicker = dynamic(() => import('@/components/user/MapPicker'), { ssr: false })
 
 // ── Response Schema ─────────────────────────────────────────────────────────
 const orderResponseSchema = z.discriminatedUnion('success', [
@@ -129,6 +132,13 @@ export default function CheckoutPage() {
   const [selectedAddressId, setSelectedAddressId] = useState<string>('')
   const [isManualAddress, setIsManualAddress] = useState(false)
 
+  // Shipping & Pinpoint Map state
+  const [coordinates, setCoordinates] = useState<[number, number] | null>(null)
+  const [shippingRates, setShippingRates] = useState<any[]>([])
+  const [selectedRate, setSelectedRate] = useState<any | null>(null)
+  const [isLoadingRates, setIsLoadingRates] = useState(false)
+  const [addressNameFromMap, setAddressNameFromMap] = useState('')
+
   const { data: profileResponse } = useQuery({
     queryKey: ['profile'],
     queryFn: () => api<{ success: boolean; data?: any }>('/api/user/profile'),
@@ -183,13 +193,81 @@ export default function CheckoutPage() {
     }
   }, [cartItems.length, authStatus, router])
 
+  // Geocode saved address when selected
+  useEffect(() => {
+    if (delivery === 'DELIVERY' && !isManualAddress && selectedAddressId && addresses.length > 0) {
+      const selected = addresses.find((a) => a.id === selectedAddressId)
+      if (selected) {
+        setIsLoadingRates(true)
+        fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(selected.fullAddress)}&countrycodes=id&limit=1`
+        )
+          .then((res) => res.json())
+          .then((data) => {
+            if (data && data.length > 0) {
+              const lat = parseFloat(data[0].lat)
+              const lon = parseFloat(data[0].lon)
+              setCoordinates([lat, lon])
+            } else {
+              toast.error(
+                'Alamat tersimpan tidak ditemukan di peta. Silakan pinpoint lokasi manual.'
+              )
+              setIsManualAddress(true)
+            }
+          })
+          .catch((err) => {
+            console.error('Geocoding Error:', err)
+            setIsManualAddress(true)
+          })
+          .finally(() => setIsLoadingRates(false))
+      }
+    }
+  }, [selectedAddressId, isManualAddress, delivery, addresses])
+
+  // Fetch shipping rates when coordinates change
+  useEffect(() => {
+    if (coordinates) {
+      setIsLoadingRates(true)
+      getShippingRates(coordinates[0], coordinates[1])
+        .then((res) => {
+          if (res.success && res.data) {
+            setShippingRates(res.data)
+            if (res.data.length > 0) {
+              // Select cheapest rate by default
+              const sorted = [...res.data].sort((a, b) => a.price - b.price)
+              setSelectedRate(sorted[0])
+            } else {
+              setShippingRates([])
+              setSelectedRate(null)
+              toast.error('Lokasi Anda di luar jangkauan pengiriman kami (Maksimal 40km).')
+            }
+          } else {
+            toast.error(res.error || 'Gagal mengambil tarif pengiriman.')
+          }
+        })
+        .catch((err) => {
+          console.error(err)
+          toast.error('Gagal memuat ongkos kirim.')
+        })
+        .finally(() => setIsLoadingRates(false))
+    }
+  }, [coordinates])
+
+  // Reset shipping when changing delivery method
+  useEffect(() => {
+    if (delivery === 'PICKUP') {
+      setCoordinates(null)
+      setShippingRates([])
+      setSelectedRate(null)
+    }
+  }, [delivery])
+
   const deliveryFeeSetting = getSetting('store_delivery_fee', '0')
-  const deliveryFee = /^[0-9]{1,9}$/.test(deliveryFeeSetting) ? Number(deliveryFeeSetting) : 0
-  const pointsToUse = usePoints
-    ? Math.min(koinPisang, cartTotal + (delivery === 'DELIVERY' ? deliveryFee : 0))
-    : 0
+  const baseDeliveryFee = /^[0-9]{1,9}$/.test(deliveryFeeSetting) ? Number(deliveryFeeSetting) : 0
+  const deliveryFee = delivery === 'DELIVERY' ? (selectedRate ? selectedRate.price : 0) : 0
+  const pointsToUse = usePoints ? Math.min(koinPisang, cartTotal + deliveryFee) : 0
   const discount = usePoints ? pointsToUse : (appliedVoucher?.discountAmount ?? 0)
-  const grandTotal = Math.max(cartTotal + (delivery === 'DELIVERY' ? deliveryFee : 0) - discount, 0)
+  const grandTotal = Math.max(cartTotal + deliveryFee - discount, 0)
 
   const jamOperasional = getSetting('jam_operasional', '10.00–21.00')
   const storeMode = getSetting('store_status', 'AUTO')
@@ -235,6 +313,14 @@ export default function CheckoutPage() {
       }
       if (!isManualAddress && !selectedAddressId) {
         toast.error('Pilih alamat pengiriman terlebih dahulu')
+        return
+      }
+      if (!coordinates) {
+        toast.error('Silakan tentukan lokasi pengiriman Anda pada peta terlebih dahulu')
+        return
+      }
+      if (!selectedRate) {
+        toast.error('Silakan pilih kurir pengiriman terlebih dahulu')
         return
       }
     }
@@ -323,19 +409,27 @@ export default function CheckoutPage() {
 
     const finalAddress =
       delivery === 'DELIVERY'
-        ? isManualAddress
-          ? address.trim()
-          : (() => {
-              const sel = addresses.find((a) => a.id === selectedAddressId)
-              return sel
-                ? `${sel.fullAddress} ${sel.notes ? `(Catatan: ${sel.notes})` : ''}`.trim()
-                : ''
-            })()
+        ? `${
+            isManualAddress
+              ? address.trim()
+              : (
+                  () => {
+                    const sel = addresses.find((a) => a.id === selectedAddressId)
+                    return sel
+                      ? `${sel.fullAddress} ${sel.notes ? `(Catatan: ${sel.notes})` : ''}`.trim()
+                      : ''
+                  }
+                )()
+          } | Kurir: ${selectedRate?.courierName} ${selectedRate?.serviceName} (Rp ${selectedRate?.price})`
         : [pickupTime ? `Waktu Ambil: ${pickupTime}` : null, notes.trim()]
             .filter(Boolean)
             .join(' | ') || null
 
+    // Generasikan UUID valid untuk idempotencyKey
+    const idempotencyKey = crypto.randomUUID()
+
     checkoutMutation.mutate({
+      idempotencyKey,
       customerName: customerName.trim(),
       customerPhone: customerPhone.trim(),
       deliveryMethod: delivery,
@@ -343,6 +437,9 @@ export default function CheckoutPage() {
       notes: finalAddress,
       voucherCode: usePoints ? null : (appliedVoucher?.code ?? null),
       usePoints,
+      deliveryCoordinates: coordinates ? `${coordinates[0]},${coordinates[1]}` : null,
+      courierCode: selectedRate?.courierCode || null,
+      courierService: selectedRate?.serviceCode || null,
       items
     })
   }
@@ -599,7 +696,7 @@ export default function CheckoutPage() {
                     )}
 
                     {delivery === 'DELIVERY' && (
-                      <div className="space-y-3">
+                      <div className="space-y-4">
                         <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider">
                           Alamat Pengiriman Lengkap *
                         </label>
@@ -669,6 +766,80 @@ export default function CheckoutPage() {
                             )}
                           </div>
                         )}
+
+                        {/* Pinpoint Lokasi (Peta) */}
+                        <div className="space-y-2 pt-2">
+                          <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider">
+                            Tentukan Titik Pengiriman (Peta) *
+                          </label>
+                          <MapPicker
+                            position={coordinates}
+                            setPosition={(pos) => setCoordinates(pos)}
+                            setAddressName={(name) => {
+                              setAddressNameFromMap(name)
+                              setAddress(name)
+                            }}
+                          />
+                        </div>
+
+                        {/* Kurir Pengiriman Section */}
+                        {isLoadingRates ? (
+                          <div className="space-y-2 py-2">
+                            <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider">
+                              Kurir Pengiriman
+                            </label>
+                            <div className="w-full h-20 bg-zinc-100 dark:bg-zinc-800 animate-pulse rounded-[4px] flex items-center justify-center text-zinc-400 text-xs">
+                              Menghitung tarif pengiriman...
+                            </div>
+                          </div>
+                        ) : shippingRates.length > 0 ? (
+                          <div className="space-y-2 py-2">
+                            <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider animate-fadeIn">
+                              Pilih Kurir Pengiriman *
+                            </label>
+                            <div className="grid gap-2">
+                              {shippingRates.map((rate) => {
+                                const isSelected =
+                                  selectedRate?.courierCode === rate.courierCode &&
+                                  selectedRate?.serviceCode === rate.serviceCode
+                                return (
+                                  <button
+                                    key={`${rate.courierCode}-${rate.serviceCode}`}
+                                    type="button"
+                                    onClick={() => setSelectedRate(rate)}
+                                    className={`flex items-center justify-between p-3.5 rounded-[4px] border-2 text-left transition-all ${
+                                      isSelected
+                                        ? 'border-amber-400 bg-amber-50 dark:bg-amber-900/20'
+                                        : 'border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600 bg-zinc-50 dark:bg-zinc-800'
+                                    }`}
+                                  >
+                                    <div className="flex items-center gap-3">
+                                      <span className="text-xl">🛵</span>
+                                      <div>
+                                        <div className="font-bold text-sm text-zinc-800 dark:text-zinc-100">
+                                          {rate.courierName} ({rate.serviceName})
+                                        </div>
+                                        <div className="text-xs text-zinc-400 mt-0.5">
+                                          Estimasi: {rate.etd}
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div className="text-right">
+                                      <span className="font-serif text-sm font-bold text-amber-600 dark:text-amber-400">
+                                        {formatPrice(rate.price)}
+                                      </span>
+                                    </div>
+                                  </button>
+                                )
+                              })}
+                            </div>
+                          </div>
+                        ) : coordinates ? (
+                          <div className="text-xs text-red-500 bg-red-50 dark:bg-red-950/20 p-3 rounded-[4px] border border-red-200 dark:border-red-900/50">
+                            ⚠️ Tidak ada layanan kurir instan yang menjangkau lokasi Anda. Silakan
+                            pilih lokasi pinpoint yang lebih dekat atau ubah ke Ambil Sendiri.
+                          </div>
+                        ) : null}
                       </div>
                     )}
 

@@ -73,3 +73,63 @@ export async function processPayment(rawFormData: FormData): Promise<void> {
 
   redirect('/track-order?payment=success')
 }
+
+export async function getShippingRates(
+  lat: number,
+  lng: number
+): Promise<{ success: boolean; data?: any; error?: string }> {
+  try {
+    const actor = await requireCheckoutActor()
+    if (actor === null) {
+      return { success: false, error: 'Sesi pelanggan diperlukan.' }
+    }
+
+    if (!(await hasValidSameOriginHeaders())) {
+      return { success: false, error: 'Permintaan ditolak.' }
+    }
+
+    // Load user cart
+    const { redis } = await import('@/lib/redis')
+    const { prisma } = await import('@/lib/prisma')
+    const { calculateShippingRates } = await import('@/src/services/shipping.service')
+
+    const redisKey = `user:cart:${actor.userId}`
+    let items: any[] = []
+
+    const cachedCart = await redis.get(redisKey)
+    if (cachedCart) {
+      items = typeof cachedCart === 'string' ? JSON.parse(cachedCart) : (cachedCart as any[])
+    } else {
+      const userCart = await prisma.userCart.findUnique({
+        where: { userId: actor.userId }
+      })
+      items = (userCart?.items as any[]) || []
+    }
+
+    if (items.length === 0) {
+      return { success: false, error: 'Keranjang belanja kosong.' }
+    }
+
+    const mappedItems = items.map((item: any) => {
+      const toppingsPrice = item.toppings
+        ? item.toppings.reduce((sum: number, t: any) => sum + (t.priceAdd || 0), 0)
+        : 0
+      return {
+        name: item.variantName || 'Pisang Goreng',
+        quantity: item.quantity || 1,
+        price: (item.basePrice || 0) + toppingsPrice
+      }
+    })
+
+    const rates = await calculateShippingRates({
+      destinationLat: lat,
+      destinationLng: lng,
+      items: mappedItems
+    })
+
+    return { success: true, data: rates }
+  } catch (error: any) {
+    console.error('[SHIPPING_ACTION_ERROR]', error)
+    return { success: false, error: error?.message || 'Gagal menghitung ongkos kirim.' }
+  }
+}

@@ -83,6 +83,14 @@ export const createOrderInputSchema = z
     notes: z.string().trim().max(500).nullable().optional(),
     voucherCode: voucherCodeSchema.nullable().optional(),
     usePoints: z.boolean().default(false),
+    deliveryCoordinates: z
+      .string()
+      .trim()
+      .regex(/^-?[0-9.]+,\s*-?[0-9.]+$/)
+      .optional()
+      .nullable(),
+    courierCode: z.string().trim().max(50).optional().nullable(),
+    courierService: z.string().trim().max(50).optional().nullable(),
     items: z.array(checkoutItemInputSchema).min(1).max(40)
   })
   .strict()
