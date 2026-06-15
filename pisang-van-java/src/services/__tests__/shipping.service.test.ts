@@ -7,7 +7,7 @@ vi.mock('server-only', () => {
   return {}
 })
 
-let mockBiteshipApiKey: string | undefined = undefined
+let mockBiteshipApiKey: string | undefined
 
 vi.mock('@/src/env', () => {
   return {
@@ -21,8 +21,8 @@ vi.mock('@/src/env', () => {
 
 import {
   calculateHaversineDistance,
-  calculateSimulatedRates,
-  calculateShippingRates
+  calculateShippingRates,
+  calculateSimulatedRates
 } from '../shipping.service'
 
 describe('Shipping Service', () => {

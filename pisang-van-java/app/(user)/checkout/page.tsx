@@ -2,6 +2,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { AnimatePresence, motion } from 'framer-motion'
+import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
@@ -12,11 +13,10 @@ import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import { z } from 'zod'
 import { useSettings } from '@/context/SettingsContext'
-import { validateVoucher, getShippingRates } from '@/src/features/checkout/actions'
+import { selectCartDisplayTotal, useCartStore } from '@/src/features/cart/stores/cart.store'
+import { getShippingRates, validateVoucher } from '@/src/features/checkout/actions'
 import { api } from '@/src/lib/api'
 import { isStoreOpen } from '@/src/lib/time'
-import { selectCartDisplayTotal, useCartStore } from '@/src/features/cart/stores/cart.store'
-import dynamic from 'next/dynamic'
 
 const MapPicker = dynamic(() => import('@/components/user/MapPicker'), { ssr: false })
 

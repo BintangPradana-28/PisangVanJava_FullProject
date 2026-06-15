@@ -1,17 +1,17 @@
-import { OrderStatus, Prisma } from '@prisma/client'
+import { OrderStatus, type Prisma } from '@prisma/client'
 import DOMPurify from '@/lib/sanitize'
 import {
-  BaseType,
-  CheckoutActor,
-  CheckoutRole,
+  type BaseType,
+  type CheckoutActor,
+  type CheckoutRole,
   CheckoutSecurityError,
-  CreateCheckoutOrderResult,
-  CreateOrderInput,
-  PreparedOrderItem,
-  ToppingRecord,
-  VariantRecord,
-  VoucherApplication,
-  VoucherRecord
+  type CreateCheckoutOrderResult,
+  type CreateOrderInput,
+  type PreparedOrderItem,
+  type ToppingRecord,
+  type VariantRecord,
+  type VoucherApplication,
+  type VoucherRecord
 } from '@/src/features/checkout/schemas'
 
 const voucherSelect = {

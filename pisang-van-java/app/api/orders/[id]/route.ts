@@ -3,8 +3,8 @@ import { logAudit } from '@/lib/audit'
 import { sendWhatsAppNotification } from '@/lib/notifications'
 import { prisma } from '@/lib/prisma'
 import { orderStatusInputSchema, paymentFormInputSchema } from '@/src/features/checkout/schemas'
-import { hasValidSameOriginHeaders, requireCheckoutActor } from '@/src/services/checkout.service'
 import { sendOrderStatusEmail } from '@/src/features/payment/email'
+import { hasValidSameOriginHeaders, requireCheckoutActor } from '@/src/services/checkout.service'
 
 interface OrderRouteContext {
   params: Promise<{

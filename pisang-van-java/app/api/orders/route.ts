@@ -115,6 +115,10 @@ export async function POST(req: NextRequest) {
 
     const parsed = createOrderInputSchema.safeParse(payload)
     if (!parsed.success) {
+      console.error(
+        '[SECURITY] Checkout payload rejected validation errors:',
+        JSON.stringify(parsed.error.format(), null, 2)
+      )
       return NextResponse.json(
         { success: false, error: 'Checkout payload rejected' },
         { status: 400 }

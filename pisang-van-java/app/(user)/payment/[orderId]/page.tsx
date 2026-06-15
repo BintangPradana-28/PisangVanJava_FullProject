@@ -8,8 +8,8 @@ import { prisma } from '@/lib/prisma'
 import { env } from '@/src/env'
 import { processPayment } from '@/src/features/checkout/actions'
 import { paymentFormInputSchema } from '@/src/features/checkout/schemas'
-import { getPaymentOrderForActor, requireCheckoutActor } from '@/src/services/checkout.service'
 import { generateSnapToken } from '@/src/features/payment/service'
+import { getPaymentOrderForActor, requireCheckoutActor } from '@/src/services/checkout.service'
 
 interface PaymentPageProps {
   params: Promise<{

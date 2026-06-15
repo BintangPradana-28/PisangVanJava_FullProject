@@ -9,7 +9,6 @@ import { useSession } from 'next-auth/react'
 import toast from 'react-hot-toast'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSettings } from '@/context/SettingsContext'
-import { generateWaCartLink } from '@/src/lib/wa-link-client'
 import {
   selectCartItemCount,
   selectCartItems,
@@ -17,6 +16,7 @@ import {
   selectItemSubtotal,
   useCartStore
 } from '@/src/features/cart/stores/cart.store'
+import { generateWaCartLink } from '@/src/lib/wa-link-client'
 
 const formatPrice = (n: number): string =>
   new Intl.NumberFormat('id-ID', {
