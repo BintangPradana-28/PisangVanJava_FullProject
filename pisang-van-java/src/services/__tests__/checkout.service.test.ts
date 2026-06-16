@@ -43,7 +43,53 @@ vi.mock('@/lib/prisma', () => {
 })
 
 import { prisma } from '@/lib/prisma'
-import { getPaymentOrderForActor } from '../checkout.service'
+import { authorizeOrderReadForActor, getPaymentOrderForActor } from '../checkout.service'
+
+describe('authorizeOrderReadForActor', () => {
+  it('should allow guest order reads when the order has no userId', () => {
+    expect(authorizeOrderReadForActor({ userId: null }, null)).toEqual({ allowed: true })
+  })
+
+  it('should require authentication for registered member orders', () => {
+    expect(authorizeOrderReadForActor({ userId: 'user-123' }, null)).toEqual({
+      allowed: false,
+      statusCode: 401
+    })
+  })
+
+  it('should forbid registered members from reading another member order', () => {
+    const actor = {
+      userId: 'other-user',
+      role: 'CUSTOMER' as const,
+      email: 'other@test.com'
+    }
+
+    expect(authorizeOrderReadForActor({ userId: 'user-123' }, actor)).toEqual({
+      allowed: false,
+      statusCode: 403
+    })
+  })
+
+  it('should allow the owner to read their registered member order', () => {
+    const actor = {
+      userId: 'user-123',
+      role: 'CUSTOMER' as const,
+      email: 'member@test.com'
+    }
+
+    expect(authorizeOrderReadForActor({ userId: 'user-123' }, actor)).toEqual({ allowed: true })
+  })
+
+  it('should allow staff to read registered member orders', () => {
+    const actor = {
+      userId: 'staff-456',
+      role: 'CASHIER' as const,
+      email: 'cashier@test.com'
+    }
+
+    expect(authorizeOrderReadForActor({ userId: 'user-123' }, actor)).toEqual({ allowed: true })
+  })
+})
 
 describe('getPaymentOrderForActor', () => {
   it('should return null if order is not found', async () => {

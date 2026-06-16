@@ -44,6 +44,15 @@ const paymentRateLimit = new Ratelimit({
   prefix: 'ratelimit_checkout_payment'
 })
 
+const ORDER_READ_STAFF_ROLES = ['ADMIN', 'SUPER_ADMIN', 'KITCHEN', 'CASHIER'] as const
+
+type OrderReadAuthorization =
+  | { allowed: true }
+  | {
+      allowed: false
+      statusCode: 401 | 403
+    }
+
 export async function requireCheckoutActor(): Promise<CheckoutActor | null> {
   const session = await auth()
   if (!session?.user) {
@@ -129,6 +138,29 @@ export async function getRateLimitIdentifier(scope: string, actor: CheckoutActor
   const clientIp = forwardedFor?.split(',')[0]?.trim()
   const networkPart = clientIp && clientIp.length > 0 ? clientIp : 'unknown'
   return `${scope}:${actor.userId}:${networkPart}`
+}
+
+export function isOrderReadStaffRole(role: CheckoutActor['role']): boolean {
+  return ORDER_READ_STAFF_ROLES.some((staffRole) => staffRole === role)
+}
+
+export function authorizeOrderReadForActor(
+  order: { userId: string | null },
+  actor: CheckoutActor | null
+): OrderReadAuthorization {
+  if (order.userId === null) {
+    return { allowed: true }
+  }
+
+  if (actor === null) {
+    return { allowed: false, statusCode: 401 }
+  }
+
+  if (order.userId === actor.userId || isOrderReadStaffRole(actor.role)) {
+    return { allowed: true }
+  }
+
+  return { allowed: false, statusCode: 403 }
 }
 
 export async function enforceCheckoutRateLimit(actor: CheckoutActor): Promise<boolean> {
@@ -369,20 +401,9 @@ export async function getPaymentOrderForActor(
     return null
   }
 
-  // Authorization check (BOLA prevention):
-  // 1. If order has a userId (belongs to a registered member):
-  //    - The actor must not be null
-  //    - Either actor is the owner (actor.userId === order.userId) OR actor has a staff role (ADMIN, SUPER_ADMIN, KITCHEN, CASHIER)
-  // 2. If order has no userId (guest order):
-  //    - Anyone with the unguessable CUID `orderId` is allowed to access and pay for it.
-  if (order.userId !== null) {
-    if (actor === null) {
-      return null
-    }
-    const STAFF_ROLES = ['ADMIN', 'SUPER_ADMIN', 'KITCHEN', 'CASHIER']
-    if (order.userId !== actor.userId && !STAFF_ROLES.includes(actor.role)) {
-      return null
-    }
+  const authorization = authorizeOrderReadForActor(order, actor)
+  if (!authorization.allowed) {
+    return null
   }
 
   return prisma.order.findUnique({

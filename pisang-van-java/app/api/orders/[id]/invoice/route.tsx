@@ -1,8 +1,9 @@
 import { Document, Page, renderToStream, StyleSheet, Text, View } from '@react-pdf/renderer'
 import { NextResponse } from 'next/server'
-import React from 'react'
 import { prisma } from '@/lib/prisma'
 import { supabase } from '@/lib/supabase'
+import { paymentFormInputSchema } from '@/src/features/checkout/schemas'
+import { authorizeOrderReadForActor, requireCheckoutActor } from '@/src/services/checkout.service'
 
 // Create styles
 const styles = StyleSheet.create({
@@ -73,8 +74,8 @@ const Invoice = ({ order }: { order: any }) => (
           </View>
         </View>
 
-        {order.items.map((item: any, i: number) => (
-          <View style={styles.tableRow} key={i}>
+        {order.items.map((item: any) => (
+          <View style={styles.tableRow} key={item.id}>
             <View style={styles.tableColWide}>
               <Text style={styles.text}>
                 {item.variant.flavorName} ({item.baseType})
@@ -148,11 +149,17 @@ const Invoice = ({ order }: { order: any }) => (
   </Document>
 )
 
-export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(_: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
+    const parsedParams = paymentFormInputSchema.safeParse({ orderId: id })
+    if (!parsedParams.success) {
+      return NextResponse.json({ error: 'Invalid order' }, { status: 400 })
+    }
+
+    const actor = await requireCheckoutActor()
     const order = await prisma.order.findUnique({
-      where: { id },
+      where: { id: parsedParams.data.orderId },
       include: {
         user: true,
         items: {
@@ -163,7 +170,15 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 
     if (!order) return NextResponse.json({ error: 'Order not found' }, { status: 404 })
 
-    const fileName = `invoice-${id}.pdf`
+    const authorization = authorizeOrderReadForActor(order, actor)
+    if (!authorization.allowed) {
+      return NextResponse.json(
+        { error: authorization.statusCode === 401 ? 'Unauthorized' : 'Forbidden' },
+        { status: authorization.statusCode }
+      )
+    }
+
+    const fileName = `invoice-${parsedParams.data.orderId}.pdf`
 
     // 1. Try to fetch from Supabase Storage first
     try {
@@ -198,8 +213,8 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     // 3. Upload to Supabase Storage for caching
     try {
       // Ensure bucket exists (just in case)
-      await supabase.storage.createBucket('invoices', { public: true })
-    } catch (bucketErr) {
+      await supabase.storage.createBucket('invoices', { public: false })
+    } catch {
       // Ignore if bucket already exists
     }
 

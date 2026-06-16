@@ -2,7 +2,8 @@ import { type NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 
 import { prisma } from '@/lib/prisma'
-import { requireCheckoutActor } from '@/src/services/checkout.service'
+import { paymentFormInputSchema } from '@/src/features/checkout/schemas'
+import { authorizeOrderReadForActor, requireCheckoutActor } from '@/src/services/checkout.service'
 
 // RAG Source: prisma/schema.prisma (Order model and OrderStatus enum)
 // RAG Source: src/services/checkout.service.ts (requireCheckoutActor)
@@ -16,7 +17,7 @@ const trackOrderQuerySchema = z
       .max(20)
       .regex(/^(\+62|62|0)8[1-9][0-9]{6,10}$/)
       .optional(),
-    orderId: z.string().min(1).optional()
+    orderId: z.string().trim().min(1).max(128).optional()
   })
   .strict()
   .refine((data) => data.phone || data.orderId, {
@@ -25,10 +26,6 @@ const trackOrderQuerySchema = z
 
 export async function GET(req: NextRequest) {
   const actor = await requireCheckoutActor()
-  if (actor === null) {
-    return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
-  }
-
   const phoneParam = req.nextUrl.searchParams.get('phone')
   const orderIdParam = req.nextUrl.searchParams.get('orderId')
 
@@ -45,9 +42,14 @@ export async function GET(req: NextRequest) {
 
   try {
     if (orderId) {
+      const parsedOrderId = paymentFormInputSchema.safeParse({ orderId })
+      if (!parsedOrderId.success) {
+        return NextResponse.json({ success: false, error: 'Invalid order' }, { status: 400 })
+      }
+
       // Fetch status for a single order
       const order = await prisma.order.findUnique({
-        where: { id: orderId },
+        where: { id: parsedOrderId.data.orderId },
         select: {
           id: true,
           status: true,
@@ -62,11 +64,15 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({ success: false, error: 'Order not found' }, { status: 404 })
       }
 
-      // Authorization check (BOLA prevention)
-      // Check if user is owner of the order or is staff (ADMIN, SUPER_ADMIN, KITCHEN, CASHIER)
-      const STAFF_ROLES = ['ADMIN', 'SUPER_ADMIN', 'KITCHEN', 'CASHIER']
-      if (order.userId && order.userId !== actor.userId && !STAFF_ROLES.includes(actor.role)) {
-        return NextResponse.json({ success: false, error: 'Forbidden' }, { status: 403 })
+      const authorization = authorizeOrderReadForActor(order, actor)
+      if (!authorization.allowed) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: authorization.statusCode === 401 ? 'Unauthorized' : 'Forbidden'
+          },
+          { status: authorization.statusCode }
+        )
       }
 
       return NextResponse.json({
@@ -79,6 +85,14 @@ export async function GET(req: NextRequest) {
           deliveryMethod: order.deliveryMethod
         }
       })
+    }
+
+    if (actor === null) {
+      return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
+    }
+
+    if (!phone) {
+      return NextResponse.json({ success: false, error: 'Invalid request' }, { status: 400 })
     }
 
     // Fetch list of orders by phone
