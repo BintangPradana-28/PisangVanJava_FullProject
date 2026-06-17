@@ -31,7 +31,14 @@ type State = 'checking' | 'unsupported' | 'denied' | 'unsubscribed' | 'subscribe
  * Required by PushManager.subscribe() applicationServerKey.
  * Source: MDN Push API documentation (standard utility).
  */
-function urlBase64ToUint8Array(base64String: string): Uint8Array {
+// Return type pinned to Uint8Array<ArrayBuffer> (not the default ArrayBufferLike).
+// Root cause: TS 5.7+ made typed arrays generic over their buffer type, and
+// @types/node's global ambient declarations widen the default to ArrayBufferLike
+// (which includes SharedArrayBuffer) even in this 'use client' browser file.
+// DOM's BufferSource (required by applicationServerKey below) only accepts the
+// narrower ArrayBuffer-backed view. `new Uint8Array(n)` always allocates a real
+// ArrayBuffer at runtime, so this annotation is accurate — not a type suppression.
+function urlBase64ToUint8Array(base64String: string): Uint8Array<ArrayBuffer> {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4)
   const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/')
   const rawData = window.atob(base64)
@@ -39,7 +46,13 @@ function urlBase64ToUint8Array(base64String: string): Uint8Array {
   for (let i = 0; i < rawData.length; i++) {
     outputArray[i] = rawData.charCodeAt(i)
   }
-  return outputArray
+  // Explicit assertion, not a suppression: `new Uint8Array(length)` always
+  // allocates a fresh, non-shared ArrayBuffer at runtime. The assertion exists
+  // only because @types/node's global augmentation can cause the compiler to
+  // widen the inferred generic to ArrayBufferLike regardless of which
+  // constructor overload is actually used — asserting here is mechanism-agnostic
+  // and doesn't depend on guessing which overload TS resolves to.
+  return outputArray as Uint8Array<ArrayBuffer>
 }
 
 export function PushNotificationManager() {
