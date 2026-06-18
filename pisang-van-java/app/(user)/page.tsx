@@ -20,7 +20,15 @@ export const metadata: Metadata = {
     url: baseUrl,
     siteName: 'Pisang Van Java',
     locale: 'id_ID',
-    type: 'website'
+    type: 'website',
+    images: [
+      {
+        url: `${baseUrl}/kitchen.png`,
+        width: 1200,
+        height: 630,
+        alt: 'Pisang Goreng Van Java — Premium Crispy Banana'
+      }
+    ]
   }
 }
 
@@ -203,6 +211,32 @@ const getCachedReviews = async () => {
   }
 }
 
+// SEO FIX: Fetch SiteSetting for JSON-LD (cached, fail-safe)
+const getCachedSiteSettingsRaw = unstable_cache(
+  async () => {
+    const settings = await prisma.siteSetting.findMany({
+      where: { key: { in: ['alamat', 'nomor_wa', 'jam_operasional'] } },
+      select: { key: true, value: true }
+    })
+    const map: Record<string, string> = {}
+    for (const s of settings) {
+      map[s.key] = s.value
+    }
+    return map
+  },
+  ['home-site-settings'],
+  { revalidate: 3600, tags: ['settings'] }
+)
+
+const getCachedSiteSettings = async (): Promise<Record<string, string>> => {
+  try {
+    return await getCachedSiteSettingsRaw()
+  } catch {
+    console.warn('[Safe Log] Database connection error during site settings fetch')
+    return {}
+  }
+}
+
 export default async function HomePage() {
   const products = await getCachedMenu()
   const homeProducts = products.slice(0, 3) // Hanya tampilkan 3 menu teratas
@@ -213,26 +247,36 @@ export default async function HomePage() {
   // Fetch aggregate review data for Hero Rating Indicator (Now Cached & Fail-Safe)
   const reviewAggregates = await getCachedReviews()
 
+  // SEO FIX: Fetch real site settings for JSON-LD (not hardcoded)
+  const siteSettings = await getCachedSiteSettings()
+
   const averageRating = reviewAggregates._avg.rating
     ? Number(reviewAggregates._avg.rating.toFixed(1))
     : 0
   const totalReviews = reviewAggregates._count.rating || 0
 
+  // SEO FIX (H1): JSON-LD now pulls from SiteSetting DB instead of hardcoded values.
+  // Defaults match the real store location in Cipayung, Jakarta Timur.
+  const storePhone = siteSettings.nomor_wa || '6281312167554'
+  const storeAddress =
+    siteSettings.alamat ||
+    'Jl. Raya Cilangkap l Rt.2/Rw.5, Cilangkap, Kec. Cipayung, Kota Jakarta Timur'
+
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Restaurant',
     name: 'Pisang Goreng Van Java',
-    image: activeBanner?.imageUrl || 'https://pisangvanjava.com/kitchen.png',
-    '@id': 'https://pisangvanjava.com',
-    url: 'https://pisangvanjava.com',
-    telephone: '+628123456789',
+    image: activeBanner?.imageUrl || `${baseUrl}/kitchen.png`,
+    '@id': baseUrl,
+    url: baseUrl,
+    telephone: `+${storePhone}`,
     priceRange: '$$',
     address: {
       '@type': 'PostalAddress',
-      streetAddress: 'Jl. Kaliurang No. 12',
-      addressLocality: 'Sleman',
-      addressRegion: 'Yogyakarta',
-      postalCode: '55281',
+      streetAddress: storeAddress,
+      addressLocality: 'Jakarta Timur',
+      addressRegion: 'DKI Jakarta',
+      postalCode: '13870',
       addressCountry: 'ID'
     },
     openingHoursSpecification: {
