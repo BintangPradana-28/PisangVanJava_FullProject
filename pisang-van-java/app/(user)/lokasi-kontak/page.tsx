@@ -171,7 +171,7 @@ export default function LokasiKontakPage() {
 
       {/* ── Hero — compact ──────────────────────────────────────────────── */}
       <section className="relative pt-28 pb-12 overflow-hidden bg-cream-50 dark:bg-zinc-900 border-b border-outline-variant/20 dark:border-zinc-800">
-        <div className="absolute inset-0 opacity-40 pointer-events-none" />
+        <div className="absolute inset-0 bg-hero-pattern opacity-40 pointer-events-none" />
         {/* decorative blobs */}
         <div className="absolute -top-24 -right-16 w-96 h-96 rounded-[4px] opacity-10 pointer-events-none bg-[radial-gradient(circle,_var(--tw-gradient-stops))] from-amber-600 to-transparent" />
         <div className="absolute -bottom-16 -left-16 w-72 h-72 rounded-[4px] opacity-10 pointer-events-none bg-[radial-gradient(circle,_var(--tw-gradient-stops))] from-amber-600 to-transparent" />

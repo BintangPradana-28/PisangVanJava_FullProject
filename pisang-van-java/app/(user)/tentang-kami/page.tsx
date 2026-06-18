@@ -95,7 +95,7 @@ export default function TentangKamiPage() {
     <div className="min-h-screen bg-[var(--background-custom)] text-primary dark:text-zinc-100">
       {/* ── Hero ── */}
       <section className="relative pt-28 pb-12 overflow-hidden bg-cream-50 dark:bg-zinc-900 border-b border-outline-variant/20 dark:border-zinc-800">
-        <div className="absolute inset-0 opacity-40 pointer-events-none" />
+        <div className="absolute inset-0 bg-hero-pattern opacity-40 pointer-events-none" />
         {/* Decorative blobs - Tailwind purely */}
         <div className="absolute -top-24 -right-16 w-96 h-96 rounded-[4px] opacity-10 pointer-events-none bg-[radial-gradient(circle,_var(--tw-gradient-stops))] from-amber-600 to-transparent" />
         <div className="max-w-[1200px] mx-auto px-6 relative z-10">
