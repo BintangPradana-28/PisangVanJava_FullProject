@@ -213,7 +213,7 @@ export default function Hero({
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden md:block z-20">
         <div className="flex flex-col items-center gap-1 cursor-pointer animate-bounce">
           <span className="text-xs text-gray-400 uppercase tracking-widest font-medium">
-            Scroll Down
+            {t('hero_scroll_down')}
           </span>
           <span className="text-amber-500 text-sm">↓</span>
         </div>

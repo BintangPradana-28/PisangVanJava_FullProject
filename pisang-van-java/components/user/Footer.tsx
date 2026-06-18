@@ -114,6 +114,30 @@ export default function Footer() {
             <ul className="space-y-2.5 text-sm">
               <li>
                 <Link
+                  href="/tentang-kami"
+                  className="text-cream-50/75 hover:text-white transition-colors duration-200 flex items-center gap-1.5"
+                >
+                  🏪 {locale === 'id' ? 'Tentang Kami' : 'About Us'}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/ulasan"
+                  className="text-cream-50/75 hover:text-white transition-colors duration-200 flex items-center gap-1.5"
+                >
+                  ⭐ {locale === 'id' ? 'Ulasan Pelanggan' : 'Customer Reviews'}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/reseller"
+                  className="text-cream-50/75 hover:text-white transition-colors duration-200 flex items-center gap-1.5"
+                >
+                  🤝 {locale === 'id' ? 'Kemitraan & Reseller' : 'Partnership & Reseller'}
+                </Link>
+              </li>
+              <li>
+                <Link
                   href="/track-order"
                   className="text-cream-50/75 hover:text-white transition-colors duration-200 flex items-center gap-1.5"
                 >

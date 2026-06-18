@@ -62,8 +62,8 @@ const getFallbackImageUrl = (name: string): string => {
   if (lower.includes('blueberry') || lower.includes('bluberi'))
     return '/images/flavors/blueberry.png'
   if (lower.includes('taro')) return '/images/flavors/taro.png'
-  if (lower.includes('cokelat') || lower.includes('coklat')) return '/images/flavors/taro.png'
-  if (lower.includes('keju')) return '/images/flavors/matcha.png'
+  if (lower.includes('cokelat') || lower.includes('coklat')) return '/images/flavors/blueberry.png'
+  if (lower.includes('keju')) return '/images/flavors/strawberry.png'
   return '/kitchen.png'
 }
 
