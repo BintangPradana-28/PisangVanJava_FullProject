@@ -36,6 +36,15 @@ const getCachedProducts = async () => {
   }
 }
 
+// "Harga Terendah" sort: a variant may not offer all 3 base types (e.g. priceKembung
+// can legitimately be 0 for a Krispy-only flavor — see matchBase filter below), so
+// sorting by priceKembung alone would wrongly rank those as "cheapest". This takes
+// the lowest *non-zero* price across the 3 base types instead.
+const getStartingPrice = (p: { priceKembung: number; priceLumpia: number; priceKrispy: number }) => {
+  const prices = [p.priceKembung, p.priceLumpia, p.priceKrispy].filter((price) => price > 0)
+  return prices.length > 0 ? Math.min(...prices) : Infinity // no price set → sort to the end
+}
+
 export default async function MenuSpesialPage(props: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
@@ -43,6 +52,7 @@ export default async function MenuSpesialPage(props: {
   const q = typeof searchParams.q === 'string' ? searchParams.q : ''
   const filter = typeof searchParams.filter === 'string' ? searchParams.filter : 'all'
   const flavor = typeof searchParams.flavor === 'string' ? searchParams.flavor : 'all'
+  const sort = typeof searchParams.sort === 'string' ? searchParams.sort : 'default'
 
   // Module 4: Edge Middleware Personalization Context
   const cookieStore = await cookies()
@@ -58,7 +68,7 @@ export default async function MenuSpesialPage(props: {
   if (menuContextCookie) {
     try {
       promoContext = JSON.parse(menuContextCookie)
-    } catch (e) {}
+    } catch (e) { }
   }
 
   // Fetch all active products with review aggregates (Cached)
@@ -79,11 +89,12 @@ export default async function MenuSpesialPage(props: {
     stock: p.stock,
     soldCount: p.soldCount,
     tags: p.tags || [],
+    createdAt: p.createdAt,
     rating:
       p.reviews.length > 0
         ? Math.round(
-            (p.reviews.reduce((s: any, r: any) => s + r.rating, 0) / p.reviews.length) * 10
-          ) / 10
+          (p.reviews.reduce((s: any, r: any) => s + r.rating, 0) / p.reviews.length) * 10
+        ) / 10
         : undefined,
     reviewCount: p.reviews.length > 0 ? p.reviews.length : undefined,
     isActive: p.isActive
@@ -107,8 +118,20 @@ export default async function MenuSpesialPage(props: {
     return matchSearch && matchBase && matchFlavor
   })
 
-  // Module 4: Reorder based on Edge Time-of-Day Context (Cookie)
-  if (promoContext.evening || promoContext.lateAfternoon) {
+  // Explicit sort (user-selected) takes priority over the implicit time-of-day
+  // personalization below — if someone picks "Harga Terendah", that's a direct
+  // intent and shouldn't get silently re-ordered by the edge context. When sort
+  // is left at "default", behavior is unchanged from before (falls through to
+  // the original Module 4 reorder, including doing nothing if no context applies).
+  if (sort === 'terlaris') {
+    filtered.sort((a: any, b: any) => b.soldCount - a.soldCount)
+  } else if (sort === 'harga-rendah') {
+    filtered.sort((a: any, b: any) => getStartingPrice(a) - getStartingPrice(b))
+  } else if (sort === 'terbaru') {
+    filtered.sort(
+      (a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    )
+  } else if (promoContext.evening || promoContext.lateAfternoon) {
     filtered.sort((a: any, b: any) => {
       const aHasKembung = a.priceKembung > 0 ? 1 : 0
       const bHasKembung = b.priceKembung > 0 ? 1 : 0
@@ -124,8 +147,8 @@ export default async function MenuSpesialPage(props: {
     filtered.sort((a: any, b: any) => {
       const isMilky = (name: string) =>
         name.toLowerCase().includes('susu') ||
-        name.toLowerCase().includes('milky') ||
-        name.toLowerCase().includes('coklat')
+          name.toLowerCase().includes('milky') ||
+          name.toLowerCase().includes('coklat')
           ? 1
           : 0
       return isMilky(b.flavorName) - isMilky(a.flavorName)

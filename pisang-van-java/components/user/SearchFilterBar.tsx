@@ -29,6 +29,16 @@ const FLAVOR_CHIPS = [
   { key: 'Original', label: '✨ Original' }
 ]
 
+// ── Sort — "default" doubles as the label for the existing time-of-day
+// personalization (Edge Middleware reorder), so picking it surfaces that
+// feature instead of leaving it silent ─────────────────────────────────────
+const SORT_OPTIONS = [
+  { key: 'default', label: 'Rekomendasi' },
+  { key: 'terlaris', label: 'Paling Laris' },
+  { key: 'harga-rendah', label: 'Harga Terendah' },
+  { key: 'terbaru', label: 'Terbaru' }
+]
+
 interface SearchFilterBarProps {
   totalItems: number
 }
@@ -42,6 +52,7 @@ export default function SearchFilterBar({ totalItems }: SearchFilterBarProps) {
   const [search, setSearch] = useState(searchParams.get('q') ?? '')
   const [baseFilter, setBaseFilter] = useState(searchParams.get('filter') ?? 'all')
   const [flavorFilter, setFlavorFilter] = useState(searchParams.get('flavor') ?? 'all')
+  const [sortBy, setSortBy] = useState(searchParams.get('sort') ?? 'default')
   const [isDragging, setIsDragging] = useState(false)
   const dragStart = useRef<{ x: number; scrollLeft: number }>({ x: 0, scrollLeft: 0 })
 
@@ -52,10 +63,11 @@ export default function SearchFilterBar({ totalItems }: SearchFilterBarProps) {
       if (search) params.set('q', search)
       if (baseFilter !== 'all') params.set('filter', baseFilter)
       if (flavorFilter !== 'all') params.set('flavor', flavorFilter)
+      if (sortBy !== 'default') params.set('sort', sortBy)
       router.push(`?${params.toString()}`, { scroll: false })
     }, 400)
     return () => clearTimeout(timer)
-  }, [search, baseFilter, flavorFilter, router])
+  }, [search, baseFilter, flavorFilter, sortBy, router])
 
   // ── Mouse drag-to-scroll for flavor chip row (desktop UX) ───────────────────
   const onMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -119,6 +131,30 @@ export default function SearchFilterBar({ totalItems }: SearchFilterBarProps) {
           )}
         </div>
 
+        {/* Sort dropdown — native <select> for built-in keyboard/screen-reader support */}
+        <div className="relative shrink-0">
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            aria-label="Urutkan menu"
+            className="appearance-none text-xs font-semibold pl-3 pr-7 py-2.5 rounded-[4px] outline-none transition-all bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 cursor-pointer focus-visible:ring-2 focus-visible:ring-amber-400"
+          >
+            {SORT_OPTIONS.map((opt) => (
+              <option key={opt.key} value={opt.key}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+          <svg
+            className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 pointer-events-none text-zinc-400"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+
         <span className="text-xs shrink-0 font-medium tabular-nums text-[var(--text-custom)] opacity-55">
           {totalItems} {t('menu_count_suffix')}
         </span>
@@ -133,11 +169,10 @@ export default function SearchFilterBar({ totalItems }: SearchFilterBarProps) {
               key={tab.key}
               onClick={() => setBaseFilter(tab.key)}
               {...{ 'aria-pressed': active }}
-              className={`flex-shrink-0 text-xs font-bold px-4 py-2 rounded-[4px] transition-all duration-200 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-amber-400 ${
-                active
+              className={`flex-shrink-0 text-xs font-bold px-4 py-2 rounded-[4px] transition-all duration-200 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-amber-400 ${active
                   ? 'bg-[#D4802A] text-white shadow-[0_4px_14px_rgba(212,128,42,0.35)]'
                   : 'bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300'
-              }`}
+                }`}
             >
               {tab.label}
             </button>
@@ -163,11 +198,10 @@ export default function SearchFilterBar({ totalItems }: SearchFilterBarProps) {
               key={chip.key}
               onClick={() => !isDragging && setFlavorFilter(chip.key)}
               {...{ 'aria-pressed': active }}
-              className={`flex-shrink-0 text-[11px] font-semibold px-3.5 py-1.5 rounded-[4px] transition-all duration-200 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 ${
-                active
+              className={`flex-shrink-0 text-[11px] font-semibold px-3.5 py-1.5 rounded-[4px] transition-all duration-200 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 ${active
                   ? 'bg-amber-500/15 border-[1.5px] border-[#D4802A] text-[#D4802A]'
                   : 'bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 opacity-75'
-              }`}
+                }`}
             >
               {chip.label}
             </button>

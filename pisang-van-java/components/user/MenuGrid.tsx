@@ -30,6 +30,20 @@ const getFallbackImage = (name: string) => {
   return '/kitchen.png' // Default local fallback
 }
 
+// Maps tags set by admin (AdminMenuDashboard.tsx → Tags picker) to a small icon
+// for the customer-facing badge. Distinct from the ⭐ rating and 🔥 sold-count
+// icons already on the card, so they don't visually collide. Falls back to 🏷️
+// for any tag value not in this list (tags is a free string[] in the schema),
+// so adding a new tag option later never breaks rendering.
+const TAG_ICONS: Record<string, string> = {
+  Baru: '✨',
+  'Best Seller': '🏆',
+  Premium: '👑',
+  Rekomendasi: '💎',
+  Manis: '🍯',
+  Gurih: '🧂'
+}
+
 const ProductImage = ({
   src,
   alt,
@@ -216,6 +230,21 @@ export default function MenuGrid({ products }: { products: ProductType[] }) {
                       >
                         {product.flavorName}
                       </h3>
+
+                      {/* Tag Badges — set by admin, shown regardless of stock status */}
+                      {product.tags && product.tags.length > 0 && (
+                        <div className="flex items-center justify-center gap-1.5 flex-wrap mb-1.5">
+                          {product.tags.slice(0, 3).map((tag) => (
+                            <span
+                              key={tag}
+                              className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-[4px] bg-amber-500/15 border border-[#D4802A]/40 text-[#D4802A]"
+                            >
+                              <span aria-hidden="true">{TAG_ICONS[tag] ?? '🏷️'}</span>
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      )}
 
                       {/* Stock Indicator */}
                       <div className="flex items-center gap-1.5 mb-2 mt-1">
