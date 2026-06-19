@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 import nextDynamic from 'next/dynamic'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 const QuickViewModal = nextDynamic(() => import('@/components/user/QuickViewModal'), { ssr: false })
 
@@ -177,6 +177,7 @@ export default function MenuCards({ products }: Props) {
             {allTags.map((tag) => (
               <button
                 key={tag}
+                type="button"
                 onClick={() => setActiveTag(tag)}
                 className={`px-5 py-2 rounded-[4px] text-sm font-medium transition-all active:scale-95 ${
                   activeTag === tag
@@ -210,15 +211,25 @@ export default function MenuCards({ products }: Props) {
                   className={`bg-white dark:bg-zinc-900 rounded-[4px] overflow-hidden border border-outline-variant/30 dark:border-zinc-800/60 hover:border-secondary/40 shadow-sbx-card transition-all duration-300 flex flex-col group ${!available ? 'opacity-80 grayscale-[50%]' : ''}`}
                 >
                   {/* Image Container */}
-                  <ProductImage src={image} alt={product.flavorName} available={available} />
+                  <Link
+                    href={`/menu-spesial/${product.id}`}
+                    className="focus:outline-none block overflow-hidden"
+                  >
+                    <ProductImage src={image} alt={product.flavorName} available={available} />
+                  </Link>
 
                   {/* Card Content */}
                   <div className="p-6.5 flex flex-col items-center text-center flex-grow">
-                    <h3
-                      className={`font-serif text-2xl font-bold text-primary dark:text-zinc-100 mb-1 w-full text-center ${!available ? 'text-zinc-500' : ''}`}
+                    <Link
+                      href={`/menu-spesial/${product.id}`}
+                      className="focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded-[4px] block mb-1"
                     >
-                      {product.flavorName}
-                    </h3>
+                      <h3
+                        className={`font-serif text-2xl font-bold text-primary dark:text-zinc-100 w-full text-center transition-colors hover:text-amber-brand ${!available ? 'text-zinc-500' : ''}`}
+                      >
+                        {product.flavorName}
+                      </h3>
+                    </Link>
 
                     {/* Stock Indicator */}
                     <div className="flex items-center justify-center gap-1.5 mb-2 mt-1 w-full">
@@ -308,6 +319,7 @@ export default function MenuCards({ products }: Props) {
                       </div>
 
                       <button
+                        type="button"
                         onClick={() => available && setSelectedProduct(product)}
                         disabled={!available}
                         className={

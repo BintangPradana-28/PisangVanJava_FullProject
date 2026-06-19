@@ -3,7 +3,7 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
@@ -103,7 +103,6 @@ const getFlavorDescriptionKey = (flavorName: string): string | null => {
 export default function MenuGrid({ products }: { products: ProductType[] }) {
   const { t } = useLanguage()
   const router = useRouter()
-  const searchParams = useSearchParams()
   const { getSetting } = useSettings()
   const jamOperasional = getSetting('jam_operasional', '10.00–21.00')
   const storeMode = getSetting('store_status', 'AUTO')
@@ -152,7 +151,7 @@ export default function MenuGrid({ products }: { products: ProductType[] }) {
       toast.success(isFav ? 'Dihapus dari favorit' : 'Ditambahkan ke favorit', {
         id: `fav-${variantId}`
       })
-    } catch (err) {
+    } catch {
       // Revert optimistic UI
       setFavorites((prev) => (isFav ? [...prev, variantId] : prev.filter((id) => id !== variantId)))
       toast.error('Gagal memperbarui favorit', { id: `fav-err-${variantId}` })
@@ -170,6 +169,7 @@ export default function MenuGrid({ products }: { products: ProductType[] }) {
             </p>
             <p className="text-sm text-zinc-900 dark:text-zinc-100">{t('menu_empty_desc')}</p>
             <button
+              type="button"
               onClick={() => router.push('?', { scroll: false })}
               className="mt-6 text-xs font-bold px-6 py-3 rounded-[4px] shadow-sm hover:shadow-md transition-all active:scale-95 flex items-center gap-1.5 focus:outline-none bg-[#D4802A] text-white"
             >
@@ -196,6 +196,7 @@ export default function MenuGrid({ products }: { products: ProductType[] }) {
                   >
                     {/* Favorite Button */}
                     <button
+                      type="button"
                       onClick={(e) => toggleFavorite(e, product.id)}
                       className="absolute top-4 right-4 z-20 w-10 h-10 rounded-[4px] flex items-center justify-center transition-all bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md shadow-sm hover:scale-110 active:scale-95 border border-zinc-200/50 dark:border-zinc-800"
                       aria-label="Toggle Favorite"
@@ -207,6 +208,7 @@ export default function MenuGrid({ products }: { products: ProductType[] }) {
                         stroke="currentColor"
                         strokeWidth={isFav ? 0 : 2}
                       >
+                        <title>Favorite</title>
                         <path
                           strokeLinecap="round"
                           strokeLinejoin="round"
@@ -216,20 +218,30 @@ export default function MenuGrid({ products }: { products: ProductType[] }) {
                     </button>
 
                     {/* Image */}
-                    <ProductImage
-                      src={img}
-                      alt={product.flavorName}
-                      available={available}
-                      priority={i < 3}
-                    />
+                    <Link
+                      href={`/menu-spesial/${product.id}`}
+                      className="focus:outline-none block overflow-hidden"
+                    >
+                      <ProductImage
+                        src={img}
+                        alt={product.flavorName}
+                        available={available}
+                        priority={i < 3}
+                      />
+                    </Link>
 
                     {/* Content */}
                     <div className="p-6 flex flex-col items-center text-center flex-grow">
-                      <h3
-                        className={`font-serif text-2xl font-bold mb-1 ${available ? 'text-zinc-900 dark:text-zinc-100' : 'text-zinc-500'}`}
+                      <Link
+                        href={`/menu-spesial/${product.id}`}
+                        className="focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded-[4px] block mb-1"
                       >
-                        {product.flavorName}
-                      </h3>
+                        <h3
+                          className={`font-serif text-2xl font-bold transition-colors ${available ? 'text-zinc-900 dark:text-zinc-100 hover:text-amber-brand' : 'text-zinc-500'}`}
+                        >
+                          {product.flavorName}
+                        </h3>
+                      </Link>
 
                       {/* Tag Badges — set by admin, shown regardless of stock status */}
                       {product.tags && product.tags.length > 0 && (
