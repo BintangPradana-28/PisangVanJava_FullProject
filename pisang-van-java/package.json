@@ -8,12 +8,9 @@
   },
   "packageManager": "pnpm@11.5.0",
   "browserslist": [
-    "Chrome >= 95",
-    "Edge >= 95",
-    "Safari >= 15",
-    "Firefox >= 95",
-    "iOS >= 15",
-    "not dead"
+    "last 2 years",
+    "not dead",
+    "not ie 11"
   ],
   "scripts": {
     "preinstall": "npx only-allow pnpm",

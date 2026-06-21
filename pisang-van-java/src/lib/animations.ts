@@ -48,12 +48,16 @@ export function animateFlyToCart(fromElement: HTMLElement) {
   wrapper.appendChild(inner)
   document.body.appendChild(wrapper)
 
-  // Force layout reflow
-  void wrapper.offsetWidth
-
-  // Execute coordinates transformation
-  wrapper.style.transform = `translate3d(${endX}px, ${startY}px, 0)`
-  inner.style.transform = `translate3d(-50%, calc(-50% + ${endY - startY}px), 0) scale(0.15) rotate(540deg)`
+  // PERF: requestAnimationFrame replaces a forced-reflow read (void wrapper.offsetWidth).
+  // Both techniques make the browser commit the starting transform before animating to
+  // the end position — rAF does this by waiting for the next paint frame instead of
+  // forcing a synchronous layout recalculation, so the visual result is identical but
+  // the main thread isn't blocked on a forced reflow.
+  requestAnimationFrame(() => {
+    // Execute coordinates transformation
+    wrapper.style.transform = `translate3d(${endX}px, ${startY}px, 0)`
+    inner.style.transform = `translate3d(-50%, calc(-50% + ${endY - startY}px), 0) scale(0.15) rotate(540deg)`
+  })
 
   setTimeout(() => {
     wrapper.remove()
@@ -100,12 +104,12 @@ export function animateFlyHeart(fromElement: HTMLElement) {
   wrapper.appendChild(inner)
   document.body.appendChild(wrapper)
 
-  // Force layout reflow
-  void wrapper.offsetWidth
-
-  // Execute coordinates transformation
-  wrapper.style.transform = `translate3d(${endX}px, ${startY}px, 0)`
-  inner.style.transform = `translate3d(-50%, calc(-50% + ${endY - startY}px), 0) scale(0.15) rotate(360deg)`
+  // PERF: see animateFlyToCart() above for why rAF replaces the forced-reflow read.
+  requestAnimationFrame(() => {
+    // Execute coordinates transformation
+    wrapper.style.transform = `translate3d(${endX}px, ${startY}px, 0)`
+    inner.style.transform = `translate3d(-50%, calc(-50% + ${endY - startY}px), 0) scale(0.15) rotate(360deg)`
+  })
 
   setTimeout(() => {
     wrapper.remove()

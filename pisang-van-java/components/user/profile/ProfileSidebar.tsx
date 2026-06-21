@@ -43,7 +43,7 @@ export default function ProfileSidebar() {
         <div className="hidden md:flex flex-col items-center pb-6 mb-6 border-b border-zinc-100 dark:border-zinc-800">
           <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden border-4 border-white dark:border-zinc-900 shadow-md relative bg-zinc-100 dark:bg-zinc-800">
             {session?.user?.image ? (
-              <Image src={session.user.image} alt="Avatar" fill className="object-cover" />
+              <Image src={session.user.image} alt="Avatar" fill sizes="112px" className="object-cover" />
             ) : (
               <User className="w-12 h-12 text-zinc-400 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
             )}
@@ -66,11 +66,10 @@ export default function ProfileSidebar() {
               <Link
                 key={item.key}
                 href={item.href}
-                className={`flex items-center gap-3 px-4 py-3.5 md:py-3 rounded-[4px] whitespace-nowrap transition-all font-medium text-sm ${
-                  isActive
+                className={`flex items-center gap-3 px-4 py-3.5 md:py-3 rounded-[4px] whitespace-nowrap transition-all font-medium text-sm ${isActive
                     ? 'bg-[#D4802A] text-white shadow-md'
                     : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800/50'
-                }`}
+                  }`}
               >
                 <Icon
                   className={`w-5 h-5 ${isActive ? 'text-white' : 'text-zinc-400 dark:text-zinc-500'}`}
@@ -98,11 +97,10 @@ export default function ProfileSidebar() {
               <Link
                 key={item.key}
                 href={item.href}
-                className={`flex items-center gap-3 px-4 py-3.5 md:py-3 rounded-[4px] whitespace-nowrap transition-all font-medium text-sm ${
-                  isActive
+                className={`flex items-center gap-3 px-4 py-3.5 md:py-3 rounded-[4px] whitespace-nowrap transition-all font-medium text-sm ${isActive
                     ? 'bg-orange-50 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400'
                     : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800/50'
-                }`}
+                  }`}
               >
                 <Icon
                   className={`w-5 h-5 ${isActive ? 'text-orange-600 dark:text-orange-400' : 'text-zinc-400 dark:text-zinc-500'}`}
