@@ -260,8 +260,8 @@ export default function QuickViewModal({
       shouldScaleBackground={false}
     >
       <Drawer.Portal>
-        <Drawer.Overlay className="fixed inset-0 z-50 bg-black/40 backdrop-blur-[2px] animate-fade-in" />
-        <Drawer.Content className="fixed inset-x-0 bottom-0 z-50 flex flex-col w-full max-w-lg mx-auto h-[88vh] md:h-auto md:max-h-[90vh] md:top-0 md:bottom-0 md:my-auto md:!transform-none bg-white dark:bg-zinc-900 rounded-t-3xl md:rounded-[4px] overflow-hidden outline-none shadow-[0_-10px_40px_rgba(0,0,0,0.15)] md:animate-in md:fade-in md:zoom-in-95">
+        <Drawer.Overlay className="fixed inset-0 z-[70] bg-black/40 backdrop-blur-[2px] animate-fade-in" />
+        <Drawer.Content className="fixed inset-x-0 bottom-0 z-[70] flex flex-col w-full max-w-lg mx-auto h-[88vh] h-[88dvh] md:h-auto md:max-h-[90vh] md:top-0 md:bottom-0 md:my-auto md:!transform-none bg-white dark:bg-zinc-900 rounded-t-3xl md:rounded-[4px] overflow-hidden outline-none shadow-[0_-10px_40px_rgba(0,0,0,0.15)] md:animate-in md:fade-in md:zoom-in-95">
           {/* RAG Source: vaul library (Drawer.Handle)
               FIX: The previous implementation was a purely cosmetic div with no drag event
               listeners. vaul's <Drawer.Handle /> wires the correct touch/pointer events for
@@ -566,7 +566,7 @@ export default function QuickViewModal({
           </div>
 
           {/* Footer (Sticky Bottom) */}
-          <div className="p-4 shrink-0 bg-white dark:bg-zinc-900 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-between gap-4 w-full shadow-[0_-4px_15px_rgba(0,0,0,0.05)]">
+          <div className="p-4 pb-safe md:pb-4 shrink-0 bg-white dark:bg-zinc-900 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-between gap-4 w-full shadow-[0_-4px_15px_rgba(0,0,0,0.05)]">
             {/* Kontrol Kuantitas */}
             <div className="flex items-center gap-3 bg-zinc-100 dark:bg-zinc-800 rounded-[4px] p-1 border border-zinc-200 dark:border-zinc-700">
               <button

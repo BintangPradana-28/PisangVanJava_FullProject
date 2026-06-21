@@ -130,6 +130,13 @@
 }
 
 @layer utilities {
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .pt-safe {
+    padding-top: env(safe-area-inset-top);
+  }
+
   /* Stitch Custom Typographic Scales */
   .font-display-lg {
     @apply font-serif text-[48px] leading-[56px] tracking-[-0.02em] font-bold;
