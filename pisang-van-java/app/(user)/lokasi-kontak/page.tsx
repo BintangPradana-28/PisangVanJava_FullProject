@@ -74,15 +74,11 @@ export default function LokasiKontakPage() {
     {
       label: 'WhatsApp',
       handle: `Hubungi Admin`,
-      href: `#`,
+      href: `https://wa.me/${getSetting('nomor_wa', '6281312167554').replace(/[^0-9]/g, '')}`,
       icon: WhatsAppIcon,
       textColor: 'text-[#25D366]',
       bg: '#25D366',
-      soon: false,
-      onClick: (e: React.MouseEvent) => {
-        e.preventDefault()
-        document.getElementById('contact-name')?.focus()
-      }
+      soon: false
     }
   ]
 
@@ -111,7 +107,7 @@ export default function LokasiKontakPage() {
       val: t('location_delivery_val'),
       soon: false,
       svgPath:
-        'M19 7c0-1.1-.9-2-2-2h-3v2h3v2.65L13.52 14H10V9H6c-2.21 0-4 1.79-4 4v3h2c0 1.66 1.34 3 3 3s3-1.34 3-3h4.48L19 10.35V7zM7 17c-.55 0-1-.45-1-1h2c0 .55-.45 1-1 1z M20 15h-1v-4h1m1 4h-3m1-5v5',
+        'M19 7c0-1.1-.9-2-2-2h-3v2h3v2.65L13.52 14H10V9H6c-2.21 0-4 1.79-4 4v3h2c0 1.66 1.34 3 3 3s3-1.34 3-3h4.48L19 10.35V7zM7 17c-.55 0-1-.45-1-1h2c0 .55-.45 1-1 1zM20 15h-1v-4h1m1 4h-3m1-5v5',
       iconColor: '#D4802A'
     }
   ]
@@ -362,12 +358,6 @@ export default function LokasiKontakPage() {
                       if (soon) {
                         e.preventDefault()
                         toast(t('kontak_toast_soon'), { icon: '⏳' })
-                      } else if (label === 'WhatsApp') {
-                        e.preventDefault()
-                        document.getElementById('contact-name')?.focus()
-                        toast.success('Silakan isi formulir terlebih dahulu untuk keamanan', {
-                          icon: '🛡️'
-                        })
                       }
                     }}
                     className={`flex items-center gap-2 px-4 py-2.5 rounded-[4px] transition-all group ${soon ? 'cursor-default opacity-70' : 'hover:-translate-y-0.5 hover:shadow-sm hover:bg-cream-100/30 dark:hover:bg-zinc-800 bg-cream-50 dark:bg-zinc-900 border border-cream-200 dark:border-zinc-800'}`}
