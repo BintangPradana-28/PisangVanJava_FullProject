@@ -18,6 +18,17 @@ import {
 } from '@/src/features/cart/stores/cart.store'
 import { generateWaCartLink } from '@/src/lib/wa-link-client'
 
+const getFallbackImage = (name: string): string => {
+  const n = name.toLowerCase()
+  if (n.includes('matcha')) return '/images/flavors/matcha.png'
+  if (n.includes('taro')) return '/images/flavors/taro.png'
+  if (n.includes('blueberry') || n.includes('bluberi')) return '/images/flavors/blueberry.png'
+  if (n.includes('strawberry') || n.includes('stroberi')) return '/images/flavors/strawberry.png'
+  if (n.includes('cokelat') || n.includes('coklat')) return '/images/flavors/chocolate.png'
+  if (n.includes('keju')) return '/images/flavors/cheese.png'
+  return '/kitchen.png'
+}
+
 const formatPrice = (n: number): string =>
   new Intl.NumberFormat('id-ID', {
     style: 'currency',
@@ -139,6 +150,17 @@ export default function KeranjangPage() {
                     className="bg-white dark:bg-zinc-900 rounded-[4px] border border-zinc-100 dark:border-zinc-800 p-4 sm:p-5 shadow-sm"
                   >
                     <div className="flex items-start gap-4">
+                      {/* Thumbnail Image */}
+                      <div className="relative w-16 h-16 rounded-[4px] overflow-hidden bg-zinc-100 dark:bg-zinc-800 shrink-0">
+                        <Image
+                          src={item.imageUrl || getFallbackImage(item.variantName)}
+                          alt={item.variantName}
+                          fill
+                          sizes="64px"
+                          className="object-cover"
+                        />
+                      </div>
+
                       {/* Info */}
                       <div className="flex-1 min-w-0">
                         <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100 truncate">
@@ -154,13 +176,7 @@ export default function KeranjangPage() {
                             &quot;{item.notes}&quot;
                           </p>
                         )}
-                        <p className="text-xs text-zinc-400 mt-1">
-                          <CartItemSubtotal
-                            cartItemId={item.cartItemId}
-                            formatPrice={formatPrice}
-                          />{' '}
-                          pcs
-                        </p>
+                        <p className="text-xs text-zinc-400 mt-1">{item.quantity} pcs</p>
                       </div>
 
                       {/* Qty + Price */}

@@ -467,7 +467,7 @@ export default function Navbar() {
       </header>
 
       {/* Floating/Sticky Cart Button */}
-      {isHydrated && cartCount > 0 && (
+      {isHydrated && cartCount > 0 && pathname !== '/keranjang' && pathname !== '/checkout' && (
         <button
           type="button"
           id="floating-cart"
@@ -512,17 +512,19 @@ export default function Navbar() {
       )}
 
       {/* Floating empty cart button (desktop only) */}
-      {(!isHydrated || cartCount === 0) && (
-        <button
-          type="button"
-          id="floating-cart-empty"
-          onClick={() => setIsCartOpen(true)}
-          className="fixed bottom-6 right-6 z-[60] w-14 h-14 bg-amber-brand hover:bg-amber-brand/90 text-white rounded-[4px] flex items-center justify-center shadow-sbx-frap transition-all duration-200 active:scale-95 active:shadow-sm focus:outline-none group"
-          aria-label="Buka Keranjang"
-        >
-          <ShoppingBagIcon />
-        </button>
-      )}
+      {(!isHydrated || cartCount === 0) &&
+        pathname !== '/keranjang' &&
+        pathname !== '/checkout' && (
+          <button
+            type="button"
+            id="floating-cart-empty"
+            onClick={() => setIsCartOpen(true)}
+            className="fixed bottom-6 right-6 z-[60] w-14 h-14 bg-amber-brand hover:bg-amber-brand/90 text-white rounded-[4px] hidden sm:flex items-center justify-center shadow-sbx-frap transition-all duration-200 active:scale-95 active:shadow-sm focus:outline-none group"
+            aria-label="Buka Keranjang"
+          >
+            <ShoppingBagIcon />
+          </button>
+        )}
 
       {/* Cart Drawer component */}
       <CartModal isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />

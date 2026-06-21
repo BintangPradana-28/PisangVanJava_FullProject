@@ -88,6 +88,7 @@ export default function CheckoutPage() {
 
   // Form state
   const [step, setStep] = useState(0) // 0=review, 1=form, 2=confirm
+  const [showSummaryMobile, setShowSummaryMobile] = useState(false)
   const {
     register,
     trigger,
@@ -542,7 +543,7 @@ export default function CheckoutPage() {
 
         <div className="grid lg:grid-cols-[1fr_380px] gap-6">
           {/* ── Left Panel ── */}
-          <div className="space-y-4">
+          <div className="space-y-4 lg:order-1 order-2">
             <AnimatePresence mode="wait">
               {/* STEP 0: Review Cart */}
               {step === 0 && (
@@ -1152,71 +1153,92 @@ export default function CheckoutPage() {
           </div>
 
           {/* ── Right Panel: Order Summary (sticky) ── */}
-          <div className="lg:sticky lg:top-28 h-fit">
+          <div className="lg:sticky lg:top-28 h-fit lg:order-2 order-1">
             <div className="bg-white dark:bg-zinc-900 rounded-[4px] border border-zinc-100 dark:border-zinc-800 shadow-sm p-6">
-              <h3 className="font-serif text-lg font-bold text-zinc-900 dark:text-zinc-100 mb-4 pb-4 border-b border-zinc-100 dark:border-zinc-800">
+              {/* Mobile Collapsible Header */}
+              <button
+                type="button"
+                onClick={() => setShowSummaryMobile(!showSummaryMobile)}
+                className="w-full flex lg:hidden items-center justify-between font-serif text-lg font-bold text-zinc-900 dark:text-zinc-100"
+                aria-expanded={showSummaryMobile}
+              >
+                <span className="flex items-center gap-2">
+                  🛒 Ringkasan Pesanan
+                  <span className="text-xs text-zinc-500 font-sans font-normal">
+                    ({showSummaryMobile ? 'Sembunyikan' : 'Lihat Detail'})
+                  </span>
+                </span>
+                <span className="text-amber-600 font-serif">{formatPrice(grandTotal)}</span>
+              </button>
+
+              <h3 className="hidden lg:block font-serif text-lg font-bold text-zinc-900 dark:text-zinc-100 mb-4 pb-4 border-b border-zinc-100 dark:border-zinc-800">
                 Ringkasan Pesanan
               </h3>
 
-              <div className="space-y-2.5 mb-4">
-                {cartItems.map((item, i) => {
-                  const itemTotal =
-                    (item.basePrice +
-                      (item.toppings
-                        ? item.toppings.reduce((sum: number, t: any) => sum + t.priceAdd, 0)
-                        : 0)) *
-                    item.quantity
-                  return (
-                    <div key={`${item.cartItemId}`} className="flex justify-between text-sm gap-2">
-                      <div className="min-w-0">
-                        <span className="text-zinc-700 dark:text-zinc-300 font-medium truncate block">
-                          {item.variantName}
-                        </span>
-                        {item.toppings && item.toppings.length > 0 && (
-                          <span className="text-xs text-amber-500 block">
-                            +{item.toppings.map((t: any) => t.name).join(', ')}
+              <div className={`${showSummaryMobile ? 'block' : 'hidden lg:block'} mt-4 lg:mt-0`}>
+                <div className="space-y-2.5 mb-4">
+                  {cartItems.map((item, i) => {
+                    const itemTotal =
+                      (item.basePrice +
+                        (item.toppings
+                          ? item.toppings.reduce((sum: number, t: any) => sum + t.priceAdd, 0)
+                          : 0)) *
+                      item.quantity
+                    return (
+                      <div
+                        key={`${item.cartItemId}`}
+                        className="flex justify-between text-sm gap-2"
+                      >
+                        <div className="min-w-0">
+                          <span className="text-zinc-700 dark:text-zinc-300 font-medium truncate block">
+                            {item.variantName}
                           </span>
-                        )}
+                          {item.toppings && item.toppings.length > 0 && (
+                            <span className="text-xs text-amber-500 block">
+                              +{item.toppings.map((t: any) => t.name).join(', ')}
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-zinc-800 dark:text-zinc-100 font-semibold shrink-0">
+                          {formatPrice(itemTotal)}
+                        </span>
                       </div>
-                      <span className="text-zinc-800 dark:text-zinc-100 font-semibold shrink-0">
-                        {formatPrice(itemTotal)}
-                      </span>
-                    </div>
-                  )
-                })}
-              </div>
-
-              <div className="border-t border-zinc-100 dark:border-zinc-800 pt-4 space-y-2">
-                <div className="flex justify-between text-sm text-zinc-500">
-                  <span>Subtotal</span>
-                  <span className="font-medium text-zinc-700 dark:text-zinc-300">
-                    {formatPrice(cartTotal)}
-                  </span>
+                    )
+                  })}
                 </div>
-                {discount > 0 && (
-                  <div className="flex justify-between text-sm text-green-600 font-semibold">
-                    <span>{usePoints ? 'Tukar Koin' : 'Diskon'}</span>
-                    <span>−{formatPrice(discount)}</span>
-                  </div>
-                )}
-                {delivery === 'DELIVERY' && (
+
+                <div className="border-t border-zinc-100 dark:border-zinc-800 pt-4 space-y-2">
                   <div className="flex justify-between text-sm text-zinc-500">
-                    <span>Ongkos Kirim</span>
+                    <span>Subtotal</span>
                     <span className="font-medium text-zinc-700 dark:text-zinc-300">
-                      {deliveryFee > 0 ? formatPrice(deliveryFee) : 'Gratis'}
+                      {formatPrice(cartTotal)}
                     </span>
                   </div>
-                )}
-                <div className="flex justify-between font-bold text-zinc-900 dark:text-zinc-100 border-t border-zinc-100 dark:border-zinc-800 pt-3 text-lg">
-                  <span>Total</span>
-                  <span className="text-amber-600 font-serif">{formatPrice(grandTotal)}</span>
+                  {discount > 0 && (
+                    <div className="flex justify-between text-sm text-green-600 font-semibold">
+                      <span>{usePoints ? 'Tukar Koin' : 'Diskon'}</span>
+                      <span>−{formatPrice(discount)}</span>
+                    </div>
+                  )}
+                  {delivery === 'DELIVERY' && (
+                    <div className="flex justify-between text-sm text-zinc-500">
+                      <span>Ongkos Kirim</span>
+                      <span className="font-medium text-zinc-700 dark:text-zinc-300">
+                        {deliveryFee > 0 ? formatPrice(deliveryFee) : 'Gratis'}
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex justify-between font-bold text-zinc-900 dark:text-zinc-100 border-t border-zinc-100 dark:border-zinc-800 pt-3 text-lg">
+                    <span>Total</span>
+                    <span className="text-amber-600 font-serif">{formatPrice(grandTotal)}</span>
+                  </div>
                 </div>
-              </div>
 
-              {/* Security badge */}
-              <div className="mt-4 flex items-center gap-2 text-xs text-zinc-400 bg-zinc-50 dark:bg-zinc-800/50 rounded-[4px] px-3 py-2.5">
-                <span className="text-green-500 text-base">🔒</span>
-                <span>Data Anda terenkripsi. Harga dikunci server, bebas manipulasi.</span>
+                {/* Security badge */}
+                <div className="mt-4 flex items-center gap-2 text-xs text-zinc-400 bg-zinc-50 dark:bg-zinc-800/50 rounded-[4px] px-3 py-2.5">
+                  <span className="text-green-500 text-base">🔒</span>
+                  <span>Data Anda terenkripsi. Harga dikunci server, bebas manipulasi.</span>
+                </div>
               </div>
             </div>
           </div>

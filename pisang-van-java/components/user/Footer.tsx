@@ -92,17 +92,17 @@ export default function Footer() {
             </h4>
             <ul className="space-y-2.5 text-sm">
               {[
-                'Kembung (Isi 15)',
-                'Lumpia (Isi 6)',
-                'Krispy (Isi 5)',
-                'Aneka Topping Premium'
+                { name: 'Kembung (Isi 15)', href: '/menu-spesial?filter=Kembung' },
+                { name: 'Lumpia (Isi 6)', href: '/menu-spesial?filter=Lumpia' },
+                { name: 'Krispy (Isi 5)', href: '/menu-spesial?filter=Krispy' },
+                { name: 'Aneka Topping Premium', href: '/menu-spesial' }
               ].map((item) => (
-                <li key={item}>
+                <li key={item.name}>
                   <Link
-                    href="/menu-spesial"
+                    href={item.href}
                     className="text-cream-50/75 hover:text-white transition-colors duration-200"
                   >
-                    {item}
+                    {item.name}
                   </Link>
                 </li>
               ))}

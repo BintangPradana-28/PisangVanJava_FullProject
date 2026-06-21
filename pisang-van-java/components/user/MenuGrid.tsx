@@ -76,11 +76,11 @@ const ProductImage = ({
       />
       {available ? (
         <div className="absolute top-4 left-1/2 -translate-x-1/2 rounded-[4px] px-3 py-1 text-xs font-bold backdrop-blur-sm bg-white/90 dark:bg-zinc-900/90 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 shadow-sm">
-          {t('menu_fresh_badge')}
+          {t('menu_fresh_badge') || 'Baru'}
         </div>
       ) : (
         <div className="absolute top-4 left-1/2 -translate-x-1/2 rounded-[4px] px-3 py-1 text-xs font-bold backdrop-blur-sm bg-red-600 text-white shadow-md">
-          Sold Out
+          {t('menu_sold_out_badge') || 'Habis Terjual'}
         </div>
       )}
     </div>
@@ -185,6 +185,20 @@ export default function MenuGrid({ products }: { products: ProductType[] }) {
                 const img = product.imageUrl || getFallbackImage(product.flavorName)
                 const available = product.isAvailable && product.stock > 0
                 const isFav = favorites.includes(product.id)
+
+                const defaultPrice =
+                  product.priceKembung > 0
+                    ? product.priceKembung
+                    : product.priceLumpia > 0
+                      ? product.priceLumpia
+                      : product.priceKrispy
+
+                const defaultWholesale =
+                  product.priceKembung > 0
+                    ? product.wholesaleKembung
+                    : product.priceLumpia > 0
+                      ? product.wholesaleLumpia
+                      : product.wholesaleKrispy
 
                 return (
                   <motion.div
@@ -323,15 +337,15 @@ export default function MenuGrid({ products }: { products: ProductType[] }) {
                           <div
                             className={`font-sans text-lg font-bold ${available ? 'text-[#D4802A]' : 'text-zinc-500'}`}
                           >
-                            {session?.user.role === 'RESELLER' && product.wholesaleKembung > 0 ? (
+                            {session?.user.role === 'RESELLER' && defaultWholesale > 0 ? (
                               <div className="flex flex-col items-start leading-tight">
                                 <span className="text-xs line-through text-zinc-400 font-normal">
-                                  {formatPrice(product.priceKembung)}
+                                  {formatPrice(defaultPrice)}
                                 </span>
-                                <span>{formatPrice(product.wholesaleKembung)}</span>
+                                <span>{formatPrice(defaultWholesale)}</span>
                               </div>
                             ) : (
-                              formatPrice(product.priceKembung)
+                              formatPrice(defaultPrice)
                             )}
                           </div>
                         </div>

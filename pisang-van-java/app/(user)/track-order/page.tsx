@@ -156,7 +156,7 @@ function ReorderButton({ order }: { order: Order }) {
             ? item.toppings.map((t: any) => ({
                 toppingId: t.id || 'unknown',
                 name: t.name,
-                priceAdd: 2000
+                priceAdd: t.price || 2000
               }))
             : [],
           quantity: item.quantity,

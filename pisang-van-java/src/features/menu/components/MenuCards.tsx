@@ -201,6 +201,21 @@ export default function MenuCards({ products }: Props) {
             filteredProducts.map((product, i) => {
               const image = product.imageUrl || getFallbackImageUrl(product.flavorName)
               const available = product.isAvailable && product.stock > 0
+
+              const defaultPrice =
+                product.priceKembung > 0
+                  ? product.priceKembung
+                  : product.priceLumpia > 0
+                    ? product.priceLumpia
+                    : product.priceKrispy
+
+              const defaultWholesale =
+                product.priceKembung > 0
+                  ? product.wholesaleKembung
+                  : product.priceLumpia > 0
+                    ? product.wholesaleLumpia
+                    : product.wholesaleKrispy
+
               return (
                 <motion.div
                   key={product.id}
@@ -303,17 +318,17 @@ export default function MenuCards({ products }: Props) {
                         <div
                           className={`font-sans text-lg font-bold text-primary dark:text-amber-400 ${!available ? 'text-zinc-500' : ''}`}
                         >
-                          {isReseller && product.wholesaleKembung > 0 ? (
+                          {isReseller && defaultWholesale > 0 ? (
                             <div className="flex flex-col items-center leading-tight">
                               <span className="text-xs line-through text-zinc-400 font-normal">
-                                {formatPrice(product.priceKembung)}
+                                {formatPrice(defaultPrice)}
                               </span>
                               <span className="text-[#D4802A]">
-                                {formatPrice(product.wholesaleKembung)}
+                                {formatPrice(defaultWholesale)}
                               </span>
                             </div>
                           ) : (
-                            formatPrice(product.priceKembung)
+                            formatPrice(defaultPrice)
                           )}
                         </div>
                       </div>

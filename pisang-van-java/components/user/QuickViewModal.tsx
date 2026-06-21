@@ -99,7 +99,14 @@ export default function QuickViewModal({
   useEffect(() => {
     if (product) {
       setSelectedFlavor(product.flavorName)
-      setSelectedType(AVAILABLE_TYPES[0])
+      const defaultType =
+        ['Kembung', 'Lumpia', 'Krispy'].find((t) => {
+          if (t === 'Kembung') return product.priceKembung > 0
+          if (t === 'Lumpia') return product.priceLumpia > 0
+          if (t === 'Krispy') return product.priceKrispy > 0
+          return false
+        }) || 'Kembung'
+      setSelectedType(defaultType)
       setQuantity(1)
       if (toppingsData.length > 0) {
         setSelectedToppings([toppingsData[0].id])
@@ -394,14 +401,27 @@ export default function QuickViewModal({
               <div className="grid grid-cols-3 gap-3">
                 {AVAILABLE_TYPES.map((type) => {
                   const isSelected = selectedType === type
+                  const isTypeDisabled = (() => {
+                    const p = displayProduct
+                    if (!p) return true
+                    if (type === 'Kembung') return p.priceKembung <= 0
+                    if (type === 'Lumpia') return p.priceLumpia <= 0
+                    if (type === 'Krispy') return p.priceKrispy <= 0
+                    return false
+                  })()
+
                   return (
                     <button
                       key={type}
-                      onClick={() => setSelectedType(type)}
+                      type="button"
+                      disabled={isTypeDisabled}
+                      onClick={() => !isTypeDisabled && setSelectedType(type)}
                       className={`py-2.5 px-2 rounded-[4px] border-2 text-sm font-bold transition-all ${
                         isSelected
                           ? 'border-[#D4802A] bg-[#D4802A]/10 text-[#D4802A]'
-                          : 'border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:border-zinc-300'
+                          : isTypeDisabled
+                            ? 'border-zinc-100 dark:border-zinc-800 text-zinc-300 dark:text-zinc-700 cursor-not-allowed opacity-50 bg-zinc-50 dark:bg-zinc-800/20'
+                            : 'border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:border-zinc-300'
                       }`}
                     >
                       {type}
