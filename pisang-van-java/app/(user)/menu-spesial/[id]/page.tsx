@@ -209,12 +209,12 @@ export default async function ProductDetailPage(props: PageProps) {
     },
     ...(averageRating
       ? {
-        aggregateRating: {
-          '@type': 'AggregateRating',
-          ratingValue: averageRating,
-          reviewCount: product.reviews.length
+          aggregateRating: {
+            '@type': 'AggregateRating',
+            ratingValue: averageRating,
+            reviewCount: product.reviews.length
+          }
         }
-      }
       : {})
   }
 
@@ -222,12 +222,12 @@ export default async function ProductDetailPage(props: PageProps) {
     <main className="min-h-screen bg-zinc-50 dark:bg-zinc-950 pt-20">
       <script
         type="application/ld+json"
-        // nosemgrep: typescript.react.security.audit.react-dangerouslysetinnerhtml.react-dangerouslysetinnerhtml
         // JSON-LD structured data for SEO (Product schema). Not raw HTML — content type
         // is application/ld+json, so the browser never executes it as markup or script.
         // safeJsonLdScript() escapes "<" to block "</script>" breakout from free-text
         // fields (flavorName, deskripsi_topping are admin-entered, not user-submitted).
-        dangerouslySetInnerHTML={{ __html: safeJsonLdScript(productJsonLd) }}
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD schema requires raw HTML injection
+        dangerouslySetInnerHTML={{ __html: safeJsonLdScript(productJsonLd) }} // nosemgrep: typescript.react.security.audit.react-dangerouslysetinnerhtml.react-dangerouslysetinnerhtml
       />
       <ProductDetailClient
         product={mappedProduct}
