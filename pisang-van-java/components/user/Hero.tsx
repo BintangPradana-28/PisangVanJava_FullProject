@@ -34,12 +34,14 @@ export default function Hero({
   banner,
   averageRating = 0,
   totalReviews = 0,
-  activeToppingsCount = 12
+  activeToppingsCount = 12,
+  activeFlavorsCount = 3
 }: {
   banner?: { imageUrl?: string | null; linkUrl?: string | null } | null
   averageRating?: number
   totalReviews?: number
   activeToppingsCount?: number
+  activeFlavorsCount?: number
 }) {
   const { t } = useLanguage()
 
@@ -187,7 +189,7 @@ export default function Hero({
                 num: activeToppingsCount > 0 ? `${activeToppingsCount}+` : '12+',
                 label: t('hero_stat_topping')
               },
-              { num: '3', label: t('hero_stat_type') },
+              { num: activeFlavorsCount > 0 ? `${activeFlavorsCount}` : '3', label: t('hero_stat_type') },
               { num: '100%', label: t('hero_stat_local') }
             ].map(({ num, label }) => (
               <div key={label}>

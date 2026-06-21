@@ -331,6 +331,7 @@ export default async function HomePage() {
         averageRating={averageRating}
         totalReviews={totalReviews}
         activeToppingsCount={activeToppingsCount}
+        activeFlavorsCount={activeFlavorsCount}
       />
       {/* PERF/CRO: MenuCards dipindah ke sini, langsung setelah Hero — menu yang
           bisa dipesan sebelumnya berada di urutan ke-4 (setelah About+Gallery),
