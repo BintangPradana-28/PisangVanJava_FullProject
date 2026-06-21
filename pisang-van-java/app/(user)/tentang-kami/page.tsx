@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
 import Footer from '@/components/user/Footer'
 import Gallery from '@/components/user/Gallery'
 import { useLanguage } from '@/context/LanguageContext'
@@ -11,6 +12,35 @@ import { useSettings } from '@/context/SettingsContext'
 export default function TentangKamiPage() {
   const { t } = useLanguage()
   const { getSetting } = useSettings()
+
+  const [flavorsCount, setFlavorsCount] = useState(12)
+  const [toppingsCount, setToppingsCount] = useState(12)
+  const [galleryProducts, setGalleryProducts] = useState<any[]>([])
+
+  useEffect(() => {
+    fetch('/api/menu')
+      .then((res) => res.json())
+      .then((res) => {
+        if (res.success && res.data) {
+          const variants = res.data.variants || []
+          if (variants.length > 0) {
+            setFlavorsCount(variants.length)
+            setGalleryProducts(
+              variants.map((v: any) => ({
+                id: v.id,
+                flavorName: v.flavorName,
+                imageUrl: v.imageUrl
+              }))
+            )
+          }
+          const toppings = res.data.toppings || []
+          if (toppings.length > 0) {
+            setToppingsCount(toppings.length)
+          }
+        }
+      })
+      .catch(() => {})
+  }, [])
 
   const values = [
     {
@@ -86,13 +116,38 @@ export default function TentangKamiPage() {
 
   const stats = [
     { num: `${new Date().getFullYear() - 2018}+`, label: t('about_stat_experience') },
-    { num: '12+', label: t('about_stat_flavor') },
-    { num: '500+', label: t('about_stat_fried') },
-    { num: '100%', label: t('about_stat_hygiene') }
+    { num: `${flavorsCount}+`, label: t('about_stat_flavor') },
+    { num: `${toppingsCount}+`, label: t('hero_stat_topping') },
+    { num: '100%', label: t('about_stat_local') }
   ]
+
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://pisanggorengvanjava.com'
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: baseUrl
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: t('nav_about') || 'Tentang Kami',
+        item: `${baseUrl}/tentang-kami`
+      }
+    ]
+  }
 
   return (
     <div className="min-h-screen bg-[var(--background-custom)] text-primary dark:text-zinc-100">
+      <script
+        type="application/ld+json"
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD schema requires raw HTML injection
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       {/* ── Hero ── */}
       <section className="relative pt-28 pb-12 overflow-hidden bg-cream-50 dark:bg-zinc-900 border-b border-outline-variant/20 dark:border-zinc-800">
         <div className="absolute inset-0 bg-hero-pattern opacity-40 pointer-events-none" />
@@ -291,7 +346,7 @@ export default function TentangKamiPage() {
         </div>
       </section>
 
-      <Gallery compact />
+      <Gallery compact products={galleryProducts} />
 
       {/* ── Team ── */}
       <section className="py-20 bg-cream-50 dark:bg-zinc-950 border-t border-cream-200 dark:border-zinc-900">
@@ -325,7 +380,16 @@ export default function TentangKamiPage() {
                 <div
                   className={`relative w-32 h-32 mx-auto mb-6 rounded-[4px] overflow-hidden border-4 border-cream-100 dark:border-zinc-800 group-hover:border-amber-500 transition-colors flex items-center justify-center ${bgColor}`}
                 >
-                  <span className="font-serif text-4xl font-bold text-white select-none">
+                  <div className="absolute inset-0 bg-gradient-to-tr from-black/20 via-transparent to-white/10 opacity-70 pointer-events-none" />
+                  <svg
+                    className="w-14 h-14 text-white/30 absolute bottom-0 right-0 translate-x-3 translate-y-3 shrink-0 pointer-events-none"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
+                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                  </svg>
+                  <span className="font-serif text-3xl font-bold text-white select-none relative z-10 drop-shadow-md">
                     {name
                       .split(' ')
                       .map((w) => w[0])

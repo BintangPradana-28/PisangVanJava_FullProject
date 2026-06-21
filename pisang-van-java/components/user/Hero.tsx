@@ -33,11 +33,13 @@ const ShoppingBagIcon = () => (
 export default function Hero({
   banner,
   averageRating = 0,
-  totalReviews = 0
+  totalReviews = 0,
+  activeToppingsCount = 12
 }: {
   banner?: { imageUrl?: string | null; linkUrl?: string | null } | null
   averageRating?: number
   totalReviews?: number
+  activeToppingsCount?: number
 }) {
   const { t } = useLanguage()
 
@@ -171,11 +173,20 @@ export default function Hero({
               <ShoppingBagIcon />
               <span>{t('hero_order_btn')}</span>
             </Link>
+            <Link
+              href="/track-order"
+              className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/15 border border-white/30 text-white font-bold text-base px-8 py-4 rounded-[4px] transition-all duration-200 active:scale-95 focus:outline-none focus:ring-4 focus:ring-white/30"
+            >
+              <span>📦 {t('hero_sec_cta')}</span>
+            </Link>
           </div>
 
           <div className="grid grid-cols-3 gap-6 max-w-sm mt-12 pt-8 border-t border-white/10">
             {[
-              { num: '12+', label: t('hero_stat_topping') },
+              {
+                num: activeToppingsCount > 0 ? `${activeToppingsCount}+` : '12+',
+                label: t('hero_stat_topping')
+              },
               { num: '3', label: t('hero_stat_type') },
               { num: '100%', label: t('hero_stat_local') }
             ].map(({ num, label }) => (

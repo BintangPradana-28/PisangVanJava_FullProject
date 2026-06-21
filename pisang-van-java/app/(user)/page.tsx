@@ -237,6 +237,23 @@ const getCachedSiteSettings = async (): Promise<Record<string, string>> => {
   }
 }
 
+const getCachedToppingsCountRaw = unstable_cache(
+  async () => {
+    return await prisma.topping.count({ where: { isActive: true } })
+  },
+  ['home-toppings-count'],
+  { revalidate: 3600, tags: ['toppings'] }
+)
+
+const getCachedToppingsCount = async () => {
+  try {
+    return await getCachedToppingsCountRaw()
+  } catch {
+    console.warn('[Safe Log] Database connection error during toppings count fetch')
+    return 12 // Fallback to hardcoded 12
+  }
+}
+
 export default async function HomePage() {
   const products = await getCachedMenu()
   const homeProducts = products.slice(0, 3) // Hanya tampilkan 3 menu teratas
@@ -249,6 +266,9 @@ export default async function HomePage() {
 
   // SEO FIX: Fetch real site settings for JSON-LD (not hardcoded)
   const siteSettings = await getCachedSiteSettings()
+
+  const activeToppingsCount = await getCachedToppingsCount()
+  const activeFlavorsCount = products.length > 0 ? products.length : 12
 
   const averageRating = reviewAggregates._avg.rating
     ? Number(reviewAggregates._avg.rating.toFixed(1))
@@ -306,14 +326,23 @@ export default async function HomePage() {
         // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD schema requires raw HTML injection
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <Hero banner={activeBanner} averageRating={averageRating} totalReviews={totalReviews} />
+      <Hero
+        banner={activeBanner}
+        averageRating={averageRating}
+        totalReviews={totalReviews}
+        activeToppingsCount={activeToppingsCount}
+      />
       {/* PERF/CRO: MenuCards dipindah ke sini, langsung setelah Hero — menu yang
           bisa dipesan sebelumnya berada di urutan ke-4 (setelah About+Gallery),
           memaksa scroll panjang sebelum pengunjung lihat produk. MenuCards juga
           sudah di-import statis (bukan next/dynamic seperti About/Gallery di
           bawah), jadi urutan render ini konsisten dengan prioritas loading-nya. */}
       <MenuCards products={homeProducts} />
-      <About />
+      <About
+        averageRating={averageRating}
+        totalReviews={totalReviews}
+        activeFlavorsCount={activeFlavorsCount}
+      />
       <Gallery
         products={products.slice(0, 6).map((p) => ({
           id: p.id,

@@ -57,6 +57,8 @@ export default async function MenuSpesialPage(props: {
   const filter = typeof searchParams.filter === 'string' ? searchParams.filter : 'all'
   const flavor = typeof searchParams.flavor === 'string' ? searchParams.flavor : 'all'
   const sort = typeof searchParams.sort === 'string' ? searchParams.sort : 'default'
+  const available =
+    typeof searchParams.available === 'string' ? searchParams.available === 'true' : false
 
   // Module 4: Edge Middleware Personalization Context
   const cookieStore = await cookies()
@@ -119,7 +121,9 @@ export default async function MenuSpesialPage(props: {
 
     const matchFlavor = flavor === 'all' || name.includes(flavor.toLowerCase())
 
-    return matchSearch && matchBase && matchFlavor
+    const matchAvailable = !available || (p.isAvailable && p.stock > 0)
+
+    return matchSearch && matchBase && matchFlavor && matchAvailable
   })
 
   // Explicit sort (user-selected) takes priority over the implicit time-of-day

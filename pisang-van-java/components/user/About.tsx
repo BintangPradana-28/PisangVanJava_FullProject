@@ -6,7 +6,15 @@ import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 
-export default function About() {
+export default function About({
+  averageRating = 0,
+  totalReviews = 0,
+  activeFlavorsCount = 12
+}: {
+  averageRating?: number
+  totalReviews?: number
+  activeFlavorsCount?: number
+}) {
   const { t } = useLanguage()
   const ref = useRef<HTMLElement>(null)
   const [visible, setVisible] = useState(false)
@@ -33,7 +41,10 @@ export default function About() {
 
   const stats = [
     { num: `${new Date().getFullYear() - 2018}+`, label: t('about_stat_experience') },
-    { num: '12+', label: t('about_stat_flavor') },
+    {
+      num: activeFlavorsCount > 0 ? `${activeFlavorsCount}+` : '12+',
+      label: t('about_stat_flavor')
+    },
     { num: '3', label: t('about_stat_types') },
     { num: '100%', label: t('about_stat_local') }
   ]
@@ -93,8 +104,23 @@ export default function About() {
                   transition: { duration: 0.5, delay: 0.12, ease: 'easeOut' }
                 })}
           >
-            <div className="inline-block bg-secondary/10 text-secondary text-xs font-bold tracking-[0.2em] uppercase px-4 py-1 rounded-[4px] mb-4">
-              {t('about_badge')}
+            <div className="flex flex-wrap items-center gap-3 mb-4">
+              <div className="inline-block bg-secondary/10 text-secondary text-xs font-bold tracking-[0.2em] uppercase px-4 py-1 rounded-[4px]">
+                {t('about_badge')}
+              </div>
+              {totalReviews >= 5 && (
+                <Link
+                  href="/ulasan"
+                  className="inline-flex items-center gap-1 bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-[4px] transition-all hover:bg-amber-500/20 active:scale-95 focus:outline-none"
+                >
+                  <span className="text-amber-500 text-xs font-bold">
+                    ★ {averageRating.toFixed(1)}
+                  </span>
+                  <span className="text-[10px] font-semibold text-amber-700 dark:text-amber-400">
+                    ({totalReviews} {t('about_review_social')})
+                  </span>
+                </Link>
+              )}
             </div>
 
             <h2 className="font-serif text-4xl sm:text-5xl font-bold text-primary dark:text-zinc-100 mb-6 leading-[1.15]">
