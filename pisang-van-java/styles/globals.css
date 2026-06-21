@@ -131,10 +131,10 @@
 
 @layer utilities {
   .pb-safe {
-    padding-bottom: env(safe-area-inset-bottom);
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom));
   }
   .pt-safe {
-    padding-top: env(safe-area-inset-top);
+    padding-top: calc(1rem + env(safe-area-inset-top));
   }
 
   /* Stitch Custom Typographic Scales */

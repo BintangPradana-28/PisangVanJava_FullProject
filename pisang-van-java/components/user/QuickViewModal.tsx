@@ -268,8 +268,9 @@ export default function QuickViewModal({
               actual bottom-sheet dragging on mobile. */}
           <Drawer.Handle className="md:hidden absolute left-1/2 -translate-x-1/2 top-2 z-20 h-1.5 w-12 flex-shrink-0 rounded-full bg-white/70" />
 
-          {/* Header: image hero + overlay icon buttons (back/favorite) + name + stat row */}
-          <div className="shrink-0">
+          {/* Scrollable Container (covers the entire drawer except the footer) */}
+          <div className="flex-1 overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch]">
+            {/* Header: image hero + overlay icon buttons (back/favorite) */}
             <div className="relative w-full aspect-[4/3] bg-zinc-100 dark:bg-zinc-800">
               <Image
                 src={heroImage}
@@ -319,66 +320,62 @@ export default function QuickViewModal({
               )}
             </div>
 
-            <Drawer.Description className="sr-only">
-              Sesuaikan opsi untuk {dynamicTitle}
-            </Drawer.Description>
-            <Drawer.Title className="font-serif font-bold text-2xl text-center text-zinc-900 dark:text-zinc-100 pt-4 px-6">
-              {selectedFlavor || product.flavorName}
-            </Drawer.Title>
+            {/* Body content with padding */}
+            <div className="p-6 bg-zinc-50 dark:bg-zinc-900/50">
+              <Drawer.Description className="sr-only">
+                Sesuaikan opsi untuk {dynamicTitle}
+              </Drawer.Description>
+              <Drawer.Title className="font-serif font-bold text-2xl text-center text-zinc-900 dark:text-zinc-100 mb-2">
+                {selectedFlavor || product.flavorName}
+              </Drawer.Title>
 
-            {matchedProduct && matchedProduct.stock <= 5 && matchedProduct.stock > 0 && (
-              <div className="flex items-center justify-center gap-1.5 mt-1.5 animate-shake infinite [animation-duration:1.5s]">
-                <span className="w-2 h-2 rounded-[4px] bg-amber-500 animate-pulse" />
-                <span className="text-xs font-bold text-amber-600 dark:text-amber-400">
-                  ⚠️ Stok Terbatas: Sisa {matchedProduct.stock} porsi!
-                </span>
-              </div>
-            )}
+              {matchedProduct && matchedProduct.stock <= 5 && matchedProduct.stock > 0 && (
+                <div className="flex items-center justify-center gap-1.5 mb-4 animate-shake infinite [animation-duration:1.5s]">
+                  <span className="w-2 h-2 rounded-[4px] bg-amber-500 animate-pulse" />
+                  <span className="text-xs font-bold text-amber-600 dark:text-amber-400">
+                    ⚠️ Stok Terbatas: Sisa {matchedProduct.stock} porsi!
+                  </span>
+                </div>
+              )}
 
-            {/* Stat row — real data only. Reference shows calories/prep-time/weight,
-                none of which exist in our schema; substituted with soldCount, stock,
-                rating, and the live-selected type instead of fabricating numbers. */}
-            <div className="flex items-center justify-center gap-5 px-6 py-4 border-b border-zinc-100 dark:border-zinc-800">
-              <div className="flex flex-col items-center gap-0.5">
-                <span className="text-base">🔥</span>
-                <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">
-                  {displayProduct.soldCount && displayProduct.soldCount >= 1000
-                    ? `${(displayProduct.soldCount / 1000).toFixed(1)}k+`
-                    : (displayProduct.soldCount ?? 0)}
-                </span>
-                <span className="text-[10px] text-zinc-400">Terjual</span>
+              {/* Stat row — real data only. */}
+              <div className="flex items-center justify-center gap-5 py-4 mb-6 border-b border-zinc-250 dark:border-zinc-800 bg-white dark:bg-zinc-900/80 rounded-[4px] shadow-sm">
+                <div className="flex flex-col items-center gap-0.5">
+                  <span className="text-base">🔥</span>
+                  <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">
+                    {displayProduct.soldCount && displayProduct.soldCount >= 1000
+                      ? `${(displayProduct.soldCount / 1000).toFixed(1)}k+`
+                      : (displayProduct.soldCount ?? 0)}
+                  </span>
+                  <span className="text-[10px] text-zinc-400">Terjual</span>
+                </div>
+                <div className="w-px h-8 bg-zinc-200 dark:bg-zinc-700" />
+                <div className="flex flex-col items-center gap-0.5">
+                  <span className="text-base">📦</span>
+                  <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">
+                    {displayProduct.stock}
+                  </span>
+                  <span className="text-[10px] text-zinc-400">Sisa Stok</span>
+                </div>
+                <div className="w-px h-8 bg-zinc-200 dark:bg-zinc-700" />
+                <div className="flex flex-col items-center gap-0.5">
+                  <span className="text-base">⭐</span>
+                  <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">
+                    {displayProduct.rating ? displayProduct.rating : 'Baru'}
+                  </span>
+                  <span className="text-[10px] text-zinc-400">
+                    {displayProduct.reviewCount ? `${displayProduct.reviewCount} Ulasan` : 'Rating'}
+                  </span>
+                </div>
+                <div className="w-px h-8 bg-zinc-200 dark:bg-zinc-700" />
+                <div className="flex flex-col items-center gap-0.5">
+                  <span className="text-base">{TYPE_EMOJI[selectedType] ?? '🍌'}</span>
+                  <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">
+                    {selectedType || '—'}
+                  </span>
+                  <span className="text-[10px] text-zinc-400">Tipe Dipilih</span>
+                </div>
               </div>
-              <div className="w-px h-8 bg-zinc-200 dark:bg-zinc-700" />
-              <div className="flex flex-col items-center gap-0.5">
-                <span className="text-base">📦</span>
-                <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">
-                  {displayProduct.stock}
-                </span>
-                <span className="text-[10px] text-zinc-400">Sisa Stok</span>
-              </div>
-              <div className="w-px h-8 bg-zinc-200 dark:bg-zinc-700" />
-              <div className="flex flex-col items-center gap-0.5">
-                <span className="text-base">⭐</span>
-                <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">
-                  {displayProduct.rating ? displayProduct.rating : 'Baru'}
-                </span>
-                <span className="text-[10px] text-zinc-400">
-                  {displayProduct.reviewCount ? `${displayProduct.reviewCount} Ulasan` : 'Rating'}
-                </span>
-              </div>
-              <div className="w-px h-8 bg-zinc-200 dark:bg-zinc-700" />
-              <div className="flex flex-col items-center gap-0.5">
-                <span className="text-base">{TYPE_EMOJI[selectedType] ?? '🍌'}</span>
-                <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">
-                  {selectedType || '—'}
-                </span>
-                <span className="text-[10px] text-zinc-400">Tipe Dipilih</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Body (Bisa di-Scroll) */}
-          <div className="flex-1 overflow-y-auto p-6 bg-zinc-50 dark:bg-zinc-900/50 overscroll-contain [-webkit-overflow-scrolling:touch]">
             {/* Description — reuses the exact same copy source as the menu grid card,
                 so the text customers see here matches what they saw before opening */}
             <div className="mb-8">
@@ -563,6 +560,7 @@ export default function QuickViewModal({
                 className="w-full p-4 border-2 border-zinc-200 dark:border-zinc-800 rounded-[4px] text-sm bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-[#D4802A] transition-colors min-h-[80px]"
               />
             </div>
+          </div>
           </div>
 
           {/* Footer (Sticky Bottom) */}
