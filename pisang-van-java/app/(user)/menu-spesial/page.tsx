@@ -40,7 +40,11 @@ const getCachedProducts = async () => {
 // can legitimately be 0 for a Krispy-only flavor — see matchBase filter below), so
 // sorting by priceKembung alone would wrongly rank those as "cheapest". This takes
 // the lowest *non-zero* price across the 3 base types instead.
-const getStartingPrice = (p: { priceKembung: number; priceLumpia: number; priceKrispy: number }) => {
+const getStartingPrice = (p: {
+  priceKembung: number
+  priceLumpia: number
+  priceKrispy: number
+}) => {
   const prices = [p.priceKembung, p.priceLumpia, p.priceKrispy].filter((price) => price > 0)
   return prices.length > 0 ? Math.min(...prices) : Infinity // no price set → sort to the end
 }
@@ -68,7 +72,7 @@ export default async function MenuSpesialPage(props: {
   if (menuContextCookie) {
     try {
       promoContext = JSON.parse(menuContextCookie)
-    } catch (e) { }
+    } catch {}
   }
 
   // Fetch all active products with review aggregates (Cached)
@@ -93,8 +97,8 @@ export default async function MenuSpesialPage(props: {
     rating:
       p.reviews.length > 0
         ? Math.round(
-          (p.reviews.reduce((s: any, r: any) => s + r.rating, 0) / p.reviews.length) * 10
-        ) / 10
+            (p.reviews.reduce((s: any, r: any) => s + r.rating, 0) / p.reviews.length) * 10
+          ) / 10
         : undefined,
     reviewCount: p.reviews.length > 0 ? p.reviews.length : undefined,
     isActive: p.isActive
@@ -147,8 +151,8 @@ export default async function MenuSpesialPage(props: {
     filtered.sort((a: any, b: any) => {
       const isMilky = (name: string) =>
         name.toLowerCase().includes('susu') ||
-          name.toLowerCase().includes('milky') ||
-          name.toLowerCase().includes('coklat')
+        name.toLowerCase().includes('milky') ||
+        name.toLowerCase().includes('coklat')
           ? 1
           : 0
       return isMilky(b.flavorName) - isMilky(a.flavorName)
@@ -187,6 +191,7 @@ export default async function MenuSpesialPage(props: {
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100">
       <script
         type="application/ld+json"
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD schema requires raw HTML injection
         dangerouslySetInnerHTML={{ __html: JSON.stringify(menuJsonLd) }}
       />
       {/* ── Hero ── */}
@@ -211,8 +216,7 @@ export default async function MenuSpesialPage(props: {
           </p>
           <Link
             href="/lokasi-kontak"
-            className="inline-block px-8 py-3.5 rounded-[4px] font-bold text-sm transition-all active:scale-95"
-            style={{ background: '#D4802A', color: 'white' }}
+            className="inline-block px-8 py-3.5 rounded-[4px] font-bold text-sm bg-amber-brand text-white transition-all hover:bg-amber-brand/90 active:scale-95"
           >
             Lihat Lokasi Outlet
           </Link>
