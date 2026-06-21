@@ -8,8 +8,7 @@ export const metadata: Metadata = {
     'Cerita Pisang Goreng Van Java sejak 2018 — membawa rasa warisan tradisional Jawa ke tingkat premium dengan bahan pilihan dari petani lokal dan resep rahasia turun-temurun.',
   openGraph: {
     title: 'Tentang Kami - Warisan Rasa Van Java',
-    description:
-      'Cerita, nilai, dan tim di balik Pisang Goreng Van Java sejak 2018.',
+    description: 'Cerita, nilai, dan tim di balik Pisang Goreng Van Java sejak 2018.',
     url: `${baseUrl}/tentang-kami`,
     siteName: 'Pisang Van Java',
     locale: 'id_ID',
@@ -25,6 +24,10 @@ export const metadata: Metadata = {
   }
 }
 
-export default function TentangKamiLayout({ children }: { children: React.ReactNode }): React.ReactNode {
+export default function TentangKamiLayout({
+  children
+}: {
+  children: React.ReactNode
+}): React.ReactNode {
   return children
 }

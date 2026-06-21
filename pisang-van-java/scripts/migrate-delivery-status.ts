@@ -43,7 +43,9 @@ async function main() {
     }
   })
 
-  console.log(`🔍 Found ${completedDeliveryOrders.length} completed delivery orders without proof of delivery.`)
+  console.log(
+    `🔍 Found ${completedDeliveryOrders.length} completed delivery orders without proof of delivery.`
+  )
 
   if (completedDeliveryOrders.length > 0) {
     console.log('🔄 Setting placeholder proof of delivery for historical completed orders...')
@@ -57,7 +59,9 @@ async function main() {
       })
       count++
     }
-    console.log(`✅ Successfully updated ${count} completed delivery orders with placeholder proof of delivery.`)
+    console.log(
+      `✅ Successfully updated ${count} completed delivery orders with placeholder proof of delivery.`
+    )
   }
 
   console.log('🎉 Migration completed successfully.')

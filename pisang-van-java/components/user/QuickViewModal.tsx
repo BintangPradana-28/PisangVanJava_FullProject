@@ -395,10 +395,11 @@ export default function QuickViewModal({
                     <button
                       key={type}
                       onClick={() => setSelectedType(type)}
-                      className={`py-2.5 px-2 rounded-[4px] border-2 text-sm font-bold transition-all ${isSelected
+                      className={`py-2.5 px-2 rounded-[4px] border-2 text-sm font-bold transition-all ${
+                        isSelected
                           ? 'border-[#D4802A] bg-[#D4802A]/10 text-[#D4802A]'
                           : 'border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:border-zinc-300'
-                        }`}
+                      }`}
                     >
                       {type}
                     </button>
@@ -421,10 +422,11 @@ export default function QuickViewModal({
                     return (
                       <label
                         key={topping.id}
-                        className={`flex flex-col p-3.5 min-h-[44px] min-w-[44px] border-2 rounded-[4px] cursor-pointer transition-all select-none active:scale-[0.97] ${isSelected
+                        className={`flex flex-col p-3.5 min-h-[44px] min-w-[44px] border-2 rounded-[4px] cursor-pointer transition-all select-none active:scale-[0.97] ${
+                          isSelected
                             ? 'border-[#D4802A] bg-[#D4802A]/5'
                             : 'border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-800/50'
-                          }`}
+                        }`}
                       >
                         <div className="flex items-center gap-2.5 mb-1">
                           <input
@@ -465,10 +467,11 @@ export default function QuickViewModal({
                           return (
                             <label
                               key={topping.id}
-                              className={`flex flex-col p-3.5 min-h-[44px] min-w-[44px] border-2 rounded-[4px] cursor-pointer transition-all select-none active:scale-[0.97] ${isSelected
+                              className={`flex flex-col p-3.5 min-h-[44px] min-w-[44px] border-2 rounded-[4px] cursor-pointer transition-all select-none active:scale-[0.97] ${
+                                isSelected
                                   ? 'border-[#D4802A] bg-[#D4802A]/5'
                                   : 'border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-800/50'
-                                }`}
+                              }`}
                             >
                               <div className="flex items-center gap-2.5 mb-1">
                                 <input
@@ -516,10 +519,11 @@ export default function QuickViewModal({
                           setNotes((prev) => (prev ? `${prev} [${tag}]` : `[${tag}]`).trim())
                         }
                       }}
-                      className={`px-3 py-1.5 rounded-[4px] text-xs font-bold border transition-colors ${isSelected
+                      className={`px-3 py-1.5 rounded-[4px] text-xs font-bold border transition-colors ${
+                        isSelected
                           ? 'bg-[#D4802A]/10 text-[#D4802A] border-[#D4802A]'
                           : 'bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700 hover:border-[#D4802A]/50'
-                        }`}
+                      }`}
                     >
                       {isSelected ? '✓ ' : '+ '}
                       {tag}
@@ -570,10 +574,11 @@ export default function QuickViewModal({
             <button
               onClick={(e) => handleAddToCart(e)}
               disabled={!isFormValid || !isStoreOpen}
-              className={`flex-1 py-3.5 px-4 rounded-[4px] font-bold text-sm transition-all duration-200 shadow-md flex items-center justify-center gap-2 ${isFormValid && isStoreOpen
+              className={`flex-1 py-3.5 px-4 rounded-[4px] font-bold text-sm transition-all duration-200 shadow-md flex items-center justify-center gap-2 ${
+                isFormValid && isStoreOpen
                   ? 'bg-[#D4802A] hover:bg-[#b56d24] text-white active:scale-95 shadow-[#D4802A]/30'
                   : 'bg-zinc-300 dark:bg-zinc-800 text-zinc-500 cursor-not-allowed shadow-none'
-                }`}
+              }`}
             >
               {!isStoreOpen ? (
                 <>Toko Sedang Tutup</>

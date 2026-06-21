@@ -33,12 +33,12 @@ Sentry.init({
 
   integrations: isInternalPanel
     ? [
-      Sentry.replayIntegration({
-        // 🛡️ Sembunyikan semua teks dan input di layar pengguna dari rekaman Sentry
-        maskAllText: true,
-        maskAllInputs: true
-      })
-    ]
+        Sentry.replayIntegration({
+          // 🛡️ Sembunyikan semua teks dan input di layar pengguna dari rekaman Sentry
+          maskAllText: true,
+          maskAllInputs: true
+        })
+      ]
     : []
 })
 

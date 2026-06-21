@@ -31,7 +31,7 @@ self.addEventListener('push', (e) => {
     payload = {
       title: 'Pisang Van Java 🍌',
       body: e.data.text(),
-      url: '/profile/pesanan',
+      url: '/profile/pesanan'
     }
   }
 
@@ -47,7 +47,7 @@ self.addEventListener('push', (e) => {
       // tag deduplicates: same tag replaces the previous notification bubble
       // so a rapid PROCESSING → READY update won't stack 2 notifications
       tag: 'pvj-order-update',
-      renotify: true, // vibrate/sound even if replacing same tag
+      renotify: true // vibrate/sound even if replacing same tag
     })
   )
 })
@@ -60,23 +60,21 @@ self.addEventListener('notificationclick', (e) => {
 
   e.waitUntil(
     // Find an existing open tab for this origin and navigate it
-    clients
-      .matchAll({ type: 'window', includeUncontrolled: true })
-      .then((clientList) => {
-        for (const client of clientList) {
-          if (
-            typeof client.url === 'string' &&
-            client.url.startsWith(self.location.origin) &&
-            'focus' in client
-          ) {
-            client.navigate(targetUrl)
-            return client.focus()
-          }
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      for (const client of clientList) {
+        if (
+          typeof client.url === 'string' &&
+          client.url.startsWith(self.location.origin) &&
+          'focus' in client
+        ) {
+          client.navigate(targetUrl)
+          return client.focus()
         }
-        // No existing tab — open a new window
-        if (clients.openWindow) {
-          return clients.openWindow(targetUrl)
-        }
-      })
+      }
+      // No existing tab — open a new window
+      if (clients.openWindow) {
+        return clients.openWindow(targetUrl)
+      }
+    })
   )
 })

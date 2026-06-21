@@ -30,15 +30,9 @@ const pushSubscriptionSchema = z.object({
     .max(500, 'Endpoint terlalu panjang'),
   expirationTime: z.number().nullable().optional().default(null),
   keys: z.object({
-    p256dh: z
-      .string()
-      .min(10, 'p256dh key tidak valid')
-      .max(200, 'p256dh key terlalu panjang'),
-    auth: z
-      .string()
-      .min(10, 'auth key tidak valid')
-      .max(100, 'auth key terlalu panjang'),
-  }),
+    p256dh: z.string().min(10, 'p256dh key tidak valid').max(200, 'p256dh key terlalu panjang'),
+    auth: z.string().min(10, 'auth key tidak valid').max(100, 'auth key terlalu panjang')
+  })
 })
 
 export async function POST(req: NextRequest) {
@@ -67,10 +61,7 @@ export async function POST(req: NextRequest) {
   try {
     body = await req.json()
   } catch {
-    return NextResponse.json(
-      { success: false, error: 'Request body tidak valid' },
-      { status: 400 }
-    )
+    return NextResponse.json({ success: false, error: 'Request body tidak valid' }, { status: 400 })
   }
 
   // ── 4. ZOD VALIDATION ────────────────────────────────────────────────────────
@@ -80,7 +71,7 @@ export async function POST(req: NextRequest) {
       {
         success: false,
         error: 'Data subscription tidak valid',
-        details: parsed.error.flatten(),
+        details: parsed.error.flatten()
       },
       { status: 422 }
     )
@@ -92,7 +83,7 @@ export async function POST(req: NextRequest) {
     await savePushSubscription(userId, {
       endpoint: parsed.data.endpoint,
       expirationTime: parsed.data.expirationTime ?? null,
-      keys: parsed.data.keys,
+      keys: parsed.data.keys
     })
 
     return NextResponse.json({ success: true })

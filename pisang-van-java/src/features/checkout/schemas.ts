@@ -1,4 +1,4 @@
-import { OrderStatus } from '@prisma/client'
+import type { OrderStatus } from '@prisma/client'
 import { z } from 'zod'
 
 export const ROLE_VALUES = [

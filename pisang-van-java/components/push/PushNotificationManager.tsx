@@ -99,14 +99,14 @@ export function PushNotificationManager() {
       // Prompt permission + create subscription
       const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true, // W3C requirement: must always show notification
-        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
+        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
       })
 
       // Persist to server (auth-gated API route)
       const res = await fetch('/api/push/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(subscription.toJSON()),
+        body: JSON.stringify(subscription.toJSON())
       })
 
       if (!res.ok) {
@@ -198,9 +198,7 @@ export function PushNotificationManager() {
             )}
             <div>
               <p className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
-                {state === 'subscribed'
-                  ? 'Notifikasi Aktif'
-                  : 'Notifikasi Tidak Aktif'}
+                {state === 'subscribed' ? 'Notifikasi Aktif' : 'Notifikasi Tidak Aktif'}
               </p>
               <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
                 {state === 'subscribed'
@@ -219,12 +217,10 @@ export function PushNotificationManager() {
               'transition-all disabled:opacity-50 disabled:cursor-not-allowed',
               state === 'subscribed'
                 ? 'bg-zinc-200 hover:bg-zinc-300 dark:bg-zinc-700 dark:hover:bg-zinc-600 text-zinc-800 dark:text-zinc-200'
-                : 'bg-amber-600 hover:bg-amber-700 text-white',
+                : 'bg-amber-600 hover:bg-amber-700 text-white'
             ].join(' ')}
             aria-label={
-              state === 'subscribed'
-                ? 'Matikan notifikasi pesanan'
-                : 'Aktifkan notifikasi pesanan'
+              state === 'subscribed' ? 'Matikan notifikasi pesanan' : 'Aktifkan notifikasi pesanan'
             }
           >
             {state === 'loading' ? (

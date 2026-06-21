@@ -189,7 +189,10 @@ export default function Hero({
                 num: activeToppingsCount > 0 ? `${activeToppingsCount}+` : '12+',
                 label: t('hero_stat_topping')
               },
-              { num: activeFlavorsCount > 0 ? `${activeFlavorsCount}` : '3', label: t('hero_stat_type') },
+              {
+                num: activeFlavorsCount > 0 ? `${activeFlavorsCount}` : '3',
+                label: t('hero_stat_type')
+              },
               { num: '100%', label: t('hero_stat_local') }
             ].map(({ num, label }) => (
               <div key={label}>

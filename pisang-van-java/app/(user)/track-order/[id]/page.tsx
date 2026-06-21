@@ -117,10 +117,12 @@ export default async function TrackOrderDetailPage({
     etaMinutes: order.etaMinutes,
     tipAmount: order.tipAmount,
     proofPhotoUrl: order.proofPhotoUrl,
-    address: order.address ? {
-      fullAddress: order.address.fullAddress,
-      notes: order.address.notes
-    } : null,
+    address: order.address
+      ? {
+          fullAddress: order.address.fullAddress,
+          notes: order.address.notes
+        }
+      : null,
     items: order.items.map(
       (item: {
         id: string

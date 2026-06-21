@@ -46,7 +46,9 @@ const getCachedContactSettings = unstable_cache(
 
 export default async function LokasiKontakLayout({
   children
-}: { children: React.ReactNode }): Promise<React.ReactNode> {
+}: {
+  children: React.ReactNode
+}): Promise<React.ReactNode> {
   let siteSettings: Record<string, string> = {}
   try {
     siteSettings = await getCachedContactSettings()
@@ -85,15 +87,7 @@ export default async function LokasiKontakLayout({
     },
     openingHoursSpecification: {
       '@type': 'OpeningHoursSpecification',
-      dayOfWeek: [
-        'Monday',
-        'Tuesday',
-        'Wednesday',
-        'Thursday',
-        'Friday',
-        'Saturday',
-        'Sunday'
-      ],
+      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
       opens: '10:00',
       closes: '21:00'
     },

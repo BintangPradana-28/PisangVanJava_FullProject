@@ -26,9 +26,7 @@ const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY ?? ''
 const VAPID_EMAIL = process.env.VAPID_EMAIL ?? 'mailto:admin@pisangvanjava.com'
 
 if (!VAPID_PUBLIC_KEY || !VAPID_PRIVATE_KEY) {
-  console.warn(
-    '⚠️  VAPID_PUBLIC_KEY or VAPID_PRIVATE_KEY is missing. Web Push will be disabled.'
-  )
+  console.warn('⚠️  VAPID_PUBLIC_KEY or VAPID_PRIVATE_KEY is missing. Web Push will be disabled.')
 } else {
   webpush.setVapidDetails(VAPID_EMAIL, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY)
 }
@@ -70,7 +68,7 @@ export async function savePushSubscription(
   subscription: PushSubscriptionPayload
 ): Promise<void> {
   await redis.set(pushKey(userId), JSON.stringify(subscription), {
-    ex: SUB_TTL_SECONDS,
+    ex: SUB_TTL_SECONDS
   })
 }
 
@@ -80,9 +78,7 @@ export async function deletePushSubscription(userId: string): Promise<void> {
 }
 
 /** Retrieve a subscription; returns null when absent or malformed. */
-export async function getPushSubscription(
-  userId: string
-): Promise<PushSubscriptionPayload | null> {
+export async function getPushSubscription(userId: string): Promise<PushSubscriptionPayload | null> {
   const raw = await redis.get<string>(pushKey(userId))
   if (!raw) return null
   try {
@@ -122,7 +118,7 @@ export async function sendPushNotification(
       subscription as Parameters<typeof webpush.sendNotification>[0],
       JSON.stringify(payload),
       {
-        TTL: 60 * 60 * 24, // Deliver within 24 h or discard (suits order updates)
+        TTL: 60 * 60 * 24 // Deliver within 24 h or discard (suits order updates)
       }
     )
   } catch (err: unknown) {
@@ -163,28 +159,28 @@ export function buildOrderStatusPushPayload(
   const messages: Record<string, { title: string; body: string }> = {
     PROCESSING: {
       title: '🍌 Pesanan Sedang Diproses!',
-      body: `Pesanan #${shortId} sedang dimasak di dapur kami. Mohon tunggu sebentar ya!`,
+      body: `Pesanan #${shortId} sedang dimasak di dapur kami. Mohon tunggu sebentar ya!`
     },
     READY: {
       title: '🎉 Pesanan Siap Diambil!',
-      body: `Pesanan #${shortId} sudah siap! Segera ambil atau tunggu kurir kami.`,
+      body: `Pesanan #${shortId} sudah siap! Segera ambil atau tunggu kurir kami.`
     },
     OUT_FOR_DELIVERY: {
       title: '🛵 Kurir Sedang Mengantar!',
-      body: `Pesanan #${shortId} sedang dalam perjalanan ke alamat Anda.`,
+      body: `Pesanan #${shortId} sedang dalam perjalanan ke alamat Anda.`
     },
     DELIVERED: {
       title: '📦 Pesanan Telah Sampai!',
-      body: `Pesanan #${shortId} sudah diantar. Selamat menikmati!`,
+      body: `Pesanan #${shortId} sudah diantar. Selamat menikmati!`
     },
     COMPLETED: {
       title: '✅ Pesanan Selesai',
-      body: `Terima kasih! Pesanan #${shortId} selesai. Jangan lupa kasih ulasan ya! ⭐`,
+      body: `Terima kasih! Pesanan #${shortId} selesai. Jangan lupa kasih ulasan ya! ⭐`
     },
     CANCELED: {
       title: '❌ Pesanan Dibatalkan',
-      body: `Maaf, pesanan #${shortId} dibatalkan. Hubungi admin untuk info lebih lanjut.`,
-    },
+      body: `Maaf, pesanan #${shortId} dibatalkan. Hubungi admin untuk info lebih lanjut.`
+    }
   }
 
   const msg = messages[status]
@@ -194,6 +190,6 @@ export function buildOrderStatusPushPayload(
     ...msg,
     url: '/profile/pesanan',
     icon: '/icons/icon-192.png',
-    badge: '/icons/icon-192.png',
+    badge: '/icons/icon-192.png'
   }
 }

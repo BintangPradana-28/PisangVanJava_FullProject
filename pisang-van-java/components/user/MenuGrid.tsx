@@ -343,11 +343,7 @@ export default function MenuGrid({ products }: { products: ProductType[] }) {
                               : 'shrink-0 bg-zinc-300 text-zinc-500 cursor-not-allowed font-bold text-xs px-4 py-2.5 rounded-full flex items-center justify-center gap-1.5 opacity-70'
                           }
                         >
-                          {!isStoreOpen
-                            ? 'Tutup'
-                            : available
-                              ? t('menu_btn_order')
-                              : 'Habis'}
+                          {!isStoreOpen ? 'Tutup' : available ? t('menu_btn_order') : 'Habis'}
                         </button>
                       </div>
                     </div>

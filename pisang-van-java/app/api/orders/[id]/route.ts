@@ -1,15 +1,15 @@
+import type { OrderStatus } from '@prisma/client'
 import { type NextRequest, NextResponse } from 'next/server'
-import { OrderStatus } from '@prisma/client'
 import { logAudit } from '@/lib/audit'
 import { sendWhatsAppNotification } from '@/lib/notifications'
 import { prisma } from '@/lib/prisma'
 // RAG Source: lib/push.ts (new) — sendPushNotification + buildOrderStatusPushPayload
 import { buildOrderStatusPushPayload, sendPushNotification } from '@/lib/push'
 import {
-  orderStatusInputSchema,
-  paymentFormInputSchema,
   ALLOWED_STATUS_TRANSITIONS,
-  deliveryUpdateSchema
+  deliveryUpdateSchema,
+  orderStatusInputSchema,
+  paymentFormInputSchema
 } from '@/src/features/checkout/schemas'
 import { sendOrderStatusEmail } from '@/src/features/payment/email'
 import { hasValidSameOriginHeaders, requireCheckoutActor } from '@/src/services/checkout.service'
@@ -84,7 +84,10 @@ export async function PATCH(req: NextRequest, { params }: OrderRouteContext) {
 
   const parsedBody = deliveryUpdateSchema.safeParse(payload)
   if (!parsedBody.success) {
-    return NextResponse.json({ success: false, error: 'Invalid fields', details: parsedBody.error.format() }, { status: 400 })
+    return NextResponse.json(
+      { success: false, error: 'Invalid fields', details: parsedBody.error.format() },
+      { status: 400 }
+    )
   }
 
   const orderId = parsedParams.data.orderId
@@ -110,20 +113,30 @@ export async function PATCH(req: NextRequest, { params }: OrderRouteContext) {
 
     // Status transition validation
     if (status && status !== currentOrder.status) {
-      const allowedTransitions = ALLOWED_STATUS_TRANSITIONS[currentOrder.status as OrderStatus] || []
+      const allowedTransitions =
+        ALLOWED_STATUS_TRANSITIONS[currentOrder.status as OrderStatus] || []
       if (!allowedTransitions.includes(status as OrderStatus)) {
-        return NextResponse.json({
-          success: false,
-          error: `Invalid status transition from ${currentOrder.status} to ${status}`
-        }, { status: 400 })
+        return NextResponse.json(
+          {
+            success: false,
+            error: `Invalid status transition from ${currentOrder.status} to ${status}`
+          },
+          { status: 400 }
+        )
       }
 
       // Delivery-only status restrictions
-      if ((status === 'OUT_FOR_DELIVERY' || status === 'DELIVERED') && currentOrder.deliveryMethod !== 'DELIVERY') {
-        return NextResponse.json({
-          success: false,
-          error: 'Cannot set delivery status for non-delivery order'
-        }, { status: 400 })
+      if (
+        (status === 'OUT_FOR_DELIVERY' || status === 'DELIVERED') &&
+        currentOrder.deliveryMethod !== 'DELIVERY'
+      ) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: 'Cannot set delivery status for non-delivery order'
+          },
+          { status: 400 }
+        )
       }
     }
 
@@ -133,20 +146,26 @@ export async function PATCH(req: NextRequest, { params }: OrderRouteContext) {
       const activePhone = courierPhone !== undefined ? courierPhone : currentOrder.courierPhone
       const activeEta = etaMinutes !== undefined ? etaMinutes : currentOrder.etaMinutes
       if (!activePhone || activeEta === null || activeEta === undefined) {
-        return NextResponse.json({
-          success: false,
-          error: 'courierPhone and etaMinutes are required when order is OUT_FOR_DELIVERY'
-        }, { status: 400 })
+        return NextResponse.json(
+          {
+            success: false,
+            error: 'courierPhone and etaMinutes are required when order is OUT_FOR_DELIVERY'
+          },
+          { status: 400 }
+        )
       }
     }
 
     if (targetStatus === 'DELIVERED') {
       const activeProof = proofPhotoUrl !== undefined ? proofPhotoUrl : currentOrder.proofPhotoUrl
       if (!activeProof) {
-        return NextResponse.json({
-          success: false,
-          error: 'proofPhotoUrl is required when order is DELIVERED'
-        }, { status: 400 })
+        return NextResponse.json(
+          {
+            success: false,
+            error: 'proofPhotoUrl is required when order is DELIVERED'
+          },
+          { status: 400 }
+        )
       }
     }
 
@@ -232,7 +251,10 @@ export async function PATCH(req: NextRequest, { params }: OrderRouteContext) {
       })
     })
 
-    await logAudit('UPDATE_ORDER_STATUS', 'Order', order.id, { newStatus: order.status, fieldsUpdated: Object.keys(parsedBody.data) })
+    await logAudit('UPDATE_ORDER_STATUS', 'Order', order.id, {
+      newStatus: order.status,
+      fieldsUpdated: Object.keys(parsedBody.data)
+    })
 
     if (
       order.status === 'PROCESSING' ||
