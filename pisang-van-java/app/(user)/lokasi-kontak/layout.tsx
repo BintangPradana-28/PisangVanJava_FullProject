@@ -104,34 +104,34 @@ export default async function LokasiKontakLayout({
     mainEntity: [
       {
         '@type': 'Question',
-        name: 'Bagaimana cara memesan pisang goreng Van Java?',
+        name: 'Apakah bisa pesan dalam jumlah besar?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Anda bisa langsung pesan melalui website kami di halaman Menu Spesial, atau kunjungi gerai kami di Cipayung, Jakarta Timur. Pemesanan juga bisa dilakukan via WhatsApp.'
+          text: 'Tentu! Kami melayani pemesanan partai besar (catering, event) — hubungi kami via WhatsApp untuk info harga spesial.'
         }
       },
       {
         '@type': 'Question',
-        name: 'Apakah tersedia layanan pengantaran?',
+        name: 'Berapa lama waktu pengiriman?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Ya! Kami melayani pengantaran via kurir untuk area Jakarta Timur dan sekitarnya. Biaya kirim disesuaikan dengan jarak lokasi pengiriman.'
+          text: 'Pengiriman dilakukan melalui mitra ojek online (Grab/Gojek/Lalamove) dengan estimasi waktu 20-40 menit tergantung jarak lokasi Anda dari gerai kami.'
         }
       },
       {
         '@type': 'Question',
-        name: 'Jam operasional Pisang Goreng Van Java?',
+        name: 'Apakah ada pilihan topping tanpa gula?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: storeHours
+          text: 'Ya! Kami menyediakan pilihan original (tanpa topping manis) dan bisa request khusus saat pemesanan.'
         }
       },
       {
         '@type': 'Question',
-        name: 'Apakah bisa pesan dalam jumlah besar atau untuk acara?',
+        name: 'Apakah ada diskon untuk member?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Tentu! Kami menerima pesanan partai besar untuk acara, katering, dan kemitraan reseller. Hubungi kami via WhatsApp untuk harga khusus grosir.'
+          text: 'Member terdaftar mendapatkan akses promo eksklusif. Daftar sekarang di halaman Login Member!'
         }
       }
     ]

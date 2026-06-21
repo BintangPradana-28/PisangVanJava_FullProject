@@ -6,7 +6,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
-import toast from 'react-hot-toast'
+import toast, { Toaster } from 'react-hot-toast'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSettings } from '@/context/SettingsContext'
 import {
@@ -40,7 +40,7 @@ export default function KeranjangPage() {
 
   const handleClearCart = () => {
     clearCart()
-    toast.success('Keranjang dikosongkan')
+    toast.success(t('cart_toast_cleared') || 'Keranjang dikosongkan')
   }
 
   const handleWhatsAppOrder = () => {
@@ -66,12 +66,15 @@ export default function KeranjangPage() {
     if (link && link !== '#') {
       window.open(link, '_blank', 'noopener,noreferrer')
     } else {
-      toast.error('Gagal membuat link WhatsApp. Periksa item keranjang Anda.')
+      toast.error(
+        t('cart_toast_wa_error') || 'Gagal membuat link WhatsApp. Periksa item keranjang Anda.'
+      )
     }
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-orange-50 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950 pt-24 pb-16">
+      <Toaster position="top-center" toastOptions={{ className: '!rounded-[4px] !text-sm' }} />
       <div className="max-w-3xl mx-auto px-4 sm:px-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
@@ -80,21 +83,21 @@ export default function KeranjangPage() {
               href="/menu-spesial"
               className="inline-flex items-center gap-1.5 text-sm font-semibold text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 transition-colors mb-2"
             >
-              <ArrowLeft className="h-4 w-4" /> Lanjut Belanja
+              <ArrowLeft className="h-4 w-4" /> {t('cart_continue_shopping')}
             </Link>
             <h1 className="font-serif text-3xl font-bold text-zinc-900 dark:text-zinc-100">
-              🛒 Keranjang Anda
+              🛒 {t('cart_title')}
             </h1>
             <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
-              {cartCount} item · {formatPrice(cartTotal)}
+              {cartCount} {t('cart_item_unit')} · {formatPrice(cartTotal)}
             </p>
           </div>
           {cartItems.length > 0 && (
             <button
               onClick={handleClearCart}
-              className="text-xs font-semibold text-red-500 hover:text-red-700 px-3 py-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/30 transition-all"
+              className="text-xs font-semibold text-red-500 hover:text-red-755 px-3 py-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/30 transition-all"
             >
-              Kosongkan
+              {t('cart_clear_btn')}
             </button>
           )}
         </div>
@@ -110,16 +113,14 @@ export default function KeranjangPage() {
               <ShoppingBag className="h-10 w-10 text-amber-500" />
             </div>
             <h2 className="font-serif text-xl font-bold text-zinc-800 dark:text-zinc-200 mb-2">
-              Keranjang Kosong
+              {t('cart_empty_title')}
             </h2>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-6">
-              Yuk pilih pisang goreng favorit Anda!
-            </p>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-6">{t('cart_empty_desc')}</p>
             <Link
               href="/menu-spesial"
               className="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 px-8 rounded-[4px] transition-all active:scale-95 shadow-md shadow-amber-200"
             >
-              🍌 Lihat Menu
+              🍌 {t('hero_menu_btn')}
             </Link>
           </motion.div>
         ) : (
@@ -157,7 +158,7 @@ export default function KeranjangPage() {
                           <CartItemSubtotal
                             cartItemId={item.cartItemId}
                             formatPrice={formatPrice}
-                          />
+                          />{' '}
                           pcs
                         </p>
                       </div>
@@ -172,7 +173,13 @@ export default function KeranjangPage() {
                         </p>
                         <div className="flex items-center gap-1.5">
                           <button
-                            onClick={() => updateQuantity(item.cartItemId, item.quantity - 1)}
+                            onClick={() => {
+                              const newQty = item.quantity - 1
+                              updateQuantity(item.cartItemId, newQty)
+                              if (newQty <= 0) {
+                                toast.success(t('cart_toast_removed') || 'Item dihapus')
+                              }
+                            }}
                             className="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-600 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors active:scale-90"
                           >
                             <Minus className="h-3.5 w-3.5" />
@@ -181,7 +188,14 @@ export default function KeranjangPage() {
                             {item.quantity}
                           </span>
                           <button
-                            onClick={() => updateQuantity(item.cartItemId, item.quantity + 1)}
+                            onClick={() => {
+                              const limit = item.stock ?? 999
+                              if (item.quantity >= limit) {
+                                toast.error(t('cart_toast_qty_limit') || 'Stok terbatas!')
+                              } else {
+                                updateQuantity(item.cartItemId, item.quantity + 1)
+                              }
+                            }}
                             className="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-600 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors active:scale-90"
                           >
                             <Plus className="h-3.5 w-3.5" />
@@ -189,7 +203,7 @@ export default function KeranjangPage() {
                           <button
                             onClick={() => {
                               removeItem(item.cartItemId)
-                              toast.success('Item dihapus')
+                              toast.success(t('cart_toast_removed') || 'Item dihapus')
                             }}
                             className="w-7 h-7 rounded-lg bg-red-50 dark:bg-red-950/30 flex items-center justify-center text-red-500 hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors active:scale-90 ml-1"
                           >
@@ -206,7 +220,9 @@ export default function KeranjangPage() {
             {/* Summary + CTA */}
             <div className="bg-white dark:bg-zinc-900 rounded-[4px] border border-zinc-100 dark:border-zinc-800 shadow-sm p-6 sticky bottom-4">
               <div className="flex justify-between items-center mb-4">
-                <span className="text-sm text-zinc-500">Subtotal ({cartCount} item)</span>
+                <span className="text-sm text-zinc-500">
+                  {t('cart_subtotal_label')} ({cartCount} {t('cart_item_unit')})
+                </span>
                 <span className="font-serif text-2xl font-bold text-amber-600 dark:text-amber-400">
                   {formatPrice(cartTotal)}
                 </span>
@@ -216,17 +232,17 @@ export default function KeranjangPage() {
                   onClick={() => router.push('/checkout')}
                   className="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3.5 rounded-[4px] transition-all active:scale-[0.98] shadow-sm shadow-amber-200 dark:shadow-amber-900/30 text-sm"
                 >
-                  Lanjut ke Checkout →
+                  {t('cart_btn_checkout')}
                 </button>
                 <button
                   onClick={handleWhatsAppOrder}
                   className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-[4px] transition-all active:scale-[0.98] shadow-sm shadow-emerald-200 dark:shadow-emerald-900/30 text-sm flex items-center justify-center gap-2"
                 >
-                  <span>💬</span> Pesan via WhatsApp (Tanpa Form)
+                  <span>💬</span> {t('cart_btn_whatsapp')}
                 </button>
               </div>
               <p className="text-[10px] text-zinc-400 text-center mt-3">
-                🔒 Data Anda terenkripsi. Harga dikunci server.
+                {t('cart_security_notice')}
               </p>
             </div>
           </>

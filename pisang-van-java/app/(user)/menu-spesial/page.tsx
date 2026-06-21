@@ -36,6 +36,32 @@ const getCachedProducts = async () => {
   }
 }
 
+import type { MenuVariant } from '@prisma/client'
+
+type DBProductType = MenuVariant & {
+  reviews: { rating: true }[]
+}
+
+type MappedProduct = {
+  id: string
+  flavorName: string
+  priceKembung: number
+  priceLumpia: number
+  priceKrispy: number
+  wholesaleKembung: number
+  wholesaleLumpia: number
+  wholesaleKrispy: number
+  imageUrl: string | null
+  isAvailable: boolean
+  stock: number
+  soldCount: number
+  tags: string[]
+  createdAt: Date
+  rating: number | undefined
+  reviewCount: number | undefined
+  isActive: boolean
+}
+
 // "Harga Terendah" sort: a variant may not offer all 3 base types (e.g. priceKembung
 // can legitimately be 0 for a Krispy-only flavor — see matchBase filter below), so
 // sorting by priceKembung alone would wrongly rank those as "cheapest". This takes
@@ -78,10 +104,10 @@ export default async function MenuSpesialPage(props: {
   }
 
   // Fetch all active products with review aggregates (Cached)
-  const dbProducts = await getCachedProducts()
+  const dbProducts = (await getCachedProducts()) as any[]
 
   // Compute rating & reviewCount per variant
-  const products = dbProducts.map((p: any) => ({
+  const products: MappedProduct[] = dbProducts.map((p) => ({
     id: p.id,
     flavorName: p.flavorName,
     priceKembung: p.priceKembung,
@@ -99,7 +125,9 @@ export default async function MenuSpesialPage(props: {
     rating:
       p.reviews.length > 0
         ? Math.round(
-            (p.reviews.reduce((s: any, r: any) => s + r.rating, 0) / p.reviews.length) * 10
+            (p.reviews.reduce((s: number, r: { rating: number }) => s + r.rating, 0) /
+              p.reviews.length) *
+              10
           ) / 10
         : undefined,
     reviewCount: p.reviews.length > 0 ? p.reviews.length : undefined,
@@ -107,7 +135,7 @@ export default async function MenuSpesialPage(props: {
   }))
 
   // Two-pass filter: base-type tab → flavor-family chip → search query
-  const filtered = products.filter((p: any) => {
+  const filtered = products.filter((p) => {
     const name = p.flavorName.toLowerCase()
     const matchSearch = q === '' || name.includes(q.toLowerCase())
 
@@ -132,27 +160,25 @@ export default async function MenuSpesialPage(props: {
   // is left at "default", behavior is unchanged from before (falls through to
   // the original Module 4 reorder, including doing nothing if no context applies).
   if (sort === 'terlaris') {
-    filtered.sort((a: any, b: any) => b.soldCount - a.soldCount)
+    filtered.sort((a, b) => (b.soldCount || 0) - (a.soldCount || 0))
   } else if (sort === 'harga-rendah') {
-    filtered.sort((a: any, b: any) => getStartingPrice(a) - getStartingPrice(b))
+    filtered.sort((a, b) => getStartingPrice(a) - getStartingPrice(b))
   } else if (sort === 'terbaru') {
-    filtered.sort(
-      (a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    )
+    filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
   } else if (promoContext.evening || promoContext.lateAfternoon) {
-    filtered.sort((a: any, b: any) => {
+    filtered.sort((a, b) => {
       const aHasKembung = a.priceKembung > 0 ? 1 : 0
       const bHasKembung = b.priceKembung > 0 ? 1 : 0
       return bHasKembung - aHasKembung
     })
   } else if (promoContext.earlyMorning) {
-    filtered.sort((a: any, b: any) => {
+    filtered.sort((a, b) => {
       const aHasKrispy = a.priceKrispy > 0 ? 1 : 0
       const bHasKrispy = b.priceKrispy > 0 ? 1 : 0
       return bHasKrispy - aHasKrispy
     })
   } else if (promoContext.isLateNight) {
-    filtered.sort((a: any, b: any) => {
+    filtered.sort((a, b) => {
       const isMilky = (name: string) =>
         name.toLowerCase().includes('susu') ||
         name.toLowerCase().includes('milky') ||
@@ -162,7 +188,7 @@ export default async function MenuSpesialPage(props: {
       return isMilky(b.flavorName) - isMilky(a.flavorName)
     })
   } else if (promoContext.lunch) {
-    filtered.sort((a: any, b: any) => {
+    filtered.sort((a, b) => {
       const aHasLumpia = a.priceLumpia > 0 ? 1 : 0
       const bHasLumpia = b.priceLumpia > 0 ? 1 : 0
       return bHasLumpia - aHasLumpia
@@ -175,10 +201,10 @@ export default async function MenuSpesialPage(props: {
     name: 'Menu Spesial Pisang Goreng Van Java',
     description: 'Pilihan varian rasa premium pisang kembung, lumpia, dan krispy',
     numberOfItems: filtered.length,
-    hasMenuItem: filtered.map((p: any) => ({
+    hasMenuItem: filtered.map((p) => ({
       '@type': 'MenuItem',
       name: p.flavorName,
-      description: p.deskripsi_topping || `${p.flavorName} premium`,
+      description: `${p.flavorName} premium`,
       offers: {
         '@type': 'Offer',
         priceCurrency: 'IDR',

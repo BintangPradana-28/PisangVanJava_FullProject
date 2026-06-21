@@ -115,17 +115,19 @@ export default function StarRating({ variantId, existingRating, onSubmit }: Star
 
   if (success) {
     return (
-      <div className="bg-orange-50 border border-amber-100 rounded-[4px] p-6 text-center shadow-sm">
+      <div className="bg-[#FDFBF7] dark:bg-zinc-900 border border-amber-100 dark:border-zinc-800 rounded-[4px] p-6 text-center shadow-sm">
         <div className="text-4xl mb-2">🌟</div>
-        <p className="font-semibold text-neutral-800">Terima kasih atas ulasan Anda!</p>
-        <p className="text-sm text-neutral-500 mt-1">Penilaian Anda sangat berarti bagi kami.</p>
+        <p className="font-bold text-zinc-800 dark:text-zinc-200">Terima kasih atas ulasan Anda!</p>
+        <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
+          Penilaian Anda sangat berarti bagi kami.
+        </p>
       </div>
     )
   }
 
   return (
-    <div className="bg-orange-50 border border-amber-100 rounded-[4px] p-6 shadow-sm space-y-4">
-      <h3 className="font-semibold text-neutral-800 text-base">
+    <div className="bg-[#FDFBF7] dark:bg-zinc-900/60 border border-amber-100 dark:border-zinc-800 rounded-[4px] p-6 shadow-sm space-y-4">
+      <h3 className="font-bold text-zinc-800 dark:text-zinc-150 text-base">
         {existingRating ? '✏️ Perbarui Ulasan Anda' : '⭐ Tulis Ulasan'}
       </h3>
 
@@ -173,7 +175,7 @@ export default function StarRating({ variantId, existingRating, onSubmit }: Star
           </button>
         ))}
         {displayRating > 0 && (
-          <span className="ml-2 text-sm font-medium text-amber-600 transition-all duration-200 ease-in-out">
+          <span className="ml-2 text-sm font-bold text-amber-brand transition-all duration-200 ease-in-out">
             {LABELS[displayRating]}
           </span>
         )}
@@ -185,12 +187,12 @@ export default function StarRating({ variantId, existingRating, onSubmit }: Star
         onChange={(e) => setComment(e.target.value)}
         placeholder="Ceritakan pengalaman Anda mencicipi menu ini... (opsional)"
         rows={3}
-        className="w-full rounded-[4px] border border-amber-100 bg-white px-4 py-2.5 text-sm text-neutral-700 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-amber-300 transition-all duration-200 ease-in-out resize-none shadow-sm"
+        className="w-full rounded-[4px] border border-amber-150 dark:border-zinc-800 bg-white dark:bg-zinc-950 px-4 py-2.5 text-sm text-zinc-800 dark:text-zinc-200 placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-amber-300 dark:focus:ring-amber-500/30 transition-all duration-200 ease-in-out resize-none shadow-sm"
       />
 
       {/* Photo Upload */}
       <div>
-        <label className="flex items-center gap-2 cursor-pointer border border-dashed border-amber-300 rounded-[4px] p-3 hover:bg-amber-100/50 transition-colors text-sm text-amber-700 font-medium w-max">
+        <label className="flex items-center gap-2 cursor-pointer border border-dashed border-amber-300 dark:border-zinc-700 rounded-[4px] p-3 hover:bg-amber-100/50 dark:hover:bg-zinc-800/50 transition-colors text-sm text-amber-700 dark:text-amber-400 font-bold w-max">
           <span>📸</span>
           <span>{photo ? 'Ganti Foto' : 'Unggah Foto (Opsional)'}</span>
           <input
@@ -206,7 +208,7 @@ export default function StarRating({ variantId, existingRating, onSubmit }: Star
             <img
               src={photoPreview}
               alt="Preview"
-              className="w-24 h-24 object-cover rounded-[4px] border border-amber-200 shadow-sm"
+              className="w-24 h-24 object-cover rounded-[4px] border border-amber-250 dark:border-zinc-700 shadow-sm"
             />
             <button
               onClick={() => {
@@ -231,7 +233,7 @@ export default function StarRating({ variantId, existingRating, onSubmit }: Star
         type="button"
         onClick={handleSubmit}
         disabled={isPending || isUploading}
-        className="w-full bg-amber-400 hover:bg-amber-500 disabled:bg-neutral-200 disabled:cursor-not-allowed text-white font-semibold py-2.5 rounded-[4px] shadow-sm hover:shadow-md transition-all duration-200 ease-in-out active:scale-95"
+        className="w-full bg-[#D4802A] hover:bg-[#b56d24] disabled:bg-zinc-200 dark:disabled:bg-zinc-800 disabled:text-zinc-400 disabled:cursor-not-allowed text-white font-bold py-2.5 rounded-[4px] shadow-sm hover:shadow-md transition-all duration-200 ease-in-out active:scale-95"
       >
         {isUploading ? 'Mengunggah Foto...' : isPending ? 'Mengirim...' : 'Kirim Ulasan'}
       </button>

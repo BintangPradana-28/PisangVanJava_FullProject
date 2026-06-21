@@ -46,6 +46,8 @@ const getFallbackImage = (name: string) => {
   if (n.includes('taro')) return '/images/flavors/taro.png'
   if (n.includes('blueberry') || n.includes('bluberi')) return '/images/flavors/blueberry.png'
   if (n.includes('strawberry') || n.includes('stroberi')) return '/images/flavors/strawberry.png'
+  if (n.includes('cokelat') || n.includes('coklat')) return '/images/flavors/chocolate.png'
+  if (n.includes('keju')) return '/images/flavors/cheese.png'
   return '/kitchen.png'
 }
 
@@ -224,7 +226,8 @@ export default function QuickViewModal({
       basePrice: basePrice,
       toppings: finalToppings,
       quantity,
-      notes
+      notes,
+      stock: displayProduct.stock
     })
 
     toast.success(t('toast_added'), {
@@ -563,7 +566,13 @@ export default function QuickViewModal({
               </motion.span>
               <button
                 type="button"
-                onClick={() => setQuantity((q) => q + 1)}
+                onClick={() => {
+                  if (quantity >= displayProduct.stock) {
+                    toast.error(t('cart_toast_qty_limit') || 'Stok terbatas!')
+                  } else {
+                    setQuantity((q) => q + 1)
+                  }
+                }}
                 className="w-10 h-10 rounded-[4px] bg-white dark:bg-zinc-700 shadow-sm flex items-center justify-center font-bold text-zinc-600 dark:text-zinc-300 hover:text-[#D4802A] transition-colors active:scale-95"
               >
                 +

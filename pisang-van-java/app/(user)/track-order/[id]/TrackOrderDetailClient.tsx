@@ -604,7 +604,7 @@ export default function TrackOrderDetailClient({ order, storePhone }: TrackOrder
         )}
 
         {/* Tipping Card */}
-        {(currentStatus === 'DELIVERED' || currentStatus === 'COMPLETED') && (
+        {!isPickup && (currentStatus === 'DELIVERED' || currentStatus === 'COMPLETED') && (
           <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200/60 dark:border-zinc-800 p-6 shadow-sm space-y-4">
             <h2 className="text-xs font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-2 border-b border-zinc-100 dark:border-zinc-800 pb-2.5">
               ☕ BERIKAN TIP UNTUK KURIR

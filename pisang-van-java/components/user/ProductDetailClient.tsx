@@ -9,6 +9,7 @@ import { useSession } from 'next-auth/react'
 import type React from 'react'
 import { useEffect, useMemo, useState } from 'react'
 import toast, { Toaster } from 'react-hot-toast'
+import ReviewSection from '@/components/user/ReviewSection'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSettings } from '@/context/SettingsContext'
 import { type CartTopping, useCartStore } from '@/src/features/cart/stores/cart.store'
@@ -60,8 +61,8 @@ const getFallbackImage = (name: string) => {
   if (n.includes('taro')) return '/images/flavors/taro.png'
   if (n.includes('blueberry') || n.includes('bluberi')) return '/images/flavors/blueberry.png'
   if (n.includes('strawberry') || n.includes('stroberi')) return '/images/flavors/strawberry.png'
-  if (n.includes('cokelat') || n.includes('coklat')) return '/images/flavors/blueberry.png'
-  if (n.includes('keju')) return '/images/flavors/strawberry.png'
+  if (n.includes('cokelat') || n.includes('coklat')) return '/images/flavors/chocolate.png'
+  if (n.includes('keju')) return '/images/flavors/cheese.png'
   return '/kitchen.png'
 }
 
@@ -171,7 +172,8 @@ export default function ProductDetailClient({
       basePrice: basePrice,
       toppings: finalToppings,
       quantity,
-      notes
+      notes,
+      stock: product.stock
     })
 
     toast.success(t('toast_added') || 'Berhasil ditambahkan ke keranjang!', {
@@ -482,7 +484,13 @@ export default function ProductDetailClient({
                 </motion.span>
                 <button
                   type="button"
-                  onClick={() => setQuantity((q) => q + 1)}
+                  onClick={() => {
+                    if (quantity >= product.stock) {
+                      toast.error(t('cart_toast_qty_limit') || 'Stok terbatas!')
+                    } else {
+                      setQuantity((q) => q + 1)
+                    }
+                  }}
                   className="w-10 h-10 rounded-[4px] bg-white dark:bg-zinc-700 shadow-sm flex items-center justify-center font-bold text-zinc-600 dark:text-zinc-300 hover:text-amber-brand transition-colors active:scale-95"
                 >
                   +
@@ -516,65 +524,7 @@ export default function ProductDetailClient({
 
       {/* Reviews Section */}
       <div className="border-t border-zinc-200 dark:border-zinc-800 pt-16 mb-16">
-        <h2 className="font-serif text-3xl font-bold text-zinc-900 dark:text-zinc-150 mb-8">
-          Ulasan Pelanggan ({reviews.length})
-        </h2>
-        {reviews.length === 0 ? (
-          <div className="rounded-[4px] p-8 text-center bg-cream-50/50 dark:bg-zinc-900/30 border border-zinc-200/50 dark:border-zinc-800">
-            <Info className="w-8 h-8 text-zinc-400 mx-auto mb-3" />
-            <p className="text-zinc-500 text-sm">
-              Varian ini belum memiliki ulasan dari pembeli. Jadilah yang pertama memberikan ulasan!
-            </p>
-          </div>
-        ) : (
-          <div className="grid sm:grid-cols-2 gap-6">
-            {reviews.map((review) => (
-              <div
-                key={review.id}
-                className="rounded-[4px] p-5 bg-white dark:bg-zinc-900 border border-zinc-250/60 dark:border-zinc-800 shadow-sm space-y-3"
-              >
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h4 className="font-bold text-sm text-zinc-800 dark:text-zinc-200 truncate max-w-[150px]">
-                      {review.user.name}
-                    </h4>
-                    <span className="text-[10px] text-zinc-500">
-                      {new Date(review.createdAt).toLocaleDateString('id-ID', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                      })}
-                    </span>
-                  </div>
-                  <div className="flex gap-0.5">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <Star
-                        // biome-ignore lint/suspicious/noArrayIndexKey: Static array for stars rendering
-                        key={i}
-                        className={`w-3.5 h-3.5 ${i < review.rating ? 'fill-amber-400 text-amber-400' : 'text-zinc-200 dark:text-zinc-700'}`}
-                      />
-                    ))}
-                  </div>
-                </div>
-                {review.isVerifiedBuyer && (
-                  <span className="inline-flex text-[9px] font-semibold text-green-600 bg-green-500/10 px-1.5 py-0.5 rounded-[4px]">
-                    Verified Buyer
-                  </span>
-                )}
-                {review.comment && (
-                  <p className="text-sm leading-relaxed text-zinc-650 dark:text-zinc-400 font-sans">
-                    {review.comment}
-                  </p>
-                )}
-                {review.imageUrl && (
-                  <div className="relative w-20 h-20 rounded-[4px] overflow-hidden border border-zinc-200 dark:border-zinc-800 mt-2">
-                    <Image src={review.imageUrl} alt="Foto Ulasan" fill className="object-cover" />
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
+        <ReviewSection variantId={product.id} />
       </div>
 
       {/* Recommendations Section */}

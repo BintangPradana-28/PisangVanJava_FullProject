@@ -27,6 +27,8 @@ const getFallbackImage = (name: string) => {
   if (n.includes('taro')) return '/images/flavors/taro.png'
   if (n.includes('blueberry') || n.includes('bluberi')) return '/images/flavors/blueberry.png'
   if (n.includes('strawberry') || n.includes('stroberi')) return '/images/flavors/strawberry.png'
+  if (n.includes('cokelat') || n.includes('coklat')) return '/images/flavors/chocolate.png'
+  if (n.includes('keju')) return '/images/flavors/cheese.png'
   return '/kitchen.png' // Default local fallback
 }
 

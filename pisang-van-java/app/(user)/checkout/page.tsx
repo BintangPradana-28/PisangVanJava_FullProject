@@ -13,10 +13,15 @@ import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import { z } from 'zod'
 import { useSettings } from '@/context/SettingsContext'
-import { selectCartDisplayTotal, useCartStore } from '@/src/features/cart/stores/cart.store'
+import {
+  type CartTopping,
+  selectCartDisplayTotal,
+  useCartStore
+} from '@/src/features/cart/stores/cart.store'
 import { getShippingRates, validateVoucher } from '@/src/features/checkout/actions'
 import { api } from '@/src/lib/api'
 import { isStoreOpen } from '@/src/lib/time'
+import type { CourierOption } from '@/src/services/shipping.service'
 
 const MapPicker = dynamic(() => import('@/components/user/MapPicker'), { ssr: false })
 
@@ -134,14 +139,17 @@ export default function CheckoutPage() {
 
   // Shipping & Pinpoint Map state
   const [coordinates, setCoordinates] = useState<[number, number] | null>(null)
-  const [shippingRates, setShippingRates] = useState<any[]>([])
-  const [selectedRate, setSelectedRate] = useState<any | null>(null)
+  const [shippingRates, setShippingRates] = useState<CourierOption[]>([])
+  const [selectedRate, setSelectedRate] = useState<CourierOption | null>(null)
   const [isLoadingRates, setIsLoadingRates] = useState(false)
   const [addressNameFromMap, setAddressNameFromMap] = useState('')
 
   const { data: profileResponse } = useQuery({
     queryKey: ['profile'],
-    queryFn: () => api<{ success: boolean; data?: any }>('/api/user/profile'),
+    queryFn: () =>
+      api<{ success: boolean; data?: { phone: string | null; koinPisang: number } }>(
+        '/api/user/profile'
+      ),
     enabled: authStatus === 'authenticated',
     staleTime: 60 * 1000
   })
@@ -234,7 +242,9 @@ export default function CheckoutPage() {
             setShippingRates(res.data)
             if (res.data.length > 0) {
               // Select cheapest rate by default
-              const sorted = [...res.data].sort((a, b) => a.price - b.price)
+              const sorted = [...res.data].sort(
+                (a: CourierOption, b: CourierOption) => a.price - b.price
+              )
               setSelectedRate(sorted[0])
             } else {
               setShippingRates([])
@@ -332,8 +342,31 @@ export default function CheckoutPage() {
     setStep(2)
   }
 
+  interface CreateOrderItem {
+    variantId: string
+    toppingIds: string[]
+    baseType: BaseType
+    quantity: number
+    notes: string | null
+  }
+
+  interface CreateOrderInput {
+    idempotencyKey: string
+    customerName: string
+    customerPhone: string
+    deliveryMethod: DeliveryMethod
+    paymentMethod: PaymentMethod
+    notes: string | null
+    voucherCode: string | null
+    usePoints: boolean
+    deliveryCoordinates: string | null
+    courierCode: string | null
+    courierService: string | null
+    items: (CreateOrderItem | null)[]
+  }
+
   const checkoutMutation = useMutation({
-    mutationFn: async (payload: any) => {
+    mutationFn: async (payload: CreateOrderInput) => {
       const json = await api<unknown>('/api/orders', {
         method: 'POST',
         body: payload
@@ -394,7 +427,7 @@ export default function CheckoutPage() {
         if (!baseType) return null
         return {
           variantId: item.menuVariantId,
-          toppingIds: item.toppings ? item.toppings.map((t: any) => t.toppingId) : [],
+          toppingIds: item.toppings ? item.toppings.map((t: CartTopping) => t.toppingId) : [],
           baseType,
           quantity: item.quantity,
           notes: item.notes?.trim() || null

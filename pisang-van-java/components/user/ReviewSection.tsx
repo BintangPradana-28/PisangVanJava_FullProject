@@ -80,7 +80,7 @@ export default function ReviewSection({ variantId }: ReviewSectionProps) {
 
   return (
     <section className="space-y-6 mt-8">
-      <h2 className="font-semibold text-neutral-800 text-lg border-b border-amber-100 pb-2">
+      <h2 className="font-serif font-bold text-zinc-800 dark:text-zinc-150 text-xl border-b border-amber-100 dark:border-zinc-800/80 pb-2">
         💬 Ulasan Pelanggan
       </h2>
 
@@ -89,8 +89,11 @@ export default function ReviewSection({ variantId }: ReviewSectionProps) {
         <StarRating variantId={variantId} existingRating={myRating} onSubmit={handleSubmit} />
       )}
       {status === 'unauthenticated' && (
-        <div className="bg-orange-50 border border-amber-100 rounded-[4px] p-4 text-sm text-neutral-600 text-center">
-          <Link href="/member-login" className="text-amber-600 font-semibold hover:underline">
+        <div className="bg-[#FDFBF7] dark:bg-zinc-900 border border-amber-100 dark:border-zinc-800 rounded-[4px] p-4 text-sm text-zinc-650 dark:text-zinc-400 text-center">
+          <Link
+            href="/member-login"
+            className="text-[#D4802A] dark:text-amber-400 font-bold hover:underline"
+          >
             Masuk / Daftar
           </Link>{' '}
           untuk memberikan ulasan.
@@ -106,7 +109,7 @@ export default function ReviewSection({ variantId }: ReviewSectionProps) {
               setFilterRating(null)
               setFilterPhoto(false)
             }}
-            className={`px-4 py-1.5 rounded-[4px] text-sm font-semibold border transition-colors ${!filterRating && !filterPhoto ? 'bg-amber-100 border-amber-300 text-amber-800' : 'bg-white border-zinc-200 text-neutral-600 hover:bg-neutral-50'}`}
+            className={`px-4 py-1.5 rounded-[4px] text-sm font-bold border transition-all ${!filterRating && !filterPhoto ? 'bg-amber-500/10 border-[#D4802A] text-[#D4802A]' : 'bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-650 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800'}`}
           >
             Semua
           </button>
@@ -115,7 +118,7 @@ export default function ReviewSection({ variantId }: ReviewSectionProps) {
               setFilterRating(null)
               setFilterPhoto(true)
             }}
-            className={`px-4 py-1.5 rounded-[4px] text-sm font-semibold border transition-colors ${filterPhoto ? 'bg-amber-100 border-amber-300 text-amber-800' : 'bg-white border-zinc-200 text-neutral-600 hover:bg-neutral-50'}`}
+            className={`px-4 py-1.5 rounded-[4px] text-sm font-bold border transition-all ${filterPhoto ? 'bg-amber-500/10 border-[#D4802A] text-[#D4802A]' : 'bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-650 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800'}`}
           >
             📸 Dengan Foto
           </button>
@@ -126,7 +129,7 @@ export default function ReviewSection({ variantId }: ReviewSectionProps) {
                 setFilterRating(star)
                 setFilterPhoto(false)
               }}
-              className={`px-4 py-1.5 rounded-[4px] text-sm font-semibold border transition-colors flex items-center gap-1 ${filterRating === star ? 'bg-amber-100 border-amber-300 text-amber-800' : 'bg-white border-zinc-200 text-neutral-600 hover:bg-neutral-50'}`}
+              className={`px-4 py-1.5 rounded-[4px] text-sm font-bold border transition-all flex items-center gap-1 ${filterRating === star ? 'bg-amber-500/10 border-[#D4802A] text-[#D4802A]' : 'bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-650 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800'}`}
             >
               ⭐ {star}
             </button>
@@ -134,7 +137,7 @@ export default function ReviewSection({ variantId }: ReviewSectionProps) {
         </div>
 
         {loading ? (
-          <div className="text-sm text-neutral-400 text-center py-6 animate-pulse">
+          <div className="text-sm text-zinc-450 dark:text-zinc-500 text-center py-6 animate-pulse">
             Memuat ulasan...
           </div>
         ) : (

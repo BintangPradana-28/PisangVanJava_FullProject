@@ -19,6 +19,7 @@ export interface CartItem {
   notes: string
   imageUrl?: string
   addedAt: string // ISO string
+  stock?: number // available stock
 }
 
 export interface ConflictState {
@@ -78,8 +79,14 @@ export const useCartStore = create<CartStore>()(
               i.toppings?.length === newItem.toppings?.length &&
               i.toppings?.every((t, idx) => t.toppingId === newItem.toppings?.[idx]?.toppingId)
           )
+          const limit = newItem.stock ?? 999
           if (existing) {
-            existing.quantity += newItem.quantity
+            const nextQty = existing.quantity + newItem.quantity
+            if (nextQty > limit) {
+              existing.quantity = limit
+            } else {
+              existing.quantity = nextQty
+            }
           } else {
             state.items.push({
               ...newItem,
@@ -100,8 +107,11 @@ export const useCartStore = create<CartStore>()(
         set((state) => {
           const item = state.items.find((i) => i.cartItemId === cartItemId)
           if (item) {
+            const limit = item.stock ?? 999
             if (qty <= 0) {
               state.items = state.items.filter((i) => i.cartItemId !== cartItemId)
+            } else if (qty > limit) {
+              item.quantity = limit
             } else {
               item.quantity = qty
             }

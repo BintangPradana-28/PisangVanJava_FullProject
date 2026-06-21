@@ -3,8 +3,19 @@ import { usePathname } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { useEffect, useRef, useState } from 'react'
 import { MergeConflictModal } from '@/src/features/cart/components/MergeConflictModal'
-import { type CartItem, useCartStore } from '@/src/features/cart/stores/cart.store'
+import {
+  type CartItem,
+  type CartTopping,
+  useCartStore
+} from '@/src/features/cart/stores/cart.store'
 import { api } from '@/src/lib/api'
+
+interface CartSyncResponse {
+  success: boolean
+  data?: {
+    items: CartItem[]
+  }
+}
 
 export function CartSyncProvider({ children }: { children: React.ReactNode }) {
   const { status } = useSession()
@@ -46,7 +57,7 @@ export function CartSyncProvider({ children }: { children: React.ReactNode }) {
 
     const fetchAndMergeCart = async () => {
       try {
-        const data = await api<any>('/api/user/cart/sync')
+        const data = await api<CartSyncResponse>('/api/user/cart/sync')
 
         if (data.success && Array.isArray(data.data?.items)) {
           const dbItems: CartItem[] = data.data.items
@@ -65,19 +76,19 @@ export function CartSyncProvider({ children }: { children: React.ReactNode }) {
 
             const aToppings = Array.isArray(a.toppings)
               ? a.toppings
-              : (a as any).topping
-                ? [(a as any).topping]
+              : (a as unknown as { topping?: CartTopping }).topping
+                ? [(a as unknown as { topping: CartTopping }).topping]
                 : []
             const bToppings = Array.isArray(b.toppings)
               ? b.toppings
-              : (b as any).topping
-                ? [(b as any).topping]
+              : (b as unknown as { topping?: CartTopping }).topping
+                ? [(b as unknown as { topping: CartTopping }).topping]
                 : []
 
             if (aToppings.length !== bToppings.length) return false
 
-            const aIds = aToppings.map((t: any) => t.toppingId).sort()
-            const bIds = bToppings.map((t: any) => t.toppingId).sort()
+            const aIds = aToppings.map((t) => t.toppingId).sort()
+            const bIds = bToppings.map((t) => t.toppingId).sort()
 
             return aIds.every((val, index) => val === bIds[index])
           }
@@ -105,7 +116,8 @@ export function CartSyncProvider({ children }: { children: React.ReactNode }) {
             (acc, item) =>
               acc +
               (item.basePrice +
-                (item.toppings?.reduce((s: number, t: any) => s + (t.priceAdd || 0), 0) || 0)) *
+                (item.toppings?.reduce((s: number, t: CartTopping) => s + (t.priceAdd || 0), 0) ||
+                  0)) *
                 item.quantity,
             0
           )
@@ -158,7 +170,7 @@ export function CartSyncProvider({ children }: { children: React.ReactNode }) {
     if (JSON.stringify(items) === JSON.stringify(previousItemsRef.current)) return
 
     try {
-      const res = await api<any>('/api/user/cart/sync', {
+      const res = await api<{ success: boolean }>('/api/user/cart/sync', {
         method: 'POST',
         body: { items }
       })
