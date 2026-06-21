@@ -1,4 +1,11 @@
 {
-    "workbench.externalBrowser": "chrome",
-    "vscode-edge-devtools.browserFlavor": "Default"
+  "workbench.externalBrowser": "chrome",
+  "vscode-edge-devtools.browserFlavor": "Default",
+  "sonarlint.rules": {
+    "web:S4624": "off",
+    "html:S4624": "off",
+    "css:S4624": "off",
+    "web:S5256": "off",
+    "html:S5256": "off"
+  }
 }
