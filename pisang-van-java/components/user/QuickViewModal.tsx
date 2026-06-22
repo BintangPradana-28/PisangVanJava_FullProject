@@ -376,191 +376,193 @@ export default function QuickViewModal({
                   <span className="text-[10px] text-zinc-400">Tipe Dipilih</span>
                 </div>
               </div>
-            {/* Description — reuses the exact same copy source as the menu grid card,
+              {/* Description — reuses the exact same copy source as the menu grid card,
                 so the text customers see here matches what they saw before opening */}
-            <div className="mb-8">
-              <h4 className="font-bold text-zinc-800 dark:text-zinc-100 text-lg mb-2">Deskripsi</h4>
-              <p className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
-                {displayProduct.deskripsi_topping ||
-                  (() => {
-                    const key = getFlavorDescriptionKey(displayProduct.flavorName)
-                    return key ? t(key) : t('menu_default_desc')
-                  })()}
-              </p>
-            </div>
-
-            {/* Section Tipe (Grid 3 kolom) */}
-            <div className="mb-8">
-              <div className="flex justify-between items-end mb-3">
-                <h4 className="font-bold text-zinc-800 dark:text-zinc-100 text-lg">
-                  Pilih Tipe <span className="text-red-500">*</span>
-                </h4>
-              </div>
-              <div className="grid grid-cols-3 gap-3">
-                {AVAILABLE_TYPES.map((type) => {
-                  const isSelected = selectedType === type
-                  const isTypeDisabled = (() => {
-                    const p = displayProduct
-                    if (!p) return true
-                    if (type === 'Kembung') return p.priceKembung <= 0
-                    if (type === 'Lumpia') return p.priceLumpia <= 0
-                    if (type === 'Krispy') return p.priceKrispy <= 0
-                    return false
-                  })()
-
-                  return (
-                    <button
-                      key={type}
-                      type="button"
-                      disabled={isTypeDisabled}
-                      onClick={() => !isTypeDisabled && setSelectedType(type)}
-                      className={`py-2.5 px-2 rounded-[4px] border-2 text-sm font-bold transition-all ${
-                        isSelected
-                          ? 'border-[#D4802A] bg-[#D4802A]/10 text-[#D4802A]'
-                          : isTypeDisabled
-                            ? 'border-zinc-100 dark:border-zinc-800 text-zinc-300 dark:text-zinc-700 cursor-not-allowed opacity-50 bg-zinc-50 dark:bg-zinc-800/20'
-                            : 'border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:border-zinc-300'
-                      }`}
-                    >
-                      {type}
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
-
-            {/* Section Topping (Social Proof by Default) */}
-            {toppingsData.length > 0 && (
               <div className="mb-8">
-                <div className="mb-3">
+                <h4 className="font-bold text-zinc-800 dark:text-zinc-100 text-lg mb-2">
+                  Deskripsi
+                </h4>
+                <p className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+                  {displayProduct.deskripsi_topping ||
+                    (() => {
+                      const key = getFlavorDescriptionKey(displayProduct.flavorName)
+                      return key ? t(key) : t('menu_default_desc')
+                    })()}
+                </p>
+              </div>
+
+              {/* Section Tipe (Grid 3 kolom) */}
+              <div className="mb-8">
+                <div className="flex justify-between items-end mb-3">
                   <h4 className="font-bold text-zinc-800 dark:text-zinc-100 text-lg">
-                    Topping Rekomendasi
+                    Pilih Tipe <span className="text-red-500">*</span>
                   </h4>
                 </div>
-                <div className="grid grid-cols-1 gap-3 mb-4">
-                  {toppingsData.slice(0, 1).map((topping) => {
-                    const isSelected = selectedToppings.includes(topping.id)
+                <div className="grid grid-cols-3 gap-3">
+                  {AVAILABLE_TYPES.map((type) => {
+                    const isSelected = selectedType === type
+                    const isTypeDisabled = (() => {
+                      const p = displayProduct
+                      if (!p) return true
+                      if (type === 'Kembung') return p.priceKembung <= 0
+                      if (type === 'Lumpia') return p.priceLumpia <= 0
+                      if (type === 'Krispy') return p.priceKrispy <= 0
+                      return false
+                    })()
+
                     return (
-                      <label
-                        key={topping.id}
-                        className={`flex flex-col p-3.5 min-h-[44px] min-w-[44px] border-2 rounded-[4px] cursor-pointer transition-all select-none active:scale-[0.97] ${
+                      <button
+                        key={type}
+                        type="button"
+                        disabled={isTypeDisabled}
+                        onClick={() => !isTypeDisabled && setSelectedType(type)}
+                        className={`py-2.5 px-2 rounded-[4px] border-2 text-sm font-bold transition-all ${
                           isSelected
-                            ? 'border-[#D4802A] bg-[#D4802A]/5'
-                            : 'border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-800/50'
+                            ? 'border-[#D4802A] bg-[#D4802A]/10 text-[#D4802A]'
+                            : isTypeDisabled
+                              ? 'border-zinc-100 dark:border-zinc-800 text-zinc-300 dark:text-zinc-700 cursor-not-allowed opacity-50 bg-zinc-50 dark:bg-zinc-800/20'
+                              : 'border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:border-zinc-300'
                         }`}
                       >
-                        <div className="flex items-center gap-2.5 mb-1">
-                          <input
-                            type="checkbox"
-                            name="topping"
-                            checked={isSelected}
-                            onChange={() => handleToppingToggle(topping.id)}
-                            className="accent-[#D4802A] w-5 h-5 rounded-[4px] cursor-pointer shrink-0"
-                          />
-                          <span className="text-sm font-bold text-zinc-800 dark:text-zinc-200 truncate flex items-center gap-1.5">
-                            ⭐ {topping.emoji} {topping.name}{' '}
-                            <span className="text-xs text-zinc-500 font-normal hidden sm:inline">
-                              (Paling Populer)
+                        {type}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+
+              {/* Section Topping (Social Proof by Default) */}
+              {toppingsData.length > 0 && (
+                <div className="mb-8">
+                  <div className="mb-3">
+                    <h4 className="font-bold text-zinc-800 dark:text-zinc-100 text-lg">
+                      Topping Rekomendasi
+                    </h4>
+                  </div>
+                  <div className="grid grid-cols-1 gap-3 mb-4">
+                    {toppingsData.slice(0, 1).map((topping) => {
+                      const isSelected = selectedToppings.includes(topping.id)
+                      return (
+                        <label
+                          key={topping.id}
+                          className={`flex flex-col p-3.5 min-h-[44px] min-w-[44px] border-2 rounded-[4px] cursor-pointer transition-all select-none active:scale-[0.97] ${
+                            isSelected
+                              ? 'border-[#D4802A] bg-[#D4802A]/5'
+                              : 'border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-800/50'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2.5 mb-1">
+                            <input
+                              type="checkbox"
+                              name="topping"
+                              checked={isSelected}
+                              onChange={() => handleToppingToggle(topping.id)}
+                              className="accent-[#D4802A] w-5 h-5 rounded-[4px] cursor-pointer shrink-0"
+                            />
+                            <span className="text-sm font-bold text-zinc-800 dark:text-zinc-200 truncate flex items-center gap-1.5">
+                              ⭐ {topping.emoji} {topping.name}{' '}
+                              <span className="text-xs text-zinc-500 font-normal hidden sm:inline">
+                                (Paling Populer)
+                              </span>
                             </span>
+                          </div>
+                          <span className="text-xs font-bold text-green-600 dark:text-green-400 pl-[30px]">
+                            +{formatPrice(topping.price)}
                           </span>
+                        </label>
+                      )
+                    })}
+                  </div>
+
+                  {toppingsData.length > 1 && (
+                    <div>
+                      <button
+                        onClick={() => setShowOtherToppings(!showOtherToppings)}
+                        className="flex items-center gap-2 text-sm font-bold text-zinc-500 dark:text-zinc-400 mb-3 hover:text-[#D4802A] transition-colors focus:outline-none"
+                      >
+                        Topping Lainnya{' '}
+                        <span className="text-[10px]">{showOtherToppings ? '▲' : '▼'}</span>
+                      </button>
+                      {showOtherToppings && (
+                        <div className="grid grid-cols-2 gap-3">
+                          {toppingsData.slice(1).map((topping) => {
+                            const isSelected = selectedToppings.includes(topping.id)
+                            return (
+                              <label
+                                key={topping.id}
+                                className={`flex flex-col p-3.5 min-h-[44px] min-w-[44px] border-2 rounded-[4px] cursor-pointer transition-all select-none active:scale-[0.97] ${
+                                  isSelected
+                                    ? 'border-[#D4802A] bg-[#D4802A]/5'
+                                    : 'border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-800/50'
+                                }`}
+                              >
+                                <div className="flex items-center gap-2.5 mb-1">
+                                  <input
+                                    type="checkbox"
+                                    name="topping"
+                                    checked={isSelected}
+                                    onChange={() => handleToppingToggle(topping.id)}
+                                    className="accent-[#D4802A] w-5 h-5 rounded-[4px] cursor-pointer shrink-0"
+                                  />
+                                  <span className="text-sm font-bold text-zinc-800 dark:text-zinc-200 truncate">
+                                    {topping.emoji} {topping.name}
+                                  </span>
+                                </div>
+                                <span className="text-xs font-bold text-green-600 dark:text-green-400 pl-[30px]">
+                                  +{formatPrice(topping.price)}
+                                </span>
+                              </label>
+                            )
+                          })}
                         </div>
-                        <span className="text-xs font-bold text-green-600 dark:text-green-400 pl-[30px]">
-                          +{formatPrice(topping.price)}
-                        </span>
-                      </label>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Catatan Khusus & Predefined Modifiers (Cognitive Load 12/100) */}
+              <div className="mb-2">
+                <h4 className="font-bold text-zinc-800 dark:text-zinc-100 text-lg mb-2">
+                  Catatan Khusus
+                </h4>
+
+                {/* Predefined Tags */}
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {['Garing', 'Pisah Topping', 'Sedikit Manis'].map((tag) => {
+                    const isSelected = notes.includes(`[${tag}]`)
+                    return (
+                      <button
+                        key={tag}
+                        type="button"
+                        onClick={() => {
+                          if (isSelected) {
+                            setNotes(notes.replace(`[${tag}] `, '').replace(`[${tag}]`, '').trim())
+                          } else {
+                            setNotes((prev) => (prev ? `${prev} [${tag}]` : `[${tag}]`).trim())
+                          }
+                        }}
+                        className={`px-3 py-1.5 rounded-[4px] text-xs font-bold border transition-colors ${
+                          isSelected
+                            ? 'bg-[#D4802A]/10 text-[#D4802A] border-[#D4802A]'
+                            : 'bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700 hover:border-[#D4802A]/50'
+                        }`}
+                      >
+                        {isSelected ? '✓ ' : '+ '}
+                        {tag}
+                      </button>
                     )
                   })}
                 </div>
 
-                {toppingsData.length > 1 && (
-                  <div>
-                    <button
-                      onClick={() => setShowOtherToppings(!showOtherToppings)}
-                      className="flex items-center gap-2 text-sm font-bold text-zinc-500 dark:text-zinc-400 mb-3 hover:text-[#D4802A] transition-colors focus:outline-none"
-                    >
-                      Topping Lainnya{' '}
-                      <span className="text-[10px]">{showOtherToppings ? '▲' : '▼'}</span>
-                    </button>
-                    {showOtherToppings && (
-                      <div className="grid grid-cols-2 gap-3">
-                        {toppingsData.slice(1).map((topping) => {
-                          const isSelected = selectedToppings.includes(topping.id)
-                          return (
-                            <label
-                              key={topping.id}
-                              className={`flex flex-col p-3.5 min-h-[44px] min-w-[44px] border-2 rounded-[4px] cursor-pointer transition-all select-none active:scale-[0.97] ${
-                                isSelected
-                                  ? 'border-[#D4802A] bg-[#D4802A]/5'
-                                  : 'border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-800/50'
-                              }`}
-                            >
-                              <div className="flex items-center gap-2.5 mb-1">
-                                <input
-                                  type="checkbox"
-                                  name="topping"
-                                  checked={isSelected}
-                                  onChange={() => handleToppingToggle(topping.id)}
-                                  className="accent-[#D4802A] w-5 h-5 rounded-[4px] cursor-pointer shrink-0"
-                                />
-                                <span className="text-sm font-bold text-zinc-800 dark:text-zinc-200 truncate">
-                                  {topping.emoji} {topping.name}
-                                </span>
-                              </div>
-                              <span className="text-xs font-bold text-green-600 dark:text-green-400 pl-[30px]">
-                                +{formatPrice(topping.price)}
-                              </span>
-                            </label>
-                          )
-                        })}
-                      </div>
-                    )}
-                  </div>
-                )}
+                <textarea
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder="Tambahan khusus lainnya (opsional)..."
+                  className="w-full p-4 border-2 border-zinc-200 dark:border-zinc-800 rounded-[4px] text-sm bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-[#D4802A] transition-colors min-h-[80px]"
+                />
               </div>
-            )}
-
-            {/* Catatan Khusus & Predefined Modifiers (Cognitive Load 12/100) */}
-            <div className="mb-2">
-              <h4 className="font-bold text-zinc-800 dark:text-zinc-100 text-lg mb-2">
-                Catatan Khusus
-              </h4>
-
-              {/* Predefined Tags */}
-              <div className="flex flex-wrap gap-2 mb-3">
-                {['Garing', 'Pisah Topping', 'Sedikit Manis'].map((tag) => {
-                  const isSelected = notes.includes(`[${tag}]`)
-                  return (
-                    <button
-                      key={tag}
-                      type="button"
-                      onClick={() => {
-                        if (isSelected) {
-                          setNotes(notes.replace(`[${tag}] `, '').replace(`[${tag}]`, '').trim())
-                        } else {
-                          setNotes((prev) => (prev ? `${prev} [${tag}]` : `[${tag}]`).trim())
-                        }
-                      }}
-                      className={`px-3 py-1.5 rounded-[4px] text-xs font-bold border transition-colors ${
-                        isSelected
-                          ? 'bg-[#D4802A]/10 text-[#D4802A] border-[#D4802A]'
-                          : 'bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700 hover:border-[#D4802A]/50'
-                      }`}
-                    >
-                      {isSelected ? '✓ ' : '+ '}
-                      {tag}
-                    </button>
-                  )
-                })}
-              </div>
-
-              <textarea
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                placeholder="Tambahan khusus lainnya (opsional)..."
-                className="w-full p-4 border-2 border-zinc-200 dark:border-zinc-800 rounded-[4px] text-sm bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-[#D4802A] transition-colors min-h-[80px]"
-              />
             </div>
-          </div>
           </div>
 
           {/* Footer (Sticky Bottom) */}

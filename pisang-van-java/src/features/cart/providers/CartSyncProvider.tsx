@@ -1,7 +1,7 @@
 'use client'
 import { usePathname } from 'next/navigation'
 import { useSession } from 'next-auth/react'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { MergeConflictModal } from '@/src/features/cart/components/MergeConflictModal'
 import {
   type CartItem,
@@ -21,7 +21,6 @@ export function CartSyncProvider({ children }: { children: React.ReactNode }) {
   const { status } = useSession()
   const cartItems = useCartStore((s) => s.items)
   const setItems = useCartStore((s) => s.setItems)
-  const clearCart = useCartStore((s) => s.clearCart)
   const _hasHydrated = useCartStore((s) => s._hasHydrated)
 
   const setConflictState = useCartStore((s) => s.setConflictState)
@@ -34,11 +33,11 @@ export function CartSyncProvider({ children }: { children: React.ReactNode }) {
   const previousItemsRef = useRef<CartItem[]>([])
 
   // Auto-resolve ke LOCAL jika user pindah halaman saat modal terbuka
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Only run on pathname change to auto-resolve on navigation
   useEffect(() => {
     if (conflictState !== null) {
       resolveConflict('LOCAL')
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname])
 
   // Hydrate cart dari localStorage — satu kali saat mount
@@ -163,25 +162,45 @@ export function CartSyncProvider({ children }: { children: React.ReactNode }) {
   }, [status, _hasHydrated, isFirstSyncDone, setItems, setConflictState])
 
   // ── 2. Persist to DB on Change (Debounced) ──
-  const syncToDB = async (items: CartItem[]) => {
-    if (status !== 'authenticated') return
-    if (useCartStore.getState().isLoggingOut) return
-    // Optimasi: Jangan panggil API jika items sama persis dengan yang terakhir disimpan
-    if (JSON.stringify(items) === JSON.stringify(previousItemsRef.current)) return
+  const syncToDB = useCallback(
+    async (items: CartItem[], attempt = 1): Promise<void> => {
+      if (status !== 'authenticated') return
+      if (useCartStore.getState().isLoggingOut) return
+      // Optimasi: Jangan panggil API jika items sama persis dengan yang terakhir disimpan
+      if (JSON.stringify(items) === JSON.stringify(previousItemsRef.current)) return
 
-    try {
-      const res = await api<{ success: boolean }>('/api/user/cart/sync', {
-        method: 'POST',
-        body: { items }
-      })
-      if (res.success) {
-        previousItemsRef.current = [...items]
+      try {
+        const res = await api<{ success: boolean }>('/api/user/cart/sync', {
+          method: 'POST',
+          body: { items }
+        })
+        if (res.success) {
+          previousItemsRef.current = [...items]
+        }
+      } catch (error) {
+        console.error(`[CartSyncProvider] Sync attempt ${attempt} failed:`, error)
+        if (attempt < 3) {
+          const delay = attempt === 1 ? 2000 : attempt === 2 ? 4000 : 8000
+          console.log(`[CartSyncProvider] Retrying in ${delay}ms... (Attempt ${attempt + 1}/3)`)
+
+          setTimeout(() => {
+            // Cegah balapan: jika isi cart di store sudah berubah selama masa tunggu retry, batalkan retry
+            const currentStoreItems = useCartStore.getState().items
+            if (JSON.stringify(items) !== JSON.stringify(currentStoreItems)) {
+              console.log(
+                '[CartSyncProvider] Cart has changed since failed attempt. Cancelling retry.'
+              )
+              return
+            }
+            syncToDB(items, attempt + 1)
+          }, delay)
+        } else {
+          console.error('[CartSyncProvider] Max retries reached. Sync failed.')
+        }
       }
-    } catch (error) {
-      console.error('[CartSyncProvider] Debounced Sync Error:', error)
-      // TODO: Retry on network failure
-    }
-  }
+    },
+    [status]
+  )
 
   useEffect(() => {
     if (!_hasHydrated || status !== 'authenticated' || !isFirstSyncDone) return
@@ -199,7 +218,7 @@ export function CartSyncProvider({ children }: { children: React.ReactNode }) {
         clearTimeout(timeoutRef.current)
       }
     }
-  }, [cartItems, status, _hasHydrated, isFirstSyncDone])
+  }, [cartItems, status, _hasHydrated, isFirstSyncDone, syncToDB])
 
   // ── 3. Persist on VisibilityChange / BeforeUnload ──
   useEffect(() => {

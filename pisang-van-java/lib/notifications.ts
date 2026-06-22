@@ -2,10 +2,9 @@
  * lib/notifications.ts
  *
  * Abstraksi untuk mengirim notifikasi ke pelanggan via WhatsApp.
- * Karena ini adalah bisnis yang baru merintis dari 0, merekomendasikan provider berbayar
- * berisiko (biaya bulanan). Untuk MVP, kita membuat abstraksi webhook ini agar siap
- * disambungkan ke API gratis/freemium (seperti Fonnte versi free atau Watzap) di masa depan.
  */
+
+import { env } from '@/src/env'
 
 export async function sendWhatsAppNotification(
   customerPhone: string,
@@ -34,26 +33,33 @@ export async function sendWhatsAppNotification(
       return // Tidak ada notifikasi untuk status lain
     }
 
-    console.log(`\n==========================================`)
-    console.log(`[MOCK WEBHOOK WA] Mempersiapkan pengiriman:`)
-    console.log(`Ke     : ${customerPhone}`)
-    console.log(`Pesan  :\n${message}`)
-    console.log(`==========================================\n`)
-
-    // TODO: Ganti block mock di atas dengan fetch API beneran ke Fonnte/Watzap.
-    /*
-    const fonnteToken = process.env.FONNTE_TOKEN
+    const fonnteToken = env.FONNTE_API_TOKEN
     if (fonnteToken) {
-      await fetch('https://api.fonnte.com/send', {
+      console.log(`[WA] Mengirim pesan ke Fonnte untuk ${customerPhone}...`)
+      const res = await fetch('https://api.fonnte.com/send', {
         method: 'POST',
-        headers: { 'Authorization': fonnteToken },
+        headers: { Authorization: fonnteToken },
         body: new URLSearchParams({
           target: customerPhone,
-          message: message,
+          message: message
         })
       })
+
+      if (!res.ok) {
+        const text = await res.text()
+        console.error(`[WA ERROR] Fonnte API gagal dengan status ${res.status}: ${text}`)
+        return { success: false, error: new Error(`Fonnte API error: ${text}`) }
+      }
+
+      const responseData = await res.json()
+      console.log(`[WA SUCCESS] Notifikasi berhasil dikirim via Fonnte:`, responseData)
+    } else {
+      console.log(`\n==========================================`)
+      console.log(`[MOCK WEBHOOK WA] Mempersiapkan pengiriman (FONNTE_API_TOKEN kosong):`)
+      console.log(`Ke     : ${customerPhone}`)
+      console.log(`Pesan  :\n${message}`)
+      console.log(`==========================================\n`)
     }
-    */
 
     return { success: true }
   } catch (error) {

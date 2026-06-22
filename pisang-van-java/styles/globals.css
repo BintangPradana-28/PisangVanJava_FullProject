@@ -174,16 +174,12 @@
 
   /* WhatsApp button */
   .btn-wa {
-    @apply inline-flex items-center gap-2 bg-green-wa text-white font-semibold
-           px-6 py-3 rounded-[4px] border border-green-wa/20 transition-all duration-200
-           hover:bg-green-wa/90 hover:shadow-sm active:scale-95;
+    @apply inline-flex items-center gap-2 bg-green-wa text-white font-semibold px-6 py-3 rounded-[4px] border border-green-wa/20 transition-all duration-200 hover:bg-green-wa/90 hover:shadow-sm active:scale-95;
   }
 
   /* Brown CTA button */
   .btn-brown {
-    @apply inline-flex items-center gap-2 bg-brown-700 text-cream-100 font-semibold
-           px-5 py-2.5 rounded-[4px] border border-brown-700/20 transition-all duration-200
-           hover:bg-brown-600 hover:shadow-sm active:scale-95;
+    @apply inline-flex items-center gap-2 bg-brown-700 text-cream-100 font-semibold px-5 py-2.5 rounded-[4px] border border-brown-700/20 transition-all duration-200 hover:bg-brown-600 hover:shadow-sm active:scale-95;
   }
 
   /* Card hover */
@@ -201,8 +197,7 @@
 
   /* Sidebar item */
   .sidebar-item {
-    @apply flex items-center gap-3 px-4 py-2.5 rounded-[4px] text-cream-200/70 text-sm font-medium
-           cursor-pointer transition-all duration-200 hover:bg-white/10 hover:text-white;
+    @apply flex items-center gap-3 px-4 py-2.5 rounded-[4px] text-cream-200/70 text-sm font-medium cursor-pointer transition-all duration-200 hover:bg-white/10 hover:text-white;
   }
   .sidebar-item.active {
     @apply bg-amber-brand text-white;
@@ -210,9 +205,7 @@
 
   /* Form input */
   .form-input {
-    @apply w-full px-3.5 py-2.5 border border-brown-700/20 rounded-[4px] text-brown-700
-           bg-white font-sans text-sm focus:outline-none focus:ring-1 focus:ring-brown-700
-           transition-shadow;
+    @apply w-full px-3.5 py-2.5 border border-brown-700/20 rounded-[4px] text-brown-700 bg-white font-sans text-sm focus:outline-none focus:ring-1 focus:ring-brown-700 transition-shadow;
   }
 }
 

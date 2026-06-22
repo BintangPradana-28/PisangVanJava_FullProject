@@ -1,11 +1,15 @@
 'use server'
 
-import crypto from 'crypto'
+import crypto from 'node:crypto'
+import { render } from '@react-email/components'
 import { headers } from 'next/headers'
+import React from 'react'
 import { prisma } from '@/lib/prisma'
 import { rateLimit, redis } from '@/lib/redis'
 import { hashPassword } from '@/src/lib/password'
-import { forgotPasswordSchema, registerSchema } from './schemas'
+import { resend } from '@/src/lib/resend'
+import ResetPasswordEmail from './ResetPasswordEmail'
+import { forgotPasswordSchema, registerSchema, resetPasswordSchema } from './schemas'
 
 export async function registerUser(formData: FormData) {
   try {
@@ -123,8 +127,36 @@ export async function generateResetToken(formData: FormData) {
       // Waktu 1 jam (3600s) terlalu berisiko. Diubah ke 900s (15 menit).
       await redis.set(`reset-token:${token}`, user.id, { ex: 900 })
 
-      // TODO: Panggil fungsi pihak ketiga untuk mengirim email berisi token
-      // sendEmail(user.email, `https://.../reset-password?token=${token}`)
+      // Panggil fungsi pihak ketiga untuk mengirim email berisi token
+      const host = headerStore.get('host') || 'localhost:3000'
+      const protocol = host.includes('localhost') ? 'http' : 'https'
+      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || `${protocol}://${host}`
+      const resetLink = `${baseUrl}/reset-password?token=${token}`
+
+      if (resend) {
+        try {
+          const htmlContent = await render(
+            React.createElement(ResetPasswordEmail, {
+              customerName: user.name || 'Pelanggan',
+              resetLink
+            })
+          )
+
+          await resend.emails.send({
+            from: 'Pisang Van Java <noreply@pisangvanjava.com>',
+            to: user.email,
+            subject: 'Atur Ulang Kata Sandi - Pisang Van Java',
+            html: htmlContent
+          })
+          console.log(`[AUTH] Reset password email sent successfully to ${user.email}`)
+        } catch (emailError) {
+          console.error('[AUTH ERROR] Gagal mengirim email reset password via Resend:', emailError)
+        }
+      } else {
+        console.warn(
+          `[AUTH WARN] Resend tidak dikonfigurasi. Link reset sandi (Mode Dev): ${resetLink}`
+        )
+      }
     }
 
     // OPAQUE MESSAGE: Selalu kembalikan respons yang sama
@@ -139,5 +171,57 @@ export async function generateResetToken(formData: FormData) {
       error instanceof Error ? error.message : 'Unknown'
     )
     return { success: false, error: 'Terjadi kesalahan sistem.' }
+  }
+}
+
+export async function resetPassword(formData: FormData) {
+  try {
+    // 1. EXTRACT PAYLOAD SECURELY
+    const token = formData.get('token')
+    const password = formData.get('password')
+
+    // 2. THE ABSOLUTE QUARANTINE
+    const parsed = resetPasswordSchema.safeParse({ token, password })
+    if (!parsed.success) {
+      return { success: false, error: parsed.error.issues[0].message || 'Validasi gagal.' }
+    }
+
+    const { token: validatedToken, password: validatedPassword } = parsed.data
+
+    // 3. THE IRON GATE: IP RATE LIMITING (mencegah bruteforce token)
+    const headerStore = await headers()
+    const ip = headerStore.get('x-forwarded-for')?.split(',')[0] || 'unknown-ip'
+
+    const { success: rateLimitSuccess } = await rateLimit.limit(`reset_attempt_ip_${ip}`)
+    if (!rateLimitSuccess) {
+      return { success: false, error: 'Terlalu banyak percobaan. Silakan coba lagi nanti.' }
+    }
+
+    // 4. VERIFIKASI TOKEN DI REDIS
+    const redisKey = `reset-token:${validatedToken}`
+    const userId = await redis.get<string>(redisKey)
+
+    if (!userId) {
+      return { success: false, error: 'Tautan reset sandi tidak valid atau telah kedaluwarsa.' }
+    }
+
+    // 5. UPDATE PASSWORD DI DATABASE
+    const passwordHash = await hashPassword(validatedPassword)
+
+    await prisma.user.update({
+      where: { id: userId },
+      data: { passwordHash }
+    })
+
+    // 6. HAPUS TOKEN DARI REDIS (sekali pakai)
+    await redis.del(redisKey)
+
+    return { success: true }
+  } catch (error) {
+    console.error(
+      '[SECURITY] Reset Password Execute Error:',
+      error instanceof Error ? error.message : 'Unknown'
+    )
+    return { success: false, error: 'Terjadi kesalahan sistem saat memperbarui kata sandi.' }
   }
 }

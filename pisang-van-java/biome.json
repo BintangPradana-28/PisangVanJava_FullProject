@@ -51,5 +51,11 @@
       "semicolons": "asNeeded",
       "trailingCommas": "none"
     }
+  },
+  "css": {
+    "parser": {
+      "allowWrongLineComments": true,
+      "tailwindDirectives": true
+    }
   }
 }

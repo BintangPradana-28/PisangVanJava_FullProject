@@ -36,3 +36,10 @@ export const forgotPasswordSchema = z
     email: z.string().trim().min(3).max(254).email()
   })
   .strict()
+
+export const resetPasswordSchema = z
+  .object({
+    token: z.string().trim().min(1, 'Token harus diisi'),
+    password: z.string().min(8, 'Sandi minimal 8 karakter').max(128, 'Sandi maksimal 128 karakter')
+  })
+  .strict()
