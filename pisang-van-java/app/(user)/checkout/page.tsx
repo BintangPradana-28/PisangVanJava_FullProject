@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { FetchError } from 'ofetch'
 // app/(user)/checkout/page.tsx — Dedicated Checkout Page
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import { z } from 'zod'
@@ -89,6 +89,13 @@ export default function CheckoutPage() {
   // Form state
   const [step, setStep] = useState(0) // 0=review, 1=form, 2=confirm
   const [showSummaryMobile, setShowSummaryMobile] = useState(false)
+  const mobileSummaryBtnRef = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    if (mobileSummaryBtnRef.current) {
+      mobileSummaryBtnRef.current.setAttribute('aria-expanded', showSummaryMobile ? 'true' : 'false')
+    }
+  }, [showSummaryMobile])
   const {
     register,
     trigger,
@@ -1157,10 +1164,10 @@ export default function CheckoutPage() {
             <div className="bg-white dark:bg-zinc-900 rounded-[4px] border border-zinc-100 dark:border-zinc-800 shadow-sm p-6">
               {/* Mobile Collapsible Header */}
               <button
+                ref={mobileSummaryBtnRef}
                 type="button"
                 onClick={() => setShowSummaryMobile(!showSummaryMobile)}
                 className="w-full flex lg:hidden items-center justify-between font-serif text-lg font-bold text-zinc-900 dark:text-zinc-100"
-                aria-expanded={showSummaryMobile ? 'true' : 'false'}
               >
                 <span className="flex items-center gap-2">
                   🛒 Ringkasan Pesanan
