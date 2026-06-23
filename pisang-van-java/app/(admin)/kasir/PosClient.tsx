@@ -4,6 +4,7 @@
 
 'use client'
 
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
@@ -129,6 +130,14 @@ export default function PosClient({ products, toppings }: PosClientProps): React
               />
               {isOnline ? 'Online' : 'Offline'}
             </div>
+
+            <Link
+              href="/dashboard"
+              className="flex items-center gap-2 bg-zinc-50 dark:bg-zinc-800 hover:bg-amber-50 dark:hover:bg-amber-900/20 text-zinc-600 dark:text-zinc-300 hover:text-amber-600 dark:hover:text-amber-400 px-4 py-2 rounded-lg font-bold text-sm transition-colors border border-zinc-200 dark:border-zinc-700"
+            >
+              <span>📊</span>
+              <span className="hidden sm:inline">Dashboard</span>
+            </Link>
 
             <button
               type="button"

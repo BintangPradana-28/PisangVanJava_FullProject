@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import type { ProductType } from '@/src/features/menu/components/MenuCards'
 
@@ -36,6 +36,22 @@ export default function PosModifierModal({
   const [selectedBase, setSelectedBase] = useState<'Kembung' | 'Lumpia' | 'Krispy'>('Kembung')
   const [selectedToppings, setSelectedToppings] = useState<Topping[]>([])
   const [quantity, setQuantity] = useState(1)
+
+  // RAG Source: components/user/QuickViewModal.tsx (Select first valid base with price > 0)
+  useEffect(() => {
+    if (product) {
+      const defaultBase =
+        (['Kembung', 'Lumpia', 'Krispy'] as const).find((b) => {
+          if (b === 'Kembung') return product.priceKembung > 0
+          if (b === 'Lumpia') return product.priceLumpia > 0
+          if (b === 'Krispy') return product.priceKrispy > 0
+          return false
+        }) || 'Kembung'
+      setSelectedBase(defaultBase)
+      setSelectedToppings([])
+      setQuantity(1)
+    }
+  }, [product])
 
   if (!product) return null
 
@@ -97,19 +113,24 @@ export default function PosModifierModal({
                 if (base === 'Krispy') price = product.priceKrispy
 
                 const isSelected = selectedBase === base
+                const disabled = price <= 0
 
                 return (
                   <button
                     key={base}
-                    onClick={() => setSelectedBase(base)}
+                    type="button"
+                    onClick={() => !disabled && setSelectedBase(base)}
+                    disabled={disabled}
                     className={`flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all active:scale-95 ${
-                      isSelected
-                        ? 'border-orange-500 bg-orange-50 text-orange-700'
-                        : 'border-gray-200 hover:border-orange-200 text-gray-600'
+                      disabled
+                        ? 'bg-zinc-150 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 text-zinc-400 dark:text-zinc-500 opacity-40 cursor-not-allowed'
+                        : isSelected
+                          ? 'border-orange-500 bg-orange-50 text-orange-700 dark:bg-orange-950/30 dark:text-orange-400'
+                          : 'border-gray-200 dark:border-zinc-750 hover:border-orange-200 dark:hover:border-orange-900 text-gray-600 dark:text-zinc-300'
                     }`}
                   >
                     <span className="font-bold text-lg mb-1">{base}</span>
-                    <span className="text-sm">{formatRupiah(price)}</span>
+                    <span className="text-sm">{price > 0 ? formatRupiah(price) : 'N/A'}</span>
                   </button>
                 )
               })}

@@ -7,6 +7,7 @@
 // RAG Source: prisma/schema.prisma (OrderStatus enum)
 
 import { AnimatePresence, motion } from 'framer-motion'
+import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import toast, { Toaster } from 'react-hot-toast'
 import { supabaseBrowserClient } from '@/src/lib/supabase-client'
@@ -489,6 +490,14 @@ export default function KitchenClient({ initialOrders }: KitchenClientProps) {
         </div>
 
         <div className="flex flex-wrap items-center gap-4">
+          {/* Dashboard Link */}
+          <Link
+            href="/dashboard"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-all border bg-zinc-800 text-zinc-350 border-zinc-700 hover:bg-zinc-700 hover:text-white"
+          >
+            <span>📊 Dashboard</span>
+          </Link>
+
           {/* Audio Unlock control */}
           <button
             onClick={handleUnlockAudio}

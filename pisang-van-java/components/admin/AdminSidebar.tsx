@@ -8,6 +8,8 @@ import toast from 'react-hot-toast'
 
 const navItems = [
   { href: '/dashboard', icon: '📊', label: 'Dashboard' },
+  { href: '/kasir', icon: '💻', label: 'Point of Sale (POS)' },
+  { href: '/kitchen', icon: '🍳', label: 'Kitchen Display (KDS)' },
   { href: '/orders', icon: '📋', label: 'Order' },
   { href: '/manage-menu', icon: '🍌', label: 'Kelola Menu' },
   { href: '/toppings', icon: '✨', label: 'Topping' },

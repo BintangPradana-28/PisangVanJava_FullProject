@@ -28,7 +28,7 @@ const menuItems = [
 
 const actionItems = [
   { key: 'profile_menu_referral', href: '/profile/referral', icon: Gift },
-  { key: 'profile_menu_help', href: '/profile/bantuan', icon: HelpCircle }
+  { key: 'profile_menu_help', href: '/faq', icon: HelpCircle }
 ]
 
 export default function ProfileSidebar() {
