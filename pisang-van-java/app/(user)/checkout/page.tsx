@@ -93,7 +93,10 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     if (mobileSummaryBtnRef.current) {
-      mobileSummaryBtnRef.current.setAttribute('aria-expanded', showSummaryMobile ? 'true' : 'false')
+      mobileSummaryBtnRef.current.setAttribute(
+        'aria-expanded',
+        showSummaryMobile ? 'true' : 'false'
+      )
     }
   }, [showSummaryMobile])
   const {

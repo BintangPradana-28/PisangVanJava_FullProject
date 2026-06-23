@@ -181,7 +181,13 @@ export function CartSyncProvider({ children }: { children: React.ReactNode }) {
         console.error('[CartSyncProvider] Sync attempt failed. Attempt:', attempt, error)
         if (attempt < 3) {
           const delay = attempt === 1 ? 2000 : attempt === 2 ? 4000 : 8000
-          console.log('[CartSyncProvider] Retrying. Delay:', delay, 'ms. Attempt:', attempt + 1, '/3')
+          console.log(
+            '[CartSyncProvider] Retrying. Delay:',
+            delay,
+            'ms. Attempt:',
+            attempt + 1,
+            '/3'
+          )
 
           setTimeout(() => {
             // Cegah balapan: jika isi cart di store sudah berubah selama masa tunggu retry, batalkan retry

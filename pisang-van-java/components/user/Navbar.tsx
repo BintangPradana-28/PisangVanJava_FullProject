@@ -10,6 +10,8 @@ import { useSettings } from '@/context/SettingsContext'
 import { useTheme } from '@/context/ThemeContext'
 import { formatPrice } from '@/lib/utils'
 import CartModal from '@/src/features/cart/components/CartModal'
+import SearchDialog from './SearchDialog'
+import { Search } from 'lucide-react'
 import {
   selectCartDisplayTotal,
   selectCartItemCount,
@@ -48,6 +50,7 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [isCartOpen, setIsCartOpen] = useState(false)
+  const [isSearchOpen, setIsSearchOpen] = useState(false)
 
   // High Performance: DOM refs to bypass React Virtual DOM re-renders on scroll
   const progressBarRef = useRef<HTMLDivElement>(null)
@@ -125,8 +128,9 @@ export default function Navbar() {
 
   const links = [
     { id: 'hero', href: '/', label: t('nav_home') },
-    { id: 'tentang', href: '/tentang-kami', label: t('nav_about') },
     { id: 'menu', href: '/menu-spesial', label: t('nav_menu') },
+    { id: 'promo', href: '/promo', label: t('nav_promo') },
+    { id: 'tentang', href: '/tentang-kami', label: t('nav_about') },
     { id: 'lokasi', href: '/lokasi-kontak', label: t('nav_location') }
   ]
 
@@ -235,6 +239,18 @@ export default function Navbar() {
 
           {/* Action Controls */}
           <div className="flex items-center gap-4">
+            {/* Search Trigger */}
+            <button
+              type="button"
+              onClick={() => setIsSearchOpen(true)}
+              className={`p-2 rounded-[4px] transition-all focus:outline-none hover:bg-zinc-100 dark:hover:bg-zinc-800 ${
+                useSolidHeader ? 'text-zinc-700 dark:text-zinc-200' : 'text-white'
+              }`}
+              aria-label="Buka Pencarian"
+            >
+              <Search className="w-5 h-5" />
+            </button>
+
             {/* Theme Toggle */}
             <button
               type="button"
@@ -349,6 +365,22 @@ export default function Navbar() {
                           📦 {locale === 'id' ? 'Lacak Pesanan' : 'Track Order'}
                         </Link>
 
+                        <Link
+                          href="/reseller"
+                          className="flex items-center gap-2 px-4 py-2.5 text-sm text-zinc-700 dark:text-zinc-350 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors"
+                          onClick={() => setIsDropdownOpen(false)}
+                        >
+                          🤝 {locale === 'id' ? 'Kemitraan Reseller' : 'Partnership'}
+                        </Link>
+
+                        <Link
+                          href="/faq"
+                          className="flex items-center gap-2 px-4 py-2.5 text-sm text-zinc-700 dark:text-zinc-350 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors"
+                          onClick={() => setIsDropdownOpen(false)}
+                        >
+                          ❓ {locale === 'id' ? 'FAQ & Bantuan' : 'FAQ & Help'}
+                        </Link>
+
                         {session.user.role === 'ADMIN' && (
                           <Link
                             href="/dashboard"
@@ -375,17 +407,87 @@ export default function Navbar() {
                 </AnimatePresence>
               </div>
             ) : (
-              <Link
-                id="navbar-login"
-                href="/member-login"
-                className={`hidden sm:inline-flex text-xs font-bold px-4 py-2.5 rounded-[4px] transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary ${
-                  useSolidHeader
-                    ? 'bg-secondary text-white hover:bg-secondary/95 shadow-sm'
-                    : 'bg-white text-primary hover:bg-white/95 shadow-md'
-                }`}
-              >
-                {t('nav_login')}
-              </Link>
+              <div className="relative">
+                <button
+                  type="button"
+                  id="navbar-profile-guest"
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                  className={`p-2 rounded-[4px] transition-all focus:outline-none hover:bg-zinc-100 dark:hover:bg-zinc-800 ${
+                    useSolidHeader ? 'text-zinc-700 dark:text-zinc-200' : 'text-white'
+                  }`}
+                  aria-label="Menu Akun"
+                >
+                  <span className="text-lg">👤</span>
+                </button>
+
+                <AnimatePresence>
+                  {isDropdownOpen && (
+                    <>
+                      <button
+                        type="button"
+                        aria-label="Tutup dropdown"
+                        className="fixed inset-0 z-10 w-full h-full cursor-default bg-transparent"
+                        onClick={() => setIsDropdownOpen(false)}
+                      />
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 10 }}
+                        className="absolute right-0 mt-2.5 w-48 bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800 rounded-[4px] shadow-sm py-2 z-20"
+                      >
+                        <div className="px-4 py-2 border-b border-zinc-100 dark:border-zinc-800">
+                          <p className="text-xs text-zinc-400 uppercase tracking-wider font-semibold">
+                            {locale === 'id' ? 'Tamu' : 'Guest'}
+                          </p>
+                          <p className="text-sm font-bold text-zinc-800 dark:text-zinc-200 truncate">
+                            {locale === 'id' ? 'Selamat Datang' : 'Welcome'}
+                          </p>
+                        </div>
+
+                        <Link
+                          href="/member-login"
+                          className="flex items-center gap-2 px-4 py-2.5 text-sm text-zinc-700 dark:text-zinc-350 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors"
+                          onClick={() => setIsDropdownOpen(false)}
+                        >
+                          🔑 {locale === 'id' ? 'Masuk' : 'Login'}
+                        </Link>
+
+                        <Link
+                          href="/member-register"
+                          className="flex items-center gap-2 px-4 py-2.5 text-sm text-zinc-700 dark:text-zinc-350 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors"
+                          onClick={() => setIsDropdownOpen(false)}
+                        >
+                          📝 {locale === 'id' ? 'Daftar Member' : 'Register Member'}
+                        </Link>
+
+                        <Link
+                          href="/track-order"
+                          className="flex items-center gap-2 px-4 py-2.5 text-sm text-zinc-700 dark:text-zinc-350 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors"
+                          onClick={() => setIsDropdownOpen(false)}
+                        >
+                          📦 {locale === 'id' ? 'Lacak Pesanan' : 'Track Order'}
+                        </Link>
+
+                        <Link
+                          href="/reseller"
+                          className="flex items-center gap-2 px-4 py-2.5 text-sm text-zinc-700 dark:text-zinc-350 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors"
+                          onClick={() => setIsDropdownOpen(false)}
+                        >
+                          🤝 {locale === 'id' ? 'Kemitraan Reseller' : 'Partnership'}
+                        </Link>
+
+                        <Link
+                          href="/faq"
+                          className="flex items-center gap-2 px-4 py-2.5 text-sm text-zinc-700 dark:text-zinc-350 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors"
+                          onClick={() => setIsDropdownOpen(false)}
+                        >
+                          ❓ {locale === 'id' ? 'FAQ & Bantuan' : 'FAQ & Help'}
+                        </Link>
+                      </motion.div>
+                    </>
+                  )}
+                </AnimatePresence>
+              </div>
             )}
 
             {/* Mobile Hamburger Drawer Trigger */}
@@ -451,6 +553,28 @@ export default function Navbar() {
                     </Link>
                   )
                 })}
+                {/* Additional mobile links */}
+                <Link
+                  href="/track-order"
+                  onClick={() => setIsOpen(false)}
+                  className="text-base font-semibold py-1 border-b border-zinc-100 dark:border-zinc-800 text-zinc-750 dark:text-zinc-250"
+                >
+                  📦 {locale === 'id' ? 'Lacak Pesanan' : 'Track Order'}
+                </Link>
+                <Link
+                  href="/reseller"
+                  onClick={() => setIsOpen(false)}
+                  className="text-base font-semibold py-1 border-b border-zinc-100 dark:border-zinc-800 text-zinc-750 dark:text-zinc-250"
+                >
+                  🤝 {locale === 'id' ? 'Kemitraan Reseller' : 'Partnership'}
+                </Link>
+                <Link
+                  href="/faq"
+                  onClick={() => setIsOpen(false)}
+                  className="text-base font-semibold py-1 border-b border-zinc-100 dark:border-zinc-800 text-zinc-750 dark:text-zinc-250"
+                >
+                  ❓ {locale === 'id' ? 'FAQ & Bantuan' : 'FAQ & Help'}
+                </Link>
                 {!session && (
                   <Link
                     href="/member-login"
@@ -528,6 +652,9 @@ export default function Navbar() {
 
       {/* Cart Drawer component */}
       <CartModal isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
+
+      {/* Search Dialog Component */}
+      <SearchDialog isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
     </>
   )
 }
