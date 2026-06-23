@@ -190,6 +190,7 @@ export default function KeranjangPage() {
                         </p>
                         <div className="flex items-center gap-1.5">
                           <button
+                            type="button"
                             onClick={() => {
                               const newQty = item.quantity - 1
                               updateQuantity(item.cartItemId, newQty)
@@ -198,6 +199,8 @@ export default function KeranjangPage() {
                               }
                             }}
                             className="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-600 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors active:scale-90"
+                            aria-label={t('cart_minus_label') || 'Kurangi kuantitas'}
+                            title={t('cart_minus_title') || 'Kurangi'}
                           >
                             <Minus className="h-3.5 w-3.5" />
                           </button>
@@ -205,6 +208,7 @@ export default function KeranjangPage() {
                             {item.quantity}
                           </span>
                           <button
+                            type="button"
                             onClick={() => {
                               const limit = item.stock ?? 999
                               if (item.quantity >= limit) {
@@ -214,15 +218,20 @@ export default function KeranjangPage() {
                               }
                             }}
                             className="w-7 h-7 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-zinc-600 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors active:scale-90"
+                            aria-label={t('cart_plus_label') || 'Tambah kuantitas'}
+                            title={t('cart_plus_title') || 'Tambah'}
                           >
                             <Plus className="h-3.5 w-3.5" />
                           </button>
                           <button
+                            type="button"
                             onClick={() => {
                               removeItem(item.cartItemId)
                               toast.success(t('cart_toast_removed') || 'Item dihapus')
                             }}
                             className="w-7 h-7 rounded-lg bg-red-50 dark:bg-red-950/30 flex items-center justify-center text-red-500 hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors active:scale-90 ml-1"
+                            aria-label={t('cart_remove_label') || 'Hapus item'}
+                            title={t('cart_remove_title') || 'Hapus'}
                           >
                             <Trash2 className="h-3.5 w-3.5" />
                           </button>

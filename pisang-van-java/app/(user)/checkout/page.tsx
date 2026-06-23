@@ -1160,7 +1160,7 @@ export default function CheckoutPage() {
                 type="button"
                 onClick={() => setShowSummaryMobile(!showSummaryMobile)}
                 className="w-full flex lg:hidden items-center justify-between font-serif text-lg font-bold text-zinc-900 dark:text-zinc-100"
-                aria-expanded={showSummaryMobile}
+                aria-expanded={showSummaryMobile ? 'true' : 'false'}
               >
                 <span className="flex items-center gap-2">
                   🛒 Ringkasan Pesanan
