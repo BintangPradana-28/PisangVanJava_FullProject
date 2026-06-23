@@ -3,6 +3,7 @@ import { Ratelimit } from '@upstash/ratelimit'
 import { headers } from 'next/headers'
 import { prisma } from '@/lib/prisma'
 import { redis } from '@/lib/redis'
+import { normalizePhoneNumber } from '@/lib/utils'
 import { auth } from '@/src/auth'
 import {
   type CheckoutActor,
@@ -257,9 +258,17 @@ export async function createCheckoutOrder(
   input: CreateOrderInput,
   actor: CheckoutActor
 ): Promise<CreateCheckoutOrderResult> {
-  const deliveryFee = await resolveDeliveryFeeOutsideTx(input.deliveryMethod, input)
+  const normalizedInput = {
+    ...input,
+    customerPhone: normalizePhoneNumber(input.customerPhone)
+  }
 
-  const result = await executeCheckoutTransaction(input, actor, deliveryFee, prisma)
+  const deliveryFee = await resolveDeliveryFeeOutsideTx(
+    normalizedInput.deliveryMethod,
+    normalizedInput
+  )
+
+  const result = await executeCheckoutTransaction(normalizedInput, actor, deliveryFee, prisma)
 
   try {
     await redis.del(`user:cart:${actor.userId}`)
@@ -267,7 +276,7 @@ export async function createCheckoutOrder(
     console.error('[SECURITY] Failed to invalidate cart cache in Redis:', redisError)
   }
 
-  if (input.paymentMethod === 'ONLINE') {
+  if (normalizedInput.paymentMethod === 'ONLINE') {
     if (result.totalPrice === 0) {
       await prisma.order.update({
         where: { id: result.orderId },
@@ -321,15 +330,17 @@ export async function createCheckoutOrder(
         id: 'discount',
         price: -result.discountAmount!,
         quantity: 1,
-        name: input.voucherCode ? `Diskon (${input.voucherCode})` : 'Diskon Koin'
+        name: normalizedInput.voucherCode
+          ? `Diskon (${normalizedInput.voucherCode})`
+          : 'Diskon Koin'
       })
     }
 
     const snapToken = await generateSnapToken({
       orderId: result.orderId,
       grossAmount: result.totalPrice,
-      customerName: input.customerName,
-      customerPhone: input.customerPhone,
+      customerName: normalizedInput.customerName,
+      customerPhone: normalizedInput.customerPhone,
       items: midtransItems
     })
 
@@ -361,15 +372,15 @@ export async function createCheckoutOrder(
 
   const message = buildWhatsAppMessage({
     orderId: result.orderId,
-    customerName: input.customerName,
-    customerPhone: input.customerPhone,
-    deliveryMethod: input.deliveryMethod,
-    notes: normalizeNullableText(input.notes),
+    customerName: normalizedInput.customerName,
+    customerPhone: normalizedInput.customerPhone,
+    deliveryMethod: normalizedInput.deliveryMethod,
+    notes: normalizeNullableText(normalizedInput.notes),
     subtotal: result.subtotal!,
     discountAmount: result.discountAmount!,
     deliveryFee: result.deliveryFee!,
     totalPrice: result.totalPrice,
-    voucherCode: input.voucherCode ?? null,
+    voucherCode: normalizedInput.voucherCode ?? null,
     itemLines: result.preparedItems!.map((item: any) => item.whatsappLine)
   })
 

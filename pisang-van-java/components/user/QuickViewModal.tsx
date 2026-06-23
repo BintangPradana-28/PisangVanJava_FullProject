@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
+import posthog from 'posthog-js'
 import type React from 'react'
 import { useEffect, useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
@@ -237,6 +238,20 @@ export default function QuickViewModal({
       notes,
       stock: displayProduct.stock
     })
+
+    try {
+      posthog.capture('cart_item_added', {
+        productId: finalProductId,
+        productName: finalProductName,
+        basePrice: basePrice,
+        toppings: finalToppings.map((t) => t.name),
+        quantity,
+        notes,
+        totalPrice
+      })
+    } catch (err) {
+      console.error('Failed to capture PostHog event:', err)
+    }
 
     toast.success(t('toast_added'), {
       style: {

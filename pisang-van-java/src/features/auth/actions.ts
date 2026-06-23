@@ -6,6 +6,7 @@ import { headers } from 'next/headers'
 import React from 'react'
 import { prisma } from '@/lib/prisma'
 import { rateLimit, redis } from '@/lib/redis'
+import { normalizePhoneNumber } from '@/lib/utils'
 import { hashPassword } from '@/src/lib/password'
 import { resend } from '@/src/lib/resend'
 import ResetPasswordEmail from './ResetPasswordEmail'
@@ -74,7 +75,7 @@ export async function registerUser(formData: FormData) {
       data: {
         name,
         email,
-        phone: whatsapp,
+        phone: normalizePhoneNumber(whatsapp),
         passwordHash,
         role: 'CUSTOMER', // Default absolut, anti-mass assignment
         referredBy: validReferralCode

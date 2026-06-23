@@ -4,6 +4,7 @@ import crypto from 'crypto'
 import { type NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
 import { auth } from '@/src/auth'
+import { cloudinary } from '@/src/lib/cloudinary'
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp']
 const MAX_MB = 5
@@ -70,21 +71,28 @@ export async function POST(req: NextRequest) {
 
     const safeName = `img_${crypto.randomUUID()}.${ext}`
 
-    // 4. SUPABASE SECURE UPLOAD
-    const { error } = await supabase.storage.from('menu-images').upload(safeName, buffer, {
-      contentType: `image/${ext}`,
-      upsert: false
-    })
-
-    if (error) {
-      console.error('[SUPABASE_UPLOAD_ERR]', error.message)
-      return NextResponse.json({ success: false, error: 'Internal Server Error' }, { status: 500 })
-    }
-
-    const { data: publicUrlData } = supabase.storage.from('menu-images').getPublicUrl(safeName)
+    // 4. CLOUDINARY SECURE UPLOAD
+    const uploadResult = (await new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        {
+          folder: 'menu-images',
+          public_id: safeName.split('.')[0], // strictly validated cryptographic name without extension
+          resource_type: 'image'
+        },
+        (error, result) => {
+          if (error) {
+            console.error('[CLOUDINARY_UPLOAD_ERR]', error.message)
+            reject(error)
+          } else {
+            resolve(result)
+          }
+        }
+      )
+      uploadStream.end(Buffer.from(buffer))
+    })) as any
 
     return NextResponse.json(
-      { success: true, data: { url: publicUrlData.publicUrl } },
+      { success: true, data: { url: uploadResult.secure_url } },
       { status: 201 }
     )
   } catch (e: unknown) {

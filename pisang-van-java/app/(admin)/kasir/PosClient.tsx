@@ -6,6 +6,7 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import posthog from 'posthog-js'
 import { useCallback, useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { cn } from '@/lib/utils'
@@ -89,6 +90,20 @@ export default function PosClient({ products, toppings }: PosClientProps): React
       subtotal: number
     }): void => {
       addItem(orderItem)
+
+      try {
+        posthog.capture('pos_cart_item_added', {
+          productId: orderItem.product.id,
+          productName: `${orderItem.product.flavorName} (${orderItem.baseType})`,
+          basePrice: orderItem.quantity > 0 ? orderItem.subtotal / orderItem.quantity : 0,
+          toppings: orderItem.toppings.map((t) => t.name),
+          quantity: orderItem.quantity,
+          subtotal: orderItem.subtotal
+        })
+      } catch (err) {
+        console.error('Failed to capture PostHog event:', err)
+      }
+
       toast.success(`${orderItem.product.flavorName} ditambahkan!`, {
         duration: 1500,
         icon: '🍌'

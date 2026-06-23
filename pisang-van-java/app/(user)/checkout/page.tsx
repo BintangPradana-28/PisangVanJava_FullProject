@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { FetchError } from 'ofetch'
+import posthog from 'posthog-js'
 // app/(user)/checkout/page.tsx — Dedicated Checkout Page
 import { useEffect, useState, useRef } from 'react'
 import { useForm } from 'react-hook-form'
@@ -312,6 +313,16 @@ export default function CheckoutPage() {
       setAppliedVoucher({ code: result.data.code, discountAmount: result.data.discountAmount })
       setVoucherCode(result.data.code)
       toast.success(result.data.message)
+
+      try {
+        posthog.capture('voucher_applied', {
+          code: result.data.code,
+          discountAmount: result.data.discountAmount,
+          cartTotal
+        })
+      } catch (err) {
+        console.error('Failed to capture PostHog event:', err)
+      }
     } catch {
       toast.error('Gagal memvalidasi voucher')
     } finally {
@@ -394,6 +405,18 @@ export default function CheckoutPage() {
     retry: 0,
     onSuccess: (data) => {
       const { redirectType, redirectUrl } = data
+
+      try {
+        posthog.capture('order_created', {
+          orderId: data.orderId,
+          redirectType,
+          totalPrice: data.totalPrice,
+          deliveryMethod: delivery,
+          paymentMethod
+        })
+      } catch (err) {
+        console.error('Failed to capture PostHog event:', err)
+      }
 
       if (redirectType === 'WHATSAPP') {
         if (!redirectUrl.startsWith('https://wa.me/')) {
