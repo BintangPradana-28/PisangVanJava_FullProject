@@ -5,6 +5,7 @@ import { unstable_cache } from 'next/cache'
 import nextDynamic from 'next/dynamic'
 import Hero from '@/components/user/Hero'
 import { prisma } from '@/lib/prisma'
+import { safeJsonLdScript } from '@/lib/sanitize'
 import MenuCards, { type ProductType } from '@/src/features/menu/components/MenuCards'
 
 const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://pisanggorengvanjava.com'
@@ -324,7 +325,7 @@ export default async function HomePage() {
       <script
         type="application/ld+json"
         // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD schema requires raw HTML injection
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLdScript(jsonLd) }}
       />
       <Hero
         banner={activeBanner}

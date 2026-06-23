@@ -8,6 +8,7 @@ import Footer from '@/components/user/Footer'
 import Gallery from '@/components/user/Gallery'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSettings } from '@/context/SettingsContext'
+import { safeJsonLdScript } from '@/lib/sanitize'
 
 export default function TentangKamiPage() {
   const { t } = useLanguage()
@@ -146,7 +147,7 @@ export default function TentangKamiPage() {
       <script
         type="application/ld+json"
         // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD schema requires raw HTML injection
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLdScript(breadcrumbJsonLd) }}
       />
       {/* ── Hero ── */}
       <section className="relative pt-28 pb-12 overflow-hidden bg-cream-50 dark:bg-zinc-900 border-b border-outline-variant/20 dark:border-zinc-800">

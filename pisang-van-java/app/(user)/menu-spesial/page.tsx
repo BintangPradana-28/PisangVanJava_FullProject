@@ -5,7 +5,8 @@ import Footer from '@/components/user/Footer'
 import MenuGrid from '@/components/user/MenuGrid'
 import SearchFilterBar from '@/components/user/SearchFilterBar'
 import { prisma } from '@/lib/prisma'
-import HeroBanner from './HeroBanner' // We'll extract the hero part to a small component or just inline it
+import { safeJsonLdScript } from '@/lib/sanitize'
+import HeroBanner from './HeroBanner'
 
 // Removing force-dynamic to allow Next.js optimizations
 export const dynamic = 'force-dynamic'
@@ -34,12 +35,6 @@ const getCachedProducts = async () => {
     )
     return []
   }
-}
-
-import type { MenuVariant } from '@prisma/client'
-
-type DBProductType = MenuVariant & {
-  reviews: { rating: true }[]
 }
 
 type MappedProduct = {
@@ -222,7 +217,7 @@ export default async function MenuSpesialPage(props: {
       <script
         type="application/ld+json"
         // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD schema requires raw HTML injection
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(menuJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: safeJsonLdScript(menuJsonLd) }}
       />
       {/* ── Hero ── */}
       <HeroBanner />
