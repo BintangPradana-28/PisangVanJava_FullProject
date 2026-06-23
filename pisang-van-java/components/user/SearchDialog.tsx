@@ -140,7 +140,10 @@ export default function SearchDialog({ isOpen, onClose }: SearchDialogProps) {
                 />
                 {query && (
                   <button
+                    type="button"
                     onClick={() => setQuery('')}
+                    title="Bersihkan pencarian"
+                    aria-label="Bersihkan pencarian"
                     className="p-1 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-850 text-zinc-400 hover:text-zinc-650 transition-colors"
                   >
                     <X className="w-4 h-4" />

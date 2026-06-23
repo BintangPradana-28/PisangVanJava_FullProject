@@ -43,7 +43,10 @@ export default function AdminSidebar() {
       <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-brown-700 flex items-center justify-between px-4 z-40 shadow-sm border-b border-white/10">
         <div className="flex items-center gap-3">
           <button
+            type="button"
             onClick={() => setIsOpen(true)}
+            title="Buka Sidebar"
+            aria-label="Buka Sidebar"
             className="text-white p-2 rounded-lg hover:bg-white/10 transition-colors"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -79,7 +82,10 @@ export default function AdminSidebar() {
       >
         <div className="p-5 border-b border-white/10 text-center relative">
           <button
+            type="button"
             onClick={() => setIsOpen(false)}
+            title="Tutup Sidebar"
+            aria-label="Tutup Sidebar"
             className="md:hidden absolute top-4 right-4 text-white/50 hover:text-white"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
