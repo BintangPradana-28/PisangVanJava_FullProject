@@ -34,7 +34,7 @@ export function MergeConflictModal() {
   const dbTotal = calcTotal(db)
 
   // Hitung merged preview
-  const merged = [...db]
+  const merged = structuredClone(db)
   local.forEach((localItem) => {
     const existingIndex = merged.findIndex(
       (i) =>
@@ -44,7 +44,10 @@ export function MergeConflictModal() {
         i.toppings?.every((t, idx) => t.toppingId === localItem.toppings?.[idx]?.toppingId)
     )
     if (existingIndex !== -1) {
-      merged[existingIndex].quantity += localItem.quantity
+      merged[existingIndex] = {
+        ...merged[existingIndex],
+        quantity: merged[existingIndex].quantity + localItem.quantity
+      }
     } else {
       merged.push(localItem)
     }

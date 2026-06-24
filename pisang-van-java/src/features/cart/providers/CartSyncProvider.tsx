@@ -54,6 +54,11 @@ export function CartSyncProvider({ children }: { children: React.ReactNode }) {
 
     if (status !== 'authenticated') return
 
+    // Reset status logout jika terdeteksi login aktif
+    if (useCartStore.getState().isLoggingOut) {
+      useCartStore.getState().setIsLoggingOut(false)
+    }
+
     const fetchAndMergeCart = async () => {
       try {
         const data = await api<CartSyncResponse>('/api/user/cart/sync')
@@ -98,7 +103,7 @@ export function CartSyncProvider({ children }: { children: React.ReactNode }) {
           )
 
           // Smart Merge: Keduanya digabung (DB + Lokal ditambahkan quantity-nya)
-          const merged = [...dbItems]
+          const merged = structuredClone(dbItems)
           localItems.forEach((localItem) => {
             const existingIndex = merged.findIndex((i) => isSameCartItem(i, localItem))
             if (existingIndex !== -1) {
