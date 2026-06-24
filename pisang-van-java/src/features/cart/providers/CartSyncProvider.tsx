@@ -134,9 +134,10 @@ export function CartSyncProvider({ children }: { children: React.ReactNode }) {
           // Only show conflict modal on FIRST load, to avoid annoying user repeatedly across tabs
           if (dbItems.length > 0 && localItems.length > 0 && shouldShowModal && !isFirstSyncDone) {
             setConflictState({ local: localItems, db: dbItems })
+            previousItemsRef.current = dbItems
           } else {
             setItems(merged)
-            previousItemsRef.current = merged
+            previousItemsRef.current = dbItems
           }
         }
       } catch (error) {
