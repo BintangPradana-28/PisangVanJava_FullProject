@@ -85,6 +85,20 @@ const getStatusConfig = (status: string, t: any) => {
         icon: CheckCircle2,
         label: t('status_done') || 'Selesai'
       }
+    case 'OUT_FOR_DELIVERY':
+      return {
+        color:
+          'bg-orange-100 text-orange-700 border-orange-250 dark:bg-orange-950/20 dark:text-orange-400 dark:border-orange-900/40',
+        icon: Clock,
+        label: t('status_out_for_delivery') || 'Dalam Pengiriman 🛵'
+      }
+    case 'DELIVERED':
+      return {
+        color:
+          'bg-teal-100 text-teal-700 border-teal-250 dark:bg-teal-950/20 dark:text-teal-400 dark:border-teal-900/40',
+        icon: Package,
+        label: t('status_delivered') || 'Telah Tiba 📦'
+      }
     case 'CANCELED':
       return {
         color:

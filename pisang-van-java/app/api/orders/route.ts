@@ -57,6 +57,8 @@ export async function GET(req: NextRequest) {
           deliveryMethod: true,
           deliveryFee: true,
           createdAt: true,
+          biteshipOrderId: true,
+          waybillId: true,
           items: {
             select: {
               id: true,

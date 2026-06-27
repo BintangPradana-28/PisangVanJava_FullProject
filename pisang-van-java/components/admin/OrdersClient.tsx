@@ -7,7 +7,14 @@ import toast from 'react-hot-toast'
 import { formatPrice } from '@/lib/utils'
 import { supabaseBrowserClient } from '@/src/lib/supabase-client'
 
-type OrderStatus = 'PENDING_PAYMENT' | 'PROCESSING' | 'READY' | 'COMPLETED' | 'CANCELED'
+type OrderStatus =
+  | 'PENDING_PAYMENT'
+  | 'PROCESSING'
+  | 'READY'
+  | 'OUT_FOR_DELIVERY'
+  | 'DELIVERED'
+  | 'COMPLETED'
+  | 'CANCELED'
 
 interface OrderItem {
   id: string
@@ -31,6 +38,8 @@ interface Order {
   deliveryMethod: string
   deliveryFee: number
   items: OrderItem[]
+  biteshipOrderId?: string | null
+  waybillId?: string | null
 }
 
 const STATUS_CONFIG: Record<
@@ -44,15 +53,29 @@ const STATUS_CONFIG: Record<
     next: 'PROCESSING'
   },
   PROCESSING: { label: 'Diproses', color: 'text-blue-700', bg: 'bg-blue-100', next: 'READY' },
-  READY: { label: 'Siap Antar', color: 'text-purple-700', bg: 'bg-purple-100', next: 'COMPLETED' },
-  COMPLETED: { label: 'Selesai', color: 'text-green-700', bg: 'bg-green-100' },
-  CANCELED: { label: 'Dibatalkan', color: 'text-red-700', bg: 'bg-red-100' }
+  READY: { label: 'Siap Antar', color: 'text-purple-700', bg: 'bg-purple-100' }, // Next status is determined dynamically based on deliveryMethod
+  OUT_FOR_DELIVERY: {
+    label: 'Dalam Pengiriman 🛵',
+    color: 'text-orange-700',
+    bg: 'bg-orange-100',
+    next: 'DELIVERED'
+  },
+  DELIVERED: {
+    label: 'Telah Tiba 📦',
+    color: 'text-teal-700',
+    bg: 'bg-teal-100',
+    next: 'COMPLETED'
+  },
+  COMPLETED: { label: 'Selesai ✅', color: 'text-green-700', bg: 'bg-green-100' },
+  CANCELED: { label: 'Dibatalkan ✕', color: 'text-red-700', bg: 'bg-red-100' }
 }
 
 const STATUS_ORDER: OrderStatus[] = [
   'PENDING_PAYMENT',
   'PROCESSING',
   'READY',
+  'OUT_FOR_DELIVERY',
+  'DELIVERED',
   'COMPLETED',
   'CANCELED'
 ]
@@ -250,8 +273,35 @@ export default function OrdersClient({
     return byStatus && bySearch && byDate
   })
 
+  // ── Dispatch and Proof Modals States ──────────────────────────────────────
+  const [dispatchingOrder, setDispatchingOrder] = useState<Order | null>(null)
+  const [dispatchCourierPhone, setDispatchCourierPhone] = useState('')
+  const [dispatchEtaMinutes, setDispatchEtaMinutes] = useState(30)
+  const [dispatchLoading, setDispatchLoading] = useState(false)
+
+  const [proofOrder, setProofOrder] = useState<Order | null>(null)
+  const [proofFile, setProofFile] = useState<File | null>(null)
+  const [proofPhotoUrlInput, setProofPhotoUrlInput] = useState('')
+  const [proofLoading, setProofLoading] = useState(false)
+
   // ── Actions ──────────────────────────────────────────────────────────────
   const updateStatus = async (id: string, status: OrderStatus) => {
+    const order = orders.find((o) => o.id === id)
+    if (order && order.deliveryMethod === 'DELIVERY') {
+      if (status === 'OUT_FOR_DELIVERY') {
+        setDispatchingOrder(order)
+        setDispatchCourierPhone('')
+        setDispatchEtaMinutes(30)
+        return
+      }
+      if (status === 'DELIVERED') {
+        setProofOrder(order)
+        setProofFile(null)
+        setProofPhotoUrlInput('')
+        return
+      }
+    }
+
     setUpdating(id)
     try {
       const res = await fetch(`/api/orders/${id}`, {
@@ -268,6 +318,137 @@ export default function OrdersClient({
       toast.error('Koneksi bermasalah')
     } finally {
       setUpdating(null)
+    }
+  }
+
+  const handleDispatchBiteship = async (orderId: string) => {
+    setDispatchLoading(true)
+    try {
+      const res = await fetch(`/api/orders/${orderId}/dispatch-biteship`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      })
+      const data = await res.json()
+      if (data.success) {
+        setOrders((prev) =>
+          prev.map((o) =>
+            o.id === orderId
+              ? {
+                  ...o,
+                  status: 'OUT_FOR_DELIVERY',
+                  biteshipOrderId: data.data.biteshipOrderId,
+                  waybillId: data.data.waybillId
+                }
+              : o
+          )
+        )
+        toast.success('🚚 Pengiriman via Biteship berhasil dipicu!')
+        setDispatchingOrder(null)
+      } else {
+        toast.error(data.error || 'Gagal memicu Biteship')
+      }
+    } catch {
+      toast.error('Gagal menghubungi server')
+    } finally {
+      setDispatchLoading(false)
+    }
+  }
+
+  const handleDispatchManual = async (orderId: string) => {
+    if (!dispatchCourierPhone.trim()) {
+      toast.error('Nomor telepon kurir wajib diisi')
+      return
+    }
+    setDispatchLoading(true)
+    try {
+      const res = await fetch(`/api/orders/${orderId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          status: 'OUT_FOR_DELIVERY',
+          courierPhone: dispatchCourierPhone,
+          etaMinutes: dispatchEtaMinutes
+        })
+      })
+      const data = await res.json()
+      if (data.success) {
+        setOrders((prev) =>
+          prev.map((o) =>
+            o.id === orderId
+              ? {
+                  ...o,
+                  status: 'OUT_FOR_DELIVERY',
+                  courierPhone: dispatchCourierPhone,
+                  etaMinutes: dispatchEtaMinutes
+                }
+              : o
+          )
+        )
+        toast.success('🛵 Status diubah ke Dalam Pengiriman (Manual)')
+        setDispatchingOrder(null)
+      } else {
+        toast.error(data.error || 'Gagal update')
+      }
+    } catch {
+      toast.error('Gagal menghubungi server')
+    } finally {
+      setDispatchLoading(false)
+    }
+  }
+
+  const handleDeliverOrder = async (orderId: string) => {
+    setProofLoading(true)
+    try {
+      let finalUrl = proofPhotoUrlInput.trim() || null
+
+      if (proofFile) {
+        const formData = new FormData()
+        formData.append('file', proofFile)
+        const uploadRes = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData
+        })
+        const uploadData = await uploadRes.json()
+        if (!uploadData.success) {
+          toast.error(uploadData.error || 'Gagal mengunggah foto bukti')
+          setProofLoading(false)
+          return
+        }
+        finalUrl = uploadData.data.url
+      }
+
+      const res = await fetch(`/api/orders/${orderId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          status: 'DELIVERED',
+          proofPhotoUrl: finalUrl
+        })
+      })
+      const data = await res.json()
+      if (data.success) {
+        setOrders((prev) =>
+          prev.map((o) =>
+            o.id === orderId
+              ? {
+                  ...o,
+                  status: 'DELIVERED',
+                  proofPhotoUrl: finalUrl
+                }
+              : o
+          )
+        )
+        toast.success('📦 Status diubah ke Telah Tiba!')
+        setProofOrder(null)
+        setProofFile(null)
+        setProofPhotoUrlInput('')
+      } else {
+        toast.error(data.error || 'Gagal update status')
+      }
+    } catch {
+      toast.error('Gagal menghubungi server')
+    } finally {
+      setProofLoading(false)
     }
   }
 
@@ -556,7 +737,10 @@ export default function OrdersClient({
           filtered.map((order) => {
             const cfg = isOrderStatus(order.status) ? STATUS_CONFIG[order.status] : null
             const isEx = expandedId === order.id
-            const nextStatus = cfg?.next ?? null
+            let nextStatus = cfg?.next ?? null
+            if (order.status === 'READY') {
+              nextStatus = order.deliveryMethod === 'DELIVERY' ? 'OUT_FOR_DELIVERY' : 'COMPLETED'
+            }
             const isSelected = bulkSelected.has(order.id)
 
             return (
@@ -685,6 +869,22 @@ export default function OrdersClient({
                             <div className="flex justify-between text-sm text-brown-500 border-t border-cream-200 pt-2">
                               <span>🛵 Ongkir</span>
                               <span>{formatPrice(order.deliveryFee)}</span>
+                            </div>
+                          )}
+                          {order.deliveryMethod === 'DELIVERY' && (
+                            <div className="text-xs text-brown-500 border-t border-cream-200 pt-2 space-y-1">
+                              {order.waybillId && (
+                                <div className="flex justify-between">
+                                  <span>No. Resi (Waybill ID)</span>
+                                  <span className="font-mono font-semibold text-brown-700">{order.waybillId}</span>
+                                </div>
+                              )}
+                              {order.biteshipOrderId && (
+                                <div className="flex justify-between">
+                                  <span>Biteship Order ID</span>
+                                  <span className="font-mono text-brown-600">{order.biteshipOrderId}</span>
+                                </div>
+                              )}
                             </div>
                           )}
                           <div className="flex justify-between font-bold text-brown-700 border-t border-cream-200 pt-2">
@@ -853,6 +1053,160 @@ export default function OrdersClient({
           Menampilkan {filtered.length} dari {orders.length} pesanan
         </p>
       )}
+
+      {/* ── Modal: Dispatch Courier ── */}
+      <AnimatePresence>
+        {dispatchingOrder && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-white rounded-[8px] border border-cream-200 max-w-md w-full overflow-hidden shadow-2xl"
+            >
+              <div className="bg-brown-700 text-white px-5 py-4 flex justify-between items-center">
+                <h3 className="font-bold text-sm">🛵 Dispatch Kurir (Order #{dispatchingOrder.id.slice(-6)})</h3>
+                <button
+                  onClick={() => setDispatchingOrder(null)}
+                  className="text-white/70 hover:text-white text-lg focus:outline-none"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="p-5 space-y-4">
+                <div className="text-xs text-brown-600 space-y-1">
+                  <p><strong>Pelanggan:</strong> {dispatchingOrder.customerName}</p>
+                  <p><strong>No. HP:</strong> {dispatchingOrder.customerPhone}</p>
+                  <p><strong>Alamat:</strong> {dispatchingOrder.notes || '-'}</p>
+                </div>
+
+                <div className="border-t border-cream-200 pt-3">
+                  <h4 className="text-xs font-bold text-brown-800 mb-2">PILIHAN 1: PENGIRIMAN BITESHIP (OTOMATIS)</h4>
+                  <button
+                    onClick={() => handleDispatchBiteship(dispatchingOrder.id)}
+                    disabled={dispatchLoading}
+                    className="w-full py-2.5 px-4 text-xs font-bold bg-amber-600 text-white rounded-[4px] hover:bg-amber-700 disabled:opacity-50 transition-all flex items-center justify-center gap-1.5"
+                  >
+                    {dispatchLoading ? (
+                      <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    ) : (
+                      '⚡'
+                    )}
+                    Picu Kurir Biteship Sekarang
+                  </button>
+                  <p className="text-[10px] text-zinc-400 mt-1">
+                    *Akan otomatis mencari driver instant/same-day terdekat menggunakan Biteship API.
+                  </p>
+                </div>
+
+                <div className="border-t border-cream-200 pt-3 space-y-3">
+                  <h4 className="text-xs font-bold text-brown-800">PILIHAN 2: PENGIRIMAN MANUAL</h4>
+                  
+                  <div className="space-y-1">
+                    <label className="text-[11px] font-bold text-brown-600 block">No. HP Kurir Manual</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. 08123456789"
+                      value={dispatchCourierPhone}
+                      onChange={(e) => setDispatchCourierPhone(e.target.value)}
+                      className="w-full px-3 py-2 border border-cream-200 rounded-[4px] text-xs focus:outline-none focus:border-brown-400"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-[11px] font-bold text-brown-600 block">Estimasi Tiba (ETA dalam Menit)</label>
+                    <input
+                      type="number"
+                      placeholder="30"
+                      value={dispatchEtaMinutes}
+                      onChange={(e) => setDispatchEtaMinutes(Number(e.target.value))}
+                      className="w-full px-3 py-2 border border-cream-200 rounded-[4px] text-xs focus:outline-none focus:border-brown-400"
+                    />
+                  </div>
+
+                  <button
+                    onClick={() => handleDispatchManual(dispatchingOrder.id)}
+                    disabled={dispatchLoading}
+                    className="w-full py-2 px-4 text-xs font-bold bg-brown-700 text-white rounded-[4px] hover:bg-brown-800 disabled:opacity-50 transition-all"
+                  >
+                    Kirim via Kurir Manual
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* ── Modal: Delivery Proof ── */}
+      <AnimatePresence>
+        {proofOrder && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-white rounded-[8px] border border-cream-200 max-w-md w-full overflow-hidden shadow-2xl"
+            >
+              <div className="bg-brown-700 text-white px-5 py-4 flex justify-between items-center">
+                <h3 className="font-bold text-sm">📦 Unggah Bukti Pengiriman (Order #{proofOrder.id.slice(-6)})</h3>
+                <button
+                  onClick={() => setProofOrder(null)}
+                  className="text-white/70 hover:text-white text-lg focus:outline-none"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="p-5 space-y-4">
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-brown-600 block">Unggah Foto Bukti (JPG/PNG/WEBP)</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setProofFile(e.target.files?.[0] || null)}
+                    className="w-full text-xs text-zinc-500 file:mr-3 file:py-2 file:px-4 file:rounded-[4px] file:border-0 file:text-xs file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100 cursor-pointer"
+                  />
+                  <p className="text-[10px] text-zinc-400">Maksimal 2MB. Diunggah langsung ke CDN aman.</p>
+                </div>
+
+                <div className="text-center text-xs text-zinc-400 font-bold">— ATAU —</div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-brown-600 block">Masukkan URL Foto Bukti Langsung</label>
+                  <input
+                    type="text"
+                    placeholder="https://example.com/proof.jpg"
+                    value={proofPhotoUrlInput}
+                    onChange={(e) => setProofPhotoUrlInput(e.target.value)}
+                    className="w-full px-3 py-2 border border-cream-200 rounded-[4px] text-xs focus:outline-none focus:border-brown-400"
+                  />
+                </div>
+
+                <div className="pt-2 flex gap-2">
+                  <button
+                    onClick={() => setProofOrder(null)}
+                    className="flex-1 py-2 px-4 text-xs font-bold bg-cream-50 text-brown-600 rounded-[4px] hover:bg-cream-100 transition-all"
+                  >
+                    Batal
+                  </button>
+                  <button
+                    onClick={() => handleDeliverOrder(proofOrder.id)}
+                    disabled={proofLoading}
+                    className="flex-1 py-2 px-4 text-xs font-bold bg-green-700 text-white rounded-[4px] hover:bg-green-800 disabled:opacity-50 transition-all flex items-center justify-center gap-1.5"
+                  >
+                    {proofLoading && (
+                      <span className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    )}
+                    Selesaikan Pengiriman
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
