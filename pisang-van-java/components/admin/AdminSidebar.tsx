@@ -17,6 +17,7 @@ const navItems = [
   { href: '/b2b-pipeline', icon: '🤝', label: 'B2B Pipeline' },
   { href: '/manage-vouchers', icon: '🎟️', label: 'Manajemen Voucher' },
   { href: '/complaints', icon: '🆘', label: 'Laporan Masalah' },
+  { href: '/reviews', icon: '⭐', label: 'Moderasi Ulasan' },
   { href: '/reports', icon: '📈', label: 'Laporan' },
   { href: '/settings', icon: '⚙️', label: 'Pengaturan' },
   { href: '/banners', icon: '🖼️', label: 'Banner & Promo' },

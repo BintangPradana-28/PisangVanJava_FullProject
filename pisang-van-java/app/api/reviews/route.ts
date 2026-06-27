@@ -1,4 +1,4 @@
-import type { Prisma } from '@prisma/client'
+﻿import type { Prisma } from '@prisma/client'
 import { type NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
@@ -17,11 +17,12 @@ export async function GET(req: NextRequest) {
   const variantId = req.nextUrl.searchParams.get('variantId')
   const ratingFilter = req.nextUrl.searchParams.get('rating')
   const hasComment = req.nextUrl.searchParams.get('hasComment') === 'true'
-
   const withPhoto = req.nextUrl.searchParams.get('withPhoto') === 'true'
+  const session = await auth()
+  const isAdmin = session && ['ADMIN', 'SUPER_ADMIN'].includes(session.user.role)
+  const adminView = req.nextUrl.searchParams.get('adminView') === 'true' && isAdmin
 
-  // Build where clause
-  const where: Prisma.ReviewWhereInput = {}
+  const where: Prisma.ReviewWhereInput = adminView ? {} : { isHidden: false }
   if (variantId) where.variantId = variantId
   if (ratingFilter) where.rating = parseInt(ratingFilter, 10)
   if (hasComment) where.comment = { not: null, gt: '' }
@@ -38,7 +39,6 @@ export async function GET(req: NextRequest) {
     })
 
     const data = reviews.map((r: any) => {
-      // Mask user name
       const maskName = (name: string | null) => {
         if (!name) return 'A****n'
         if (name.length <= 2) return name
@@ -47,18 +47,20 @@ export async function GET(req: NextRequest) {
       return {
         id: r.id,
         userId: r.userId,
-        userName: maskName(r.user?.name),
+        userName: adminView ? r.user?.name : maskName(r.user?.name),
         variantName: r.variant?.flavorName || 'Pesanan Umum',
         rating: r.rating,
         comment: r.comment,
         imageUrl: r.imageUrl,
         isVerifiedBuyer: r.isVerifiedBuyer,
+        isHidden: r.isHidden,
         createdAt: r.createdAt.toISOString()
       }
     })
 
-    // Calculate aggregates without filter for the summary card
-    const allReviewsWhere = variantId ? { variantId } : {}
+    const allReviewsWhere: Prisma.ReviewWhereInput = variantId
+      ? { variantId, isHidden: false }
+      : { isHidden: false }
     const allReviews = await prisma.review.findMany({
       where: allReviewsWhere,
       select: { rating: true }
@@ -81,11 +83,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       success: true,
       data,
-      aggregates: {
-        average,
-        total: allReviews.length,
-        starCounts
-      }
+      aggregates: { average, total: allReviews.length, starCounts }
     })
   } catch (err) {
     console.error('[GET /api/reviews]', err)
@@ -118,7 +116,6 @@ export async function POST(req: NextRequest) {
   const { orderId, variantId, rating, comment, imageUrl } = parsed.data
 
   try {
-    // Verified Buyer Check
     const order = await prisma.order.findUnique({ where: { id: orderId } })
     const isVerifiedBuyer = order !== null
 
@@ -143,5 +140,57 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     console.error('[POST /api/reviews]', err)
     return NextResponse.json({ success: false, error: 'Gagal menyimpan ulasan.' }, { status: 500 })
+  }
+}
+
+// PATCH /api/reviews — Admin only: toggle isHidden
+export async function PATCH(req: NextRequest) {
+  try {
+    const session = await auth()
+    if (!session || !['ADMIN', 'SUPER_ADMIN'].includes(session.user.role)) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
+    }
+
+    const body = await req.json()
+    const { reviewId, isHidden } = body
+    if (!reviewId || typeof isHidden !== 'boolean') {
+      return NextResponse.json({ error: 'Payload tidak valid' }, { status: 400 })
+    }
+
+    const updated = await prisma.review.update({
+      where: { id: reviewId },
+      data: { isHidden }
+    })
+
+    return NextResponse.json({ success: true, review: updated })
+  } catch (err) {
+    console.error('[PATCH /api/reviews]', err)
+    return NextResponse.json(
+      { success: false, error: 'Gagal memperbarui ulasan.' },
+      { status: 500 }
+    )
+  }
+}
+
+// DELETE /api/reviews — Admin only: hard delete a review
+export async function DELETE(req: NextRequest) {
+  try {
+    const session = await auth()
+    if (!session || !['ADMIN', 'SUPER_ADMIN'].includes(session.user.role)) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
+    }
+
+    const { searchParams } = new URL(req.url)
+    const reviewId = searchParams.get('reviewId')
+    if (!reviewId) {
+      return NextResponse.json({ error: 'reviewId diperlukan' }, { status: 400 })
+    }
+
+    await prisma.review.delete({ where: { id: reviewId } })
+
+    return NextResponse.json({ success: true })
+  } catch (err) {
+    console.error('[DELETE /api/reviews]', err)
+    return NextResponse.json({ success: false, error: 'Gagal menghapus ulasan.' }, { status: 500 })
   }
 }

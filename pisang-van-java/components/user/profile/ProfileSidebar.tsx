@@ -4,6 +4,7 @@ import {
   ChevronRight,
   Coins,
   Gift,
+  Heart,
   HelpCircle,
   LogOut,
   MapPin,
@@ -27,6 +28,7 @@ const menuItems = [
   { key: 'profile_menu_budget_history', href: '/profile/anggaran', icon: Wallet },
   { key: 'profile_menu_coins', href: '/profile/koin-history', icon: Coins },
   { key: 'profile_menu_vouchers', href: '/profile/voucher', icon: Ticket },
+  { key: 'profile_menu_favorites', href: '/profile/favorit', icon: Heart },
   { key: 'profile_menu_security', href: '/profile/keamanan', icon: Shield }
 ]
 
