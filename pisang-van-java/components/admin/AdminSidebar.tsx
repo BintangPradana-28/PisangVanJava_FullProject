@@ -14,6 +14,7 @@ const navItems = [
   { href: '/manage-menu', icon: '🍌', label: 'Kelola Menu' },
   { href: '/toppings', icon: '✨', label: 'Topping' },
   { href: '/manage-users', icon: '👥', label: 'Pengguna & Reseller' },
+  { href: '/b2b-pipeline', icon: '🤝', label: 'B2B Pipeline' },
   { href: '/manage-vouchers', icon: '🎟️', label: 'Manajemen Voucher' },
   { href: '/complaints', icon: '🆘', label: 'Laporan Masalah' },
   { href: '/reports', icon: '📈', label: 'Laporan' },

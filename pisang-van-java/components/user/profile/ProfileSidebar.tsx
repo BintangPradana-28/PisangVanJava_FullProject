@@ -2,6 +2,7 @@
 
 import {
   ChevronRight,
+  Coins,
   Gift,
   HelpCircle,
   LogOut,
@@ -10,8 +11,7 @@ import {
   ShoppingBag,
   Ticket,
   User,
-  Wallet,
-  Coins
+  Wallet
 } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -32,7 +32,7 @@ const menuItems = [
 
 const actionItems = [
   { key: 'profile_menu_referral', href: '/profile/referral', icon: Gift },
-  { key: 'profile_menu_help', href: '/faq', icon: HelpCircle }
+  { key: 'profile_menu_help', href: '/profile/bantuan', icon: HelpCircle }
 ]
 
 export default function ProfileSidebar() {

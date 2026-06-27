@@ -55,10 +55,34 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ success: false, message: 'Data tidak valid' }, { status: 400 })
     }
 
-    const updatedUser = await prisma.user.update({
-      where: { id: userId },
-      data: { role },
-      select: { id: true, name: true, email: true, role: true }
+    const updatedUser = await prisma.$transaction(async (tx) => {
+      const u = await tx.user.update({
+        where: { id: userId },
+        data: { role },
+        select: { id: true, name: true, email: true, role: true }
+      })
+
+      if (role === 'RESELLER') {
+        await tx.b2BDeal.updateMany({
+          where: {
+            ownerId: userId,
+            dealName: 'Reseller Application',
+            stage: { in: ['PROSPECTING', 'NEGOTIATION'] }
+          },
+          data: { stage: 'CLOSED_WON' }
+        })
+      } else if (role === 'CUSTOMER') {
+        await tx.b2BDeal.updateMany({
+          where: {
+            ownerId: userId,
+            dealName: 'Reseller Application',
+            stage: { in: ['PROSPECTING', 'NEGOTIATION'] }
+          },
+          data: { stage: 'CLOSED_LOST' }
+        })
+      }
+
+      return u
     })
 
     return NextResponse.json({
