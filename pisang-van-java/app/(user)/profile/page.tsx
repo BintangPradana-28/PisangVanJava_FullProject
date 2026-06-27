@@ -14,6 +14,7 @@ import {
   User
 } from 'lucide-react'
 import Image from 'next/image'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { FetchError } from 'ofetch'
@@ -393,6 +394,25 @@ export default function ProfileDataDiriPage() {
 
       {/* DATA DIRI SECTION */}
       <section className="bg-white dark:bg-zinc-900 rounded-[4px] p-6 md:p-8 shadow-sm border border-zinc-200/50 dark:border-zinc-800/80">
+        {/* Koin Pisang Loyalty Balance Card */}
+        {profileData?.koinPisang !== undefined && (
+          <div className="bg-gradient-to-r from-amber-500 to-amber-600 dark:from-amber-600 dark:to-amber-700 text-white rounded-[4px] p-5 shadow-sm mb-6 flex items-center justify-between">
+            <div className="space-y-1">
+              <span className="text-xs uppercase font-bold tracking-wider opacity-90">Koin Pisang Anda</span>
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-3xl font-black font-serif">🍌 {profileData.koinPisang.toLocaleString('id-ID')}</span>
+                <span className="text-xs opacity-75">Koin</span>
+              </div>
+            </div>
+            <Link
+              href="/profile/koin-history"
+              className="text-xs bg-white text-amber-700 px-4 py-2 rounded-[4px] font-bold shadow-sm hover:bg-amber-50 hover:scale-105 active:scale-95 transition-all focus:outline-none"
+            >
+              Riwayat Koin
+            </Link>
+          </div>
+        )}
+
         <div className="flex items-center gap-4 mb-6 pb-6 border-b border-zinc-100 dark:border-zinc-800">
           <div className="w-12 h-12 rounded-[4px] bg-[#D4802A]/10 text-[#D4802A] flex items-center justify-center">
             <User className="w-6 h-6" />

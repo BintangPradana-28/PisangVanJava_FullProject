@@ -83,6 +83,13 @@ export default async function ProfileOrderDetailPage({
             }
           }
         }
+      },
+      reviews: {
+        select: {
+          id: true,
+          rating: true,
+          comment: true
+        }
       }
     }
   })
@@ -129,6 +136,7 @@ export default async function ProfileOrderDetailPage({
     notes: order.notes,
     user: order.user,
     payment: order.payment,
+    reviews: order.reviews,
     items: order.items.map(
       (item: {
         id: string

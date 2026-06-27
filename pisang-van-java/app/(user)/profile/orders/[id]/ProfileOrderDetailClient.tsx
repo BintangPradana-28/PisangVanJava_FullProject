@@ -3,6 +3,7 @@
 // app/(user)/profile/orders/[id]/ProfileOrderDetailClient.tsx
 // RAG Source: app/(user)/profile/pesanan/page.tsx (Reorder logic & timeline builder)
 
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import {
   ArrowLeft,
@@ -34,6 +35,7 @@ interface ProfileOrderDetailClientProps {
     notes: string | null
     user: { email: string | null; name: string | null } | null
     payment: { status: string; paymentType: string | null } | null
+    reviews?: Array<{ id: string; rating: number; comment: string | null }>
     items: Array<{
       id: string
       baseType: string
@@ -69,6 +71,42 @@ const formatPaymentMethod = (paymentType: string | null) => {
 export default function ProfileOrderDetailClient({ order }: ProfileOrderDetailClientProps) {
   const router = useRouter()
   const addItemToCart = useCartStore((state) => state.addItem)
+
+  // Review states
+  const [showReviewModal, setShowReviewModal] = useState(false)
+  const [rating, setRating] = useState(5)
+  const [comment, setComment] = useState('')
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false)
+  const [hasReviewed, setHasReviewed] = useState(!!(order.reviews && order.reviews.length > 0))
+
+  const handleReviewSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsSubmittingReview(true)
+    const tid = toast.loading('Mengirim ulasan...')
+    try {
+      const res = await fetch('/api/reviews', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderId: order.id,
+          rating,
+          comment: comment.trim() || undefined
+        })
+      })
+      const data = await res.json()
+      if (data.success) {
+        toast.success('Ulasan berhasil dikirim!', { id: tid })
+        setHasReviewed(true)
+        setShowReviewModal(false)
+      } else {
+        toast.error(data.error || 'Gagal mengirim ulasan', { id: tid })
+      }
+    } catch {
+      toast.error('Koneksi bermasalah. Coba lagi.', { id: tid })
+    } finally {
+      setIsSubmittingReview(false)
+    }
+  }
 
   const handleReorder = () => {
     let itemsAdded = 0
@@ -335,6 +373,24 @@ export default function ProfileOrderDetailClient({ order }: ProfileOrderDetailCl
               </Link>
             )}
 
+            {(order.status === 'DELIVERED' || order.status === 'COMPLETED') && (
+              hasReviewed ? (
+                <button
+                  disabled
+                  className="w-full flex items-center justify-center gap-2 bg-zinc-100 dark:bg-zinc-800 text-zinc-400 py-3 rounded-xl text-xs font-black uppercase tracking-wider cursor-not-allowed border border-zinc-200 dark:border-zinc-700"
+                >
+                  Ulasan Telah Dikirim
+                </button>
+              ) : (
+                <button
+                  onClick={() => setShowReviewModal(true)}
+                  className="w-full flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl text-xs font-black uppercase tracking-wider transition-all active:scale-[0.98] shadow-md"
+                >
+                  Beri Ulasan
+                </button>
+              )
+            )}
+
             <a
               href={`/api/orders/${order.id}/invoice`}
               target="_blank"
@@ -353,6 +409,82 @@ export default function ProfileOrderDetailClient({ order }: ProfileOrderDetailCl
           </div>
         </div>
       </div>
+
+      {showReviewModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-6 max-w-md w-full shadow-2xl space-y-4 animate-in zoom-in-95 duration-200 text-left">
+            <div className="flex justify-between items-center border-b border-zinc-100 dark:border-zinc-800 pb-3">
+              <h3 className="font-serif text-lg font-bold text-zinc-900 dark:text-white">Beri Ulasan Pesanan</h3>
+              <button
+                onClick={() => setShowReviewModal(false)}
+                className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 text-sm font-bold"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleReviewSubmit} className="space-y-4">
+              {/* Star Rating Picker */}
+              <div className="space-y-2 text-center">
+                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider">Rating Anda</label>
+                <div className="flex justify-center gap-2">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setRating(star)}
+                      className="text-4xl transition-transform hover:scale-110 active:scale-95"
+                    >
+                      <span className={star <= rating ? 'text-amber-400' : 'text-zinc-200 dark:text-zinc-700'}>
+                        ★
+                      </span>
+                    </button>
+                  ))}
+                </div>
+                <p className="text-xs font-bold text-[#D4802A] h-4">
+                  {rating === 1 ? 'Sangat Buruk 😞' : rating === 2 ? 'Kurang Bagus 😐' : rating === 3 ? 'Biasa Saja 🙂' : rating === 4 ? 'Bagus! 😊' : 'Luar Biasa! 🤩'}
+                </p>
+              </div>
+
+              {/* Comment Textarea */}
+              <div className="space-y-1.5">
+                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider">Komentar / Ulasan (Opsional)</label>
+                <textarea
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  placeholder="Ceritakan pengalaman Anda mengenai rasa makanan, kebersihan, atau pelayanan kurir..."
+                  rows={4}
+                  className="w-full px-3.5 py-3 text-sm rounded-lg outline-none transition-all
+                             bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800
+                             text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-650
+                             focus:ring-2 focus:ring-[#D4802A]/20 focus:border-[#D4802A]"
+                />
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowReviewModal(false)}
+                  className="flex-1 py-3 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 rounded-xl text-xs font-black uppercase tracking-wider transition-all"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmittingReview}
+                  className="flex-1 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center justify-center gap-1.5"
+                >
+                  {isSubmittingReview ? (
+                    <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    'Kirim Ulasan'
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </motion.div>
   )
 }
