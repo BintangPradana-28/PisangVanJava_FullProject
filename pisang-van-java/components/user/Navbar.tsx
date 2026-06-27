@@ -374,7 +374,7 @@ export default function Navbar() {
                         </Link>
 
                         <Link
-                          href="/faq"
+                          href="/profile/bantuan"
                           className="flex items-center gap-2 px-4 py-2.5 text-sm text-zinc-700 dark:text-zinc-350 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors"
                           onClick={() => setIsDropdownOpen(false)}
                         >
@@ -477,7 +477,7 @@ export default function Navbar() {
                         </Link>
 
                         <Link
-                          href="/faq"
+                          href="/profile/bantuan"
                           className="flex items-center gap-2 px-4 py-2.5 text-sm text-zinc-700 dark:text-zinc-350 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors"
                           onClick={() => setIsDropdownOpen(false)}
                         >
@@ -578,7 +578,7 @@ export default function Navbar() {
                   🤝 {locale === 'id' ? 'Kemitraan Reseller' : 'Partnership'}
                 </Link>
                 <Link
-                  href="/faq"
+                  href="/profile/bantuan"
                   onClick={() => setIsOpen(false)}
                   className="text-base font-semibold py-1 border-b border-zinc-100 dark:border-zinc-800 text-zinc-750 dark:text-zinc-250"
                 >
