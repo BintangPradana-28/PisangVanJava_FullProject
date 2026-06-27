@@ -57,6 +57,7 @@ export default function MemberLoginPage() {
   const [showPass, setShowPass] = useState(false)
   const [mounted, setMounted] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [otpRequired, setOtpRequired] = useState(false)
 
   const {
     register,
@@ -64,7 +65,7 @@ export default function MemberLoginPage() {
     formState: { errors, isSubmitting }
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
-    defaultValues: { username: '', password: '' }
+    defaultValues: { username: '', password: '', otp: '' }
   })
 
   useEffect(() => setMounted(true), [])
@@ -89,12 +90,19 @@ export default function MemberLoginPage() {
       const res = await signIn('credentials', {
         redirect: false,
         username: data.username,
-        password: data.password
+        password: data.password,
+        otp: data.otp || undefined
       })
 
       if (res?.error) {
-        // NextAuth melempar pesan error string (termasuk validasi Rate Limit & Ambiguous Errors)
-        toast.error(res.error, { id: tid })
+        if (res.error === '2FA_REQUIRED') {
+          setOtpRequired(true)
+          toast.success('Dibutuhkan kode OTP 2FA', { id: tid })
+        } else if (res.error === 'INVALID_OTP') {
+          toast.error('Kode OTP tidak valid', { id: tid })
+        } else {
+          toast.error(res.error, { id: tid })
+        }
       } else {
         toast.success(t('login_toast_success'), { id: tid, duration: 3000 })
         setIsSubmitted(true)
@@ -199,6 +207,32 @@ export default function MemberLoginPage() {
                     </p>
                   )}
                 </motion.div>
+
+                {otpRequired && (
+                  <motion.div
+                    variants={item}
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    className="space-y-1.5"
+                  >
+                    <label className="block text-[11px] font-bold tracking-widest uppercase mb-1.5 text-[#D4802A]">
+                      Kode OTP 2FA
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Masukkan 6 digit kode OTP"
+                      maxLength={6}
+                      autoComplete="one-time-code"
+                      className={inputCls}
+                      {...register('otp')}
+                    />
+                    {errors.otp && (
+                      <p className="text-red-500 text-xs mt-1 font-medium">
+                        {errors.otp.message}
+                      </p>
+                    )}
+                  </motion.div>
+                )}
 
                 <motion.div variants={item} className="flex justify-end -mt-1">
                   <Link

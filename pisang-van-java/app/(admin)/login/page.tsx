@@ -9,6 +9,8 @@ export default function AdminLoginPage() {
   const router = useRouter()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [otp, setOtp] = useState('')
+  const [otpRequired, setOtpRequired] = useState(false)
   const [loading, setLoading] = useState(false)
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -25,11 +27,19 @@ export default function AdminLoginPage() {
       const res = await signIn('credentials', {
         redirect: false,
         username,
-        password
+        password,
+        otp: otp || undefined
       })
 
       if (res?.error) {
-        toast.error('Username atau password salah', { id: 'login-toast' })
+        if (res.error === '2FA_REQUIRED') {
+          setOtpRequired(true)
+          toast.success('Dibutuhkan kode OTP 2FA', { id: 'login-toast' })
+        } else if (res.error === 'INVALID_OTP') {
+          toast.error('Kode OTP tidak valid', { id: 'login-toast' })
+        } else {
+          toast.error('Username atau password salah', { id: 'login-toast' })
+        }
       } else if (res?.ok) {
         toast.success('Selamat datang!', { id: 'login-toast' })
         // Menggunakan hard redirect agar cookie NextAuth terbaca segar di Server Component
@@ -64,7 +74,7 @@ export default function AdminLoginPage() {
           LOGIN ADMIN
         </div>
 
-        <form className="space-y-4 text-left">
+        <form onSubmit={handleLogin} className="space-y-4 text-left">
           <div>
             <label className="block text-xs font-semibold text-brown-400 uppercase tracking-wider mb-1.5">
               Username
@@ -99,9 +109,28 @@ export default function AdminLoginPage() {
             </div>
           </div>
 
+          {otpRequired && (
+            <div>
+              <label className="block text-xs font-semibold text-brown-400 uppercase tracking-wider mb-1.5">
+                Kode OTP 2FA
+              </label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-brown-300">🔑</span>
+                <input
+                  type="text"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                  placeholder="123456"
+                  maxLength={6}
+                  className="form-input pl-9"
+                  autoComplete="one-time-code"
+                />
+              </div>
+            </div>
+          )}
+
           <button
-            type="button"
-            onClick={handleLogin}
+            type="submit"
             disabled={loading}
             className="w-full py-3.5 bg-brown-700 text-cream-100 font-serif font-bold text-base
                        rounded-[4px] hover:bg-brown-600 transition-all active:scale-95 mt-2
