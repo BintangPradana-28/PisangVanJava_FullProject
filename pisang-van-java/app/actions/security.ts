@@ -181,9 +181,27 @@ export async function updateNotificationPrefs(prefs: any) {
   const session = await auth()
   if (!session?.user?.id) throw new Error('UNAUTHORIZED')
 
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { notificationPrefs: true }
+  })
+
+  let currentPrefs: Record<string, unknown> = {}
+  if (user?.notificationPrefs) {
+    currentPrefs =
+      typeof user.notificationPrefs === 'string'
+        ? (JSON.parse(user.notificationPrefs) as Record<string, unknown>)
+        : (user.notificationPrefs as Record<string, unknown>)
+  }
+
+  const mergedPrefs = {
+    ...currentPrefs,
+    ...prefs
+  }
+
   await prisma.user.update({
     where: { id: session.user.id },
-    data: { notificationPrefs: prefs }
+    data: { notificationPrefs: mergedPrefs }
   })
 
   return { success: true }

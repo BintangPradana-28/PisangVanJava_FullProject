@@ -205,7 +205,7 @@
 
   /* Form input */
   .form-input {
-    @apply w-full px-3.5 py-2.5 border border-brown-700/20 rounded-[4px] text-brown-700 bg-white font-sans text-sm focus:outline-none focus:ring-1 focus:ring-brown-700 transition-shadow;
+    @apply w-full px-3.5 py-2.5 border border-brown-700/20 rounded-[4px] text-brown-700 bg-white font-sans text-base sm:text-sm focus:outline-none focus:ring-1 focus:ring-brown-700 transition-shadow;
   }
 }
 

@@ -656,7 +656,7 @@ export default function Navbar() {
           onClick={() => setIsCartOpen(true)}
           className="fixed z-[60] bg-amber-brand hover:bg-amber-brand/90 text-white shadow-2xl transition-all duration-200 active:scale-[0.98] focus:outline-none
             /* Mobile Sticky Bar layout */
-            bottom-0 left-0 right-0 w-full rounded-t-lg py-4 px-6 flex items-center justify-between sm:hidden
+            bottom-0 pb-safe left-0 right-0 w-full rounded-t-lg py-4 px-6 flex items-center justify-between sm:hidden
             /* Desktop Floating Button layout */
             sm:bottom-6 sm:right-6 sm:w-14 sm:h-14 sm:rounded-[4px] sm:justify-center"
           aria-label="Buka Keranjang"

@@ -42,13 +42,15 @@ interface KitchenClientProps {
 const STATUS_FLOW: Record<string, string> = {
   PENDING_PAYMENT: 'PROCESSING',
   PROCESSING: 'READY',
-  READY: 'COMPLETED'
+  READY: 'COMPLETED' // For non-delivery. Delivery goes through dispatch modal to OUT_FOR_DELIVERY
 }
 
 const STATUS_LABELS: Record<string, string> = {
   PENDING_PAYMENT: '⏳ Menunggu Bayar',
-  PROCESSING: '🔥 Sedang Dimasak',
+  PROCESSING: '🍳 Sedang Dimasak',
   READY: '✅ Siap Diambil',
+  OUT_FOR_DELIVERY: '🛵 Sedang Diantar',
+  DELIVERED: '📦 Sampai Tujuan',
   COMPLETED: '🎉 Selesai'
 }
 
@@ -124,6 +126,12 @@ export default function KitchenClient({ initialOrders }: KitchenClientProps) {
   const [updatingIds, setUpdatingIds] = useState<Set<string>>(new Set())
   const [, forceRender] = useState(0)
   const prevOrderIdsRef = useRef<Set<string>>(new Set(initialOrders.map((o) => o.id)))
+
+  // Dispatch Courier states for Delivery orders
+  const [dispatchingOrder, setDispatchingOrder] = useState<KitchenOrder | null>(null)
+  const [dispatchCourierPhone, setDispatchCourierPhone] = useState('')
+  const [dispatchEtaMinutes, setDispatchEtaMinutes] = useState(30)
+  const [dispatchLoading, setDispatchLoading] = useState(false)
 
   const handleReconnect = () => {
     setReconnectTrigger((prev) => prev + 1)
@@ -423,8 +431,72 @@ export default function KitchenClient({ initialOrders }: KitchenClientProps) {
     }
   }, [])
 
+  // ── Dispatch Courier Handlers ──────────────────────────────────────────────────
+  const handleDispatchBiteship = async (orderId: string) => {
+    setDispatchLoading(true)
+    const tid = toast.loading('Memanggil kurir Biteship...')
+    try {
+      const res = await fetch(`/api/orders/${orderId}/dispatch-biteship`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      })
+      const data = await res.json()
+      if (data.success) {
+        setOrders((prev) => prev.filter((o) => o.id !== orderId))
+        toast.success('🚚 Pengiriman via Biteship berhasil dipicu!', { id: tid })
+        setDispatchingOrder(null)
+      } else {
+        toast.error(data.error || 'Gagal memicu Biteship', { id: tid })
+      }
+    } catch {
+      toast.error('Gagal menghubungi server', { id: tid })
+    } finally {
+      setDispatchLoading(false)
+    }
+  }
+
+  const handleDispatchManual = async (orderId: string) => {
+    if (!dispatchCourierPhone.trim()) {
+      toast.error('Nomor telepon kurir wajib diisi')
+      return
+    }
+    setDispatchLoading(true)
+    const tid = toast.loading('Mengupdate status pengiriman...')
+    try {
+      const res = await fetch(`/api/orders/${orderId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          status: 'OUT_FOR_DELIVERY',
+          courierPhone: dispatchCourierPhone.trim(),
+          etaMinutes: dispatchEtaMinutes
+        })
+      })
+      const data = await res.json()
+      if (data.success) {
+        setOrders((prev) => prev.filter((o) => o.id !== orderId))
+        toast.success('🛵 Pesanan dikirim secara manual!', { id: tid })
+        setDispatchingOrder(null)
+      } else {
+        toast.error(data.error || 'Gagal mengirim manual', { id: tid })
+      }
+    } catch {
+      toast.error('Gagal menghubungi server', { id: tid })
+    } finally {
+      setDispatchLoading(false)
+    }
+  }
+
   // ── Update Order Status ──────────────────────────────────────────────────────
   const handleStatusUpdate = useCallback(async (orderId: string, currentStatus: string) => {
+    const orderObj = orders.find((o) => o.id === orderId)
+    if (currentStatus === 'READY' && orderObj?.deliveryMethod === 'DELIVERY') {
+      setDispatchCourierPhone('')
+      setDispatchEtaMinutes(30)
+      setDispatchingOrder(orderObj)
+      return
+    }
+
     const nextStatus = STATUS_FLOW[currentStatus]
     if (!nextStatus) return
 
@@ -602,6 +674,84 @@ export default function KitchenClient({ initialOrders }: KitchenClientProps) {
           </div>
         )}
       </main>
+
+      {/* Dispatch Courier Modal */}
+      {dispatchingOrder && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 max-w-md w-full shadow-2xl space-y-5 text-left text-zinc-100 animate-in zoom-in-95 duration-200">
+            <div className="flex justify-between items-center border-b border-zinc-800 pb-3">
+              <div>
+                <h3 className="font-serif text-lg font-bold text-amber-400">Atur Pengiriman Kurir</h3>
+                <p className="text-xs text-zinc-400 font-mono mt-0.5">Order #{dispatchingOrder.id.slice(-5).toUpperCase()}</p>
+              </div>
+              <button
+                onClick={() => setDispatchingOrder(null)}
+                className="text-zinc-400 hover:text-zinc-200 text-sm font-bold"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              {/* Option 1: Biteship automatic */}
+              <div className="bg-zinc-950 p-4 rounded-lg border border-zinc-800 space-y-3">
+                <h4 className="text-xs font-black text-amber-500 uppercase tracking-wider">Metode 1: Biteship (Otomatis)</h4>
+                <button
+                  type="button"
+                  onClick={() => handleDispatchBiteship(dispatchingOrder.id)}
+                  disabled={dispatchLoading}
+                  className="w-full py-3 bg-amber-500 hover:bg-amber-400 text-zinc-950 rounded-lg text-xs font-black uppercase tracking-wider transition-all disabled:opacity-50 flex items-center justify-center gap-1.5"
+                >
+                  {dispatchLoading ? 'Memproses...' : 'Picu Kurir Biteship 🚚'}
+                </button>
+                <p className="text-[10px] text-zinc-500 leading-relaxed">
+                  *Mencari driver instant/same-day terdekat secara otomatis menggunakan Biteship API.
+                </p>
+              </div>
+
+              <div className="text-center text-xs text-zinc-650 font-black tracking-widest">— ATAU —</div>
+
+              {/* Option 2: Manual Courier */}
+              <div className="bg-zinc-950 p-4 rounded-lg border border-zinc-800 space-y-3">
+                <h4 className="text-xs font-black text-amber-500 uppercase tracking-wider">Metode 2: Kurir Manual</h4>
+                <div className="space-y-2.5">
+                  <div className="space-y-1">
+                    <label htmlFor="kds-courier-phone" className="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider">No. HP Kurir</label>
+                    <input
+                      id="kds-courier-phone"
+                      type="tel"
+                      placeholder="08123456789"
+                      value={dispatchCourierPhone}
+                      onChange={(e) => setDispatchCourierPhone(e.target.value)}
+                      className="w-full px-3 py-2 text-xs rounded bg-zinc-900 border border-zinc-800 text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:border-amber-500"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label htmlFor="kds-courier-eta" className="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Estimasi Tiba (Menit)</label>
+                    <input
+                      id="kds-courier-eta"
+                      type="number"
+                      min={5}
+                      max={180}
+                      value={dispatchEtaMinutes}
+                      onChange={(e) => setDispatchEtaMinutes(Number(e.target.value))}
+                      className="w-full px-3 py-2 text-xs rounded bg-zinc-900 border border-zinc-800 text-zinc-100 focus:outline-none focus:border-amber-500"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleDispatchManual(dispatchingOrder.id)}
+                    disabled={dispatchLoading}
+                    className="w-full py-3 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 rounded-lg text-xs font-black uppercase tracking-wider transition-all disabled:opacity-50"
+                  >
+                    Kirim Manual 🛵
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -670,7 +820,10 @@ function OrderCard({
 }) {
   const elapsed = getElapsedMinutes(order.createdAt)
   const isUrgent = elapsed > 15 && order.status === 'PROCESSING'
-  const nextAction = BUTTON_LABELS[order.status]
+  let nextAction = BUTTON_LABELS[order.status]
+  if (order.status === 'READY' && order.deliveryMethod === 'DELIVERY') {
+    nextAction = 'Kirim / Antar 🛵'
+  }
 
   // Decide card background & border style
   const cardStyle = isUrgent
