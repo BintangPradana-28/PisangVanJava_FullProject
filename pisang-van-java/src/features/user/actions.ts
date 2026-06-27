@@ -1,6 +1,6 @@
 'use server'
 
-import { revalidatePath } from 'next/cache'
+import type { Prisma } from '@prisma/client'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/src/auth'
@@ -26,7 +26,7 @@ export async function deleteAccountPermanently(formData: FormData) {
   try {
     // 1. The Iron Gate: Verify Session FIRST
     const session = await auth()
-    if (!session || !session.user) {
+    if (!session?.user) {
       return { success: false, error: 'Akses ditolak. Anda harus login.' }
     }
 
@@ -60,7 +60,7 @@ export async function deleteAccountPermanently(formData: FormData) {
 
     // 4. Data Erasure: Execute the permanent deletion (Right to be Forgotten)
     // We use a transaction to ensure atomicity. If they have matching Orders based on phone, we anonymize them.
-    await prisma.$transaction(async (tx: any) => {
+    await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       // If user had a phone number, anonymize their PII in legacy Orders
       if (user.phone) {
         await tx.order.updateMany({

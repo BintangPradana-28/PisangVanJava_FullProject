@@ -1,3 +1,4 @@
+import type { Prisma } from '@prisma/client'
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/src/auth'
@@ -26,7 +27,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     }
 
     // Eksekusi atomik (Transaction)
-    const result = await prisma.$transaction(async (tx: any) => {
+    const result = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       // 1. Update status ban pengguna
       const updatedUser = await tx.user.update({
         where: { id: targetUserId },
@@ -41,7 +42,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       }
 
       // 3. Catat ke dalam log audit (Security compliance)
-      await tx.authLog.create({
+      await tx.auditLog.create({
         data: {
           action: isBanned ? 'BAN' : 'UNBAN',
           resource: 'User',

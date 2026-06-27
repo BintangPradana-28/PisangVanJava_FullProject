@@ -1,7 +1,7 @@
 /**
  * @vitest-environment node
  */
-import { describe, expect, it, vi, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest'
 
 vi.mock('@/src/auth', () => ({
   auth: vi.fn()
@@ -51,11 +51,29 @@ vi.mock('next/cache', () => ({
   revalidatePath: vi.fn()
 }))
 
-import { auth } from '@/src/auth'
 import { prisma } from '@/lib/prisma'
-import { getUserBudgetStatus, updateMonthlyBudget, cancelOrder } from '../orderHistory'
+import { auth } from '@/src/auth'
+import { cancelOrder, getUserBudgetStatus, updateMonthlyBudget } from '../orderHistory'
 
-const prismaMock = prisma as any
+const mockAuth = auth as unknown as Mock
+const prismaMock = prisma as unknown as {
+  user: {
+    findUnique: Mock
+    update: Mock
+  }
+  order: {
+    findUnique: Mock
+    update: Mock
+    aggregate: Mock
+  }
+  payment: {
+    update: Mock
+  }
+  menuVariant: {
+    update: Mock
+  }
+  $transaction: Mock
+}
 
 describe('orderHistory Server Actions', () => {
   beforeEach(() => {
@@ -65,20 +83,20 @@ describe('orderHistory Server Actions', () => {
 
   describe('updateMonthlyBudget', () => {
     it('should return error if not authenticated', async () => {
-      vi.mocked(auth).mockResolvedValue(null)
+      mockAuth.mockResolvedValue(null)
       const res = await updateMonthlyBudget(150000)
       expect(res.success).toBe(false)
       expect(res.error).toBe('Unauthorized')
     })
 
     it('should update user budget successfully', async () => {
-      vi.mocked(auth).mockResolvedValue({
+      mockAuth.mockResolvedValue({
         user: { id: 'user-123', email: 'test@email.com' }
-      } as any)
+      } as unknown)
       vi.mocked(prisma.user.findUnique).mockResolvedValue({
         id: 'user-123',
         notificationPrefs: JSON.stringify({ email: true, push: false })
-      } as any)
+      } as unknown)
 
       const res = await updateMonthlyBudget(150000)
       expect(res.success).toBe(true)
@@ -97,14 +115,14 @@ describe('orderHistory Server Actions', () => {
 
   describe('getUserBudgetStatus', () => {
     it('should return budget status and total spending', async () => {
-      vi.mocked(auth).mockResolvedValue({ user: { id: 'user-123' } } as any)
+      mockAuth.mockResolvedValue({ user: { id: 'user-123' } } as unknown)
       vi.mocked(prisma.user.findUnique).mockResolvedValue({
         id: 'user-123',
         notificationPrefs: { email: true, monthlyBudget: 200000 }
-      } as any)
+      } as unknown)
       vi.mocked(prisma.order.aggregate).mockResolvedValue({
         _sum: { totalPrice: 75000 }
-      } as any)
+      } as unknown)
 
       const res = await getUserBudgetStatus()
       expect(res.success).toBe(true)
@@ -117,7 +135,7 @@ describe('orderHistory Server Actions', () => {
 
   describe('cancelOrder', () => {
     it('should reject cancelation if order not found', async () => {
-      vi.mocked(auth).mockResolvedValue({ user: { id: 'user-123' } } as any)
+      mockAuth.mockResolvedValue({ user: { id: 'user-123' } } as unknown)
       vi.mocked(prisma.order.findUnique).mockResolvedValue(null)
 
       const res = await cancelOrder('order-999')
@@ -126,12 +144,12 @@ describe('orderHistory Server Actions', () => {
     })
 
     it('should reject cancelation if order does not belong to user', async () => {
-      vi.mocked(auth).mockResolvedValue({ user: { id: 'user-123' } } as any)
+      mockAuth.mockResolvedValue({ user: { id: 'user-123' } } as unknown)
       vi.mocked(prisma.order.findUnique).mockResolvedValue({
         id: 'order-111',
         userId: 'other-user',
         status: 'PENDING_PAYMENT'
-      } as any)
+      } as unknown)
 
       const res = await cancelOrder('order-111')
       expect(res.success).toBe(false)
@@ -139,12 +157,12 @@ describe('orderHistory Server Actions', () => {
     })
 
     it('should reject cancelation if order is not in PENDING_PAYMENT status', async () => {
-      vi.mocked(auth).mockResolvedValue({ user: { id: 'user-123' } } as any)
+      mockAuth.mockResolvedValue({ user: { id: 'user-123' } } as unknown)
       vi.mocked(prisma.order.findUnique).mockResolvedValue({
         id: 'order-111',
         userId: 'user-123',
         status: 'PROCESSING'
-      } as any)
+      } as unknown)
 
       const res = await cancelOrder('order-111')
       expect(res.success).toBe(false)
@@ -152,7 +170,7 @@ describe('orderHistory Server Actions', () => {
     })
 
     it('should cancel order, restore stock, and send notifications', async () => {
-      vi.mocked(auth).mockResolvedValue({ user: { id: 'user-123' } } as any)
+      mockAuth.mockResolvedValue({ user: { id: 'user-123' } } as unknown)
       vi.mocked(prisma.order.findUnique).mockResolvedValue({
         id: 'order-111',
         userId: 'user-123',
@@ -164,7 +182,7 @@ describe('orderHistory Server Actions', () => {
           { variantId: 'variant-2', quantity: 1 }
         ],
         payment: { id: 'payment-1' }
-      } as any)
+      } as unknown)
 
       const res = await cancelOrder('order-111')
       expect(res.success).toBe(true)

@@ -4,6 +4,7 @@
 // RAG Source: src/features/pos/utils/verifyApprovalToken.ts
 // RAG Source: lib/audit.ts (logAudit function)
 
+import type { Prisma } from '@prisma/client'
 import { type NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { logAudit } from '@/lib/audit'
@@ -100,7 +101,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     }
 
     // ── Prisma $transaction: Atomicity + Race Condition Prevention ──
-    const result = await prisma.$transaction(async (tx: any) => {
+    const result = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       // 0. Idempotency Check (Offline Sync Armor)
       if (data.offlineId) {
         const existingOrder = await tx.order.findUnique({
@@ -251,7 +252,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       } catch (qrisError: any) {
         // If QRIS creation fails, cancel the order and restore stock
         console.error('[POS] QRIS charge failed:', qrisError?.message)
-        await prisma.$transaction(async (tx: any) => {
+        await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
           const orderWithItems = await tx.order.findUnique({
             where: { id: result.order.id },
             include: { items: true }

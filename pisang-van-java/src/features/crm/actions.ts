@@ -1,5 +1,6 @@
 'use server'
 
+import type { Prisma } from '@prisma/client'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/src/auth'
@@ -79,7 +80,7 @@ export async function updateB2BDealStatus(payload: unknown) {
   }
 
   try {
-    const updated = await prisma.$transaction(async (tx: any) => {
+    const updated = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       const deal = await tx.b2BDeal.findUnique({
         where: { id: parsed.data.dealId },
         select: { dealName: true, ownerId: true }
@@ -176,7 +177,7 @@ export async function applyForReseller(payload: unknown) {
       select: { phone: true, email: true, name: true }
     })
 
-    if (!userObj || !userObj.phone) {
+    if (!userObj?.phone) {
       return {
         success: false as const,
         error: 'Nomor WhatsApp wajib diisi di profil Anda sebelum mendaftar Reseller.'

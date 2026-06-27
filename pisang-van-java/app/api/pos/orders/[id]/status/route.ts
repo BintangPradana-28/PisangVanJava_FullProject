@@ -3,6 +3,7 @@
 // RAG Source: prisma/schema.prisma (Payment, Order models)
 // Purpose: QRIS payment status polling endpoint for POS cashier UI
 
+import type { Prisma } from '@prisma/client'
 import { type NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { logAudit } from '@/lib/audit'
@@ -75,7 +76,7 @@ export async function GET(_req: NextRequest, { params }: RouteContext): Promise<
     // Map Midtrans status → our PaymentStatus
     if (txStatus === 'settlement' || txStatus === 'capture') {
       // Payment confirmed — update Payment + Order atomically
-      await prisma.$transaction(async (tx: any) => {
+      await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
         await tx.payment.update({
           where: { id: payment.id },
           data: {
@@ -112,7 +113,7 @@ export async function GET(_req: NextRequest, { params }: RouteContext): Promise<
     if (txStatus === 'cancel' || txStatus === 'deny' || txStatus === 'expire') {
       // Payment failed or expired
       const failedStatus = txStatus === 'expire' ? 'EXPIRED' : 'CANCELED'
-      await prisma.$transaction(async (tx: any) => {
+      await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
         await tx.payment.update({
           where: { id: payment.id },
           data: { status: failedStatus }

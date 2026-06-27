@@ -1,3 +1,4 @@
+import type { Prisma } from '@prisma/client'
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
@@ -26,7 +27,7 @@ export async function POST(req: Request) {
     }
 
     // ATOMIC TRANSACTION: Modifikasi saldo dan pencatatan audit tidak boleh terpisah.
-    const result = await prisma.$transaction(async (tx: any) => {
+    const result = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       const user = await tx.user.update({
         where: { id: targetUserId },
         data: {

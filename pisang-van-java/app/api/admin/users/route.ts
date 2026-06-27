@@ -1,3 +1,4 @@
+import type { Prisma } from '@prisma/client'
 import { type NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/src/auth'
@@ -55,7 +56,7 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ success: false, message: 'Data tidak valid' }, { status: 400 })
     }
 
-    const updatedUser = await prisma.$transaction(async (tx) => {
+    const updatedUser = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       const u = await tx.user.update({
         where: { id: userId },
         data: { role },

@@ -20,7 +20,7 @@ interface OrderRouteContext {
   }>
 }
 
-const updateOrderStatusSchema = orderStatusInputSchema
+const _updateOrderStatusSchema = orderStatusInputSchema
 
 export async function GET(_: NextRequest, { params }: OrderRouteContext) {
   const { id } = await params
@@ -169,7 +169,7 @@ export async function PATCH(req: NextRequest, { params }: OrderRouteContext) {
       }
     }
 
-    const order = await prisma.$transaction(async (tx: any) => {
+    const order = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       // If transitioning to cancelled, we must restore stock exactly once.
       if (status === 'CANCELED') {
         const orderWithItems = await tx.order.findUnique({
@@ -179,10 +179,12 @@ export async function PATCH(req: NextRequest, { params }: OrderRouteContext) {
 
         if (orderWithItems && orderWithItems.status !== 'CANCELED') {
           for (const item of orderWithItems.items) {
-            await tx.menuVariant.updateMany({
-              where: { id: item.variantId },
-              data: { stock: { increment: item.quantity } }
-            })
+            if (item.variantId) {
+              await tx.menuVariant.updateMany({
+                where: { id: item.variantId },
+                data: { stock: { increment: item.quantity } }
+              })
+            }
           }
         }
       }
@@ -194,7 +196,7 @@ export async function PATCH(req: NextRequest, { params }: OrderRouteContext) {
           select: { userId: true, status: true }
         })
 
-        if (orderInfo && orderInfo.userId && orderInfo.status !== 'COMPLETED') {
+        if (orderInfo?.userId && orderInfo.status !== 'COMPLETED') {
           const userObj = await tx.user.findUnique({
             where: { id: orderInfo.userId },
             select: { hasOrdered: true, referredBy: true }
@@ -310,7 +312,10 @@ export async function PATCH(req: NextRequest, { params }: OrderRouteContext) {
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
       return NextResponse.json(
-        { success: false, error: 'Pesanan telah diubah oleh transaksi lain. Silakan muat ulang halaman.' },
+        {
+          success: false,
+          error: 'Pesanan telah diubah oleh transaksi lain. Silakan muat ulang halaman.'
+        },
         { status: 409 }
       )
     }
