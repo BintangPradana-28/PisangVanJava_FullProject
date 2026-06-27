@@ -33,7 +33,7 @@ export default async function FavoritesPage() {
     }
   })
 
-  const serialized = favorites.map((fav) => ({
+  const serialized = favorites.map((fav: typeof favorites[0]) => ({
     favoriteId: fav.id,
     variantId: fav.variantId,
     flavorName: fav.variant.flavorName,
