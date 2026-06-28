@@ -1,6 +1,6 @@
 'use server'
 
-import { revalidatePath, revalidateTag, unstable_cache } from 'next/cache'
+import { revalidatePath, unstable_cache } from 'next/cache'
 import { logAudit } from '@/lib/audit'
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/src/auth'
@@ -13,7 +13,7 @@ import { auth } from '@/src/auth'
 export async function toggleAvailability(id: string, isAvailable: boolean) {
   try {
     const session = await auth()
-    if (!session || !session.user) {
+    if (!session?.user) {
       return { success: false, error: 'Akses ditolak. Sesi tidak valid.' }
     }
 
@@ -48,7 +48,7 @@ export async function toggleAvailability(id: string, isAvailable: boolean) {
 export async function updateMenuStock(id: string, newStock: number) {
   try {
     const session = await auth()
-    if (!session || !session.user) {
+    if (!session?.user) {
       return { success: false, error: 'Akses ditolak. Sesi tidak valid.' }
     }
 

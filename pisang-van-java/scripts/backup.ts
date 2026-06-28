@@ -1,9 +1,9 @@
-import { spawn } from 'child_process'
-import { createCipheriv, randomBytes } from 'crypto'
+import { spawn } from 'node:child_process'
+import { createCipheriv, randomBytes } from 'node:crypto'
+import { createWriteStream, promises as fs } from 'node:fs'
+import * as path from 'node:path'
+import { pipeline } from 'node:stream/promises'
 import * as dotenv from 'dotenv'
-import { createWriteStream, promises as fs } from 'fs'
-import * as path from 'path'
-import { pipeline } from 'stream/promises'
 
 // Load environment variables for local runs
 dotenv.config({ path: path.join(__dirname, '../.env.local') })

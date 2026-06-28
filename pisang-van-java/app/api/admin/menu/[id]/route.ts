@@ -1,4 +1,4 @@
-import { revalidatePath, revalidateTag } from 'next/cache'
+import { revalidatePath } from 'next/cache'
 import { type NextRequest, NextResponse } from 'next/server'
 import { sseEmitter } from '@/lib/eventEmitter'
 import { prisma } from '@/lib/prisma'
@@ -7,7 +7,7 @@ import { auth } from '@/src/auth'
 import { updateMenuVariantSchema } from '@/src/features/menu/schemas'
 import { StockManager } from '@/src/lib/stock-manager'
 // GET /api/admin/menu/[id]
-export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
     const variant = await prisma.menuVariant.findUnique({

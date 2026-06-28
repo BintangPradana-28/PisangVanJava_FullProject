@@ -120,7 +120,7 @@ export const formatPriceShort = (price: number): string => `${price / 1000}K`
 
 export const buildWhatsAppMessage = (
   flavorName: string,
-  baseType: string,
+  _baseType: string,
   baseLabel: string,
   toppingName?: string,
   total?: number

@@ -1,5 +1,5 @@
 import 'server-only'
-import crypto from 'crypto'
+import crypto from 'node:crypto'
 import { headers } from 'next/headers'
 import { snap } from '@/src/lib/midtrans'
 
@@ -20,7 +20,7 @@ interface GenerateSnapTokenParams {
 
 export async function generateSnapToken(params: GenerateSnapTokenParams): Promise<string | null> {
   try {
-    const isProduction = process.env.NEXT_PUBLIC_MIDTRANS_IS_PRODUCTION === 'true'
+    const _isProduction = process.env.NEXT_PUBLIC_MIDTRANS_IS_PRODUCTION === 'true'
 
     // Zero-Trust: Validate gross amount against items
     const calculatedGross = params.items.reduce((sum, item) => sum + item.price * item.quantity, 0)

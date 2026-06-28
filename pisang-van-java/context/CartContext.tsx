@@ -2,7 +2,7 @@
 
 import { useSession } from 'next-auth/react'
 import type React from 'react'
-import { createContext, useContext, useCallback, useEffect, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useState } from 'react'
 
 export interface CartItem {
   productId: string
@@ -131,8 +131,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setMounted(true)
   }, [status, mergeCarts, syncToDB])
 
-
-
   // 2. Auto-save side effect
   useEffect(() => {
     if (!mounted) return
@@ -150,8 +148,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     isDBLoaded, // Sync to DB when cart changes
     syncToDB
   ])
-
-
 
   const addToCart = (newItem: Omit<CartItem, 'totalPrice'>) => {
     setCartItems((prev) => {

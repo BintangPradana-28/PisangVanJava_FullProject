@@ -1,4 +1,4 @@
-import { createCipheriv, createDecipheriv, randomBytes } from 'crypto'
+import { createCipheriv, createDecipheriv, randomBytes } from 'node:crypto'
 import { describe, expect, it } from 'vitest'
 
 describe('Compliance: AES-256-GCM Backup Encryption Integrity', () => {

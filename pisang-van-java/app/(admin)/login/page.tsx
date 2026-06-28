@@ -6,7 +6,7 @@ import { useState } from 'react'
 import toast, { Toaster } from 'react-hot-toast'
 
 export default function AdminLoginPage() {
-  const router = useRouter()
+  const _router = useRouter()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [otp, setOtp] = useState('')

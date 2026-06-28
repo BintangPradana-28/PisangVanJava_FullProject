@@ -7,8 +7,8 @@
 // Semua test menggunakan pure functions — zero DB, zero Redis, zero network.
 // Integration test (dengan Prisma + Redis real) ada di terpisah.
 
+import { createHash } from 'node:crypto'
 import { PaymentStatus } from '@prisma/client'
-import { createHash } from 'crypto'
 import { describe, expect, it } from 'vitest'
 import { verifyMidtransSignature } from '@/src/lib/midtrans-crypto'
 import {

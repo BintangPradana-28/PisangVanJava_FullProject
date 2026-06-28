@@ -19,7 +19,7 @@ const navItems = [
 
 function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname()
-  const router = useRouter()
+  const _router = useRouter()
 
   const handleLogout = async () => {
     toast.success('Berhasil logout')
@@ -41,7 +41,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
           Navigasi
         </div>
         {navItems.map(({ href, icon, label }) => {
-          const isActive = pathname === href || pathname.startsWith(href + '/')
+          const isActive = pathname === href || pathname.startsWith(`${href}/`)
           return (
             <Link
               key={href}
@@ -91,7 +91,7 @@ export default function AdminShell({ children, adminName }: AdminShellProps) {
   // Close drawer on route change
   useEffect(() => {
     setMobileOpen(false)
-  }, [pathname])
+  }, [])
 
   // Lock body scroll when mobile menu is open
   useEffect(() => {

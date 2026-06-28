@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { ArrowLeft, Clock, Info, ShoppingBag, Star } from 'lucide-react'
+import { ArrowLeft, Clock, ShoppingBag, Star } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'

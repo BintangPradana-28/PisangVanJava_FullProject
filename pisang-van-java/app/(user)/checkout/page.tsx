@@ -154,7 +154,7 @@ export default function CheckoutPage() {
   const [shippingRates, setShippingRates] = useState<CourierOption[]>([])
   const [selectedRate, setSelectedRate] = useState<CourierOption | null>(null)
   const [isLoadingRates, setIsLoadingRates] = useState(false)
-  const [addressNameFromMap, setAddressNameFromMap] = useState('')
+  const [_addressNameFromMap, setAddressNameFromMap] = useState('')
 
   const { data: profileResponse } = useQuery({
     queryKey: ['profile'],
@@ -182,7 +182,7 @@ export default function CheckoutPage() {
       if (profileResponse.data.koinPisang !== undefined)
         setKoinPisang(profileResponse.data.koinPisang)
     }
-  }, [session, profileResponse])
+  }, [session, profileResponse, setValue])
 
   useEffect(() => {
     if (addressesResponse?.success && addressesResponse.data) {
@@ -203,7 +203,7 @@ export default function CheckoutPage() {
   // Reset voucher when cart changes
   useEffect(() => {
     setAppliedVoucher(null)
-  }, [cartTotal])
+  }, [])
 
   // Guard: empty cart
   useEffect(() => {
@@ -285,7 +285,7 @@ export default function CheckoutPage() {
   }, [delivery])
 
   const deliveryFeeSetting = getSetting('store_delivery_fee', '0')
-  const baseDeliveryFee = /^[0-9]{1,9}$/.test(deliveryFeeSetting) ? Number(deliveryFeeSetting) : 0
+  const _baseDeliveryFee = /^[0-9]{1,9}$/.test(deliveryFeeSetting) ? Number(deliveryFeeSetting) : 0
   const deliveryFee = delivery === 'DELIVERY' ? (selectedRate ? selectedRate.price : 0) : 0
   const pointsToUse = usePoints ? Math.min(koinPisang, cartTotal + deliveryFee) : 0
   const discount = usePoints ? pointsToUse : (appliedVoucher?.discountAmount ?? 0)
@@ -593,7 +593,7 @@ export default function CheckoutPage() {
                       🛒 Periksa Pesanan Anda
                     </h2>
                     <div className="space-y-3">
-                      {cartItems.map((item, i) => {
+                      {cartItems.map((item, _i) => {
                         const itemTotal =
                           (item.basePrice +
                             (item.toppings
@@ -1212,7 +1212,7 @@ export default function CheckoutPage() {
 
               <div className={`${showSummaryMobile ? 'block' : 'hidden lg:block'} mt-4 lg:mt-0`}>
                 <div className="space-y-2.5 mb-4">
-                  {cartItems.map((item, i) => {
+                  {cartItems.map((item, _i) => {
                     const itemTotal =
                       (item.basePrice +
                         (item.toppings

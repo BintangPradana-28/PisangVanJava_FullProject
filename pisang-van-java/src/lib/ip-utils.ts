@@ -40,7 +40,7 @@ export function isIpInCidr(ip: string, cidr: string): boolean {
   const prefixStr = cidr.slice(slashIndex + 1)
   const prefixLength = parseInt(prefixStr, 10)
 
-  if (isNaN(prefixLength) || prefixLength < 0 || prefixLength > 32) return false
+  if (Number.isNaN(prefixLength) || prefixLength < 0 || prefixLength > 32) return false
 
   const ipNum = ipv4ToUint32(ip)
   const networkNum = ipv4ToUint32(networkAddress)

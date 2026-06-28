@@ -128,7 +128,10 @@ export default function OfflineSyncManager() {
       window.removeEventListener('online', handleOnline)
       clearInterval(interval)
     }
-  }, []) // Empty deps ensures this runs once on mount
+  }, [
+    // 1. Pemicu Sinkronisasi Awal (On-Mount Sync Rule)
+    processQueue
+  ]) // Empty deps ensures this runs once on mount
 
   return null // Invisible background component
 }

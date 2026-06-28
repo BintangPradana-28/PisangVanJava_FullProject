@@ -29,7 +29,7 @@ const EyeIcon = ({ open }: { open: boolean }) =>
     </svg>
   )
 
-const GoogleIcon = () => (
+const _GoogleIcon = () => (
   <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
     <path
       fill="#4285F4"
@@ -232,7 +232,7 @@ export default function MemberRegisterPage() {
                       type={showPass ? 'text' : 'password'}
                       placeholder={t('register_password_placeholder')}
                       autoComplete="new-password"
-                      className={inputCls + ' pr-11'}
+                      className={`${inputCls} pr-11`}
                       {...register('password')}
                     />
                     <button

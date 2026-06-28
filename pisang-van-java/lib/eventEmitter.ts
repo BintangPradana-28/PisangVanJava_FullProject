@@ -1,4 +1,4 @@
-import { EventEmitter } from 'events'
+import { EventEmitter } from 'node:events'
 
 // Create a global singleton for EventEmitter so it persists across HMR in dev
 const globalForEventEmitter = globalThis as unknown as {

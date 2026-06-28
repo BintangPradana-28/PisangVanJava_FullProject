@@ -95,7 +95,7 @@ export default function StarRating({ variantId, existingRating, onSubmit }: Star
           setIsUploading(false)
           return
         }
-      } catch (err) {
+      } catch (_err) {
         setError('Terjadi kesalahan saat mengunggah foto.')
         setIsUploading(false)
         return

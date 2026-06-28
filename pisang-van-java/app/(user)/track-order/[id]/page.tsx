@@ -32,7 +32,7 @@ function maskPhone(phone: string | null): string | null {
   if (!phone) return null
   const clean = phone.trim()
   if (clean.length < 8) return '****'
-  return clean.slice(0, 4) + '****' + clean.slice(-4)
+  return `${clean.slice(0, 4)}****${clean.slice(-4)}`
 }
 
 export default async function TrackOrderDetailPage({

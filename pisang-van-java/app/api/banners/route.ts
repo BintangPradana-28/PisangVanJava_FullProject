@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
     })
 
     return NextResponse.json({ success: true, data: banner })
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json({ success: false, error: 'Server Error' }, { status: 500 })
   }
 }

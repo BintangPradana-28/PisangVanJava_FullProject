@@ -12,7 +12,7 @@ import { cancelBiteshipOrder } from '@/src/services/biteship.service'
 export async function getUserOrders() {
   try {
     const session = await auth()
-    if (!session || !session.user) {
+    if (!session?.user) {
       return { success: false, error: 'Sesi tidak valid. Silakan login kembali.' }
     }
 

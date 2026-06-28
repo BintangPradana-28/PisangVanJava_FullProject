@@ -1,4 +1,4 @@
-import crypto from 'crypto'
+import crypto from 'node:crypto'
 import { type NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { logAudit } from '@/lib/audit'
@@ -56,7 +56,7 @@ async function getAdminUser() {
 }
 
 // 1. GET: Check if PIN is configured
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
   const admin = await getAdminUser()
   if (!admin) return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
 
@@ -65,7 +65,7 @@ export async function GET(req: NextRequest) {
       where: { key: PIN_SETTING_KEY }
     })
     return NextResponse.json({ success: true, isConfigured: !!setting })
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json({ success: false, error: 'Internal Error' }, { status: 500 })
   }
 }

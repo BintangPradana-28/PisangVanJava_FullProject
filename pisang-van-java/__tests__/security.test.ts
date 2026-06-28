@@ -1,4 +1,3 @@
-import { z } from 'zod'
 import { loginSchema } from '@/src/features/auth/schemas'
 
 describe('Security & Validation Tests', () => {

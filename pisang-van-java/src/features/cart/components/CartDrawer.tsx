@@ -10,7 +10,6 @@ import { z } from 'zod'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSettings } from '@/context/SettingsContext'
 import {
-  type CartItem,
   selectCartDisplayTotal,
   selectCartItems,
   selectItemSubtotal,
@@ -100,7 +99,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
 
   useEffect(() => {
     setAppliedVoucher(null)
-  }, [cartTotal])
+  }, [])
 
   const formatPrice = (amount: number) => {
     return new Intl.NumberFormat('id-ID', {
@@ -314,7 +313,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                   <p className="text-sm font-medium">{t('cart_empty')}</p>
                 </div>
               ) : (
-                cartItems.map((item, index) => (
+                cartItems.map((item, _index) => (
                   <div
                     key={`${item.cartItemId}`}
                     className="p-4 border border-zinc-100 dark:border-zinc-800 bg-zinc-50/40 dark:bg-zinc-800/20 rounded-[4px] flex flex-col gap-2 relative"

@@ -434,8 +434,6 @@ export default function KitchenClient({ initialOrders }: KitchenClientProps) {
     prevOrderIdsRef.current = currentIds
   }, [orders])
 
-
-
   // ── Dispatch Courier Handlers ──────────────────────────────────────────────────
   const handleDispatchBiteship = async (orderId: string) => {
     setDispatchLoading(true)

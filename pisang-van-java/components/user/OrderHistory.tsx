@@ -11,7 +11,6 @@ import {
   Package,
   RefreshCw,
   Repeat,
-  ShoppingBag,
   XCircle
 } from 'lucide-react'
 import Link from 'next/link'
@@ -238,7 +237,7 @@ export default function OrderHistory({ phone = '', useAuth = false }: Props) {
 
       order.items.forEach((item) => {
         const live = liveVariants.find((v: any) => v.id === item.variant.id)
-        if (!live || !live.isAvailable) {
+        if (!live?.isAvailable) {
           skippedCount++
           return
         }

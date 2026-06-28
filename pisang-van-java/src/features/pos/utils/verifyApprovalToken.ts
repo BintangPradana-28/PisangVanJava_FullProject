@@ -2,7 +2,7 @@
 // RAG Source: app/api/pos/auth-pin/route.ts (generateApprovalToken logic)
 // Purpose: Server-side utility to verify Manager PIN approval tokens (HMAC-based)
 
-import crypto from 'crypto'
+import crypto from 'node:crypto'
 
 /**
  * Verifies a POS Manager approval token.

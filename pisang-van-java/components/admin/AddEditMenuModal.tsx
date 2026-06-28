@@ -44,7 +44,7 @@ export default function AddEditMenuModal({ open, editItem, onClose, onSaved }: P
     } else {
       setForm(EMPTY_FORM)
     }
-  }, [editItem, open])
+  }, [editItem])
 
   const set = <K extends keyof MenuVariantFormData>(key: K, val: MenuVariantFormData[K]) =>
     setForm((prev) => ({ ...prev, [key]: val }))

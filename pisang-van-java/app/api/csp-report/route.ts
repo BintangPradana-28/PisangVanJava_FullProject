@@ -8,7 +8,7 @@ export async function POST(req: Request) {
       extra: body['csp-report'] ?? body
     })
     return new Response(null, { status: 204 })
-  } catch (error) {
+  } catch (_error) {
     return new Response(null, { status: 400 })
   }
 }

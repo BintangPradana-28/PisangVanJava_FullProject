@@ -77,7 +77,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function DELETE(req: NextRequest) {
+export async function DELETE(_req: NextRequest) {
   try {
     const session = await auth()
     const userId = session?.user?.id
@@ -95,7 +95,7 @@ export async function DELETE(req: NextRequest) {
       select: { image: true }
     })
 
-    if (!user || !user.image) {
+    if (!user?.image) {
       return NextResponse.json(
         { success: false, message: 'Tidak ada foto untuk dihapus' },
         { status: 400 }

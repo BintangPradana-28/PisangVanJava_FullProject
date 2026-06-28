@@ -11,7 +11,7 @@ export const metadata: Metadata = { title: 'Prospek Kontak | Admin' }
 export default async function KontakLeadsPage() {
   // 1. THE IRON GATE (Auth Verification)
   const session = await auth()
-  if (!session || session.user?.role !== 'ADMIN') {
+  if (session?.user?.role !== 'ADMIN') {
     redirect('/member-login')
   }
 

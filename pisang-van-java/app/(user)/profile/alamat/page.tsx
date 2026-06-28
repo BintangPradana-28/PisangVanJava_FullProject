@@ -74,7 +74,7 @@ export default function AlamatPage() {
 
   useEffect(() => {
     fetchAddresses()
-  }, [])
+  }, [fetchAddresses])
 
   const handleOpenModal = (address?: AddressType) => {
     if (address) {

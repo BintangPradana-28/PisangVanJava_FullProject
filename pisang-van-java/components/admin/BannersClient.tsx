@@ -265,7 +265,9 @@ export default function BannersClient({ initialBanners }: { initialBanners: Bann
                 <input
                   type="number"
                   value={form.priority}
-                  onChange={(e) => setForm({ ...form, priority: parseInt(e.target.value) || 0 })}
+                  onChange={(e) =>
+                    setForm({ ...form, priority: parseInt(e.target.value, 10) || 0 })
+                  }
                   className="w-full p-2 rounded-[4px] border border-cream-200"
                   placeholder="0"
                 />

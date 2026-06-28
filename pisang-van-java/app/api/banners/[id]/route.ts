@@ -42,19 +42,19 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     })
 
     return NextResponse.json({ success: true, data: banner })
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json({ success: false, error: 'Server Error' }, { status: 500 })
   }
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   if (!(await checkAdmin())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   try {
     const { id } = await params
     await prisma.banner.delete({ where: { id } })
     return NextResponse.json({ success: true })
-  } catch (error) {
+  } catch (_error) {
     return NextResponse.json({ success: false, error: 'Server Error' }, { status: 500 })
   }
 }

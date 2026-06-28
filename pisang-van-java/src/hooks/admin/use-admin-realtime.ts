@@ -33,7 +33,7 @@ export function useAdminRealtimeSync() {
           schema: 'public',
           table: 'Order'
         },
-        (payload: any) => {
+        (_payload: any) => {
           queryClient.invalidateQueries({ queryKey: ['admin-orders'] })
         }
       )

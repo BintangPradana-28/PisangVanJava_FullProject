@@ -1,6 +1,6 @@
 'use client'
 
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import Image from 'next/image'
 import { FetchError } from 'ofetch'
 import { useEffect, useState } from 'react'
@@ -128,7 +128,7 @@ export default function AdminMenuDashboard({
     deleteMutation.mutate({ id, name })
   }
 
-  const handleToggleAvailability = async (id: string, currentStatus: boolean) => {
+  const _handleToggleAvailability = async (id: string, currentStatus: boolean) => {
     // Optimistic update
     setProducts(products.map((p) => (p.id === id ? { ...p, isAvailable: !currentStatus } : p)))
 
@@ -140,7 +140,7 @@ export default function AdminMenuDashboard({
       } else {
         toast.success(res.message || 'Status stok diperbarui')
       }
-    } catch (err) {
+    } catch (_err) {
       toast.error('Terjadi kesalahan koneksi')
       setProducts(products.map((p) => (p.id === id ? { ...p, isAvailable: currentStatus } : p)))
     }
@@ -160,7 +160,7 @@ export default function AdminMenuDashboard({
       } else {
         toast.success(res.message || 'Stok diperbarui', { icon: '📦' })
       }
-    } catch (err) {
+    } catch (_err) {
       toast.error('Terjadi kesalahan koneksi')
       setProducts(products.map((p) => (p.id === id ? { ...p, stock: currentStock } : p)))
     }

@@ -32,13 +32,13 @@ export function buildOrderMessage(
 }
 
 export function truncate(str: string, length: number): string {
-  return str.length > length ? str.slice(0, length) + '...' : str
+  return str.length > length ? `${str.slice(0, length)}...` : str
 }
 
 export function normalizePhoneNumber(phone: string): string {
   let cleaned = phone.replace(/\D/g, '')
   if (cleaned.startsWith('0')) {
-    cleaned = '62' + cleaned.slice(1)
+    cleaned = `62${cleaned.slice(1)}`
   }
   return cleaned
 }

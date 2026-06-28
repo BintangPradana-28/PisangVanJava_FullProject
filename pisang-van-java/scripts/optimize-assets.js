@@ -1,9 +1,9 @@
 const sharp = require('sharp')
-const path = require('path')
-const fs = require('fs')
+const path = require('node:path')
+const fs = require('node:fs')
 
 function optimizeImage(filePath, maxWidth, quality) {
-  const tempPath = filePath + '.tmp'
+  const tempPath = `${filePath}.tmp`
   const originalSize = fs.statSync(filePath).size
 
   return sharp(filePath)

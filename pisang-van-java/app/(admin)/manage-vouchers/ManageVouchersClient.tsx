@@ -119,7 +119,7 @@ export default function ManageVouchersClient() {
           discountValue: parseFloat(formData.discountValue),
           minPurchase: parseFloat(formData.minPurchase),
           maxDiscount: formData.maxDiscount ? parseFloat(formData.maxDiscount) : null,
-          usageLimit: parseInt(formData.usageLimit),
+          usageLimit: parseInt(formData.usageLimit, 10),
           startDate: new Date(formData.startDate).toISOString(),
           endDate: new Date(formData.endDate).toISOString()
         }

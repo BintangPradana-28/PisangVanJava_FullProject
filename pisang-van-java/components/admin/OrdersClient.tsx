@@ -127,7 +127,7 @@ function exportToCSV(orders: Order[]) {
   const csv = [header, ...rows]
     .map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(','))
     .join('\n')
-  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' })
+  const blob = new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8;' })
   const url = URL.createObjectURL(blob)
   const link = document.createElement('a')
   link.href = url
@@ -190,7 +190,7 @@ export default function OrdersClient({
       osc.start()
       gain.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.5)
       osc.stop(ctx.currentTime + 0.5)
-    } catch (e) {
+    } catch (_e) {
       console.warn('Audio playback not supported or blocked by browser')
     }
   }
@@ -225,7 +225,7 @@ export default function OrdersClient({
 
     const channel = supabaseBrowserClient
       .channel('public:Order')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'Order' }, (payload) => {
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'Order' }, (_payload) => {
         playNotificationSound()
         fetchOrders(true)
         toast.success(`🔔 Pesanan baru masuk!`, { duration: 5000, icon: '🎉' })
@@ -250,7 +250,7 @@ export default function OrdersClient({
       setConnectionStatus('disconnected')
       supabaseBrowserClient?.removeChannel(channel)
     }
-  }, [fetchOrders])
+  }, [fetchOrders, playNotificationSound])
 
   // ── Fallback Polling ─────────────────────────────────────────────────────
   useEffect(() => {

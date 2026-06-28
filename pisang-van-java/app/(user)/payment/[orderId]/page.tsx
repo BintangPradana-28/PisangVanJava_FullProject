@@ -1,12 +1,11 @@
 import { Prisma } from '@prisma/client'
 import { ArrowLeft, CheckCircle2, CreditCard, ReceiptText, ShieldCheck } from 'lucide-react'
 import Link from 'next/link'
-import { notFound, redirect } from 'next/navigation'
+import { notFound } from 'next/navigation'
 import { z } from 'zod'
 import MidtransPayButton from '@/components/user/MidtransPayButton'
 import { prisma } from '@/lib/prisma'
 import { env } from '@/src/env'
-import { processPayment } from '@/src/features/checkout/actions'
 import { paymentFormInputSchema } from '@/src/features/checkout/schemas'
 import { generateSnapToken } from '@/src/features/payment/service'
 import { getPaymentOrderForActor, requireCheckoutActor } from '@/src/services/checkout.service'
@@ -59,8 +58,7 @@ export default async function PaymentPage({ params, searchParams }: PaymentPageP
   // Check if token has expired (older than 15 minutes) or is missing
   const TOKEN_EXPIRY_MS = 15 * 60 * 1000 // 15 minutes
   const isExpired =
-    !order.midtransToken ||
-    new Date().getTime() - new Date(order.createdAt).getTime() > TOKEN_EXPIRY_MS
+    !order.midtransToken || Date.now() - new Date(order.createdAt).getTime() > TOKEN_EXPIRY_MS
 
   if (canPay && isExpired) {
     try {

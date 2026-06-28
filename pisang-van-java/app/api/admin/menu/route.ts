@@ -1,4 +1,4 @@
-import { revalidatePath, revalidateTag } from 'next/cache'
+import { revalidatePath } from 'next/cache'
 import { type NextRequest, NextResponse } from 'next/server'
 import { sseEmitter } from '@/lib/eventEmitter'
 import { prisma } from '@/lib/prisma'
@@ -7,7 +7,7 @@ import { auth } from '@/src/auth'
 import { createMenuVariantSchema } from '@/src/features/menu/schemas'
 
 // GET /api/admin/menu
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
   try {
     // Note: Middleware protects this route, no need to manually check session again
     const variants = await prisma.menuVariant.findMany({

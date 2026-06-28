@@ -106,7 +106,7 @@ const getFlavorDescriptionKey = (flavorName: string): string | null => {
 export default function MenuGrid({ products }: { products: ProductType[] }) {
   const { t } = useLanguage()
   const router = useRouter()
-  const searchParams = useSearchParams()
+  const _searchParams = useSearchParams()
   const { getSetting } = useSettings()
   const jamOperasional = getSetting('jam_operasional', '10.00–21.00')
   const storeMode = getSetting('store_status', 'AUTO')
@@ -155,7 +155,7 @@ export default function MenuGrid({ products }: { products: ProductType[] }) {
       toast.success(isFav ? 'Dihapus dari favorit' : 'Ditambahkan ke favorit', {
         id: `fav-${variantId}`
       })
-    } catch (err) {
+    } catch (_err) {
       // Revert optimistic UI
       setFavorites((prev) => (isFav ? [...prev, variantId] : prev.filter((id) => id !== variantId)))
       toast.error('Gagal memperbarui favorit', { id: `fav-err-${variantId}` })

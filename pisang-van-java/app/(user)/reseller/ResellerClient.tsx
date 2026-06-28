@@ -119,7 +119,7 @@ export default function ResellerClient({
       } else {
         toast.error(res.error)
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error('Terjadi kesalahan koneksi server.')
     } finally {
       setIsSubmitting(false)
@@ -189,137 +189,135 @@ export default function ResellerClient({
             )}
 
             {/* 2. Customer Form or Pending Status */}
-            {isLoggedIn && isCustomer && (
-              <>
-                {pendingApplication ? (
-                  <motion.div
-                    initial={{ opacity: 0, y: 15 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="bg-amber-500/10 border-2 border-amber-300 dark:border-amber-700/50 rounded-[4px] p-6 text-center space-y-4"
-                  >
-                    <div className="text-5xl">⏳</div>
-                    <h2 className="font-serif text-2xl font-bold text-amber-800 dark:text-amber-400">
-                      Pendaftaran Sedang Ditinjau
-                    </h2>
-                    <p className="text-sm text-amber-750 dark:text-amber-300 max-w-lg mx-auto leading-relaxed">
-                      Terima kasih atas minat Anda bergabung menjadi reseller Pisang Van Java!
-                      Pendaftaran yang Anda ajukan pada{' '}
-                      <strong>{formatDateTime(pendingApplication.createdAt)}</strong> saat ini
-                      sedang diproses oleh Tim Admin kami. Kami akan menghubungi Anda kembali lewat
-                      WhatsApp dalam waktu maksimal 1x24 jam.
-                    </p>
-                    <div className="pt-2 text-xs text-zinc-400 dark:text-zinc-500">
-                      Deal ID: {pendingApplication.id}
-                    </div>
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    initial={{ opacity: 0, y: 15 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="bg-white dark:bg-zinc-900 rounded-[4px] border border-zinc-100 dark:border-zinc-800 p-8 shadow-sm"
-                  >
-                    <h2 className="font-serif text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-6">
-                      📝 Ajukan Pendaftaran Reseller
-                    </h2>
+            {isLoggedIn &&
+              isCustomer &&
+              (pendingApplication ? (
+                <motion.div
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-amber-500/10 border-2 border-amber-300 dark:border-amber-700/50 rounded-[4px] p-6 text-center space-y-4"
+                >
+                  <div className="text-5xl">⏳</div>
+                  <h2 className="font-serif text-2xl font-bold text-amber-800 dark:text-amber-400">
+                    Pendaftaran Sedang Ditinjau
+                  </h2>
+                  <p className="text-sm text-amber-750 dark:text-amber-300 max-w-lg mx-auto leading-relaxed">
+                    Terima kasih atas minat Anda bergabung menjadi reseller Pisang Van Java!
+                    Pendaftaran yang Anda ajukan pada{' '}
+                    <strong>{formatDateTime(pendingApplication.createdAt)}</strong> saat ini sedang
+                    diproses oleh Tim Admin kami. Kami akan menghubungi Anda kembali lewat WhatsApp
+                    dalam waktu maksimal 1x24 jam.
+                  </p>
+                  <div className="pt-2 text-xs text-zinc-400 dark:text-zinc-500">
+                    Deal ID: {pendingApplication.id}
+                  </div>
+                </motion.div>
+              ) : (
+                <motion.div
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-white dark:bg-zinc-900 rounded-[4px] border border-zinc-100 dark:border-zinc-800 p-8 shadow-sm"
+                >
+                  <h2 className="font-serif text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-6">
+                    📝 Ajukan Pendaftaran Reseller
+                  </h2>
 
-                    {!userPhone ? (
-                      <div className="bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/50 rounded-[4px] p-5 space-y-3">
-                        <div className="text-lg font-bold text-red-700 dark:text-red-400">
-                          ⚠️ Nomor WhatsApp Diperlukan
-                        </div>
-                        <p className="text-xs text-red-650 dark:text-red-350 leading-relaxed">
-                          Anda harus menambahkan nomor WhatsApp aktif di profil akun Anda sebelum
-                          mendaftar menjadi reseller. Hal ini diperlukan agar tim kami dapat
-                          menghubungi Anda untuk proses persetujuan.
-                        </p>
-                        <Link
-                          href="/profile/keamanan"
-                          className="inline-block text-xs font-bold text-white bg-red-655 bg-red-600 hover:bg-red-750 hover:bg-red-700 px-4 py-2.5 rounded-[4px] transition-all"
-                        >
-                          Lengkapi Profil Akun →
-                        </Link>
+                  {!userPhone ? (
+                    <div className="bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/50 rounded-[4px] p-5 space-y-3">
+                      <div className="text-lg font-bold text-red-700 dark:text-red-400">
+                        ⚠️ Nomor WhatsApp Diperlukan
                       </div>
-                    ) : (
-                      <form onSubmit={handleSubmit} className="space-y-4">
-                        <div className="grid sm:grid-cols-2 gap-4">
-                          <div>
-                            <label className="block text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-1.5">
-                              Nama Kontak (Pendaftar)
-                            </label>
-                            <input
-                              type="text"
-                              value={session.user.name || ''}
-                              disabled
-                              className="w-full px-4 py-3 rounded-[4px] border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 text-sm focus:outline-none"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-1.5">
-                              Nomor WhatsApp
-                            </label>
-                            <input
-                              type="text"
-                              value={userPhone}
-                              disabled
-                              className="w-full px-4 py-3 rounded-[4px] border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 text-sm focus:outline-none"
-                            />
-                          </div>
-                        </div>
-
+                      <p className="text-xs text-red-650 dark:text-red-350 leading-relaxed">
+                        Anda harus menambahkan nomor WhatsApp aktif di profil akun Anda sebelum
+                        mendaftar menjadi reseller. Hal ini diperlukan agar tim kami dapat
+                        menghubungi Anda untuk proses persetujuan.
+                      </p>
+                      <Link
+                        href="/profile/keamanan"
+                        className="inline-block text-xs font-bold text-white bg-red-655 bg-red-600 hover:bg-red-750 hover:bg-red-700 px-4 py-2.5 rounded-[4px] transition-all"
+                      >
+                        Lengkapi Profil Akun →
+                      </Link>
+                    </div>
+                  ) : (
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                      <div className="grid sm:grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-1.5">
-                            Nama Bisnis / Toko / Instansi *
+                          <label className="block text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-1.5">
+                            Nama Kontak (Pendaftar)
                           </label>
                           <input
                             type="text"
-                            value={companyName}
-                            onChange={(e) => setCompanyName(e.target.value)}
-                            placeholder="Contoh: Toko Berkah, Catering Sinar, Koperasi..."
-                            className="w-full px-4 py-3 rounded-[4px] border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 transition-all"
+                            value={session.user.name || ''}
+                            disabled
+                            className="w-full px-4 py-3 rounded-[4px] border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 text-sm focus:outline-none"
                           />
                         </div>
-
                         <div>
-                          <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-1.5">
-                            Alamat Lengkap Tempat Usaha *
+                          <label className="block text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-1.5">
+                            Nomor WhatsApp
                           </label>
-                          <textarea
-                            value={address}
-                            onChange={(e) => setAddress(e.target.value)}
-                            placeholder="Jl. Raya Kemitraan No. 5, RT 02/03, Kelurahan, Kecamatan, Kota..."
-                            rows={3}
-                            className="w-full px-4 py-3 rounded-[4px] border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 transition-all resize-none"
+                          <input
+                            type="text"
+                            value={userPhone}
+                            disabled
+                            className="w-full px-4 py-3 rounded-[4px] border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 text-sm focus:outline-none"
                           />
                         </div>
+                      </div>
 
-                        <div>
-                          <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-1.5">
-                            Keterangan Tambahan / Catatan (Opsional)
-                          </label>
-                          <textarea
-                            value={notes}
-                            onChange={(e) => setNotes(e.target.value)}
-                            placeholder="Tuliskan pengalaman bisnis Anda atau rencana pemesanan harian..."
-                            rows={2}
-                            className="w-full px-4 py-3 rounded-[4px] border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 transition-all resize-none"
-                          />
-                        </div>
+                      <div>
+                        <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-1.5">
+                          Nama Bisnis / Toko / Instansi *
+                        </label>
+                        <input
+                          type="text"
+                          value={companyName}
+                          onChange={(e) => setCompanyName(e.target.value)}
+                          placeholder="Contoh: Toko Berkah, Catering Sinar, Koperasi..."
+                          className="w-full px-4 py-3 rounded-[4px] border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 transition-all"
+                        />
+                      </div>
 
-                        <button
-                          type="submit"
-                          disabled={isSubmitting}
-                          className="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3.5 rounded-[4px] transition-all active:scale-[0.98] shadow-sm shadow-amber-200 dark:shadow-none text-sm disabled:opacity-50"
-                        >
-                          {isSubmitting
-                            ? 'Mengirimkan Pendaftaran...'
-                            : 'Kirim Pendaftaran Reseller 🚀'}
-                        </button>
-                      </form>
-                    )}
-                  </motion.div>
-                )}
-              </>
-            )}
+                      <div>
+                        <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-1.5">
+                          Alamat Lengkap Tempat Usaha *
+                        </label>
+                        <textarea
+                          value={address}
+                          onChange={(e) => setAddress(e.target.value)}
+                          placeholder="Jl. Raya Kemitraan No. 5, RT 02/03, Kelurahan, Kecamatan, Kota..."
+                          rows={3}
+                          className="w-full px-4 py-3 rounded-[4px] border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 transition-all resize-none"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-1.5">
+                          Keterangan Tambahan / Catatan (Opsional)
+                        </label>
+                        <textarea
+                          value={notes}
+                          onChange={(e) => setNotes(e.target.value)}
+                          placeholder="Tuliskan pengalaman bisnis Anda atau rencana pemesanan harian..."
+                          rows={2}
+                          className="w-full px-4 py-3 rounded-[4px] border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-100 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 transition-all resize-none"
+                        />
+                      </div>
+
+                      <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3.5 rounded-[4px] transition-all active:scale-[0.98] shadow-sm shadow-amber-200 dark:shadow-none text-sm disabled:opacity-50"
+                      >
+                        {isSubmitting
+                          ? 'Mengirimkan Pendaftaran...'
+                          : 'Kirim Pendaftaran Reseller 🚀'}
+                      </button>
+                    </form>
+                  )}
+                </motion.div>
+              ))}
 
             {/* 3. Reseller Dashboard View */}
             {isLoggedIn && isReseller && (

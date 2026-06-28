@@ -10,7 +10,7 @@
 // Tanpa ini, hacker bisa guess signature karakter per karakter dengan
 // mengukur perbedaan response time (< 1ms per karakter yang benar).
 
-import { createHash, timingSafeEqual } from 'crypto'
+import { createHash, timingSafeEqual } from 'node:crypto'
 
 // ─────────────────────────────────────────────────────────────
 // Types

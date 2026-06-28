@@ -21,7 +21,6 @@ import { z } from 'zod'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSettings } from '@/context/SettingsContext'
 import {
-  type CartItem,
   selectCartDisplayTotal,
   selectCartItems,
   selectItemSubtotal,
@@ -162,7 +161,7 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
   // Reset voucher kalau cart berubah
   useEffect(() => {
     setAppliedVoucher(null)
-  }, [cartTotal])
+  }, [])
 
   // RAG Source:
   // app/api/user/profile/route.ts
@@ -891,18 +890,13 @@ export default function CartModal({ isOpen, onClose }: CartModalProps) {
                             </>
                           ) : !session ? (
                             <>Login untuk Checkout</>
+                          ) : paymentMethod === 'ONLINE' ? (
+                            <>
+                              <CreditCard className="w-4 h-4" aria-hidden /> Bayar Online
+                            </>
                           ) : (
                             <>
-                              {paymentMethod === 'ONLINE' ? (
-                                <>
-                                  <CreditCard className="w-4 h-4" aria-hidden /> Bayar Online
-                                </>
-                              ) : (
-                                <>
-                                  <MessageCircle className="w-4 h-4" aria-hidden />{' '}
-                                  {t('cart_checkout')}
-                                </>
-                              )}
+                              <MessageCircle className="w-4 h-4" aria-hidden /> {t('cart_checkout')}
                             </>
                           )}
                         </button>

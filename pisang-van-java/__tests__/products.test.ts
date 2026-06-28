@@ -1,4 +1,4 @@
-import { formatPriceShort, MENU_VARIANTS, TOPPINGS } from '@/data/products'
+import { MENU_VARIANTS, TOPPINGS } from '@/data/products'
 
 describe('MENU_VARIANTS', () => {
   it('has exactly 12 variants', () => {

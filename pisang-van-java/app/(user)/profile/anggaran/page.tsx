@@ -41,7 +41,7 @@ export default function AnggaranPage() {
   }, [fetchBudgetStatus])
 
   const handleSaveBudget = async () => {
-    const val = Number.parseInt(inputValue.trim())
+    const val = Number.parseInt(inputValue.trim(), 10)
     if (Number.isNaN(val) || val <= 0) {
       toast.error('Masukkan nominal anggaran yang valid (angka positif)')
       return
@@ -63,7 +63,7 @@ export default function AnggaranPage() {
   }
 
   const handleRemoveBudget = async () => {
-    if (!window.confirm(t('budget_remove_btn') + '?')) return
+    if (!window.confirm(`${t('budget_remove_btn')}?`)) return
 
     try {
       const res = await updateMonthlyBudget(null)

@@ -1,5 +1,4 @@
 import { Body, Container, Head, Heading, Html, Preview, Text } from '@react-email/components'
-import * as React from 'react'
 
 interface ReceiptEmailProps {
   orderId: string

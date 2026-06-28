@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation'
 import { signIn, useSession } from 'next-auth/react'
 import { startTransition, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import toast, { Toaster } from 'react-hot-toast'
+import toast from 'react-hot-toast'
 import type { z } from 'zod'
 import GoogleAuthButton from '@/components/auth/GoogleAuthButton'
 import { useLanguage } from '@/context/LanguageContext'
@@ -29,7 +29,7 @@ const EyeIcon = ({ open }: { open: boolean }) =>
     </svg>
   )
 
-const GoogleIcon = () => (
+const _GoogleIcon = () => (
   <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24">
     <path
       fill="#4285F4"
@@ -189,7 +189,7 @@ export default function MemberLoginPage() {
                       type={showPass ? 'text' : 'password'}
                       placeholder={t('login_password_placeholder')}
                       autoComplete="current-password"
-                      className={inputCls + ' pr-11'}
+                      className={`${inputCls} pr-11`}
                       {...register('password')}
                     />
                     <button

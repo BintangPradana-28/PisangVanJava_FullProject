@@ -13,13 +13,13 @@ const emailChangeSchema = z.object({
 
 function generateOTP() {
   // CRITICAL SECURITY FIX: Use cryptographically secure pseudo-random number generator
-  return require('crypto').randomInt(100000, 999999).toString()
+  return require('node:crypto').randomInt(100000, 999999).toString()
 }
 
 export async function requestEmailOTP() {
   try {
     const session = await auth()
-    if (!session || !session.user || !session.user.id || !session.user.email) {
+    if (!session?.user?.id || !session.user.email) {
       return { success: false, error: 'Sesi tidak valid.' }
     }
 
@@ -50,7 +50,7 @@ export async function requestEmailOTP() {
     if (!resend) {
       console.warn('RESEND API KEY missing, fallback to console. OTP:', otp)
       // Fallback for dev if no resend key
-      return { success: true, message: 'OTP terkirim (Mode Dev: ' + otp + ')' }
+      return { success: true, message: `OTP terkirim (Mode Dev: ${otp})` }
     }
 
     // Kirim email via Resend
@@ -79,7 +79,7 @@ export async function requestEmailOTP() {
 export async function verifyAndChangeEmail(otp: string, newEmail: string) {
   try {
     const session = await auth()
-    if (!session || !session.user || !session.user.id) {
+    if (!session?.user?.id) {
       return { success: false, error: 'Sesi tidak valid.' }
     }
 
@@ -98,7 +98,7 @@ export async function verifyAndChangeEmail(otp: string, newEmail: string) {
     // Validasi input dengan Zod (Zero-Trust)
     const parsed = emailChangeSchema.safeParse({ otp, newEmail })
     if (!parsed.success) {
-      return { success: false, error: 'Input tidak valid: ' + parsed.error.issues[0].message }
+      return { success: false, error: `Input tidak valid: ${parsed.error.issues[0].message}` }
     }
 
     const redisKey = `email_change_otp:${session.user.id}`

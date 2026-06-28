@@ -35,7 +35,7 @@ function LocationMarker({ position, setPosition, setAddressName }: MapPickerProp
       )
         .then((res) => res.json())
         .then((data) => {
-          if (data && data.display_name && setAddressName) {
+          if (data?.display_name && setAddressName) {
             setAddressName(data.display_name)
           }
         })

@@ -4,8 +4,6 @@
 // RAG Source: src/features/crm/actions.ts (applyForReseller)
 
 import type { Metadata } from 'next'
-import Link from 'next/link'
-import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/src/auth'
 import ResellerClient from './ResellerClient'

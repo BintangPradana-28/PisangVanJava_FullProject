@@ -41,7 +41,7 @@ export default async function KeamananPage() {
       } else {
         notificationPrefs = user.notificationPrefs as any
       }
-    } catch (e) {}
+    } catch (_e) {}
   }
 
   return (

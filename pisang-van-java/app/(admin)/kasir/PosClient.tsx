@@ -33,7 +33,7 @@ export default function PosClient({ products, toppings }: PosClientProps): React
   const [isRefreshing, setIsRefreshing] = useState(false)
 
   // ─── Zustand Store ──────────────────────────────────────
-  const items = usePosStore((s) => s.items)
+  const _items = usePosStore((s) => s.items)
   const isOnline = usePosStore((s) => s.isOnline)
   const isCartOpenOnMobile = usePosStore((s) => s.isCartOpenOnMobile)
   const addItem = usePosStore((s) => s.addItem)

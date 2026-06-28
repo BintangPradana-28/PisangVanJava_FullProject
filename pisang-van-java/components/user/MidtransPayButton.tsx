@@ -70,11 +70,11 @@ export default function MidtransPayButton({ snapToken }: Props) {
         return
       }
       window.snap.pay(snapToken, {
-        onSuccess: (result: MidtransResult) => {
+        onSuccess: (_result: MidtransResult) => {
           setIsPaying(false)
           router.push('/thanks')
         },
-        onPending: (result: MidtransResult) => {
+        onPending: (_result: MidtransResult) => {
           setIsPaying(false)
           router.push('/thanks')
         },

@@ -14,9 +14,9 @@ const profileSchema = z.object({
     .transform((val) => {
       let formatted = val.replace(/\D/g, '')
       if (formatted.startsWith('08')) {
-        formatted = '62' + formatted.substring(1)
+        formatted = `62${formatted.substring(1)}`
       }
-      return '+' + formatted
+      return `+${formatted}`
     })
     .optional(),
   address: z
@@ -26,7 +26,7 @@ const profileSchema = z.object({
     .optional()
 })
 
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
   try {
     const session = await auth()
     const userId = session?.user?.id

@@ -5,7 +5,6 @@ import '../styles/globals.css'
 import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import { headers } from 'next/headers'
-import Script from 'next/script'
 import { Providers } from './providers'
 
 const plusJakartaSans = Plus_Jakarta_Sans({
@@ -45,7 +44,7 @@ export const metadata: Metadata = {
   }
 }
 
-const localBusinessJsonLd = {
+const _localBusinessJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FoodEstablishment',
   name: 'Pisang Goreng Van Java',
@@ -78,7 +77,7 @@ const localBusinessJsonLd = {
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const headersList = await headers()
-  const nonce = headersList.get('x-nonce') || undefined
+  const _nonce = headersList.get('x-nonce') || undefined
 
   return (
     <html

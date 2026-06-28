@@ -85,7 +85,7 @@ export default function QuickViewModal({
   const { isOpen: isStoreOpen } = checkStoreOpen(jamOperasional, storeMode)
   const { data: session } = useSession()
   const isReseller = session?.user.role === 'RESELLER'
-  const router = useRouter()
+  const _router = useRouter()
 
   // State Management sesuai instruksi
   const [selectedType, setSelectedType] = useState<string>('')
@@ -138,9 +138,9 @@ export default function QuickViewModal({
       })
       .catch((err) => console.error('Failed to fetch toppings', err))
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [selectedToppings.length])
 
-  const availableFlavors = useMemo(() => {
+  const _availableFlavors = useMemo(() => {
     return Array.from(new Set(allProducts.map((p) => p.flavorName)))
   }, [allProducts])
 

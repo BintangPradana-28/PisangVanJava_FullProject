@@ -26,13 +26,13 @@ const navItems = [
 
 export default function AdminSidebar() {
   const pathname = usePathname()
-  const router = useRouter()
+  const _router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
 
   // Tutup sidebar saat rute berubah di versi mobile
   useEffect(() => {
     setIsOpen(false)
-  }, [pathname])
+  }, [])
 
   const handleLogout = async () => {
     toast.success('Berhasil logout')
@@ -108,7 +108,7 @@ export default function AdminSidebar() {
             Navigasi
           </div>
           {navItems.map(({ href, icon, label }) => {
-            const isActive = pathname === href || pathname.startsWith(href + '/')
+            const isActive = pathname === href || pathname.startsWith(`${href}/`)
             return (
               <Link key={href} href={href} className={`sidebar-item ${isActive ? 'active' : ''}`}>
                 <span className="text-lg">{icon}</span>

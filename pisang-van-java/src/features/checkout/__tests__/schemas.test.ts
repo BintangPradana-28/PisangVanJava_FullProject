@@ -30,7 +30,6 @@ vi.mock('@/src/services/checkout.service', () => {
 import { NextRequest } from 'next/server'
 import { POST } from '@/app/api/orders/route'
 import { prisma } from '@/lib/prisma'
-import { createOrderInputSchema } from '../schemas'
 
 describe('app/api/orders POST Route Integration', () => {
   it('should list DB entities and call POST handler', async () => {
