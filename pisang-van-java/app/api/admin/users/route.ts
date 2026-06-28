@@ -1,5 +1,6 @@
 import type { Prisma } from '@prisma/client'
 import { type NextRequest, NextResponse } from 'next/server'
+import { logAudit } from '@/lib/audit'
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/src/auth'
 
@@ -76,6 +77,14 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ success: false, message: 'Data tidak valid' }, { status: 400 })
     }
 
+    const targetUser = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { role: true }
+    })
+    if (!targetUser) {
+      return NextResponse.json({ success: false, message: 'User tidak ditemukan' }, { status: 404 })
+    }
+
     const updatedUser = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       const u = await tx.user.update({
         where: { id: userId },
@@ -105,6 +114,18 @@ export async function PATCH(req: NextRequest) {
 
       return u
     })
+
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0] || '127.0.0.1'
+    await logAudit(
+      'CHANGE_USER_ROLE',
+      'User',
+      userId,
+      {
+        oldRole: targetUser.role,
+        newRole: role
+      },
+      ip
+    )
 
     return NextResponse.json({
       success: true,

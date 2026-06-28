@@ -104,6 +104,12 @@ export async function GET(_req: NextRequest, { params }: RouteContext): Promise<
         confirmedBy: session.user.id
       })
 
+      await logAudit('UPDATE_ORDER_STATUS', 'Order', payment.orderId, {
+        oldStatus: 'PENDING_PAYMENT',
+        newStatus: 'COMPLETED',
+        method: 'POS_QRIS_POLLING'
+      })
+
       return NextResponse.json({
         success: true,
         data: { status: 'PAID', orderId: payment.orderId }

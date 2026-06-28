@@ -79,7 +79,7 @@ export async function sendOrderConfirmationEmail(orderId: string): Promise<boole
       return false
     }
 
-    console.log(`[EMAIL] Confirmation email sent to ${customerEmail} for order ${orderId}`)
+    console.info(`[EMAIL] Confirmation email sent successfully for order ${orderId}`)
     return true
   } catch (error) {
     console.error('[EMAIL] Exception while sending email:', error)
@@ -142,9 +142,7 @@ export async function sendOrderStatusEmail(orderId: string, status: string): Pro
       return false
     }
 
-    console.log(
-      `[EMAIL] Status update email (${status}) sent to ${customerEmail} for order ${orderId}`
-    )
+    console.info(`[EMAIL] Status update email (${status}) sent successfully for order ${orderId}`)
     return true
   } catch (error) {
     console.error('[EMAIL] Exception while sending status email:', error)

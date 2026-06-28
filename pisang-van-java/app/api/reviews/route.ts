@@ -1,6 +1,7 @@
 import type { Prisma } from '@prisma/client'
 import { type NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
+import { logAudit } from '@/lib/audit'
 import { prisma } from '@/lib/prisma'
 import { rateLimit } from '@/lib/redis'
 import { auth } from '@/src/auth'
@@ -203,6 +204,9 @@ export async function PATCH(req: NextRequest) {
       data: { isHidden }
     })
 
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0] || '127.0.0.1'
+    await logAudit('MODERATE_REVIEW_HIDE', 'Review', reviewId, { isHidden }, ip)
+
     return NextResponse.json({ success: true, review: updated })
   } catch (err) {
     console.error('[PATCH /api/reviews]', err)
@@ -228,6 +232,9 @@ export async function DELETE(req: NextRequest) {
     }
 
     await prisma.review.delete({ where: { id: reviewId } })
+
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0] || '127.0.0.1'
+    await logAudit('MODERATE_REVIEW_DELETE', 'Review', reviewId, null, ip)
 
     return NextResponse.json({ success: true })
   } catch (err) {

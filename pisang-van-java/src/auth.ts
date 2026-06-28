@@ -23,7 +23,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         otp: { label: 'OTP', type: 'text' }
       },
       async authorize(credentials) {
-        console.log('Credentials received:', credentials)
         // 1. ZOD ENFORCER
         const parsedCredentials = loginSchema.safeParse(credentials)
 
@@ -36,7 +35,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         }
 
         const { username, password, otp } = parsedCredentials.data
-        console.log('Zod parsed successfully. Email:', username)
 
         // 2. IP-BASED RATE LIMITING
         const headerStore = await headers()
@@ -82,6 +80,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         }
 
         if (!isPasswordValid) {
+          await prisma.authLog.create({
+            data: {
+              userId: user.id,
+              event: 'FAILED_SIGN_IN',
+              ip: ip,
+              userAgent: headerStore.get('user-agent') || 'unknown'
+            }
+          })
           throw new Error('Email atau Sandi tidak valid.')
         }
 
@@ -91,8 +97,27 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           }
           const { authenticator } = await import('otplib')
           const isValidOTP = authenticator.check(otp, user.twoFactorSecret!)
-          if (!isValidOTP) throw new Error('INVALID_OTP')
+          if (!isValidOTP) {
+            await prisma.authLog.create({
+              data: {
+                userId: user.id,
+                event: 'FAILED_2FA',
+                ip: ip,
+                userAgent: headerStore.get('user-agent') || 'unknown'
+              }
+            })
+            throw new Error('INVALID_OTP')
+          }
         }
+
+        await prisma.authLog.create({
+          data: {
+            userId: user.id,
+            event: 'SIGN_IN',
+            ip: ip,
+            userAgent: headerStore.get('user-agent') || 'unknown'
+          }
+        })
 
         return {
           id: user.id,

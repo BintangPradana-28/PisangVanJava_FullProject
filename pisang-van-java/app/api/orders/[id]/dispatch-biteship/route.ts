@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from 'next/server'
+import { logAudit } from '@/lib/audit'
 import { createBiteshipOrder } from '@/src/services/biteship.service'
 import { hasValidSameOriginHeaders, requireCheckoutActor } from '@/src/services/checkout.service'
 
@@ -8,7 +9,7 @@ interface RouteContext {
   }>
 }
 
-export async function POST(req: NextRequest, { params }: RouteContext) {
+export async function POST(_req: NextRequest, { params }: RouteContext) {
   const { id } = await params
 
   const actor = await requireCheckoutActor()
@@ -33,6 +34,11 @@ export async function POST(req: NextRequest, { params }: RouteContext) {
         { status: 400 }
       )
     }
+    await logAudit('DISPATCH_BITESHIP', 'Order', id, {
+      biteshipOrderId: result.data?.biteshipOrderId,
+      waybillId: result.data?.waybillId
+    })
+
     return NextResponse.json({ success: true, data: result.data })
   } catch (error) {
     console.error('[BITESHIP DISPATCH ERROR] Failed to dispatch order:', error)

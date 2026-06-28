@@ -149,7 +149,7 @@ export async function generateResetToken(formData: FormData) {
             subject: 'Atur Ulang Kata Sandi - Pisang Van Java',
             html: htmlContent
           })
-          console.log(`[AUTH] Reset password email sent successfully to ${user.email}`)
+          console.info('[AUTH] Reset password email sent successfully')
         } catch (emailError) {
           console.error('[AUTH ERROR] Gagal mengirim email reset password via Resend:', emailError)
         }

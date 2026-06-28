@@ -257,6 +257,7 @@ export async function PATCH(req: NextRequest, { params }: OrderRouteContext) {
     })
 
     await logAudit('UPDATE_ORDER_STATUS', 'Order', order.id, {
+      oldStatus: currentOrder.status,
       newStatus: order.status,
       fieldsUpdated: Object.keys(parsedBody.data)
     })
