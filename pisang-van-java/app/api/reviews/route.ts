@@ -1,4 +1,4 @@
-﻿import type { Prisma } from '@prisma/client'
+import type { Prisma } from '@prisma/client'
 import { type NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
@@ -117,6 +117,12 @@ export async function POST(req: NextRequest) {
 
   try {
     const order = await prisma.order.findUnique({ where: { id: orderId } })
+    if (order && order.userId !== session.user.id) {
+      return NextResponse.json(
+        { success: false, error: 'Forbidden: Order ini bukan milik Anda.' },
+        { status: 403 }
+      )
+    }
     const isVerifiedBuyer = order !== null
 
     const review = await prisma.review.upsert({

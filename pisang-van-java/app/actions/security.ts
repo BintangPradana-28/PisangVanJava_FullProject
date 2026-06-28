@@ -1,5 +1,6 @@
 'use server'
 
+import type { Prisma } from '@prisma/client'
 import { authenticator } from 'otplib'
 import qrcode from 'qrcode'
 import { z } from 'zod'
@@ -115,7 +116,7 @@ export async function getActiveSessions() {
     if (data) {
       try {
         parsed = typeof data === 'string' ? JSON.parse(data) : data
-      } catch (e) {}
+      } catch (_e) {}
     }
 
     // (session as any) because we might have injected sessionId into user
@@ -150,20 +151,50 @@ export async function deleteAccount(formData: FormData) {
     if (!isValid) throw new Error('Kata sandi salah. Penghapusan dibatalkan.')
   }
 
-  await prisma.user.update({
-    where: { id: session.user.id },
-    data: {
-      isDeleted: true,
-      deletedAt: new Date(),
-      twoFactorEnabled: false,
-      twoFactorSecret: null
-    }
-  })
+  const userId = session.user.id
+  const userEmail = user.email
 
-  // Opsional: Batalkan semua pesanan PENDING
-  await prisma.order.updateMany({
-    where: { userId: session.user.id, status: 'PENDING_PAYMENT' },
-    data: { status: 'CANCELED' }
+  await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+    // 1. Cancel pending orders first
+    await tx.order.updateMany({
+      where: { userId, status: 'PENDING_PAYMENT' },
+      data: { status: 'CANCELED' }
+    })
+
+    // 2. Anonymize all orders placed by this user and sever the FK relation
+    await tx.order.updateMany({
+      where: { userId },
+      data: {
+        userId: null,
+        customerName: 'Deleted User',
+        customerPhone: '00000000000',
+        notes: 'Data anonymized due to account deletion'
+      }
+    })
+
+    // 3. Delete reviews written by this user to avoid FK Restrict violation
+    await tx.review.deleteMany({
+      where: { userId }
+    })
+
+    // 4. Hard-delete the user record (cascades to Accounts, Sessions, ResetTokens, Favorites, Carts, etc.)
+    await tx.user.delete({
+      where: { id: userId }
+    })
+
+    // 5. Insert system audit log entry
+    await tx.auditLog.create({
+      data: {
+        action: 'DELETE',
+        resource: 'User',
+        resourceId: userId,
+        userId: 'SYSTEM',
+        details: JSON.stringify({
+          reason: 'Right to be Forgotten requested',
+          targetEmail: userEmail
+        })
+      }
+    })
   })
 
   // Revoke current session so it gets logged out immediately

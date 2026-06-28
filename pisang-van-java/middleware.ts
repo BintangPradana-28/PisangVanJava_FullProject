@@ -169,7 +169,7 @@ const authMiddleware = auth(async (req) => {
   // ── 4. Unauthenticated Boundary ──────────────────────────────────────────────
   if (!token) {
     // Determine login portal based on route intent
-    const isStaffRoute = requiredRoles.includes('ADMIN') && !requiredRoles.includes('CUSTOMER')
+    const _isStaffRoute = requiredRoles.includes('ADMIN') && !requiredRoles.includes('CUSTOMER')
     const loginUrl = new URL('/member-login', req.url)
 
     loginUrl.searchParams.set('callbackUrl', req.url)
@@ -220,7 +220,7 @@ export default async function middleware(req: NextRequest, event: NextFetchEvent
     })
 
   // Inject CSP into response
-  response.headers.set('Content-Security-Policy-Report-Only', cspHeader)
+  response.headers.set('Content-Security-Policy', cspHeader)
   response.headers.set(
     'Report-To',
     JSON.stringify({

@@ -1,13 +1,12 @@
 // app/api/upload/route.ts
 
-import crypto from 'crypto'
+import crypto from 'node:crypto'
 import { type NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
 import { auth } from '@/src/auth'
 import { cloudinary } from '@/src/lib/cloudinary'
 
-const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp']
-const MAX_MB = 5
+const _ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp']
+const MAX_MB = 2
 
 export async function POST(req: NextRequest) {
   const session = await auth()
@@ -22,7 +21,7 @@ export async function POST(req: NextRequest) {
     }
 
     // 1. ABSOLUTE QUARANTINE: Size Limit Enforcement (Max 2MB)
-    const MAX_BYTES = 2 * 1024 * 1024
+    const MAX_BYTES = MAX_MB * 1024 * 1024
     if (file.size > MAX_BYTES) {
       return NextResponse.json(
         { success: false, error: 'Maksimal ukuran file 2MB' },
@@ -71,11 +70,14 @@ export async function POST(req: NextRequest) {
 
     const safeName = `img_${crypto.randomUUID()}.${ext}`
 
+    const isAdmin = session.user?.role === 'ADMIN' || session.user?.role === 'SUPER_ADMIN'
+    const folder = isAdmin ? 'menu-images' : 'user-uploads'
+
     // 4. CLOUDINARY SECURE UPLOAD
     const uploadResult = (await new Promise((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
         {
-          folder: 'menu-images',
+          folder,
           public_id: safeName.split('.')[0], // strictly validated cryptographic name without extension
           resource_type: 'image'
         },
