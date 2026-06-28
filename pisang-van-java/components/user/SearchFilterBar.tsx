@@ -26,7 +26,9 @@ const FLAVOR_CHIPS = [
   { key: 'Blueberry', label: '🫐 Blueberry' },
   { key: 'Milky', label: '🥛 Milky' },
   { key: 'Taro', label: '🟣 Taro' },
-  { key: 'Original', label: '✨ Original' }
+  { key: 'Original', label: '✨ Original' },
+  { key: 'Keju', label: '🧀 Keju' },
+  { key: 'vanila', label: '🍦 Vanila' }
 ]
 
 // ── Sort — "default" doubles as the label for the existing time-of-day
@@ -53,12 +55,14 @@ export default function SearchFilterBar({ totalItems }: SearchFilterBarProps) {
   const [baseFilter, setBaseFilter] = useState(searchParams.get('filter') ?? 'all')
   const [flavorFilter, setFlavorFilter] = useState(searchParams.get('flavor') ?? 'all')
   const [sortBy, setSortBy] = useState(searchParams.get('sort') ?? 'default')
+  const [availableOnly, setAvailableOnly] = useState(searchParams.get('available') === 'true')
   const [isDragging, setIsDragging] = useState(false)
   const dragStart = useRef<{ x: number; scrollLeft: number }>({ x: 0, scrollLeft: 0 })
   // Mobile-only: tabs/chips collapse behind the filter icon button (mirrors the
   // reference's search+filter pairing). Desktop always shows them — there's room.
   const [isFilterOpen, setIsFilterOpen] = useState(false)
-  const activeFilterCount = (baseFilter !== 'all' ? 1 : 0) + (flavorFilter !== 'all' ? 1 : 0)
+  const activeFilterCount =
+    (baseFilter !== 'all' ? 1 : 0) + (flavorFilter !== 'all' ? 1 : 0) + (availableOnly ? 1 : 0)
 
   // ── Debounced URL sync ───────────────────────────────────────────────────────
   useEffect(() => {
@@ -68,10 +72,11 @@ export default function SearchFilterBar({ totalItems }: SearchFilterBarProps) {
       if (baseFilter !== 'all') params.set('filter', baseFilter)
       if (flavorFilter !== 'all') params.set('flavor', flavorFilter)
       if (sortBy !== 'default') params.set('sort', sortBy)
+      if (availableOnly) params.set('available', 'true')
       router.push(`?${params.toString()}`, { scroll: false })
     }, 400)
     return () => clearTimeout(timer)
-  }, [search, baseFilter, flavorFilter, sortBy, router])
+  }, [search, baseFilter, flavorFilter, sortBy, availableOnly, router])
 
   // ── Mouse drag-to-scroll for flavor chip row (desktop UX) ───────────────────
   const onMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -135,6 +140,17 @@ export default function SearchFilterBar({ totalItems }: SearchFilterBarProps) {
           )}
         </div>
 
+        {/* Toggle Tersedia Saja (Desktop) */}
+        <label className="hidden md:flex items-center gap-1.5 cursor-pointer text-xs font-semibold select-none text-zinc-700 dark:text-zinc-300">
+          <input
+            type="checkbox"
+            checked={availableOnly}
+            onChange={(e) => setAvailableOnly(e.target.checked)}
+            className="w-4 h-4 accent-[#D4802A] rounded border-zinc-300 dark:border-zinc-700"
+          />
+          <span>{t('menu_filter_available') || 'Tersedia Saja'}</span>
+        </label>
+
         {/* Filter toggle — circular icon button (reference's "sliders" icon),
             controls tabs/chips visibility on mobile only; badge shows active count */}
         <button
@@ -194,27 +210,44 @@ export default function SearchFilterBar({ totalItems }: SearchFilterBarProps) {
 
       {/* ── Row 1b: Sort + count for mobile (search row above is cramped) ──── */}
       <div className="sm:hidden max-w-[1200px] mx-auto px-4 pb-3 flex items-center justify-between gap-2.5">
-        <div className="relative shrink-0">
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            aria-label="Urutkan menu"
-            className="appearance-none text-xs font-semibold pl-3.5 pr-7 py-2 rounded-full outline-none transition-all bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300"
-          >
-            {SORT_OPTIONS.map((opt) => (
-              <option key={opt.key} value={opt.key}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
-          <svg
-            className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3 h-3 pointer-events-none text-zinc-400"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
+        <div className="flex items-center gap-3">
+          <div className="relative shrink-0">
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              aria-label="Urutkan menu"
+              className="appearance-none text-xs font-semibold pl-3.5 pr-7 py-2 rounded-full outline-none transition-all bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300"
+            >
+              {SORT_OPTIONS.map((opt) => (
+                <option key={opt.key} value={opt.key}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+            <svg
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3 h-3 pointer-events-none text-zinc-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+          </div>
+          {/* Toggle Tersedia Saja (Mobile) */}
+          <label className="flex items-center gap-1 cursor-pointer text-[11px] font-semibold select-none text-zinc-700 dark:text-zinc-300">
+            <input
+              type="checkbox"
+              checked={availableOnly}
+              onChange={(e) => setAvailableOnly(e.target.checked)}
+              className="w-3.5 h-3.5 accent-[#D4802A] rounded border-zinc-300 dark:border-zinc-700"
+            />
+            <span>Tersedia</span>
+          </label>
         </div>
         <span className="text-xs font-medium tabular-nums text-[var(--text-custom)] opacity-55">
           {totalItems} {t('menu_count_suffix')}

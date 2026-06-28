@@ -51,7 +51,7 @@ const _localBusinessJsonLd = {
   image: '/kitchen.png',
   '@id': '',
   url: 'https://pisanggorengvanjava.com',
-  telephone: '+6281312167554',
+  telephone: '+6285773728748',
   address: {
     '@type': 'PostalAddress',
     streetAddress: 'Jl. Raya Cilangkap l Rt.2/Rw.5, Cilangkap',

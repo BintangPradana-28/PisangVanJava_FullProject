@@ -2,6 +2,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { AnimatePresence, motion } from 'framer-motion'
+import { Minus, Plus, Trash2 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -13,6 +14,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import { z } from 'zod'
+import { useLanguage } from '@/context/LanguageContext'
 import { useSettings } from '@/context/SettingsContext'
 import {
   type CartTopping,
@@ -76,14 +78,17 @@ const formatPrice = (n: number) =>
     minimumFractionDigits: 0
   }).format(n)
 
-// ── Step indicator ──────────────────────────────────────────────────────────
-const STEPS = ['Keranjang', 'Detail', 'Konfirmasi']
-
 export default function CheckoutPage() {
   const router = useRouter()
   const { data: session, status: authStatus } = useSession()
+  const { locale } = useLanguage()
+  const isEn = locale === 'en'
+  const STEPS = isEn ? ['Review', 'Delivery', 'Payment'] : ['Keranjang', 'Detail', 'Konfirmasi']
+
   const cartItems = useCartStore((s) => s.items)
   const clearCart = useCartStore((s) => s.clearCart)
+  const updateQuantity = useCartStore((s) => s.updateQuantity)
+  const removeItem = useCartStore((s) => s.removeItem)
   const cartTotal = useCartStore(selectCartDisplayTotal)
   const { getSetting } = useSettings()
 
@@ -454,6 +459,10 @@ export default function CheckoutPage() {
       toast.error('Setujui kebijakan privasi terlebih dahulu')
       return
     }
+    if (delivery === 'PICKUP' && !pickupTime.trim()) {
+      toast.error('Waktu pengambilan wajib diisi')
+      return
+    }
 
     const items = cartItems
       .map((item) => {
@@ -620,11 +629,59 @@ export default function CheckoutPage() {
                                 </p>
                               )}
                             </div>
-                            <div className="text-right ml-4 shrink-0">
+                            <div className="flex flex-col items-end gap-1.5 ml-4 shrink-0">
                               <p className="text-sm font-bold text-zinc-800 dark:text-zinc-100">
                                 {formatPrice(itemTotal)}
                               </p>
-                              <p className="text-xs text-zinc-400">×{item.quantity}</p>
+
+                              {/* RAG Source: app/(user)/checkout/page.tsx (interactive quantity controls in Step 0) */}
+                              <div className="flex items-center gap-1 mt-1 bg-zinc-50 dark:bg-zinc-800/40 p-0.5 rounded border border-zinc-100 dark:border-zinc-800">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const newQty = item.quantity - 1
+                                    if (newQty <= 0) {
+                                      removeItem(item.cartItemId)
+                                      toast.success(isEn ? 'Item removed' : 'Item dihapus')
+                                    } else {
+                                      updateQuantity(item.cartItemId, newQty)
+                                    }
+                                  }}
+                                  className="w-5.5 h-5.5 rounded bg-white dark:bg-zinc-800 flex items-center justify-center text-zinc-600 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors shadow-xs"
+                                  aria-label={isEn ? 'Decrease quantity' : 'Kurangi kuantitas'}
+                                >
+                                  <Minus className="h-2.5 w-2.5" />
+                                </button>
+                                <span className="w-5 text-center text-xs font-bold text-zinc-850 dark:text-zinc-100">
+                                  {item.quantity}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const limit = item.stock ?? 999
+                                    if (item.quantity >= limit) {
+                                      toast.error(isEn ? 'Stock limit reached!' : 'Stok terbatas!')
+                                    } else {
+                                      updateQuantity(item.cartItemId, item.quantity + 1)
+                                    }
+                                  }}
+                                  className="w-5.5 h-5.5 rounded bg-white dark:bg-zinc-800 flex items-center justify-center text-zinc-600 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors shadow-xs"
+                                  aria-label={isEn ? 'Increase quantity' : 'Tambah kuantitas'}
+                                >
+                                  <Plus className="h-2.5 w-2.5" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    removeItem(item.cartItemId)
+                                    toast.success(isEn ? 'Item removed' : 'Item dihapus')
+                                  }}
+                                  className="w-5.5 h-5.5 rounded bg-red-50 text-red-500 hover:bg-red-105 flex items-center justify-center transition-colors ml-1"
+                                  aria-label={isEn ? 'Remove item' : 'Hapus item'}
+                                >
+                                  <Trash2 className="h-2.5 w-2.5" />
+                                </button>
+                              </div>
                             </div>
                           </div>
                         )

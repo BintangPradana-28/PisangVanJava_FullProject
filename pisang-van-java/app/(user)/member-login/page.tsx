@@ -3,7 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { signIn, useSession } from 'next-auth/react'
 import { startTransition, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -68,21 +68,29 @@ export default function MemberLoginPage() {
     defaultValues: { username: '', password: '', otp: '' }
   })
 
+  const searchParams = useSearchParams()
+  const rawCallbackUrl = searchParams.get('callbackUrl')
+  // Safe validation to prevent Open Redirect vulnerability (OWASP Top 10)
+  const callbackUrl =
+    rawCallbackUrl && rawCallbackUrl.startsWith('/') && !rawCallbackUrl.startsWith('//')
+      ? rawCallbackUrl
+      : '/#menu'
+
   useEffect(() => setMounted(true), [])
   useEffect(() => {
     if (status === 'authenticated') {
       if (isSubmitted) {
         const timer = setTimeout(() => {
           startTransition(() => {
-            router.replace('/#menu')
+            router.replace(callbackUrl)
           })
         }, 800)
         return () => clearTimeout(timer)
       } else {
-        router.replace('/#menu')
+        router.replace(callbackUrl)
       }
     }
-  }, [status, router, isSubmitted])
+  }, [status, router, isSubmitted, callbackUrl])
 
   const onSubmit = async (data: LoginFormData) => {
     const tid = toast.loading(t('login_toast_verifying'))

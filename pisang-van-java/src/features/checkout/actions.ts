@@ -8,6 +8,7 @@ import {
   validateVoucherInputSchema
 } from '@/src/features/checkout/schemas'
 import {
+  getPaymentOrderForActor,
   hasValidSameOriginHeaders,
   processPaymentForActor,
   requireCheckoutActor,
@@ -132,4 +133,17 @@ export async function getShippingRates(
     console.error('[SHIPPING_ACTION_ERROR]', error)
     return { success: false, error: error?.message || 'Gagal menghitung ongkos kirim.' }
   }
+}
+
+export async function getOrderSummary(orderId: string) {
+  const actor = await requireCheckoutActor()
+  const parsed = paymentFormInputSchema.safeParse({ orderId })
+  if (!parsed.success) {
+    return { success: false, error: 'Order ID tidak valid' }
+  }
+  const order = await getPaymentOrderForActor(parsed.data.orderId, actor)
+  if (!order) {
+    return { success: false, error: 'Pesanan tidak ditemukan' }
+  }
+  return { success: true, data: order }
 }

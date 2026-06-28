@@ -8,9 +8,9 @@ export async function POST(req: NextRequest) {
   if (!session) return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
 
   const { currentPassword, newPassword } = await req.json()
-  if (!currentPassword || !newPassword || newPassword.length < 6)
+  if (!currentPassword || !newPassword || newPassword.length < 8)
     return NextResponse.json(
-      { success: false, error: 'Password minimal 6 karakter' },
+      { success: false, error: 'Password minimal 8 karakter' },
       { status: 400 }
     )
 

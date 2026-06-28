@@ -29,7 +29,7 @@ export default function HelpCenterPage() {
             dari 08:00 hingga 22:00 WIB.
           </p>
           <a
-            href="https://wa.me/6281234567890" // Ganti dengan nomor asli
+            href="https://wa.me/6285773728748"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex w-full justify-center items-center gap-2 px-6 py-3.5 bg-green-600 text-white font-bold rounded-[4px] hover:bg-green-700 active:scale-95 transition-all shadow-sm hover:shadow"

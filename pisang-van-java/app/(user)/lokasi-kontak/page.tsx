@@ -74,7 +74,7 @@ export default function LokasiKontakPage() {
     {
       label: 'WhatsApp',
       handle: `Hubungi Admin`,
-      href: `https://wa.me/${getSetting('nomor_wa', '6281312167554').replace(/[^0-9]/g, '')}`,
+      href: `https://wa.me/${getSetting('nomor_wa', '6285773728748').replace(/[^0-9]/g, '')}`,
       icon: WhatsAppIcon,
       textColor: 'text-[#25D366]',
       bg: '#25D366',

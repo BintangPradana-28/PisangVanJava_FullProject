@@ -25,7 +25,7 @@ async function main() {
           status: OrderStatus.OUT_FOR_DELIVERY,
           // Set default fallback values for testing
           courierName: order.courierName || 'Kurir PVJ',
-          courierPhone: order.courierPhone || '6281312167554',
+          courierPhone: order.courierPhone || '6285773728748',
           etaMinutes: order.etaMinutes || 25
         }
       })

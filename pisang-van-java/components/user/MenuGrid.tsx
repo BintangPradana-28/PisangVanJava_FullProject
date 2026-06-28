@@ -296,7 +296,7 @@ export default function MenuGrid({ products }: { products: ProductType[] }) {
                       {/* Rating & Sales UI */}
                       <div className="flex items-center gap-3 mb-3">
                         <Link
-                          href="/ulasan"
+                          href={`/ulasan?variantId=${product.id}`}
                           className="flex items-center gap-1.5 text-sm text-zinc-500 hover:text-[#D4802A] transition-colors cursor-pointer active:scale-95"
                         >
                           <span className="text-amber-400">⭐</span>

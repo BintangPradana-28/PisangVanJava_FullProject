@@ -97,7 +97,7 @@ export default async function TrackOrderDetailPage({
   const settingWa = await prisma.siteSetting.findUnique({
     where: { key: 'nomor_wa' }
   })
-  const storePhone = settingWa?.value || '6281312167554'
+  const storePhone = settingWa?.value || '6285773728748'
 
   // Map to a strictly masked/safe DTO to guarantee zero PII data leaks
   const maskedOrder = {

@@ -180,7 +180,7 @@ async function main() {
 
   // 4. Seed Settings
   const defaultSettings = {
-    nomor_wa: '6281312167554',
+    nomor_wa: '6285773728748',
     alamat: 'Jl. Raya Cilangkap l Rt.2/Rw.5, Cilangkap, Kec. Cipayung, Kota Jakarta Timur',
     jam_operasional: 'Setiap Hari: 10.00–21.00 WIB'
   }
@@ -206,13 +206,13 @@ async function main() {
     },
     {
       key: 'nomor_wa',
-      value: '6281312167554',
+      value: '6285773728748',
       label: 'Nomor WhatsApp (Format: 628...)',
       group: 'contact'
     },
     {
       key: 'kontak_whatsapp',
-      value: '6281312167554',
+      value: '6285773728748',
       label: 'Nomor WhatsApp Checkout',
       group: 'contact'
     },

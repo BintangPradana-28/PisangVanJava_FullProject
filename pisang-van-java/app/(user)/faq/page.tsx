@@ -53,9 +53,9 @@ const FAQ_DATA: FAQItem[] = [
     questionId: 'Berapa jarak pengiriman maksimal dari outlet?',
     questionEn: 'What is the maximum delivery distance from the outlet?',
     answerId:
-      'Saat ini pengiriman instan online kami melayani radius maksimal 15 km dari outlet terdekat untuk memastikan pisang tetap hangat dan renyah saat sampai di tempat Anda.',
+      'Saat ini pengiriman instan online kami melayani radius maksimal 40 km dari outlet terdekat untuk memastikan pisang tetap hangat dan renyah saat sampai di tempat Anda.',
     answerEn:
-      'Currently, our online instant delivery serves a maximum radius of 15 km from the nearest outlet to ensure the bananas remain warm and crispy when they reach you.'
+      'Currently, our online instant delivery serves a maximum radius of 40 km from the nearest outlet to ensure the bananas remain warm and crispy when they reach you.'
   },
   {
     id: 'd2',
@@ -276,7 +276,7 @@ export default function FAQPage() {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <a
-              href="https://wa.me/6281312167554"
+              href="https://wa.me/6285773728748"
               target="_blank"
               rel="noopener noreferrer"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 font-bold text-xs sm:text-sm transition-all active:scale-95"

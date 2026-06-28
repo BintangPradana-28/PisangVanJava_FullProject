@@ -21,7 +21,7 @@ vi.mock('@/src/services/checkout.service', () => {
     createCheckoutOrder: vi.fn().mockResolvedValue({
       orderId: 'order-12345678',
       redirectType: 'WHATSAPP',
-      redirectUrl: 'https://wa.me/6281312167554',
+      redirectUrl: 'https://wa.me/6285773728748',
       totalPrice: 24000
     })
   }

@@ -278,7 +278,7 @@ export default async function HomePage() {
 
   // SEO FIX (H1): JSON-LD now pulls from SiteSetting DB instead of hardcoded values.
   // Defaults match the real store location in Cipayung, Jakarta Timur.
-  const storePhone = siteSettings.nomor_wa || '6281312167554'
+  const storePhone = siteSettings.nomor_wa || '6285773728748'
   const storeAddress =
     siteSettings.alamat ||
     'Jl. Raya Cilangkap l Rt.2/Rw.5, Cilangkap, Kec. Cipayung, Kota Jakarta Timur'

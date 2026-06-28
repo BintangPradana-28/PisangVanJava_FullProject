@@ -57,7 +57,7 @@ export default async function LokasiKontakLayout({
     console.warn('[Safe Log] Failed to fetch site settings for JSON-LD')
   }
 
-  const storePhone = siteSettings.nomor_wa || '6281312167554'
+  const storePhone = siteSettings.nomor_wa || '6285773728748'
   const storeAddress =
     siteSettings.alamat ||
     'Jl. Raya Cilangkap l Rt.2/Rw.5, Cilangkap, Kec. Cipayung, Kota Jakarta Timur'

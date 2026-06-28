@@ -30,6 +30,8 @@ interface ReviewSystemProps {
   initialReviews: ReviewData[]
   initialAggregates: Aggregates
   currentFilter: string
+  variantName?: string
+  variantId?: string
 }
 
 // ── Star Picker ─────────────────────────────────────────────────────────────
@@ -73,7 +75,9 @@ const FILTERS = ['Semua', '5', '4', '3', '2', '1', 'Dengan Komentar'] as const
 export default function ReviewSystem({
   initialReviews,
   initialAggregates,
-  currentFilter
+  currentFilter,
+  variantName,
+  variantId: initialVariantId
 }: ReviewSystemProps) {
   const { t } = useLanguage()
   const { data: session } = useSession()
@@ -86,7 +90,7 @@ export default function ReviewSystem({
   const [showForm, setShowForm] = useState(false)
   const [rating, setRating] = useState(0)
   const [comment, setComment] = useState('')
-  const [variantId, setVariantId] = useState('')
+  const [variantId, setVariantId] = useState(initialVariantId || '')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   // Optimistic filter
@@ -161,6 +165,20 @@ export default function ReviewSystem({
           {t('review_desc')}
         </p>
       </div>
+
+      {variantName && (
+        <div className="mb-6 p-4 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/50 rounded-2xl flex items-center justify-between gap-4 text-sm">
+          <span className="text-zinc-700 dark:text-zinc-300">
+            Menampilkan ulasan untuk varian <strong>{variantName}</strong>.
+          </span>
+          <Link
+            href="/ulasan"
+            className="text-amber-700 dark:text-amber-400 font-bold hover:underline shrink-0"
+          >
+            Tampilkan Semua
+          </Link>
+        </div>
+      )}
 
       {/* ── Aggregate Summary ── */}
       <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 sm:p-8 mb-6 shadow-sm">

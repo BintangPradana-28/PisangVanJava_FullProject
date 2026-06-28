@@ -94,12 +94,22 @@ const liveProductSchema = z
   })
   .strict()
 
+const liveToppingSchema = z
+  .object({
+    id: z.string().min(1),
+    name: z.string().min(1),
+    price: z.number().finite().min(0),
+    emoji: z.string().nullable().optional()
+  })
+  .strict()
+
 const menuResponseSchema = z
   .object({
     success: z.literal(true),
     data: z
       .object({
-        variants: z.array(liveProductSchema)
+        variants: z.array(liveProductSchema),
+        toppings: z.array(liveToppingSchema)
       })
       .strict()
   })
@@ -131,6 +141,7 @@ function ReorderButton({ order }: { order: Order }) {
         throw new Error('INVALID_MENU_RESPONSE')
       }
       const liveProducts = parsedMenu.data.data.variants
+      const liveToppings = parsedMenu.data.data.toppings
 
       let addedCount = 0
       let skippedCount = 0
@@ -148,17 +159,28 @@ function ReorderButton({ order }: { order: Order }) {
 
         const basePrice = resolveBasePrice(item.baseType, live)
 
+        // RAG Source: app/(user)/track-order/page.tsx (robust reorder live toppings mapping)
+        const mappedToppings: any[] = []
+        if (item.toppings) {
+          for (const t of item.toppings) {
+            const matched = liveToppings.find(
+              (lt) => lt.name.toLowerCase() === t.name.toLowerCase()
+            )
+            if (matched) {
+              mappedToppings.push({
+                toppingId: matched.id,
+                name: matched.name,
+                priceAdd: matched.price
+              })
+            }
+          }
+        }
+
         addToCart({
           menuVariantId: live.id,
           variantName: `${variantName} (${item.baseType})`,
           basePrice,
-          toppings: item.toppings
-            ? item.toppings.map((t: any) => ({
-                toppingId: t.id || 'unknown',
-                name: t.name,
-                priceAdd: t.price || 2000
-              }))
-            : [],
+          toppings: mappedToppings,
           quantity: item.quantity,
           notes: ''
         })

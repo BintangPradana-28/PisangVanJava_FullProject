@@ -71,7 +71,7 @@ export default function KeranjangPage() {
       toppings: item.toppings ? item.toppings.map((t) => t.name) : []
     }))
 
-    const phone = getSetting('kontak_whatsapp', '6281312167554')
+    const phone = getSetting('kontak_whatsapp', '6285773728748')
     const name = session?.user?.name || 'Pelanggan'
     const link = generateWaCartLink(phone, name, waItems)
 
@@ -267,6 +267,25 @@ export default function KeranjangPage() {
                   <span>💬</span> {t('cart_btn_whatsapp')}
                 </button>
               </div>
+
+              {!session && (
+                <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/50 rounded-[4px] p-3 text-center mt-3 text-xs text-amber-800 dark:text-amber-300">
+                  💡 Mau hemat lebih banyak?{' '}
+                  <Link
+                    href="/member-login?callbackUrl=/keranjang"
+                    className="font-bold underline hover:text-amber-900 dark:hover:text-amber-200"
+                  >
+                    Yuk masuk/daftar member
+                  </Link>{' '}
+                  untuk kumpulkan Koin Pisang dan gunakan voucher diskon di halaman checkout!
+                </div>
+              )}
+              {session && (
+                <p className="text-[10px] text-zinc-500 dark:text-zinc-400 text-center mt-2 leading-relaxed">
+                  *Catatan: Pemesanan via WhatsApp tidak mendukung redeem Koin Pisang atau voucher
+                  promo. Gunakan tombol <strong>Lanjut ke Checkout</strong> untuk menggunakannya.
+                </p>
+              )}
               <p className="text-[10px] text-zinc-400 text-center mt-3">
                 {t('cart_security_notice')}
               </p>

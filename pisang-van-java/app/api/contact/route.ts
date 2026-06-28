@@ -58,7 +58,7 @@ export async function POST(req: Request) {
 
     // 3. GENERATE WHATSAPP REDIRECT URL
     // Kita panggil Setting nomor WA dari database juga jika perlu, tapi untuk performa kita gunakan env/default
-    const waNumber = process.env.WHATSAPP_NUMBER || '6281312167554'
+    const waNumber = process.env.WHATSAPP_NUMBER || '6285773728748'
     const text = encodeURIComponent(
       `Halo Van Java! Saya *${nama}*.\nEmail: ${email}\nNo. HP: ${phone}\n\n${pesan}`
     )

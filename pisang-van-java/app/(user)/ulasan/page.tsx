@@ -16,9 +16,25 @@ export default async function UlasanPage(props: {
 }) {
   const searchParams = await props.searchParams
   const filter = searchParams.filter || 'Semua'
+  const variantId = searchParams.variantId
+
+  // Fetch variant name if filtered
+  let variantName = ''
+  if (variantId) {
+    const v = await prisma.menuVariant.findUnique({
+      where: { id: variantId },
+      select: { flavorName: true, nama_varian: true }
+    })
+    if (v) {
+      variantName = v.flavorName || v.nama_varian || ''
+    }
+  }
 
   // Build where clause
-  const where: Prisma.ReviewWhereInput = {}
+  const where: Prisma.ReviewWhereInput = { isHidden: false }
+  if (variantId) {
+    where.variantId = variantId
+  }
   if (filter === 'Dengan Komentar') {
     where.comment = { not: null, gt: '' }
   } else if (filter !== 'Semua') {
@@ -53,6 +69,7 @@ export default async function UlasanPage(props: {
   }))
 
   const allReviews = await prisma.review.findMany({
+    where: variantId ? { variantId, isHidden: false } : { isHidden: false },
     select: { rating: true }
   })
 
@@ -78,7 +95,13 @@ export default async function UlasanPage(props: {
 
   return (
     <main className="min-h-screen bg-zinc-50 dark:bg-zinc-950 pt-24 pb-16">
-      <ReviewSystem initialReviews={data} initialAggregates={aggregates} currentFilter={filter} />
+      <ReviewSystem
+        initialReviews={data}
+        initialAggregates={aggregates}
+        currentFilter={filter}
+        variantName={variantName || undefined}
+        variantId={variantId || undefined}
+      />
     </main>
   )
 }

@@ -308,7 +308,7 @@ export default async function PaymentPage({ params, searchParams }: PaymentPageP
 
             {canPay ? (
               snapToken ? (
-                <MidtransPayButton snapToken={snapToken} />
+                <MidtransPayButton snapToken={snapToken} orderId={order.id} />
               ) : (
                 <div className="w-full text-left p-4 text-sm text-rose-600 bg-rose-50 rounded-[4px] border border-rose-200 space-y-2">
                   <p className="font-bold text-center">
@@ -356,7 +356,7 @@ export default async function PaymentPage({ params, searchParams }: PaymentPageP
         </div>
         {canPay ? (
           snapToken ? (
-            <MidtransPayButton snapToken={snapToken} />
+            <MidtransPayButton snapToken={snapToken} orderId={order.id} />
           ) : (
             <div className="w-full text-left p-4 text-sm text-rose-600 bg-rose-50 rounded-[4px] border border-rose-200 space-y-2">
               <p className="font-bold text-center">

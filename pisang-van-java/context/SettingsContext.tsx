@@ -21,8 +21,8 @@ const SettingsContext = createContext<SettingsContextType | undefined>(undefined
 const DEFAULT_SETTINGS: Record<string, string> = {
   site_name: 'Pisang Goreng Van Java',
   site_description: 'Pisang goreng renyah dengan lelehan topping premium terlezat se-Jawa.',
-  nomor_wa: '6281312167554',
-  kontak_whatsapp: '6281312167554',
+  nomor_wa: '6285773728748',
+  kontak_whatsapp: '6285773728748',
   alamat: 'Jl. Raya Cilangkap l Rt.2/Rw.5, Cilangkap, Kec. Cipayung, Kota Jakarta Timur',
   jam_operasional: 'Setiap Hari: 10.00–21.00 WIB',
   instagram: 'https://instagram.com/pisanggorengvanjava',

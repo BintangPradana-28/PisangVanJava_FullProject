@@ -1,6 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { ChevronDown } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
@@ -496,7 +497,9 @@ export default function QuickViewModal({
                         className="flex items-center gap-2 text-sm font-bold text-zinc-500 dark:text-zinc-400 mb-3 hover:text-[#D4802A] transition-colors focus:outline-none"
                       >
                         Topping Lainnya{' '}
-                        <span className="text-[10px]">{showOtherToppings ? '▲' : '▼'}</span>
+                        <ChevronDown
+                          className={`w-3.5 h-3.5 transition-transform duration-200 ${showOtherToppings ? 'rotate-180' : ''}`}
+                        />
                       </button>
                       {showOtherToppings && (
                         <div className="grid grid-cols-2 gap-3">

@@ -13,7 +13,7 @@ export default async function ProfileLayout({ children }: { children: React.Reac
   const session = await auth()
 
   if (!session?.user) {
-    redirect('/login?callbackUrl=/profile')
+    redirect('/member-login?callbackUrl=/profile')
   }
 
   return (

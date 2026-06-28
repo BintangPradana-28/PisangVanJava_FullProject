@@ -297,14 +297,23 @@ export default function MemberRegisterPage() {
                     htmlFor="consent"
                     className="text-[10px] text-[var(--on-surface-variant)] cursor-pointer leading-tight"
                   >
+                    {/* RAG Source: app/(user)/member-register/page.tsx (registration consent ToS links fix) */}
                     Dengan mendaftar, saya menyetujui{' '}
-                    <a href="#" className="text-amber-brand hover:underline">
+                    <Link
+                      href="/terms"
+                      target="_blank"
+                      className="text-amber-brand hover:underline"
+                    >
                       Syarat & Ketentuan
-                    </a>{' '}
+                    </Link>{' '}
                     serta{' '}
-                    <a href="#" className="text-amber-brand hover:underline">
+                    <Link
+                      href="/privacy"
+                      target="_blank"
+                      className="text-amber-brand hover:underline"
+                    >
                       Kebijakan Privasi
-                    </a>{' '}
+                    </Link>{' '}
                     yang berlaku.
                   </label>
                 </motion.div>

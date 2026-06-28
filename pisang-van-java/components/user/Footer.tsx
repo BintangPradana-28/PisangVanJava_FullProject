@@ -146,6 +146,14 @@ export default function Footer() {
               </li>
               <li>
                 <Link
+                  href="/faq"
+                  className="text-cream-50/75 hover:text-white transition-colors duration-200 flex items-center gap-1.5"
+                >
+                  ❓ {locale === 'id' ? 'Tanya Jawab (FAQ)' : 'FAQ'}
+                </Link>
+              </li>
+              <li>
+                <Link
                   href="/privacy"
                   className="text-cream-50/75 hover:text-white transition-colors duration-200"
                 >
@@ -186,7 +194,7 @@ export default function Footer() {
                 },
                 {
                   name: 'WhatsApp',
-                  href: `https://wa.me/${getSetting('nomor_wa', '6281312167554').replace(/[^0-9]/g, '')}`,
+                  href: `https://wa.me/${getSetting('nomor_wa', '6285773728748').replace(/[^0-9]/g, '')}`,
                   icon: <WaIcon />
                 }
               ].map((item) => (

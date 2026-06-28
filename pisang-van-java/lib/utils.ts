@@ -16,7 +16,7 @@ export const formatPrice = (price: number): string =>
 export const formatPriceShort = (price: number): string => `${price / 1000}K`
 
 export function buildWhatsAppUrl(message: string): string {
-  const waNumber = process.env.NEXT_PUBLIC_WA_NUMBER || '6281312167554'
+  const waNumber = process.env.NEXT_PUBLIC_WA_NUMBER || '6285773728748'
   return `https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`
 }
 

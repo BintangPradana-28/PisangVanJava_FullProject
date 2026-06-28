@@ -7,9 +7,10 @@ import { env } from '@/src/env'
 
 interface Props {
   snapToken: string
+  orderId?: string
 }
 
-export default function MidtransPayButton({ snapToken }: Props) {
+export default function MidtransPayButton({ snapToken, orderId }: Props) {
   const router = useRouter()
   const [isReady, setIsReady] = useState(false)
   const [isPaying, setIsPaying] = useState(false)
@@ -72,11 +73,11 @@ export default function MidtransPayButton({ snapToken }: Props) {
       window.snap.pay(snapToken, {
         onSuccess: (_result: MidtransResult) => {
           setIsPaying(false)
-          router.push('/thanks')
+          router.push(orderId ? `/thanks?orderId=${orderId}` : '/thanks')
         },
         onPending: (_result: MidtransResult) => {
           setIsPaying(false)
-          router.push('/thanks')
+          router.push(orderId ? `/thanks?orderId=${orderId}` : '/thanks')
         },
         onError: (result: MidtransResult) => {
           setIsPaying(false)

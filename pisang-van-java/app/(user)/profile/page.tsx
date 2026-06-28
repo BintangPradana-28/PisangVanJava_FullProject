@@ -43,7 +43,7 @@ const profileSchema = z.object({
 const passwordSchema = z
   .object({
     currentPassword: z.string().min(1, 'Password saat ini wajib diisi'),
-    newPassword: z.string().min(6, 'Password baru minimal 6 karakter'),
+    newPassword: z.string().min(8, 'Password baru minimal 8 karakter'),
     confirmPassword: z.string().min(1, 'Konfirmasi password wajib diisi')
   })
   .refine((data) => data.newPassword === data.confirmPassword, {
@@ -386,7 +386,6 @@ export default function ProfileDataDiriPage() {
                   {isUploading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Simpan Foto'}
                 </button>
               </div>
-              <PushNotificationManager />
             </div>
           </motion.div>
         )}
@@ -855,6 +854,18 @@ export default function ProfileDataDiriPage() {
                 </button>
               </div>
             </form>
+          </section>
+
+          {/* RAG Source: app/(user)/profile/page.tsx (relocated Push Notification section) */}
+          <section className="bg-white dark:bg-zinc-900 rounded-[4px] p-6 md:p-8 shadow-sm border border-zinc-200/50 dark:border-zinc-800/80 mt-6">
+            <h2 className="text-xl font-bold font-serif text-zinc-900 dark:text-zinc-100 mb-2">
+              Notifikasi Web Push
+            </h2>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-6">
+              Aktifkan notifikasi web push untuk menerima informasi status pesanan Anda secara
+              real-time.
+            </p>
+            <PushNotificationManager />
           </section>
         </>
       )}
