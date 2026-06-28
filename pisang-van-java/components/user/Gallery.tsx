@@ -97,7 +97,7 @@ function GalleryCard({
     >
       <Link
         href={href}
-        className="group relative block aspect-square rounded-[4px] overflow-hidden border border-outline-variant/20 dark:border-zinc-800 shadow-sm focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-brand/40"
+        className="group relative block aspect-square rounded-[6px] overflow-hidden border border-outline-variant/35 dark:border-zinc-800 shadow-sm focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-brand/40"
         aria-label={`${item.label} — ${viewDetailLabel}`}
       >
         <div
@@ -124,7 +124,7 @@ function GalleryCard({
         </div>
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-1 transition-transform duration-300 ease-out group-hover:translate-y-0">
-          <p className="text-white font-serif font-bold text-sm sm:text-base drop-shadow">
+          <p className="text-white font-sans font-bold text-sm sm:text-base tracking-tight drop-shadow">
             {item.label}
           </p>
           <span className="inline-flex items-center gap-1 text-xs text-white/70 mt-1 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 transition-opacity duration-300">
@@ -175,25 +175,23 @@ export default function Gallery({ products, compact = false }: GalleryProps) {
           className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6 mb-10"
         >
           <div>
-            <div className="inline-block bg-secondary/10 text-secondary text-xs font-bold tracking-[0.2em] uppercase px-4 py-1 rounded-[4px] mb-3">
+            <div className="inline-block bg-secondary/10 text-secondary text-[11px] font-semibold tracking-wider font-mono uppercase px-3 py-1 rounded-[6px] mb-3">
               {t('gallery_badge')}
             </div>
             <h2
               id="gallery-heading"
-              className="font-serif text-3xl sm:text-4xl font-bold text-primary dark:text-zinc-100"
+              className="font-sans text-3xl sm:text-4xl font-extrabold text-primary dark:text-zinc-100 tracking-[-0.03em] sm:tracking-[-0.04em]"
             >
               {t('gallery_title')}{' '}
-              <span className="text-amber-brand italic font-normal">
-                {t('gallery_title_accent')}
-              </span>
+              <span className="text-amber-brand font-medium">{t('gallery_title_accent')}.</span>
             </h2>
-            <p className="text-on-surface-variant dark:text-zinc-400 text-sm sm:text-base mt-3 max-w-xl leading-relaxed">
+            <p className="text-zinc-650 dark:text-zinc-400 text-sm sm:text-base mt-3 max-w-xl leading-relaxed">
               {t('gallery_desc')}
             </p>
           </div>
           <Link
             href="/menu-spesial"
-            className="inline-flex items-center justify-center gap-2 shrink-0 font-bold text-sm px-6 py-3 rounded-[4px] bg-amber-brand hover:bg-amber-brand/90 text-white shadow-sm transition-all duration-200 active:scale-95 hover:-translate-y-0.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-brand/40"
+            className="inline-flex items-center justify-center gap-2 shrink-0 font-bold text-sm px-6 py-3 rounded-full bg-amber-brand hover:bg-amber-brand/95 text-white shadow-sm transition-all duration-250 active:scale-95 hover:-translate-y-0.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-brand/40"
           >
             {t('gallery_view_menu')} →
           </Link>

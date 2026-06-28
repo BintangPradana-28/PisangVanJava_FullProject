@@ -9,7 +9,7 @@ import { useLanguage } from '@/context/LanguageContext'
 // the full hero image streams in, instead of a blank flash on slow connections.
 // Still a reasonable fallback when a CMS banner image is active instead, since
 // the hero already sits on a dark background with a heavy gradient overlay on top.
-const HERO_BG_BLUR_DATA_URL =
+const _HERO_BG_BLUR_DATA_URL =
   'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABQODxIPDRQSEBIXFRQYHjIhHhwcHj0sLiQySUBMS0dARkVQWnNiUFVtVkVGZIhlbXd7gYKBTmCNl4x9lnN+gXz/2wBDARUXFx4aHjshITt8U0ZTfHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHz/wAARCAAQABADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDNRVjCKG43bkIAB6etWb+Ut+8DHLqMk1RW8WQfZ1RcdR7n+lNvbhifKZfLVOAofPNZJM0dj//Z'
 
 const ShoppingBagIcon = () => (
@@ -74,116 +74,97 @@ export default function Hero({
   return (
     <section
       id="hero"
-      // PERBAIKAN: Mengunci background utama menjadi gelap dan full width
-      // PERF: Tinggi dikurangi di mobile/tablet (85vh, bukan 100vh) — memperkecil
-      // area LCP image yang harus dirender di koneksi lambat, dan membawa section
-      // berikutnya sedikit lebih dekat ke atas tanpa mengubah tampilan desktop.
-      className="relative w-full min-h-[85vh] lg:min-h-screen flex items-center justify-center overflow-hidden bg-[#1a0f0a]"
+      className="relative w-full min-h-[85vh] lg:min-h-screen flex items-center justify-center overflow-hidden bg-surface-container-low dark:bg-zinc-950/40"
     >
-      {/* Background Image with Overlay */}
-      <div className="absolute inset-0 z-0" aria-hidden="true">
-        <Image
-          src={bgImage}
-          alt="Banner Promosi Van Java"
-          fill
-          priority
-          fetchPriority="high"
-          placeholder="blur"
-          blurDataURL={HERO_BG_BLUR_DATA_URL}
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 1200px"
-          // PERF: quality diturunkan dari 70 — gambar ini berada di belakang
-          // opacity-40 + gradient gelap berlapis, jadi detail kompresi nyaris
-          // tak terlihat, sementara ukuran file turun cukup besar untuk LCP.
-          quality={45}
-          className="object-cover opacity-40"
-        />
-        {/* PERBAIKAN: Gradient hitam pekat yang dikunci mati (tidak terpengaruh tema) */}
-        <div
-          className="absolute inset-0 bg-gradient-to-t from-[#1a0f0a] via-[#1a0f0a]/80 to-black/30"
-          aria-hidden="true"
-        />
+      {/* Warm Mesh Gradient Backdrop */}
+      <div
+        className="absolute inset-0 z-0 overflow-hidden opacity-45 dark:opacity-30 pointer-events-none"
+        aria-hidden="true"
+      >
+        <div className="absolute -top-[30%] -left-[10%] w-[70%] h-[70%] rounded-full bg-gradient-to-br from-amber-300/40 via-amber-400/20 to-amber-brand/10 blur-[120px]" />
+        <div className="absolute -top-[20%] -right-[10%] w-[60%] h-[60%] rounded-full bg-gradient-to-br from-yellow-200/40 via-amber-100/20 to-rose-300/10 blur-[100px]" />
+        <div className="absolute top-[20%] left-[10%] w-[50%] h-[50%] rounded-full bg-gradient-to-br from-amber-200/20 to-transparent blur-[90px]" />
       </div>
 
-      <div className="relative z-10 max-w-[1200px] w-full mx-auto px-6 py-24 md:py-32 grid lg:grid-cols-[3fr_2fr] gap-12 items-center">
+      <div className="relative z-10 max-w-[1200px] w-full mx-auto px-6 py-20 md:py-28 grid lg:grid-cols-[3fr_2fr] gap-12 items-center">
         {/* Text Area */}
         <div className="text-left">
           {badge && (
-            <div className="inline-flex items-center gap-2 mb-6">
-              <span className="bg-amber-500/20 border border-amber-500/40 text-amber-400 text-xs font-semibold tracking-[0.25em] uppercase px-4 py-1.5 rounded-[4px]">
+            <div className="inline-flex items-center gap-2 mb-5">
+              <span className="bg-secondary/15 border border-secondary/25 text-secondary dark:text-amber-400 font-mono text-[11px] font-semibold tracking-wider uppercase px-3 py-1 rounded-[6px]">
                 {badge}
               </span>
             </div>
           )}
 
-          <h1
-            // PERBAIKAN: Pastikan text selalu white
-            className="font-serif text-5xl sm:text-6xl lg:text-7xl font-bold text-white leading-[1.1] tracking-tight mb-4 drop-shadow-sm"
-          >
-            {renderTitle()}
+          <h1 className="font-sans text-4xl sm:text-5xl lg:text-6xl font-extrabold text-primary dark:text-zinc-100 leading-[1.08] tracking-[-0.03em] sm:tracking-[-0.05em] mb-4">
+            {renderTitle()}.
           </h1>
 
           <div className="flex flex-wrap items-center gap-3 mb-6">
             {totalReviews >= 5 && (
               <>
                 <Link href="/ulasan" className="group">
-                  <div className="flex items-center gap-1.5 bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 rounded-[4px] backdrop-blur-sm transition-all duration-200 hover:bg-amber-500/20">
+                  <div className="flex items-center gap-1.5 bg-secondary/10 border border-secondary/20 dark:border-zinc-800 px-3 py-1.5 rounded-[6px] backdrop-blur-sm transition-all duration-200 hover:bg-secondary/20">
                     <div className="flex gap-0.5">
                       {Array.from({ length: 5 }).map((_, i) => (
                         <Star
                           // biome-ignore lint/suspicious/noArrayIndexKey: Static array for rendering stars
                           key={i}
-                          className={`w-3.5 h-3.5 ${i < Math.round(averageRating) ? 'fill-amber-400 text-amber-400' : 'text-amber-400/30'}`}
+                          className={`w-3 h-3 ${i < Math.round(averageRating) ? 'fill-amber-brand text-amber-brand' : 'text-zinc-300 dark:text-zinc-700'}`}
                         />
                       ))}
                     </div>
-                    <span className="text-sm font-bold text-amber-400 ml-1">
+                    <span className="text-xs font-bold text-secondary dark:text-amber-400 ml-1">
                       {averageRating.toFixed(1)}
                     </span>
-                    <span className="text-sm text-gray-300 font-medium">
+                    <span className="text-xs text-zinc-550 dark:text-zinc-400 font-medium">
                       (
                       {totalReviews > 1000 ? `${(totalReviews / 1000).toFixed(1)}RB` : totalReviews}{' '}
                       Penilaian)
                     </span>
-                    <ChevronRight className="w-4 h-4 text-gray-400 ml-1 group-hover:text-amber-400 transition-colors" />
+                    <ChevronRight className="w-3.5 h-3.5 text-zinc-400 ml-1 group-hover:text-amber-brand transition-colors" />
                   </div>
                 </Link>
-                <span className="text-gray-500 text-lg leading-none">•</span>
+                <span className="text-zinc-300 dark:text-zinc-700 text-lg leading-none">•</span>
               </>
             )}
 
-            <div className="flex items-center gap-1.5 text-gray-300 text-sm font-medium">
-              <Clock className="w-4 h-4 opacity-70" />
+            <div className="flex items-center gap-1.5 text-zinc-550 dark:text-zinc-400 text-xs font-semibold font-mono">
+              <Clock className="w-3.5 h-3.5 opacity-70 text-secondary" />
               <span>10.00 - 21.00 WIB</span>
             </div>
 
-            <span className="text-gray-500 text-lg leading-none hidden sm:block">•</span>
+            <span className="text-zinc-300 dark:text-zinc-700 text-lg leading-none hidden sm:block">
+              •
+            </span>
 
-            <div className="hidden sm:flex items-center gap-1 text-gray-300 text-sm font-medium">
+            <div className="hidden sm:flex items-center gap-1 text-zinc-550 dark:text-zinc-400 text-xs font-semibold font-mono">
               <span>{t('hero_location')}</span>
             </div>
           </div>
 
-          <p className="text-gray-200 text-lg leading-relaxed max-w-lg mb-8 font-sans drop-shadow-md">
+          <p className="text-zinc-650 dark:text-zinc-400 text-base sm:text-lg leading-relaxed max-w-lg mb-8 font-sans">
             {subtitle}
           </p>
 
-          <div className="flex flex-wrap gap-4 items-center">
+          <div className="flex flex-wrap gap-3 items-center">
             <Link
               href={ctaLink}
-              className="inline-flex items-center gap-3 bg-amber-brand hover:bg-amber-brand/90 text-[#1a0f0a] font-bold text-base px-10 py-4 rounded-[4px] shadow-sbx-card hover:shadow-sm transition-all duration-200 active:scale-95 group focus:outline-none focus:ring-4 focus:ring-amber-brand/40"
+              className="inline-flex items-center gap-2 bg-amber-brand hover:bg-amber-brand/95 text-white font-bold text-sm px-8 py-3.5 rounded-full shadow-md transition-all duration-200 active:scale-95 group focus:outline-none focus:ring-4 focus:ring-amber-brand/40"
             >
               <ShoppingBagIcon />
               <span>{t('hero_order_btn')}</span>
             </Link>
             <Link
               href="/track-order"
-              className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/15 border border-white/30 text-white font-bold text-base px-8 py-4 rounded-[4px] transition-all duration-200 active:scale-95 focus:outline-none focus:ring-4 focus:ring-white/30"
+              className="inline-flex items-center gap-2 bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800/80 border border-outline-variant/35 dark:border-zinc-800 text-primary dark:text-zinc-200 font-bold text-sm px-6 py-3.5 rounded-full shadow-sm transition-all duration-200 active:scale-95 focus:outline-none focus:ring-4 focus:ring-zinc-300/30"
             >
               <span>📦 {t('hero_sec_cta')}</span>
             </Link>
           </div>
 
-          <div className="grid grid-cols-3 gap-6 max-w-sm mt-12 pt-8 border-t border-white/10">
+          <div className="grid grid-cols-3 gap-6 max-w-sm mt-12 pt-8 border-t border-outline-variant/20 dark:border-zinc-800">
             {[
               {
                 num: activeToppingsCount > 0 ? `${activeToppingsCount}+` : '12+',
@@ -196,8 +177,10 @@ export default function Hero({
               { num: '100%', label: t('hero_stat_local') }
             ].map(({ num, label }) => (
               <div key={label}>
-                <div className="font-serif text-3xl font-bold text-amber-500">{num}</div>
-                <div className="text-xs text-gray-400 tracking-wider uppercase mt-1 font-medium">
+                <div className="font-mono text-2xl font-bold text-secondary dark:text-amber-400">
+                  {num}
+                </div>
+                <div className="text-[10px] text-zinc-450 dark:text-zinc-500 tracking-wider uppercase mt-1 font-semibold">
                   {label}
                 </div>
               </div>
@@ -207,9 +190,9 @@ export default function Hero({
 
         {/* Visual Element */}
         <div className="hidden lg:flex justify-end">
-          <div className="relative w-full aspect-[4/3] rounded-[12px] overflow-hidden shadow-sbx-card border-8 border-white/10 bg-black/50">
+          <div className="relative w-full aspect-[4/3] rounded-[8px] overflow-hidden shadow-md border border-outline-variant/35 dark:border-zinc-800 bg-white dark:bg-zinc-900">
             <Image
-              src={banner?.imageUrl || '/kitchen.png'}
+              src={bgImage}
               alt="Visual Promosi"
               fill
               sizes="(max-width: 1024px) 1px, 450px"
@@ -217,7 +200,7 @@ export default function Hero({
               className="object-cover"
             />
             {badge && (
-              <div className="absolute top-5 right-5 bg-amber-800 text-amber-50 text-xs font-bold px-4 py-2 rounded-[4px] shadow-md">
+              <div className="absolute top-5 right-5 bg-secondary text-white text-[10px] font-bold px-3 py-1.5 rounded-[4px] shadow-sm font-mono uppercase tracking-wider">
                 {badge}
               </div>
             )}
@@ -228,10 +211,10 @@ export default function Hero({
       {/* Floating Scroll Indicator */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden md:block z-20">
         <div className="flex flex-col items-center gap-1 cursor-pointer animate-bounce">
-          <span className="text-xs text-gray-400 uppercase tracking-widest font-medium">
+          <span className="text-[10px] text-zinc-400 uppercase tracking-widest font-semibold font-mono">
             {t('hero_scroll_down')}
           </span>
-          <span className="text-amber-500 text-sm">↓</span>
+          <span className="text-secondary dark:text-amber-brand text-sm">↓</span>
         </div>
       </div>
     </section>

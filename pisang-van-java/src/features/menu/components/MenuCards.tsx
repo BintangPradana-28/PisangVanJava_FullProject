@@ -85,11 +85,11 @@ const ProductImage = ({
         blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
       />
       {available ? (
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm border border-zinc-100 dark:border-zinc-800 rounded-[4px] px-3 py-1 text-xs font-bold text-primary dark:text-zinc-300">
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm border border-outline-variant/35 dark:border-zinc-800 rounded-[6px] px-2.5 py-0.5 text-[10px] font-mono font-semibold tracking-wider uppercase text-primary dark:text-zinc-350 shadow-sm">
           Freshly Fried
         </div>
       ) : (
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-red-600/90 backdrop-blur-sm border border-red-700 rounded-[4px] px-3 py-1 text-xs font-bold text-white shadow-md">
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-red-600/90 backdrop-blur-sm border border-red-700/80 rounded-[6px] px-2.5 py-0.5 text-[10px] font-mono font-semibold tracking-wider uppercase text-white shadow-sm">
           Sold Out
         </div>
       )}
@@ -158,13 +158,13 @@ export default function MenuCards({ products }: Props) {
           transition={{ duration: 0.5 }}
           className="text-center mb-16"
         >
-          <div className="text-secondary text-xs font-bold tracking-[0.2em] uppercase mb-3">
+          <div className="text-secondary text-[11px] font-semibold tracking-wider font-mono uppercase mb-3">
             {t('menu_badge')}
           </div>
-          <h2 className="font-serif text-4xl sm:text-5xl font-bold text-primary dark:text-zinc-100">
+          <h2 className="font-sans text-3xl sm:text-4xl font-extrabold text-primary dark:text-zinc-100 tracking-[-0.03em] sm:tracking-[-0.04em]">
             {t('menu_title').split('Van Java')[0]}
-            <span className="text-secondary italic font-normal">Van Java</span>
-            {t('menu_title').split('Van Java')[1]}
+            <span className="text-secondary font-medium">Van Java</span>
+            {t('menu_title').split('Van Java')[1]}.
           </h2>
         </motion.div>
 
@@ -174,17 +174,17 @@ export default function MenuCards({ products }: Props) {
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="flex flex-wrap justify-center gap-3 mb-10"
+            className="flex flex-wrap justify-center gap-2 mb-10"
           >
             {allTags.map((tag) => (
               <button
                 key={tag}
                 type="button"
                 onClick={() => setActiveTag(tag)}
-                className={`px-5 py-2 rounded-[4px] text-sm font-medium transition-all active:scale-95 ${
+                className={`px-4 py-1.5 rounded-full text-xs font-semibold tracking-wide transition-all active:scale-95 border ${
                   activeTag === tag
-                    ? 'bg-amber-brand text-white shadow-sbx-card'
-                    : 'bg-surface-container hover:bg-surface-container-high text-on-surface-variant border border-outline-variant/30'
+                    ? 'bg-amber-brand text-white border-amber-brand shadow-sm'
+                    : 'bg-white dark:bg-zinc-900 border-outline-variant/35 dark:border-zinc-800 text-zinc-650 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800'
                 }`}
               >
                 {tag === 'ALL' ? t('menu_filter_all') : tag}
@@ -225,7 +225,7 @@ export default function MenuCards({ products }: Props) {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: i * 0.05 }}
-                  className={`bg-white dark:bg-zinc-900 rounded-[4px] overflow-hidden border border-outline-variant/30 dark:border-zinc-800/60 hover:border-secondary/40 shadow-sbx-card transition-all duration-300 flex flex-col group ${!available ? 'opacity-80 grayscale-[50%]' : ''}`}
+                  className={`bg-white dark:bg-zinc-900 rounded-[6px] overflow-hidden border border-outline-variant/35 dark:border-zinc-850 hover:border-secondary/40 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col group ${!available ? 'opacity-80 grayscale-[50%]' : ''}`}
                 >
                   {/* Image Container */}
                   <Link
@@ -239,10 +239,10 @@ export default function MenuCards({ products }: Props) {
                   <div className="p-3.5 sm:p-6.5 flex flex-col items-center text-center flex-grow">
                     <Link
                       href={`/menu-spesial/${product.id}`}
-                      className="focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded-[4px] block mb-1"
+                      className="focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 rounded-[6px] block mb-1"
                     >
                       <h3
-                        className={`font-serif text-lg sm:text-2xl font-bold text-primary dark:text-zinc-100 w-full text-center transition-colors hover:text-amber-brand ${!available ? 'text-zinc-500' : ''}`}
+                        className={`font-sans text-base sm:text-xl font-bold tracking-tight text-primary dark:text-zinc-100 w-full text-center transition-colors hover:text-amber-brand ${!available ? 'text-zinc-500' : ''}`}
                       >
                         {product.flavorName}
                       </h3>
@@ -252,16 +252,16 @@ export default function MenuCards({ products }: Props) {
                     <div className="flex items-center justify-center gap-1.5 mb-2 mt-1 w-full">
                       {product.stock > 0 ? (
                         <>
-                          <span className="w-2 h-2 rounded-[4px] bg-green-500"></span>
-                          <span className="text-xs font-semibold text-green-600 dark:text-green-400 tracking-wide">
-                            Tersedia: <span className="font-bold">{product.stock}</span> porsi
+                          <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                          <span className="text-[10px] font-mono font-semibold text-green-600 dark:text-green-400 tracking-wider uppercase">
+                            Ready: <span className="font-bold">{product.stock}</span>
                           </span>
                         </>
                       ) : (
                         <>
-                          <span className="w-2 h-2 rounded-[4px] bg-red-500"></span>
-                          <span className="text-xs font-semibold text-red-600 dark:text-red-400 tracking-wide">
-                            Habis Terjual
+                          <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+                          <span className="text-[10px] font-mono font-semibold text-red-600 dark:text-red-400 tracking-wider uppercase">
+                            Sold Out
                           </span>
                         </>
                       )}
@@ -271,39 +271,39 @@ export default function MenuCards({ products }: Props) {
                     <div className="flex items-center gap-3 mb-3 w-full justify-center">
                       <Link
                         href="/ulasan"
-                        className="flex items-center gap-1.5 text-sm text-zinc-500 hover:text-[#D4802A] transition-colors cursor-pointer active:scale-95"
+                        className="flex items-center gap-1 text-xs text-zinc-500 hover:text-[#D4802A] transition-colors cursor-pointer active:scale-95"
                       >
                         {product.rating ? (
                           <>
                             <span className="text-amber-400">⭐</span>
-                            <span className="font-semibold text-zinc-700 dark:text-zinc-300">
+                            <span className="font-semibold text-zinc-700 dark:text-zinc-300 font-mono">
                               {product.rating}
                             </span>
                             {product.reviewCount ? (
-                              <span className="text-xs">({product.reviewCount})</span>
+                              <span className="text-[10px] font-mono">({product.reviewCount})</span>
                             ) : null}
                           </>
                         ) : (
-                          <span className="font-bold text-[#D4802A] bg-[#D4802A]/10 px-2 py-0.5 rounded-[4px] text-xs">
+                          <span className="font-bold text-[#D4802A] bg-[#D4802A]/10 px-2 py-0.5 rounded-[6px] text-[10px] font-mono tracking-wider uppercase">
                             {getSalesMagnetTag(product.flavorName)}
                           </span>
                         )}
                       </Link>
 
                       {product.soldCount !== undefined && product.soldCount > 0 && (
-                        <div className="flex items-center gap-1 text-xs font-medium text-zinc-500 bg-zinc-100 dark:bg-zinc-800/50 px-2 py-0.5 rounded-[4px]">
+                        <div className="flex items-center gap-1 text-[10px] font-mono font-semibold text-zinc-500 bg-zinc-100 dark:bg-zinc-800/50 px-2 py-0.5 rounded-[6px] tracking-wider uppercase">
                           {product.soldCount > 50 && <span className="text-orange-500">🔥</span>}
                           <span>
                             {product.soldCount >= 1000
                               ? `${(product.soldCount / 1000).toFixed(1)}k+`
                               : product.soldCount}{' '}
-                            Terjual
+                            Sold
                           </span>
                         </div>
                       )}
                     </div>
 
-                    <p className="text-on-surface-variant dark:text-zinc-400 text-sm leading-relaxed mb-6 flex-grow font-sans w-full text-center">
+                    <p className="text-zinc-600 dark:text-zinc-400 text-xs leading-relaxed mb-6 flex-grow font-sans w-full text-center">
                       {product.deskripsi_topping ||
                         (() => {
                           const key = getFlavorDescriptionKey(product.flavorName)
@@ -312,13 +312,13 @@ export default function MenuCards({ products }: Props) {
                     </p>
 
                     {/* Action row */}
-                    <div className="flex flex-col items-center gap-3 pt-6 pb-8 border-t border-outline-variant/20 dark:border-zinc-800 mt-auto w-full">
+                    <div className="flex flex-col items-center gap-3 pt-4 pb-6 border-t border-outline-variant/30 dark:border-zinc-800/80 mt-auto w-full">
                       <div className="text-center">
-                        <div className="text-[10px] text-zinc-400 uppercase tracking-wider font-semibold mb-0.5">
+                        <div className="text-[10px] text-zinc-400 uppercase tracking-wider font-semibold font-mono mb-0.5">
                           {isReseller ? 'Harga Grosir (Mulai)' : t('menu_price')}
                         </div>
                         <div
-                          className={`font-sans text-lg font-bold text-primary dark:text-amber-400 ${!available ? 'text-zinc-500' : ''}`}
+                          className={`font-mono text-base font-bold text-primary dark:text-amber-400 ${!available ? 'text-zinc-500' : ''}`}
                         >
                           {isReseller && defaultWholesale > 0 ? (
                             <div className="flex flex-col items-center leading-tight">
@@ -341,8 +341,8 @@ export default function MenuCards({ products }: Props) {
                         disabled={!available}
                         className={
                           available
-                            ? 'bg-amber-brand hover:bg-amber-brand/90 text-white font-bold text-sm px-8 py-3 rounded-[4px] shadow-sbx-card transition-all duration-200 focus:outline-none flex items-center justify-center gap-1.5 active:scale-95'
-                            : 'bg-zinc-300 text-zinc-500 cursor-not-allowed font-bold text-sm px-8 py-3 rounded-[4px] flex items-center justify-center gap-1.5 opacity-70'
+                            ? 'bg-amber-brand hover:bg-amber-brand/95 text-white font-bold text-xs px-6 py-2.5 rounded-full shadow-sm transition-all duration-200 focus:outline-none flex items-center justify-center gap-1.5 active:scale-95'
+                            : 'bg-zinc-200 text-zinc-400 cursor-not-allowed font-bold text-xs px-6 py-2.5 rounded-full flex items-center justify-center gap-1.5 opacity-70'
                         }
                       >
                         <span>{available ? t('menu_btn_order') : 'Habis Terjual'}</span>
@@ -365,7 +365,7 @@ export default function MenuCards({ products }: Props) {
         >
           <Link
             href="/menu-spesial"
-            className="inline-flex items-center gap-2 font-bold text-sm px-8 py-3.5 rounded-[4px] transition-all active:scale-95 bg-amber-brand text-white shadow-sbx-card"
+            className="inline-flex items-center gap-2 font-bold text-sm px-8 py-3.5 rounded-full transition-all active:scale-95 bg-amber-brand text-white shadow-sm"
           >
             🍌 Lihat Semua Menu &amp; Varian →
           </Link>

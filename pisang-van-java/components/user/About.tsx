@@ -104,37 +104,37 @@ export default function About({
                   transition: { duration: 0.5, delay: 0.12, ease: 'easeOut' }
                 })}
           >
-            <div className="flex flex-wrap items-center gap-3 mb-4">
-              <div className="inline-block bg-secondary/10 text-secondary text-xs font-bold tracking-[0.2em] uppercase px-4 py-1 rounded-[4px]">
+            <div className="flex flex-wrap items-center gap-3 mb-5">
+              <div className="inline-block bg-secondary/10 text-secondary text-[11px] font-semibold tracking-wider font-mono uppercase px-3 py-1 rounded-[6px]">
                 {t('about_badge')}
               </div>
               {totalReviews >= 5 && (
                 <Link
                   href="/ulasan"
-                  className="inline-flex items-center gap-1 bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-[4px] transition-all hover:bg-amber-500/20 active:scale-95 focus:outline-none"
+                  className="inline-flex items-center gap-1 bg-amber-brand/10 border border-amber-brand/20 px-2.5 py-1 rounded-[6px] transition-all hover:bg-amber-brand/20 active:scale-95 focus:outline-none"
                 >
-                  <span className="text-amber-500 text-xs font-bold">
+                  <span className="text-amber-brand text-xs font-bold">
                     ★ {averageRating.toFixed(1)}
                   </span>
-                  <span className="text-[10px] font-semibold text-amber-700 dark:text-amber-400">
+                  <span className="text-[10px] font-semibold text-amber-855 dark:text-amber-400">
                     ({totalReviews} {t('about_review_social')})
                   </span>
                 </Link>
               )}
             </div>
 
-            <h2 className="font-serif text-4xl sm:text-5xl font-bold text-primary dark:text-zinc-100 mb-6 leading-[1.15]">
+            <h2 className="font-sans text-3xl sm:text-4xl font-extrabold text-primary dark:text-zinc-100 mb-6 leading-[1.12] tracking-[-0.03em] sm:tracking-[-0.04em]">
               {t('about_title').split(',')[0].trim()},<br />
-              <span className="text-amber-brand italic font-normal">
-                {t('about_title').split(',')[1]?.trim()}
+              <span className="text-amber-brand font-medium">
+                {t('about_title').split(',')[1]?.trim()}.
               </span>
             </h2>
 
-            <p className="text-on-surface-variant dark:text-zinc-400 text-base leading-relaxed mb-6 font-sans">
+            <p className="text-zinc-650 dark:text-zinc-400 text-sm sm:text-base leading-relaxed mb-6 font-sans">
               {t('about_desc1')}
             </p>
 
-            <p className="text-on-surface-variant dark:text-zinc-400 text-base leading-relaxed mb-8 font-sans">
+            <p className="text-zinc-650 dark:text-zinc-400 text-sm sm:text-base leading-relaxed mb-8 font-sans">
               {t('about_desc2')}
             </p>
 
@@ -146,10 +146,10 @@ export default function About({
               {stats.map(({ num, label }) => (
                 <div
                   key={label}
-                  className="rounded-[4px] border border-outline-variant/20 dark:border-zinc-800 bg-surface-container-low dark:bg-zinc-900 px-4 py-3 text-center"
+                  className="rounded-[6px] border border-outline-variant/35 dark:border-zinc-800 bg-white dark:bg-zinc-900/60 px-4 py-3 text-center shadow-sm"
                 >
-                  <div className="font-serif text-2xl font-bold text-amber-brand">{num}</div>
-                  <div className="text-[10px] sm:text-xs text-on-surface-variant dark:text-zinc-500 uppercase tracking-wider mt-1 font-medium">
+                  <div className="font-mono text-2xl font-bold text-amber-brand">{num}</div>
+                  <div className="text-[10px] text-zinc-450 dark:text-zinc-500 font-mono tracking-wider uppercase mt-1 font-semibold">
                     {label}
                   </div>
                 </div>
@@ -162,15 +162,15 @@ export default function About({
                 <motion.div
                   key={title}
                   {...motionProps(0.28 + i * 0.08)}
-                  className="bg-surface-container-low dark:bg-zinc-900 border border-outline-variant/20 dark:border-zinc-800 rounded-[4px] p-5 md:p-6 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 ease-out"
+                  className="bg-white dark:bg-zinc-900/80 border border-outline-variant/35 dark:border-zinc-800/80 rounded-[6px] p-5 md:p-6 shadow-sm hover:shadow-md transition-all duration-200 ease-out"
                 >
-                  <div className="text-2xl mb-2" aria-hidden="true">
+                  <div className="text-2xl mb-2.5" aria-hidden="true">
                     {icon}
                   </div>
-                  <div className="font-serif text-lg font-bold text-primary dark:text-zinc-200 leading-tight mb-1">
+                  <div className="font-sans text-base font-bold text-primary dark:text-zinc-200 leading-tight mb-1">
                     {title}
                   </div>
-                  <div className="text-sm text-on-surface-variant dark:text-zinc-450 leading-relaxed">
+                  <div className="text-xs text-zinc-550 dark:text-zinc-400 leading-relaxed">
                     {desc}
                   </div>
                 </motion.div>
@@ -181,7 +181,7 @@ export default function About({
             <motion.div {...motionProps(0.55)}>
               <Link
                 href="/tentang-kami"
-                className="inline-flex items-center gap-2 font-bold text-sm px-6 py-3 rounded-[4px] bg-amber-brand hover:bg-amber-brand/90 text-white shadow-sm transition-all duration-200 active:scale-95 hover:-translate-y-0.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-brand/40"
+                className="inline-flex items-center gap-2 font-bold text-sm px-6 py-3 rounded-full bg-amber-brand hover:bg-amber-brand/95 text-white shadow-sm transition-all duration-205 active:scale-95 focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-brand/40"
               >
                 {t('about_read_more')} →
               </Link>

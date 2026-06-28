@@ -26,13 +26,13 @@ export default function LocationMap() {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <div className="text-secondary text-xs font-bold tracking-[0.2em] uppercase mb-3">
+          <div className="text-secondary text-[11px] font-semibold tracking-wider font-mono uppercase mb-3">
             {t('location_badge')}
           </div>
-          <h2 className="font-serif text-4xl sm:text-5xl font-bold text-primary dark:text-zinc-100">
+          <h2 className="font-sans text-3xl sm:text-4xl font-extrabold text-primary dark:text-zinc-100 tracking-[-0.03em] sm:tracking-[-0.04em]">
             {t('location_title').split(' ')[0]}{' '}
-            <span className="text-secondary italic font-normal">
-              {t('location_title').split(' ').slice(1).join(' ')}
+            <span className="text-secondary font-medium">
+              {t('location_title').split(' ').slice(1).join(' ')}.
             </span>
           </h2>
         </motion.div>
@@ -45,16 +45,16 @@ export default function LocationMap() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
-            className="lg:col-span-1 bg-surface-container-low dark:bg-zinc-900 border border-outline-variant/30 dark:border-zinc-800 rounded-[4px] p-8 flex flex-col justify-between"
+            className="lg:col-span-1 bg-white dark:bg-zinc-900 border border-outline-variant/35 dark:border-zinc-800 rounded-[6px] p-8 flex flex-col justify-between shadow-sm"
           >
             <div>
-              <h3 className="font-serif text-2xl font-bold text-primary dark:text-zinc-100 mb-6">
+              <h3 className="font-sans text-xl font-bold text-primary dark:text-zinc-100 mb-6 tracking-tight">
                 {t('location_branch')}
               </h3>
 
               <div className="space-y-6">
                 <div>
-                  <div className="text-xs text-secondary dark:text-amber-500 uppercase tracking-wider font-semibold mb-1">
+                  <div className="text-[10px] text-zinc-450 dark:text-zinc-500 font-mono tracking-wider uppercase mb-1 font-semibold">
                     {t('location_address_label')}
                   </div>
                   <p className="text-primary dark:text-zinc-300 font-medium text-sm sm:text-base leading-relaxed">
@@ -63,16 +63,16 @@ export default function LocationMap() {
                 </div>
 
                 <div>
-                  <div className="text-xs text-secondary dark:text-amber-500 uppercase tracking-wider font-semibold mb-1">
+                  <div className="text-[10px] text-zinc-450 dark:text-zinc-500 font-mono tracking-wider uppercase mb-1 font-semibold">
                     {t('location_hours_label')}
                   </div>
-                  <p className="text-primary dark:text-zinc-300 font-medium text-sm sm:text-base leading-relaxed">
+                  <p className="text-primary dark:text-zinc-300 font-medium text-sm sm:text-base leading-relaxed font-mono">
                     {getSetting('jam_operasional', t('location_hours_val'))}
                   </p>
                 </div>
 
                 <div>
-                  <div className="text-xs text-secondary dark:text-amber-500 uppercase tracking-wider font-semibold mb-1">
+                  <div className="text-[10px] text-zinc-450 dark:text-zinc-500 font-mono tracking-wider uppercase mb-1 font-semibold">
                     {t('location_delivery_label')}
                   </div>
                   <p className="text-primary dark:text-zinc-300 font-medium text-sm sm:text-base leading-relaxed">
@@ -101,7 +101,7 @@ export default function LocationMap() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="lg:col-span-2 h-[450px] lg:h-auto rounded-[4px] overflow-hidden shadow-sm border border-outline-variant/30 dark:border-zinc-800 bg-surface-container-high dark:bg-zinc-900/60"
+            className="lg:col-span-2 h-[450px] lg:h-auto rounded-[6px] overflow-hidden shadow-sm border border-outline-variant/35 dark:border-zinc-800 bg-surface-container-high dark:bg-zinc-900/60"
           >
             {/* Google Maps Iframe with high reliability Location */}
             <MapEmbed
@@ -123,7 +123,7 @@ export default function LocationMap() {
         >
           <Link
             href="/lokasi-kontak"
-            className="inline-flex items-center gap-2 font-bold text-sm px-8 py-3.5 rounded-[4px] transition-all active:scale-95 hover:-translate-y-0.5 bg-amber-brand hover:bg-amber-brand/90 text-white shadow-sbx-card hover:shadow-sm"
+            className="inline-flex items-center gap-2 font-bold text-sm px-8 py-3.5 rounded-full transition-all active:scale-95 bg-amber-brand hover:bg-amber-brand/95 text-white shadow-sm"
           >
             📍 {t('location_btn_detail')} →
           </Link>

@@ -1,6 +1,7 @@
 'use client'
 
 import { AnimatePresence, motion } from 'framer-motion'
+import { Search } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { signOut, useSession } from 'next-auth/react'
@@ -10,13 +11,12 @@ import { useSettings } from '@/context/SettingsContext'
 import { useTheme } from '@/context/ThemeContext'
 import { formatPrice } from '@/lib/utils'
 import CartModal from '@/src/features/cart/components/CartModal'
-import SearchDialog from './SearchDialog'
-import { Search } from 'lucide-react'
 import {
   selectCartDisplayTotal,
   selectCartItemCount,
   useCartStore
 } from '@/src/features/cart/stores/cart.store'
+import SearchDialog from './SearchDialog'
 
 const ShoppingBagIcon = () => (
   <svg
@@ -57,6 +57,7 @@ export default function Navbar() {
   const totalScrollRef = useRef<number>(0)
   const mobileMenuTriggerRef = useRef<HTMLButtonElement>(null)
   // Sprint 3: Cart badge pop animation — track count changes
+  // biome-ignore lint/correctness/noUnusedVariables: Used to force badge pop re-render
   const [cartPopKey, setCartPopKey] = useState(0)
   const prevCartCountRef = useRef(cartCount)
 
@@ -138,7 +139,7 @@ export default function Navbar() {
     return pathname === link.href
   }
 
-  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
+  const handleLinkClick = (_e: React.MouseEvent<HTMLAnchorElement>, _targetId: string) => {
     setIsOpen(false)
   }
 
@@ -187,7 +188,7 @@ export default function Navbar() {
             className="flex items-center gap-3 group focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary rounded-lg"
             aria-label="Kembali ke halaman utama Pisang Goreng Van Java"
           >
-            <div className="w-10 h-10 rounded-[4px] bg-secondary flex items-center justify-center text-xl shadow-sm group-hover:scale-105 transition-transform duration-200">
+            <div className="w-10 h-10 rounded-[6px] bg-secondary flex items-center justify-center text-xl shadow-sm group-hover:scale-105 transition-transform duration-200">
               🍌
             </div>
             <div className="leading-tight whitespace-nowrap">
@@ -209,7 +210,7 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop Navigation Links */}
-          <ul className="hidden md:flex items-center gap-8">
+          <ul className="hidden md:flex items-center gap-1.5">
             {links.map((link) => {
               const isActive = isLinkActive(link)
               return (
@@ -217,20 +218,17 @@ export default function Navbar() {
                   <Link
                     href={link.href}
                     onClick={(e) => handleLinkClick(e, link.id)}
-                    className={`font-sans text-sm font-semibold tracking-wide transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary rounded py-1 relative ${
+                    className={`font-sans text-xs font-semibold tracking-wide transition-all duration-205 focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary rounded-full px-3.5 py-1.5 relative ${
                       useSolidHeader
                         ? isActive
-                          ? 'text-secondary'
-                          : 'text-zinc-700 dark:text-zinc-200 hover:text-secondary'
+                          ? 'bg-zinc-100 dark:bg-zinc-800 text-secondary'
+                          : 'text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100/50 dark:hover:bg-zinc-800/40 hover:text-secondary'
                         : isActive
-                          ? 'text-secondary-container'
-                          : 'text-white/90 hover:text-secondary-container'
+                          ? 'bg-white/15 text-white'
+                          : 'text-white/90 hover:bg-white/5 hover:text-white'
                     }`}
                   >
                     {link.label}
-                    {isActive && (
-                      <span className="absolute -bottom-1 left-0 right-0 h-0.5 rounded-[4px] bg-secondary" />
-                    )}
                   </Link>
                 </li>
               )
@@ -243,7 +241,7 @@ export default function Navbar() {
             <button
               type="button"
               onClick={() => setIsSearchOpen(true)}
-              className={`p-2 rounded-[4px] transition-all focus:outline-none hover:bg-zinc-100 dark:hover:bg-zinc-800 ${
+              className={`p-2 rounded-[6px] transition-all focus:outline-none hover:bg-zinc-100 dark:hover:bg-zinc-800 ${
                 useSolidHeader ? 'text-zinc-700 dark:text-zinc-200' : 'text-white'
               }`}
               aria-label="Buka Pencarian"
@@ -255,7 +253,7 @@ export default function Navbar() {
             <button
               type="button"
               onClick={toggleTheme}
-              className={`hidden md:block p-2 rounded-[4px] transition-all focus:outline-none hover:bg-zinc-100 dark:hover:bg-zinc-800 ${
+              className={`hidden md:block p-2 rounded-[6px] transition-all focus:outline-none hover:bg-zinc-100 dark:hover:bg-zinc-800 ${
                 useSolidHeader ? 'text-zinc-700 dark:text-zinc-200' : 'text-white'
               }`}
               aria-label="Toggle tema gelap/terang"
@@ -267,7 +265,7 @@ export default function Navbar() {
             <button
               type="button"
               onClick={() => setLocale(locale === 'id' ? 'en' : 'id')}
-              className={`hidden md:block text-xs font-bold px-2.5 py-1.5 rounded-[4px] border transition-all hover:bg-zinc-100 dark:hover:bg-zinc-800 ${
+              className={`hidden md:block text-xs font-bold px-2.5 py-1.5 rounded-[6px] border transition-all hover:bg-zinc-100 dark:hover:bg-zinc-800 ${
                 useSolidHeader
                   ? 'text-zinc-700 dark:text-zinc-200 border-zinc-300 dark:border-zinc-700'
                   : 'text-white border-white/40'
@@ -281,7 +279,7 @@ export default function Navbar() {
               type="button"
               id="navbar-cart"
               onClick={() => setIsCartOpen(true)}
-              className={`relative p-2 rounded-[4px] transition-all focus:outline-none hover:bg-zinc-100 dark:hover:bg-zinc-800 ${
+              className={`relative p-2 rounded-[6px] transition-all focus:outline-none hover:bg-zinc-100 dark:hover:bg-zinc-800 ${
                 useSolidHeader ? 'text-zinc-700 dark:text-zinc-200' : 'text-white'
               }`}
               aria-label="Buka Keranjang Belanja"
@@ -293,7 +291,7 @@ export default function Navbar() {
                   initial={{ scale: 0.5, rotate: -10 }}
                   animate={{ scale: 1, rotate: 0 }}
                   transition={{ type: 'spring', stiffness: 500, damping: 12 }}
-                  className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 rounded-[4px] flex items-center justify-center border-2 border-white dark:border-zinc-950"
+                  className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 rounded-[6px] flex items-center justify-center border-2 border-white dark:border-zinc-950"
                 >
                   {cartCount}
                 </motion.span>
@@ -338,7 +336,7 @@ export default function Navbar() {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 10 }}
-                        className="absolute right-0 mt-2.5 w-48 bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800 rounded-[4px] shadow-sm py-2 z-20"
+                        className="absolute right-0 mt-2.5 w-48 bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800 rounded-[6px] shadow-sm py-2 z-20"
                       >
                         <div className="px-4 py-2 border-b border-zinc-100 dark:border-zinc-800">
                           <p className="text-xs text-zinc-400 uppercase tracking-wider font-semibold">
@@ -412,7 +410,7 @@ export default function Navbar() {
                   type="button"
                   id="navbar-profile-guest"
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  className={`p-2 rounded-[4px] transition-all focus:outline-none hover:bg-zinc-100 dark:hover:bg-zinc-800 ${
+                  className={`p-2 rounded-[6px] transition-all focus:outline-none hover:bg-zinc-100 dark:hover:bg-zinc-800 ${
                     useSolidHeader ? 'text-zinc-700 dark:text-zinc-200' : 'text-white'
                   }`}
                   aria-label="Menu Akun"
@@ -433,7 +431,7 @@ export default function Navbar() {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 10 }}
-                        className="absolute right-0 mt-2.5 w-48 bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800 rounded-[4px] shadow-sm py-2 z-20"
+                        className="absolute right-0 mt-2.5 w-48 bg-white dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800 rounded-[6px] shadow-sm py-2 z-20"
                       >
                         <div className="px-4 py-2 border-b border-zinc-100 dark:border-zinc-800">
                           <p className="text-xs text-zinc-400 uppercase tracking-wider font-semibold">

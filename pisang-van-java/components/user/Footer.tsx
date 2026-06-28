@@ -87,7 +87,7 @@ export default function Footer() {
 
           {/* Links area */}
           <div>
-            <h4 className="text-secondary-container text-xs font-bold tracking-[0.2em] uppercase mb-4">
+            <h4 className="text-secondary-container text-[11px] font-semibold tracking-wider font-mono uppercase mb-4">
               {t('footer_menu')}
             </h4>
             <ul className="space-y-2.5 text-sm">
@@ -108,7 +108,7 @@ export default function Footer() {
               ))}
             </ul>
 
-            <h4 className="text-secondary-container text-xs font-bold tracking-[0.2em] uppercase mt-8 mb-4">
+            <h4 className="text-secondary-container text-[11px] font-semibold tracking-wider font-mono uppercase mt-8 mb-4">
               {locale === 'id' ? 'Layanan & Legal' : 'Services & Legal'}
             </h4>
             <ul className="space-y-2.5 text-sm">
@@ -165,7 +165,7 @@ export default function Footer() {
 
           {/* Contact / Social area */}
           <div>
-            <h4 className="text-secondary-container text-xs font-bold tracking-[0.2em] uppercase mb-4">
+            <h4 className="text-secondary-container text-[11px] font-semibold tracking-wider font-mono uppercase mb-4">
               {t('footer_follow')}
             </h4>
             <ul className="space-y-2.5 text-sm">
