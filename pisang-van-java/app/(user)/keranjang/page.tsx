@@ -17,25 +17,8 @@ import {
   useCartStore
 } from '@/src/features/cart/stores/cart.store'
 import { generateWaCartLink } from '@/src/lib/wa-link-client'
+import { formatPrice, getFallbackImage } from '@/lib/utils'
 
-const getFallbackImage = (name: string): string => {
-  const n = name.toLowerCase()
-  if (n.includes('matcha')) return '/images/flavors/matcha.png'
-  if (n.includes('taro')) return '/images/flavors/taro.png'
-  if (n.includes('blueberry') || n.includes('bluberi')) return '/images/flavors/blueberry.png'
-  if (n.includes('strawberry') || n.includes('stroberi')) return '/images/flavors/strawberry.png'
-  if (n.includes('cokelat') || n.includes('coklat')) return '/images/flavors/chocolate.png'
-  if (n.includes('keju')) return '/images/flavors/cheese.png'
-  if (n.includes('vanilla') || n.includes('vanila')) return '/images/flavors/vanilla.png'
-  return '/kitchen.png'
-}
-
-const formatPrice = (n: number): string =>
-  new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
-    minimumFractionDigits: 0
-  }).format(n)
 
 export default function KeranjangPage() {
   const router = useRouter()
