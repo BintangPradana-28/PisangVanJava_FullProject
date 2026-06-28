@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma'
 import { rateLimit } from '@/lib/redis'
 import { auth } from '@/src/auth'
 import { hashPassword, verifyPassword } from '@/src/lib/password'
+import { logger } from '@/src/lib/logger'
 
 const passwordSchema = z.object({
   oldPassword: z.string().min(1, 'Password lama wajib diisi'),
@@ -83,7 +84,7 @@ export async function PUT(req: NextRequest) {
 
     return NextResponse.json({ success: true, message: 'Password berhasil diubah.' })
   } catch (error) {
-    console.error('PUT /api/user/password Error:', error)
+    logger.error(error as Error, 'PUT /api/user/password Error')
     return NextResponse.json({ success: false, message: 'Internal Server Error' }, { status: 500 })
   }
 }

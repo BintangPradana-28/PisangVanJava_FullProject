@@ -15,6 +15,8 @@ export const env = createEnv({
     RESEND_API_KEY: z.string().optional(),
     FONNTE_API_TOKEN: z.string().min(1).optional(),
     DOPPLER_TOKEN: z.string().optional(),
+    SUPABASE_SERVICE_ROLE_KEY: z.string().min(1).optional(),
+    BACKUP_ENCRYPTION_KEY: z.string().min(1).optional(),
 
     // ✅ Tambahan yang tertinggal
     CLOUDINARY_API_SECRET: z.string().min(1).optional(),
@@ -54,6 +56,8 @@ export const env = createEnv({
     RESEND_API_KEY: process.env.RESEND_API_KEY,
     FONNTE_API_TOKEN: process.env.FONNTE_API_TOKEN,
     DOPPLER_TOKEN: process.env.DOPPLER_TOKEN,
+    SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
+    BACKUP_ENCRYPTION_KEY: process.env.BACKUP_ENCRYPTION_KEY,
     CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
     CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
     CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME,

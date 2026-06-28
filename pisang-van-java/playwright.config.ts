@@ -25,12 +25,16 @@ export default defineConfig({
       name: 'webkit',
       use: { ...devices['Desktop Safari'] }
     }
-  ]
+  ],
 
   /* Run your local dev server before starting the tests */
-  // webServer: {
-  //   command: 'pnpm run dev',
-  //   url: 'http://127.0.0.1:3000',
-  //   reuseExistingServer: !process.env.CI,
-  // },
+  webServer: {
+    command: 'pnpm run start',
+    url: 'http://127.0.0.1:3000',
+    reuseExistingServer: !process.env.CI,
+    timeout: 120000,
+    env: {
+      AUTH_TRUST_HOST: 'true'
+    }
+  }
 })

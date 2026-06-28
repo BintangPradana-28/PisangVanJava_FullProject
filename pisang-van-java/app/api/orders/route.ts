@@ -13,6 +13,7 @@ import {
   hasValidSameOriginHeaders,
   requireCheckoutActor
 } from '@/src/services/checkout.service'
+import { logger } from '@/src/lib/logger'
 
 export async function GET(req: NextRequest) {
   const actor = await requireCheckoutActor()
@@ -164,7 +165,7 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    console.error('[SECURITY] Order creation failed.', error)
+    logger.error(error as Error, '[SECURITY] Order creation failed')
     return NextResponse.json(
       // RAG Source: app/api/orders/route.ts (sanitize database/server errors to prevent schema leakage)
       { success: false, error: 'Server error' },

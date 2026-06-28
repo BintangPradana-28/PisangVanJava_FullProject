@@ -7,6 +7,8 @@ import { redis } from '@/lib/redis'
 import { sendOrderConfirmationEmail } from '@/src/features/payment/email'
 import { mapMidtransStatusToPaymentStatus } from '@/src/features/payment/payment-status.mapper'
 import { verifyMidtransSignature } from '@/src/features/payment/service'
+import { logger } from '@/src/lib/logger'
+
 
 export async function POST(req: NextRequest) {
   try {
@@ -54,7 +56,7 @@ export async function POST(req: NextRequest) {
     const acquired = await redis.set(lockKey, 'locked', { nx: true, ex: 300 }) // Lock for 5 minutes
 
     if (!acquired) {
-      console.warn(
+      logger.warn(
         `[SECURITY] Duplicate webhook blocked by Redis NX Guard for transaction: ${transaction_id}`
       )
       // Return 200 so Midtrans marks it as successfully delivered without us double-processing it
@@ -219,7 +221,7 @@ export async function POST(req: NextRequest) {
 
     if (sendEmail) {
       // Trigger order confirmation email in the background
-      sendOrderConfirmationEmail(realOrderId).catch(console.error)
+      sendOrderConfirmationEmail(realOrderId).catch((err) => logger.error(err as Error, '[EMAIL ERROR]'))
     }
 
     // Force real-time Edge Cache purge for Storefront and Dashboard
@@ -233,13 +235,13 @@ export async function POST(req: NextRequest) {
       // @ts-expect-error Next.js Canary type requires 2 args
       revalidateTag('menu-spesial-all-products')
     } catch (e) {
-      console.warn('[Midtrans Webhook] Failed to revalidate Next.js cache', e)
+      logger.warn(e as Error, '[Midtrans Webhook] Failed to revalidate Next.js cache')
     }
 
     return NextResponse.json({ success: true, message: 'Webhook processed successfully' })
   } catch (error) {
     Sentry.captureException(error)
-    console.error('[Midtrans Webhook Error]', error)
+    logger.error(error as Error, '[Midtrans Webhook Error]')
     return NextResponse.json({ success: false, error: 'Internal Server Error' }, { status: 500 })
   }
 }

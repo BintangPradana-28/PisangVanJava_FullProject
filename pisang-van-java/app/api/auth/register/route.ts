@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { rateLimit } from '@/lib/redis'
 import { registerSchema } from '@/src/features/auth/schemas'
 import { hashPassword } from '@/src/lib/password'
+import { logger } from '@/src/lib/logger'
 
 export async function POST(req: NextRequest) {
   try {
@@ -67,8 +68,8 @@ export async function POST(req: NextRequest) {
       },
       { status: 201 }
     )
-  } catch (error: unknown) {
-    console.error('Register Error:', error)
+  } catch (error) {
+    logger.error(error as Error, 'Register Error')
     return NextResponse.json(
       { success: false, message: 'Terjadi kesalahan pada server' },
       { status: 500 }

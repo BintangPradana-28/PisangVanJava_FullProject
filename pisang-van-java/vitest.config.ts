@@ -9,7 +9,7 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./vitest.setup.ts'],
     include: ['**/*.{test,spec}.{js,ts,jsx,tsx}'],
-    exclude: ['node_modules', '.next', 'playwright-tests'],
+    exclude: ['node_modules', '.next', 'playwright-tests', 'e2e'],
     alias: {
       '@': path.resolve(__dirname, './')
     }

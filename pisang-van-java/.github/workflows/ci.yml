@@ -55,3 +55,9 @@ jobs:
 
       - name: Security & Unit Tests
         run: pnpm test
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      - name: E2E Tests (Playwright)
+        run: pnpm test:e2e
