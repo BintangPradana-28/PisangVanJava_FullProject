@@ -297,7 +297,10 @@ function PeakHoursHeatmap({ distribution }: { distribution: Record<string, numbe
               onMouseEnter={() => setHovered(h)}
               onMouseLeave={() => setHovered(null)}
             >
-              <span className="text-xs font-bold leading-none" style={{ color: getTextColor(count) }}>
+              <span
+                className="text-xs font-bold leading-none"
+                style={{ color: getTextColor(count) }}
+              >
                 {count}
               </span>
               <span

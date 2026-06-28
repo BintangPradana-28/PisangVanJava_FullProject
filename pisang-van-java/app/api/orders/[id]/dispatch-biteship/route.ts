@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server'
-import { requireCheckoutActor, hasValidSameOriginHeaders } from '@/src/services/checkout.service'
 import { createBiteshipOrder } from '@/src/services/biteship.service'
+import { hasValidSameOriginHeaders, requireCheckoutActor } from '@/src/services/checkout.service'
 
 interface RouteContext {
   params: Promise<{
@@ -10,7 +10,7 @@ interface RouteContext {
 
 export async function POST(req: NextRequest, { params }: RouteContext) {
   const { id } = await params
-  
+
   const actor = await requireCheckoutActor()
   if (actor === null) {
     return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })

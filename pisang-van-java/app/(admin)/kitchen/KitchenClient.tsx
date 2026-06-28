@@ -681,8 +681,12 @@ export default function KitchenClient({ initialOrders }: KitchenClientProps) {
           <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 max-w-md w-full shadow-2xl space-y-5 text-left text-zinc-100 animate-in zoom-in-95 duration-200">
             <div className="flex justify-between items-center border-b border-zinc-800 pb-3">
               <div>
-                <h3 className="font-serif text-lg font-bold text-amber-400">Atur Pengiriman Kurir</h3>
-                <p className="text-xs text-zinc-400 font-mono mt-0.5">Order #{dispatchingOrder.id.slice(-5).toUpperCase()}</p>
+                <h3 className="font-serif text-lg font-bold text-amber-400">
+                  Atur Pengiriman Kurir
+                </h3>
+                <p className="text-xs text-zinc-400 font-mono mt-0.5">
+                  Order #{dispatchingOrder.id.slice(-5).toUpperCase()}
+                </p>
               </div>
               <button
                 onClick={() => setDispatchingOrder(null)}
@@ -695,7 +699,9 @@ export default function KitchenClient({ initialOrders }: KitchenClientProps) {
             <div className="space-y-4">
               {/* Option 1: Biteship automatic */}
               <div className="bg-zinc-950 p-4 rounded-lg border border-zinc-800 space-y-3">
-                <h4 className="text-xs font-black text-amber-500 uppercase tracking-wider">Metode 1: Biteship (Otomatis)</h4>
+                <h4 className="text-xs font-black text-amber-500 uppercase tracking-wider">
+                  Metode 1: Biteship (Otomatis)
+                </h4>
                 <button
                   type="button"
                   onClick={() => handleDispatchBiteship(dispatchingOrder.id)}
@@ -705,18 +711,28 @@ export default function KitchenClient({ initialOrders }: KitchenClientProps) {
                   {dispatchLoading ? 'Memproses...' : 'Picu Kurir Biteship 🚚'}
                 </button>
                 <p className="text-[10px] text-zinc-500 leading-relaxed">
-                  *Mencari driver instant/same-day terdekat secara otomatis menggunakan Biteship API.
+                  *Mencari driver instant/same-day terdekat secara otomatis menggunakan Biteship
+                  API.
                 </p>
               </div>
 
-              <div className="text-center text-xs text-zinc-650 font-black tracking-widest">— ATAU —</div>
+              <div className="text-center text-xs text-zinc-650 font-black tracking-widest">
+                — ATAU —
+              </div>
 
               {/* Option 2: Manual Courier */}
               <div className="bg-zinc-950 p-4 rounded-lg border border-zinc-800 space-y-3">
-                <h4 className="text-xs font-black text-amber-500 uppercase tracking-wider">Metode 2: Kurir Manual</h4>
+                <h4 className="text-xs font-black text-amber-500 uppercase tracking-wider">
+                  Metode 2: Kurir Manual
+                </h4>
                 <div className="space-y-2.5">
                   <div className="space-y-1">
-                    <label htmlFor="kds-courier-phone" className="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider">No. HP Kurir</label>
+                    <label
+                      htmlFor="kds-courier-phone"
+                      className="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider"
+                    >
+                      No. HP Kurir
+                    </label>
                     <input
                       id="kds-courier-phone"
                       type="tel"
@@ -727,7 +743,12 @@ export default function KitchenClient({ initialOrders }: KitchenClientProps) {
                     />
                   </div>
                   <div className="space-y-1">
-                    <label htmlFor="kds-courier-eta" className="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Estimasi Tiba (Menit)</label>
+                    <label
+                      htmlFor="kds-courier-eta"
+                      className="block text-[10px] font-bold text-zinc-400 uppercase tracking-wider"
+                    >
+                      Estimasi Tiba (Menit)
+                    </label>
                     <input
                       id="kds-courier-eta"
                       type="number"

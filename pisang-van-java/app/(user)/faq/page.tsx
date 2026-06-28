@@ -1,7 +1,7 @@
 'use client'
 
-import { motion, AnimatePresence } from 'framer-motion'
-import { Search, HelpCircle, Phone, Mail, MapPin, ChevronDown } from 'lucide-react'
+import { AnimatePresence, motion } from 'framer-motion'
+import { ChevronDown, HelpCircle, Mail, MapPin, Phone, Search } from 'lucide-react'
 import { useState } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 

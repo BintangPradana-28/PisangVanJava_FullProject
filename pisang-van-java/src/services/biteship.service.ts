@@ -1,5 +1,5 @@
-import { env } from '@/src/env'
 import { prisma } from '@/lib/prisma'
+import { env } from '@/src/env'
 
 const STORE_LAT = -6.3157
 const STORE_LNG = 106.9016
@@ -58,7 +58,11 @@ function mapCourierToBiteship(courierName: string | null): { company: string; ty
 /**
  * Creates an order in Biteship for a given DB order
  */
-export async function createBiteshipOrder(orderId: string): Promise<{ success: boolean; data?: { biteshipOrderId: string; waybillId: string | null }; error?: string }> {
+export async function createBiteshipOrder(orderId: string): Promise<{
+  success: boolean
+  data?: { biteshipOrderId: string; waybillId: string | null }
+  error?: string
+}> {
   const apiKey = env.BITESHIP_API_KEY?.trim()
   if (!apiKey) {
     console.warn('[BITESHIP] API Key is missing. Skipping API call.')
@@ -87,8 +91,15 @@ export async function createBiteshipOrder(orderId: string): Promise<{ success: b
     }
 
     const { company, type } = mapCourierToBiteship(order.courierName)
-    const totalWeight = order.items.reduce((sum: number, item: { quantity: number }) => sum + item.quantity * 200, 0)
-    const totalValue = order.items.reduce((sum: number, item: { quantity: number; unitPrice: number }) => sum + item.quantity * item.unitPrice, 0)
+    const totalWeight = order.items.reduce(
+      (sum: number, item: { quantity: number }) => sum + item.quantity * 200,
+      0
+    )
+    const totalValue = order.items.reduce(
+      (sum: number, item: { quantity: number; unitPrice: number }) =>
+        sum + item.quantity * item.unitPrice,
+      0
+    )
 
     const requestBody = {
       shipper_contact_name: 'Pisang Goreng Van Java',
@@ -170,7 +181,10 @@ export async function createBiteshipOrder(orderId: string): Promise<{ success: b
 /**
  * Cancels a Biteship order
  */
-export async function cancelBiteshipOrder(biteshipOrderId: string, reason = 'Pelanggan membatalkan pesanan'): Promise<{ success: boolean; error?: string }> {
+export async function cancelBiteshipOrder(
+  biteshipOrderId: string,
+  reason = 'Pelanggan membatalkan pesanan'
+): Promise<{ success: boolean; error?: string }> {
   const apiKey = env.BITESHIP_API_KEY?.trim()
   if (!apiKey) {
     return { success: false, error: 'Biteship API Key is not configured.' }
@@ -203,7 +217,9 @@ export async function cancelBiteshipOrder(biteshipOrderId: string, reason = 'Pel
 /**
  * Gets real-time tracking details from Biteship
  */
-export async function getBiteshipTracking(biteshipOrderId: string): Promise<{ success: boolean; data?: BiteshipTrackingResponse['data']; error?: string }> {
+export async function getBiteshipTracking(
+  biteshipOrderId: string
+): Promise<{ success: boolean; data?: BiteshipTrackingResponse['data']; error?: string }> {
   const apiKey = env.BITESHIP_API_KEY?.trim()
   if (!apiKey) {
     return { success: false, error: 'Biteship API Key is not configured.' }
@@ -224,7 +240,11 @@ export async function getBiteshipTracking(biteshipOrderId: string): Promise<{ su
     }
 
     const json = (await res.json()) as BiteshipTrackingResponse
-    return { success: json.success, data: json.data, error: json.success ? undefined : 'Biteship failed' }
+    return {
+      success: json.success,
+      data: json.data,
+      error: json.success ? undefined : 'Biteship failed'
+    }
   } catch (error) {
     console.error('[BITESHIP ERROR] getBiteshipTracking exception:', error)
     return { success: false, error: error instanceof Error ? error.message : 'Unknown exception' }

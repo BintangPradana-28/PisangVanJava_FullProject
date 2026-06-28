@@ -24,7 +24,8 @@ export default function ThanksPage() {
         </h1>
 
         <p className="mb-8 text-zinc-500 dark:text-zinc-400 text-sm">
-          {t('thanks_desc') || 'Terima kasih telah melakukan pembayaran pesanan Anda. Kami sedang memprosesnya!'}
+          {t('thanks_desc') ||
+            'Terima kasih telah melakukan pembayaran pesanan Anda. Kami sedang memprosesnya!'}
         </p>
 
         <div className="flex flex-col gap-3">

@@ -1,11 +1,11 @@
-import { type NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
-import { redis } from '@/lib/redis'
+import { OrderStatus, type Prisma } from '@prisma/client'
 import * as Sentry from '@sentry/nextjs'
+import { type NextRequest, NextResponse } from 'next/server'
 import { sendWhatsAppNotification } from '@/lib/notifications'
-import { sendOrderStatusEmail } from '@/src/features/payment/email'
+import { prisma } from '@/lib/prisma'
 import { buildOrderStatusPushPayload, sendPushNotification } from '@/lib/push'
-import { OrderStatus, Prisma } from '@prisma/client'
+import { redis } from '@/lib/redis'
+import { sendOrderStatusEmail } from '@/src/features/payment/email'
 
 // Allowed status mapping from Biteship to DB OrderStatus
 const STATUS_MAP: Record<string, OrderStatus> = {
@@ -25,7 +25,10 @@ export async function POST(req: NextRequest) {
     const { event, order_id, status, courier } = payload
 
     if (!order_id || !status) {
-      return NextResponse.json({ success: false, error: 'Invalid payload: order_id and status are required' }, { status: 400 })
+      return NextResponse.json(
+        { success: false, error: 'Invalid payload: order_id and status are required' },
+        { status: 400 }
+      )
     }
 
     // Zero-Trust Security: Optional token authentication via URL query parameter or header
@@ -33,14 +36,19 @@ export async function POST(req: NextRequest) {
     const expectedToken = process.env.BITESHIP_WEBHOOK_TOKEN
     if (expectedToken && token !== expectedToken) {
       console.warn('[SECURITY] Unauthorized Biteship webhook attempt detected')
-      return NextResponse.json({ success: false, error: 'Unauthorized: Invalid token' }, { status: 401 })
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized: Invalid token' },
+        { status: 401 }
+      )
     }
 
     // Zero-Trust: Distributed Idempotency & Concurrency Guard via Redis NX
     const lockKey = `biteship:webhook:lock:${order_id}:${status}`
     const acquired = await redis.set(lockKey, 'locked', { nx: true, ex: 300 }) // Lock for 5 minutes
     if (!acquired) {
-      console.warn(`[SECURITY] Duplicate Biteship webhook blocked by Redis NX Guard for order: ${order_id}`)
+      console.warn(
+        `[SECURITY] Duplicate Biteship webhook blocked by Redis NX Guard for order: ${order_id}`
+      )
       return NextResponse.json({ success: true, message: 'Already processed' })
     }
 
@@ -58,10 +66,14 @@ export async function POST(req: NextRequest) {
     // If order is already completed, delivered, or canceled, we should not transition it back
     if (
       existingOrder.status === OrderStatus.COMPLETED ||
-      (existingOrder.status === OrderStatus.DELIVERED && status !== 'cancelled' && status !== 'rejected') ||
+      (existingOrder.status === OrderStatus.DELIVERED &&
+        status !== 'cancelled' &&
+        status !== 'rejected') ||
       existingOrder.status === OrderStatus.CANCELED
     ) {
-      console.info(`[BITESHIP WEBHOOK] Skipping status update because order ${existingOrder.id} is already in state ${existingOrder.status}`)
+      console.info(
+        `[BITESHIP WEBHOOK] Skipping status update because order ${existingOrder.id} is already in state ${existingOrder.status}`
+      )
       return NextResponse.json({ success: true, message: 'Order is already in a final state' })
     }
 
@@ -88,7 +100,10 @@ export async function POST(req: NextRequest) {
         console.info(`[BITESHIP WEBHOOK] Updated courier details for order ${existingOrder.id}`)
       }
 
-      return NextResponse.json({ success: true, message: 'Status parsed but no order state transition required' })
+      return NextResponse.json({
+        success: true,
+        message: 'Status parsed but no order state transition required'
+      })
     }
 
     // Update database and process state changes transactionally
@@ -115,7 +130,9 @@ export async function POST(req: NextRequest) {
       })
     })
 
-    console.info(`[BITESHIP WEBHOOK] Order ${updatedOrder.id} successfully updated to status ${updatedOrder.status}`)
+    console.info(
+      `[BITESHIP WEBHOOK] Order ${updatedOrder.id} successfully updated to status ${updatedOrder.status}`
+    )
 
     // Trigger Notifications asynchronously
     try {
@@ -139,7 +156,10 @@ export async function POST(req: NextRequest) {
       const pushPayload = buildOrderStatusPushPayload(updatedOrder.id, updatedOrder.status)
       if (pushPayload) {
         sendPushNotification(updatedOrder.userId, pushPayload).catch((pushErr) =>
-          console.error('[PUSH ERROR] Failed to send push notification from Biteship webhook:', pushErr)
+          console.error(
+            '[PUSH ERROR] Failed to send push notification from Biteship webhook:',
+            pushErr
+          )
         )
       }
     }

@@ -3,7 +3,6 @@
 // app/(user)/profile/orders/[id]/ProfileOrderDetailClient.tsx
 // RAG Source: app/(user)/profile/pesanan/page.tsx (Reorder logic & timeline builder)
 
-import { useState } from 'react'
 import { motion } from 'framer-motion'
 import {
   ArrowLeft,
@@ -17,6 +16,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 import { toast } from 'react-hot-toast'
 import { formatPrice } from '@/lib/utils'
 import { useCartStore } from '@/src/features/cart/stores/cart.store'
@@ -373,8 +373,8 @@ export default function ProfileOrderDetailClient({ order }: ProfileOrderDetailCl
               </Link>
             )}
 
-            {(order.status === 'DELIVERED' || order.status === 'COMPLETED') && (
-              hasReviewed ? (
+            {(order.status === 'DELIVERED' || order.status === 'COMPLETED') &&
+              (hasReviewed ? (
                 <button
                   disabled
                   className="w-full flex items-center justify-center gap-2 bg-zinc-100 dark:bg-zinc-800 text-zinc-400 py-3 rounded-xl text-xs font-black uppercase tracking-wider cursor-not-allowed border border-zinc-200 dark:border-zinc-700"
@@ -388,8 +388,7 @@ export default function ProfileOrderDetailClient({ order }: ProfileOrderDetailCl
                 >
                   Beri Ulasan
                 </button>
-              )
-            )}
+              ))}
 
             <a
               href={`/api/orders/${order.id}/invoice`}
@@ -414,7 +413,9 @@ export default function ProfileOrderDetailClient({ order }: ProfileOrderDetailCl
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-6 max-w-md w-full shadow-2xl space-y-4 animate-in zoom-in-95 duration-200 text-left">
             <div className="flex justify-between items-center border-b border-zinc-100 dark:border-zinc-800 pb-3">
-              <h3 className="font-serif text-lg font-bold text-zinc-900 dark:text-white">Beri Ulasan Pesanan</h3>
+              <h3 className="font-serif text-lg font-bold text-zinc-900 dark:text-white">
+                Beri Ulasan Pesanan
+              </h3>
               <button
                 onClick={() => setShowReviewModal(false)}
                 className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 text-sm font-bold"
@@ -426,7 +427,9 @@ export default function ProfileOrderDetailClient({ order }: ProfileOrderDetailCl
             <form onSubmit={handleReviewSubmit} className="space-y-4">
               {/* Star Rating Picker */}
               <div className="space-y-2 text-center">
-                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider">Rating Anda</label>
+                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider">
+                  Rating Anda
+                </label>
                 <div className="flex justify-center gap-2">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <button
@@ -435,20 +438,34 @@ export default function ProfileOrderDetailClient({ order }: ProfileOrderDetailCl
                       onClick={() => setRating(star)}
                       className="text-4xl transition-transform hover:scale-110 active:scale-95"
                     >
-                      <span className={star <= rating ? 'text-amber-400' : 'text-zinc-200 dark:text-zinc-700'}>
+                      <span
+                        className={
+                          star <= rating ? 'text-amber-400' : 'text-zinc-200 dark:text-zinc-700'
+                        }
+                      >
                         ★
                       </span>
                     </button>
                   ))}
                 </div>
                 <p className="text-xs font-bold text-[#D4802A] h-4">
-                  {rating === 1 ? 'Sangat Buruk 😞' : rating === 2 ? 'Kurang Bagus 😐' : rating === 3 ? 'Biasa Saja 🙂' : rating === 4 ? 'Bagus! 😊' : 'Luar Biasa! 🤩'}
+                  {rating === 1
+                    ? 'Sangat Buruk 😞'
+                    : rating === 2
+                      ? 'Kurang Bagus 😐'
+                      : rating === 3
+                        ? 'Biasa Saja 🙂'
+                        : rating === 4
+                          ? 'Bagus! 😊'
+                          : 'Luar Biasa! 🤩'}
                 </p>
               </div>
 
               {/* Comment Textarea */}
               <div className="space-y-1.5">
-                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider">Komentar / Ulasan (Opsional)</label>
+                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-wider">
+                  Komentar / Ulasan (Opsional)
+                </label>
                 <textarea
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}

@@ -9,7 +9,7 @@ import { useSession } from 'next-auth/react'
 import { FetchError } from 'ofetch'
 import posthog from 'posthog-js'
 // app/(user)/checkout/page.tsx — Dedicated Checkout Page
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import { z } from 'zod'
@@ -560,7 +560,9 @@ export default function CheckoutPage() {
               </button>
               <span
                 className={`text-xs font-semibold ${
-                  i === step ? 'text-amber-700 dark:text-amber-400 block' : 'text-zinc-400 hidden sm:block'
+                  i === step
+                    ? 'text-amber-700 dark:text-amber-400 block'
+                    : 'text-zinc-400 hidden sm:block'
                 }`}
               >
                 {label}

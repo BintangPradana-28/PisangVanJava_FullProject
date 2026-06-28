@@ -227,9 +227,7 @@ export default function MemberLoginPage() {
                       {...register('otp')}
                     />
                     {errors.otp && (
-                      <p className="text-red-500 text-xs mt-1 font-medium">
-                        {errors.otp.message}
-                      </p>
+                      <p className="text-red-500 text-xs mt-1 font-medium">{errors.otp.message}</p>
                     )}
                   </motion.div>
                 )}

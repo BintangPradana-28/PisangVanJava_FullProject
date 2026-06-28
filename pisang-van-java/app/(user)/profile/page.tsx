@@ -398,9 +398,13 @@ export default function ProfileDataDiriPage() {
         {profileData?.koinPisang !== undefined && (
           <div className="bg-gradient-to-r from-amber-500 to-amber-600 dark:from-amber-600 dark:to-amber-700 text-white rounded-[4px] p-5 shadow-sm mb-6 flex items-center justify-between">
             <div className="space-y-1">
-              <span className="text-xs uppercase font-bold tracking-wider opacity-90">Koin Pisang Anda</span>
+              <span className="text-xs uppercase font-bold tracking-wider opacity-90">
+                Koin Pisang Anda
+              </span>
               <div className="flex items-baseline gap-1.5">
-                <span className="text-3xl font-black font-serif">🍌 {profileData.koinPisang.toLocaleString('id-ID')}</span>
+                <span className="text-3xl font-black font-serif">
+                  🍌 {profileData.koinPisang.toLocaleString('id-ID')}
+                </span>
                 <span className="text-xs opacity-75">Koin</span>
               </div>
             </div>

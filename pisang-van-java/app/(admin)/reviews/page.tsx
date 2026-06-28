@@ -22,7 +22,7 @@ export default async function ReviewModerationPage() {
     }
   })
 
-  const serialized = reviews.map((r: typeof reviews[0]) => ({
+  const serialized = reviews.map((r: (typeof reviews)[0]) => ({
     id: r.id,
     userName: r.user?.name ?? 'Unknown',
     userEmail: r.user?.email ?? '',

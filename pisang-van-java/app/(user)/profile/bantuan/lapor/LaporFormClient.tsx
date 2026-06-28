@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { AlertCircle, ArrowLeft, CheckCircle2, Send } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 import toast from 'react-hot-toast'
 import { formatPrice } from '@/lib/utils'
 
@@ -73,7 +73,8 @@ export default function LaporFormClient({ orders }: { orders: OrderSelection[] }
         </h2>
         <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
           Terima kasih atas laporan Anda. Manajemen kami akan segera mengevaluasi keluhan ini dalam
-          waktu maksimal 1x24 jam. Jawaban akan dikirimkan ke email Anda atau dapat dipantau di riwayat tiket bantuan.
+          waktu maksimal 1x24 jam. Jawaban akan dikirimkan ke email Anda atau dapat dipantau di
+          riwayat tiket bantuan.
         </p>
         <button
           onClick={() => router.push('/profile/bantuan')}
@@ -151,7 +152,8 @@ export default function LaporFormClient({ orders }: { orders: OrderSelection[] }
                 })
                 return (
                   <option key={order.id} value={order.id}>
-                    Order #{order.id.slice(-6).toUpperCase()} • {dateStr} • {formatPrice(order.totalPrice)} ({order.status})
+                    Order #{order.id.slice(-6).toUpperCase()} • {dateStr} •{' '}
+                    {formatPrice(order.totalPrice)} ({order.status})
                   </option>
                 )
               })}
@@ -179,7 +181,8 @@ export default function LaporFormClient({ orders }: { orders: OrderSelection[] }
             />
             <p className="text-[10px] text-zinc-400 flex items-center gap-1">
               <AlertCircle className="w-3.5 h-3.5 text-amber-500" />
-              Tuliskan detail seperti menu yang bermasalah, perkiraan waktu kejadian, dsb. (Minimal 10 karakter)
+              Tuliskan detail seperti menu yang bermasalah, perkiraan waktu kejadian, dsb. (Minimal
+              10 karakter)
             </p>
           </div>
 

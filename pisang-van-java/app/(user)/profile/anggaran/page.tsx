@@ -4,9 +4,9 @@ import { motion } from 'framer-motion'
 import { AlertCircle, Edit2, Info, PiggyBank, Plus, Trash2, Wallet } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
+import { getUserBudgetStatus, updateMonthlyBudget } from '@/app/actions/orderHistory'
 import OrderHistory from '@/components/user/OrderHistory'
 import { useLanguage } from '@/context/LanguageContext'
-import { getUserBudgetStatus, updateMonthlyBudget } from '@/app/actions/orderHistory'
 
 export default function AnggaranPage() {
   const { t } = useLanguage()

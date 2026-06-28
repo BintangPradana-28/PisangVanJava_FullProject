@@ -23,7 +23,7 @@ vi.mock('@/lib/prisma', () => ({
   }
 }))
 
-import { createBiteshipOrder, cancelBiteshipOrder, getBiteshipTracking } from '../biteship.service'
+import { cancelBiteshipOrder, createBiteshipOrder, getBiteshipTracking } from '../biteship.service'
 
 const prismaMock = prisma as any
 
@@ -44,7 +44,7 @@ describe('Biteship Service Unit Tests', () => {
 
     it('should successfully create an order and update DB with Biteship IDs', async () => {
       mockBiteshipApiKey = 'test-api-key'
-      
+
       const mockOrder = {
         id: 'test-order-id',
         customerName: 'John Doe',
@@ -66,7 +66,11 @@ describe('Biteship Service Unit Tests', () => {
       }
 
       prismaMock.order.findUnique.mockResolvedValue(mockOrder)
-      prismaMock.order.update.mockResolvedValue({ ...mockOrder, biteshipOrderId: '5dd599ebdefcd4158eb8470b', waybillId: 'WYB-1112223333442' })
+      prismaMock.order.update.mockResolvedValue({
+        ...mockOrder,
+        biteshipOrderId: '5dd599ebdefcd4158eb8470b',
+        waybillId: 'WYB-1112223333442'
+      })
 
       const mockResponse = {
         success: true,
@@ -91,12 +95,15 @@ describe('Biteship Service Unit Tests', () => {
 
       const result = await createBiteshipOrder('test-order-id')
 
-      expect(fetchSpy).toHaveBeenCalledWith('https://api.biteship.com/v1/orders', expect.objectContaining({
-        method: 'POST',
-        headers: expect.objectContaining({
-          Authorization: 'Bearer test-api-key'
+      expect(fetchSpy).toHaveBeenCalledWith(
+        'https://api.biteship.com/v1/orders',
+        expect.objectContaining({
+          method: 'POST',
+          headers: expect.objectContaining({
+            Authorization: 'Bearer test-api-key'
+          })
         })
-      }))
+      )
 
       expect(prismaMock.order.update).toHaveBeenCalledWith({
         where: { id: 'test-order-id' },
@@ -124,9 +131,12 @@ describe('Biteship Service Unit Tests', () => {
 
       const result = await cancelBiteshipOrder('5dd599ebdefcd4158eb8470b')
 
-      expect(fetchSpy).toHaveBeenCalledWith('https://api.biteship.com/v1/orders/5dd599ebdefcd4158eb8470b', expect.objectContaining({
-        method: 'DELETE'
-      }))
+      expect(fetchSpy).toHaveBeenCalledWith(
+        'https://api.biteship.com/v1/orders/5dd599ebdefcd4158eb8470b',
+        expect.objectContaining({
+          method: 'DELETE'
+        })
+      )
       expect(result.success).toBe(true)
     })
   })
@@ -170,9 +180,12 @@ describe('Biteship Service Unit Tests', () => {
 
       const result = await getBiteshipTracking('5dd599ebdefcd4158eb8470b')
 
-      expect(fetchSpy).toHaveBeenCalledWith('https://api.biteship.com/v1/trackings/5dd599ebdefcd4158eb8470b', expect.objectContaining({
-        method: 'GET'
-      }))
+      expect(fetchSpy).toHaveBeenCalledWith(
+        'https://api.biteship.com/v1/trackings/5dd599ebdefcd4158eb8470b',
+        expect.objectContaining({
+          method: 'GET'
+        })
+      )
       expect(result.success).toBe(true)
       expect(result.data?.id).toBe('5dd599ebdefcd4158eb8470b')
       expect(result.data?.status).toBe('allocated')

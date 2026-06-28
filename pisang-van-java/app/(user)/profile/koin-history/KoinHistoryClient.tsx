@@ -1,6 +1,6 @@
 'use client'
 
-import { ArrowLeft, Clock, Gift, Coins } from 'lucide-react'
+import { ArrowLeft, Clock, Coins, Gift } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
 interface KoinLog {
@@ -39,7 +39,9 @@ export default function KoinHistoryClient({ logs }: { logs: KoinLog[] }) {
           <div className="p-16 text-center text-zinc-400">
             <Gift className="w-12 h-12 mx-auto mb-3 opacity-30 text-amber-500" />
             <p className="font-semibold text-sm">Belum ada riwayat transaksi koin</p>
-            <p className="text-xs mt-1">Lakukan transaksi belanja pertama Anda untuk mengumpulkan koin.</p>
+            <p className="text-xs mt-1">
+              Lakukan transaksi belanja pertama Anda untuk mengumpulkan koin.
+            </p>
           </div>
         ) : (
           <div className="divide-y divide-zinc-100 dark:divide-zinc-800">

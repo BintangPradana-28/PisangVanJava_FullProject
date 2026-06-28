@@ -876,13 +876,17 @@ export default function OrdersClient({
                               {order.waybillId && (
                                 <div className="flex justify-between">
                                   <span>No. Resi (Waybill ID)</span>
-                                  <span className="font-mono font-semibold text-brown-700">{order.waybillId}</span>
+                                  <span className="font-mono font-semibold text-brown-700">
+                                    {order.waybillId}
+                                  </span>
                                 </div>
                               )}
                               {order.biteshipOrderId && (
                                 <div className="flex justify-between">
                                   <span>Biteship Order ID</span>
-                                  <span className="font-mono text-brown-600">{order.biteshipOrderId}</span>
+                                  <span className="font-mono text-brown-600">
+                                    {order.biteshipOrderId}
+                                  </span>
                                 </div>
                               )}
                             </div>
@@ -1065,7 +1069,9 @@ export default function OrdersClient({
               className="bg-white rounded-[8px] border border-cream-200 max-w-md w-full overflow-hidden shadow-2xl"
             >
               <div className="bg-brown-700 text-white px-5 py-4 flex justify-between items-center">
-                <h3 className="font-bold text-sm">🛵 Dispatch Kurir (Order #{dispatchingOrder.id.slice(-6)})</h3>
+                <h3 className="font-bold text-sm">
+                  🛵 Dispatch Kurir (Order #{dispatchingOrder.id.slice(-6)})
+                </h3>
                 <button
                   onClick={() => setDispatchingOrder(null)}
                   className="text-white/70 hover:text-white text-lg focus:outline-none"
@@ -1076,13 +1082,21 @@ export default function OrdersClient({
 
               <div className="p-5 space-y-4">
                 <div className="text-xs text-brown-600 space-y-1">
-                  <p><strong>Pelanggan:</strong> {dispatchingOrder.customerName}</p>
-                  <p><strong>No. HP:</strong> {dispatchingOrder.customerPhone}</p>
-                  <p><strong>Alamat:</strong> {dispatchingOrder.notes || '-'}</p>
+                  <p>
+                    <strong>Pelanggan:</strong> {dispatchingOrder.customerName}
+                  </p>
+                  <p>
+                    <strong>No. HP:</strong> {dispatchingOrder.customerPhone}
+                  </p>
+                  <p>
+                    <strong>Alamat:</strong> {dispatchingOrder.notes || '-'}
+                  </p>
                 </div>
 
                 <div className="border-t border-cream-200 pt-3">
-                  <h4 className="text-xs font-bold text-brown-800 mb-2">PILIHAN 1: PENGIRIMAN BITESHIP (OTOMATIS)</h4>
+                  <h4 className="text-xs font-bold text-brown-800 mb-2">
+                    PILIHAN 1: PENGIRIMAN BITESHIP (OTOMATIS)
+                  </h4>
                   <button
                     onClick={() => handleDispatchBiteship(dispatchingOrder.id)}
                     disabled={dispatchLoading}
@@ -1096,15 +1110,18 @@ export default function OrdersClient({
                     Picu Kurir Biteship Sekarang
                   </button>
                   <p className="text-[10px] text-zinc-400 mt-1">
-                    *Akan otomatis mencari driver instant/same-day terdekat menggunakan Biteship API.
+                    *Akan otomatis mencari driver instant/same-day terdekat menggunakan Biteship
+                    API.
                   </p>
                 </div>
 
                 <div className="border-t border-cream-200 pt-3 space-y-3">
                   <h4 className="text-xs font-bold text-brown-800">PILIHAN 2: PENGIRIMAN MANUAL</h4>
-                  
+
                   <div className="space-y-1">
-                    <label className="text-[11px] font-bold text-brown-600 block">No. HP Kurir Manual</label>
+                    <label className="text-[11px] font-bold text-brown-600 block">
+                      No. HP Kurir Manual
+                    </label>
                     <input
                       type="text"
                       placeholder="e.g. 08123456789"
@@ -1115,7 +1132,9 @@ export default function OrdersClient({
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-[11px] font-bold text-brown-600 block">Estimasi Tiba (ETA dalam Menit)</label>
+                    <label className="text-[11px] font-bold text-brown-600 block">
+                      Estimasi Tiba (ETA dalam Menit)
+                    </label>
                     <input
                       type="number"
                       placeholder="30"
@@ -1150,7 +1169,9 @@ export default function OrdersClient({
               className="bg-white rounded-[8px] border border-cream-200 max-w-md w-full overflow-hidden shadow-2xl"
             >
               <div className="bg-brown-700 text-white px-5 py-4 flex justify-between items-center">
-                <h3 className="font-bold text-sm">📦 Unggah Bukti Pengiriman (Order #{proofOrder.id.slice(-6)})</h3>
+                <h3 className="font-bold text-sm">
+                  📦 Unggah Bukti Pengiriman (Order #{proofOrder.id.slice(-6)})
+                </h3>
                 <button
                   onClick={() => setProofOrder(null)}
                   className="text-white/70 hover:text-white text-lg focus:outline-none"
@@ -1161,7 +1182,12 @@ export default function OrdersClient({
 
               <div className="p-5 space-y-4">
                 <div className="space-y-1">
-                  <label htmlFor="proof-photo-file" className="text-xs font-bold text-brown-600 block">Unggah Foto Bukti (JPG/PNG/WEBP)</label>
+                  <label
+                    htmlFor="proof-photo-file"
+                    className="text-xs font-bold text-brown-600 block"
+                  >
+                    Unggah Foto Bukti (JPG/PNG/WEBP)
+                  </label>
                   <input
                     id="proof-photo-file"
                     type="file"
@@ -1170,13 +1196,17 @@ export default function OrdersClient({
                     title="Unggah Foto Bukti"
                     className="w-full text-xs text-zinc-500 file:mr-3 file:py-2 file:px-4 file:rounded-[4px] file:border-0 file:text-xs file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100 cursor-pointer"
                   />
-                  <p className="text-[10px] text-zinc-400">Maksimal 2MB. Diunggah langsung ke CDN aman.</p>
+                  <p className="text-[10px] text-zinc-400">
+                    Maksimal 2MB. Diunggah langsung ke CDN aman.
+                  </p>
                 </div>
 
                 <div className="text-center text-xs text-zinc-400 font-bold">— ATAU —</div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-brown-600 block">Masukkan URL Foto Bukti Langsung</label>
+                  <label className="text-xs font-bold text-brown-600 block">
+                    Masukkan URL Foto Bukti Langsung
+                  </label>
                   <input
                     type="text"
                     placeholder="https://example.com/proof.jpg"

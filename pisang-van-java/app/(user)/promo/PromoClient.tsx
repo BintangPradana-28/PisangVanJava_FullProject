@@ -1,10 +1,10 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Ticket, Coins, Gift, Sparkles, Copy, Clock, ChevronRight } from 'lucide-react'
+import { ChevronRight, Clock, Coins, Copy, Gift, Sparkles, Ticket } from 'lucide-react'
+import Link from 'next/link'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
-import Link from 'next/link'
 import { useLanguage } from '@/context/LanguageContext'
 
 interface Voucher {

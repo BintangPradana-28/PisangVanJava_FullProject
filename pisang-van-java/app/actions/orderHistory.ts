@@ -1,12 +1,12 @@
 'use server'
 
-import { prisma } from '@/lib/prisma'
 import type { Prisma } from '@prisma/client'
-import { auth } from '@/src/auth'
-import { sendWhatsAppNotification } from '@/lib/notifications'
-import { sendOrderStatusEmail } from '@/src/features/payment/email'
-import { buildOrderStatusPushPayload, sendPushNotification } from '@/lib/push'
 import { revalidatePath } from 'next/cache'
+import { sendWhatsAppNotification } from '@/lib/notifications'
+import { prisma } from '@/lib/prisma'
+import { buildOrderStatusPushPayload, sendPushNotification } from '@/lib/push'
+import { auth } from '@/src/auth'
+import { sendOrderStatusEmail } from '@/src/features/payment/email'
 import { cancelBiteshipOrder } from '@/src/services/biteship.service'
 
 export async function getUserOrders() {
@@ -222,7 +222,9 @@ export async function cancelOrder(orderId: string) {
       try {
         const biteshipResult = await cancelBiteshipOrder(order.biteshipOrderId)
         if (!biteshipResult.success) {
-          console.warn(`[BITESHIP WARNING] Failed to cancel Biteship order ${order.biteshipOrderId}: ${biteshipResult.error}`)
+          console.warn(
+            `[BITESHIP WARNING] Failed to cancel Biteship order ${order.biteshipOrderId}: ${biteshipResult.error}`
+          )
         }
       } catch (biteshipErr) {
         console.error('[BITESHIP ERROR] Exception during Biteship order cancellation:', biteshipErr)
