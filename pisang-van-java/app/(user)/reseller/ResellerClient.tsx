@@ -244,24 +244,28 @@ export default function ResellerClient({
                     <form onSubmit={handleSubmit} className="space-y-4">
                       <div className="grid sm:grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-1.5">
+                          <label className="block text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-1.5" htmlFor="contact-name">
                             Nama Kontak (Pendaftar)
                           </label>
                           <input
+                            id="contact-name"
                             type="text"
                             value={session.user.name || ''}
                             disabled
+                            placeholder="Nama Kontak"
                             className="w-full px-4 py-3 rounded-[4px] border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 text-sm focus:outline-none"
                           />
                         </div>
                         <div>
-                          <label className="block text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-1.5">
+                          <label className="block text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-1.5" htmlFor="whatsapp-number">
                             Nomor WhatsApp
                           </label>
                           <input
+                            id="whatsapp-number"
                             type="text"
                             value={userPhone}
                             disabled
+                            placeholder="Nomor WhatsApp"
                             className="w-full px-4 py-3 rounded-[4px] border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500 text-sm focus:outline-none"
                           />
                         </div>
