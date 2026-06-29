@@ -1,11 +1,13 @@
 'use client'
 
 import { AnimatePresence, motion } from 'framer-motion'
-import { ArrowLeft, Minus, Plus, ShoppingBag, Trash2 } from 'lucide-react'
+import { ArrowLeft, Minus, Plus, Trash2 } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
+import Lottie from 'lottie-react'
+import emptyCartAnimation from '@/public/animations/empty-cart.json'
 import toast, { Toaster } from 'react-hot-toast'
 import { useLanguage } from '@/context/LanguageContext'
 import { useSettings } from '@/context/SettingsContext'
@@ -104,8 +106,12 @@ export default function KeranjangPage() {
             animate={{ opacity: 1, y: 0 }}
             className="text-center py-20"
           >
-            <div className="w-24 h-24 mx-auto mb-6 rounded-[4px] bg-amber-100 dark:bg-amber-900/20 flex items-center justify-center">
-              <ShoppingBag className="h-10 w-10 text-amber-500" />
+            <div className="w-32 h-32 mx-auto mb-6 flex items-center justify-center">
+              <Lottie
+                animationData={emptyCartAnimation}
+                loop={true}
+                className="w-32 h-32"
+              />
             </div>
             <h2 className="font-serif text-xl font-bold text-zinc-800 dark:text-zinc-200 mb-2">
               {t('cart_empty_title')}

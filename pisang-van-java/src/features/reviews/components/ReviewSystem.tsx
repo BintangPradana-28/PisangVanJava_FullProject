@@ -5,6 +5,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 // src/features/reviews/components/ReviewSystem.tsx — v2 with Verified Buyer Form
 import { useOptimistic, useState, useTransition } from 'react'
+import { useInfiniteQuery } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 import { useLanguage } from '@/context/LanguageContext'
 
@@ -85,6 +86,46 @@ export default function ReviewSystem({
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const [isPending, startTransition] = useTransition()
+
+  // RAG Source: src/features/reviews/components/ReviewSystem.tsx
+  const fetchReviews = async ({ pageParam = 1 }) => {
+    const params = new URLSearchParams()
+    params.set('page', String(pageParam))
+    params.set('limit', '10')
+    if (initialVariantId) params.set('variantId', initialVariantId)
+    if (currentFilter !== 'Semua') {
+      if (currentFilter === 'Dengan Komentar') {
+        params.set('hasComment', 'true')
+      } else {
+        params.set('rating', currentFilter)
+      }
+    }
+    const res = await fetch(`/api/reviews?${params.toString()}`)
+    const json = await res.json()
+    if (!json.success) throw new Error(json.error || 'Failed to fetch reviews')
+    return json.data as ReviewData[]
+  }
+
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage
+  } = useInfiniteQuery({
+    queryKey: ['reviews', currentFilter, initialVariantId],
+    queryFn: ({ pageParam }) => fetchReviews({ pageParam }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, allPages) => {
+      if (lastPage.length < 10) return undefined
+      return allPages.length + 1
+    },
+    initialData: {
+      pages: [initialReviews],
+      pageParams: [1]
+    }
+  })
+
+  const allReviews = data ? data.pages.flat() : initialReviews
 
   // Review form state
   const [showForm, setShowForm] = useState(false)
@@ -414,7 +455,7 @@ export default function ReviewSystem({
       <div
         className={`space-y-6 transition-opacity duration-300 ${isPending ? 'opacity-50' : 'opacity-100'}`}
       >
-        {initialReviews.length === 0 ? (
+        {allReviews.length === 0 ? (
           <div className="text-center py-16 bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800">
             <div className="text-5xl mb-4">📝</div>
             <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100 mb-2">
@@ -423,64 +464,78 @@ export default function ReviewSystem({
             <p className="text-zinc-500 text-sm">{t('review_empty_desc')}</p>
           </div>
         ) : (
-          <AnimatePresence>
-            {initialReviews.map((review) => (
-              <motion.div
-                key={review.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                className="p-6 bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800 shadow-sm hover:shadow-md transition-shadow"
-              >
-                <div className="flex justify-between items-start mb-4">
-                  <div className="flex items-center gap-3">
-                    {/* Avatar */}
-                    <div className="w-11 h-11 rounded-full bg-gradient-to-br from-amber-200 to-orange-400 flex items-center justify-center text-amber-900 font-bold text-sm shadow-sm">
-                      {review.userName[0].toUpperCase()}
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-bold text-zinc-900 dark:text-zinc-100 text-sm">
-                          {review.userName}
-                        </span>
-                        {review.isVerifiedBuyer && (
-                          <span className="inline-flex items-center gap-1 text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-900/50">
-                            ✅ Pembeli Terverifikasi
+          <>
+            <AnimatePresence>
+              {allReviews.map((review) => (
+                <motion.div
+                  key={review.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  className="p-6 bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800 shadow-sm hover:shadow-md transition-shadow"
+                >
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="flex items-center gap-3">
+                      {/* Avatar */}
+                      <div className="w-11 h-11 rounded-full bg-gradient-to-br from-amber-200 to-orange-400 flex items-center justify-center text-amber-900 font-bold text-sm shadow-sm">
+                        {review.userName[0].toUpperCase()}
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-bold text-zinc-900 dark:text-zinc-100 text-sm">
+                            {review.userName}
                           </span>
-                        )}
-                      </div>
-                      <div className="flex gap-0.5 text-amber-400 text-sm mt-0.5">
-                        {Array.from({ length: 5 }).map((_, i) => (
-                          <span key={i}>{i < review.rating ? '★' : '☆'}</span>
-                        ))}
+                          {review.isVerifiedBuyer && (
+                            <span className="inline-flex items-center gap-1 text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-900/50">
+                              ✅ Pembeli Terverifikasi
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex gap-0.5 text-amber-400 text-sm mt-0.5">
+                          {Array.from({ length: 5 }).map((_, i) => (
+                            <span key={i}>{i < review.rating ? '★' : '☆'}</span>
+                          ))}
+                        </div>
                       </div>
                     </div>
+                    <div className="text-xs text-zinc-400 font-medium shrink-0 ml-2">
+                      {new Date(review.createdAt).toLocaleDateString('id-ID', {
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric'
+                      })}
+                    </div>
                   </div>
-                  <div className="text-xs text-zinc-400 font-medium shrink-0 ml-2">
-                    {new Date(review.createdAt).toLocaleDateString('id-ID', {
-                      day: '2-digit',
-                      month: 'short',
-                      year: 'numeric'
-                    })}
+
+                  {review.comment && (
+                    <p className="text-zinc-700 dark:text-zinc-300 text-sm leading-relaxed mb-4 whitespace-pre-wrap">
+                      {review.comment}
+                    </p>
+                  )}
+
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/30 rounded-xl text-xs font-semibold text-amber-700 dark:text-amber-400">
+                    <span>🍌</span>
+                    <span>{t('review_menu_liked')}</span>
+                    <span className="text-[#D4802A] uppercase tracking-wide">
+                      {review.variantName}
+                    </span>
                   </div>
-                </div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
 
-                {review.comment && (
-                  <p className="text-zinc-700 dark:text-zinc-300 text-sm leading-relaxed mb-4 whitespace-pre-wrap">
-                    {review.comment}
-                  </p>
-                )}
-
-                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/30 rounded-xl text-xs font-semibold text-amber-700 dark:text-amber-400">
-                  <span>🍌</span>
-                  <span>{t('review_menu_liked')}</span>
-                  <span className="text-[#D4802A] uppercase tracking-wide">
-                    {review.variantName}
-                  </span>
-                </div>
-              </motion.div>
-            ))}
-          </AnimatePresence>
+            {hasNextPage && (
+              <div className="flex justify-center mt-8">
+                <button
+                  onClick={() => fetchNextPage()}
+                  disabled={isFetchingNextPage}
+                  className="px-6 py-3 rounded-[4px] font-bold text-sm bg-zinc-150 hover:bg-zinc-200 text-zinc-800 transition-all dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700 disabled:opacity-50"
+                >
+                  {isFetchingNextPage ? 'Memuat...' : 'Tampilkan Lebih Banyak 🍌'}
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

@@ -5,7 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useSession } from 'next-auth/react'
-import { useEffect, useState } from 'react'
+import { useEffect, useOptimistic, useState, useTransition } from 'react'
 import toast from 'react-hot-toast'
 import QuickViewModal from '@/components/user/QuickViewModal'
 import { useLanguage } from '@/context/LanguageContext'
@@ -86,6 +86,16 @@ export default function MenuGrid({ products }: { products: ProductType[] }) {
 
   const { data: session } = useSession()
   const [favorites, setFavorites] = useState<string[]>([])
+  const [isPending, startTransition] = useTransition()
+
+  // RAG Source: components/user/MenuGrid.tsx
+  const [optimisticFavorites, setOptimisticFavorites] = useOptimistic(
+    favorites,
+    (state, variantId: string) => {
+      const isFav = state.includes(variantId)
+      return isFav ? state.filter((id) => id !== variantId) : [...state, variantId]
+    }
+  )
 
   useEffect(() => {
     if (session?.user) {
@@ -101,7 +111,7 @@ export default function MenuGrid({ products }: { products: ProductType[] }) {
     }
   }, [session])
 
-  const toggleFavorite = async (e: React.MouseEvent, variantId: string) => {
+  const toggleFavorite = (e: React.MouseEvent, variantId: string) => {
     e.stopPropagation()
     if (!session?.user) {
       toast.error('Silakan login untuk menyimpan favorit')
@@ -109,28 +119,29 @@ export default function MenuGrid({ products }: { products: ProductType[] }) {
     }
 
     const isFav = favorites.includes(variantId)
-    // Optimistic UI
-    setFavorites((prev) => (isFav ? prev.filter((id) => id !== variantId) : [...prev, variantId]))
     if (!isFav) {
       animateFlyHeart(e.currentTarget as HTMLElement)
     }
 
-    try {
-      const res = await fetch('/api/favorites', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ variantId })
-      })
-      const data = await res.json()
-      if (!data.success) throw new Error(data.error)
-      toast.success(isFav ? 'Dihapus dari favorit' : 'Ditambahkan ke favorit', {
-        id: `fav-${variantId}`
-      })
-    } catch (_err) {
-      // Revert optimistic UI
-      setFavorites((prev) => (isFav ? [...prev, variantId] : prev.filter((id) => id !== variantId)))
-      toast.error('Gagal memperbarui favorit', { id: `fav-err-${variantId}` })
-    }
+    startTransition(async () => {
+      setOptimisticFavorites(variantId)
+
+      try {
+        const res = await fetch('/api/favorites', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ variantId })
+        })
+        const data = await res.json()
+        if (!data.success) throw new Error(data.error)
+        setFavorites((prev) => (isFav ? prev.filter((id) => id !== variantId) : [...prev, variantId]))
+        toast.success(isFav ? 'Dihapus dari favorit' : 'Ditambahkan ke favorit', {
+          id: `fav-${variantId}`
+        })
+      } catch (_err) {
+        toast.error('Gagal memperbarui favorit', { id: `fav-err-${variantId}` })
+      }
+    })
   }
 
   return (
@@ -156,7 +167,7 @@ export default function MenuGrid({ products }: { products: ProductType[] }) {
               {products.map((product, i) => {
                 const img = product.imageUrl || getFallbackImage(product.flavorName)
                 const available = product.isAvailable && product.stock > 0
-                const isFav = favorites.includes(product.id)
+                const isFav = optimisticFavorites.includes(product.id)
 
                 const defaultPrice =
                   product.priceKembung > 0

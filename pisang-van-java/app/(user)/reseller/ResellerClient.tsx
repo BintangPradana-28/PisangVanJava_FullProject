@@ -8,9 +8,10 @@
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { useAction } from 'next-safe-action/hooks'
 import { useState } from 'react'
 import toast, { Toaster } from 'react-hot-toast'
-import { applyForReseller } from '@/src/features/crm/actions'
+import { applyForResellerAction } from '@/src/features/crm/actions'
 
 interface ProductVariant {
   id: string
@@ -89,12 +90,26 @@ export default function ResellerClient({
   userPhone
 }: ResellerClientProps) {
   const router = useRouter()
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const [companyName, setCompanyName] = useState('')
   const [address, setAddress] = useState('')
   const [notes, setNotes] = useState('')
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // RAG Source: app/(user)/reseller/ResellerClient.tsx
+  const { execute, isPending } = useAction(applyForResellerAction, {
+    onSuccess: ({ data }) => {
+      if (data?.success) {
+        toast.success('Pendaftaran Anda berhasil dikirim! 🚀')
+        router.refresh()
+      } else {
+        toast.error(data?.error || 'Gagal mengirim pendaftaran')
+      }
+    },
+    onError: ({ error }) => {
+      toast.error(error.serverError || 'Terjadi kesalahan koneksi server.')
+    }
+  })
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!companyName.trim()) {
       toast.error('Nama toko / bisnis wajib diisi.')
@@ -105,25 +120,11 @@ export default function ResellerClient({
       return
     }
 
-    setIsSubmitting(true)
-    try {
-      const res = await applyForReseller({
-        companyName: companyName.trim(),
-        address: address.trim(),
-        notes: notes.trim() || null
-      })
-
-      if (res.success) {
-        toast.success('Pendaftaran Anda berhasil dikirim! 🚀')
-        router.refresh()
-      } else {
-        toast.error(res.error)
-      }
-    } catch (_error) {
-      toast.error('Terjadi kesalahan koneksi server.')
-    } finally {
-      setIsSubmitting(false)
-    }
+    execute({
+      companyName: companyName.trim(),
+      address: address.trim(),
+      notes: notes.trim() || null
+    })
   }
 
   const isLoggedIn = !!session?.user
@@ -307,10 +308,10 @@ export default function ResellerClient({
 
                       <button
                         type="submit"
-                        disabled={isSubmitting}
+                        disabled={isPending}
                         className="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3.5 rounded-[4px] transition-all active:scale-[0.98] shadow-sm shadow-amber-200 dark:shadow-none text-sm disabled:opacity-50"
                       >
-                        {isSubmitting
+                        {isPending
                           ? 'Mengirimkan Pendaftaran...'
                           : 'Kirim Pendaftaran Reseller 🚀'}
                       </button>

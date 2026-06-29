@@ -2,7 +2,6 @@
 
 import {
   Calendar,
-  CheckCircle2,
   CheckSquare,
   Clock,
   Home,
@@ -13,6 +12,8 @@ import {
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import Lottie from 'lottie-react'
+import successAnimation from '@/public/animations/success.json'
 import ConfettiCanvas from '@/components/user/ConfettiCanvas'
 import { useLanguage } from '@/context/LanguageContext'
 import { getOrderSummary } from '@/src/features/checkout/actions'
@@ -55,10 +56,11 @@ export default function ThanksPage() {
     <section className="min-h-[90vh] flex flex-col items-center justify-center bg-zinc-50 px-4 py-16 dark:bg-zinc-950">
       <ConfettiCanvas />
       <div className="w-full max-w-lg rounded-2xl bg-white p-6 sm:p-8 text-center shadow-md dark:bg-zinc-900 border border-zinc-200/50 dark:border-zinc-800/80">
-        <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-green-50 dark:bg-green-950/30">
-          <CheckCircle2
-            className="h-10 w-10 text-green-600 dark:text-green-400"
-            aria-hidden="true"
+        <div className="mx-auto mb-5 flex h-24 w-24 items-center justify-center">
+          <Lottie
+            animationData={successAnimation}
+            loop={false}
+            className="w-24 h-24"
           />
         </div>
 

@@ -4,6 +4,7 @@ import type { Prisma } from '@prisma/client'
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/src/auth'
+import { authActionClient } from '@/src/lib/safe-action'
 
 export async function requireAdminActor() {
   const session = await auth()
@@ -203,3 +204,61 @@ export async function applyForReseller(payload: unknown) {
     return { success: false as const, error: 'Gagal mengirimkan pendaftaran reseller.' }
   }
 }
+
+// RAG Source: src/features/crm/actions.ts
+export const applyForResellerAction = authActionClient
+  .schema(resellerApplySchema)
+  .action(async ({ parsedInput, ctx }) => {
+    const { userId } = ctx
+    const { companyName, address, notes } = parsedInput
+
+    try {
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { role: true }
+      })
+
+      if (user?.role === 'RESELLER') {
+        throw new Error('Anda sudah terdaftar sebagai Reseller resmi.')
+      }
+
+      const existing = await prisma.b2BDeal.findFirst({
+        where: {
+          ownerId: userId,
+          dealName: 'Reseller Application',
+          stage: { in: ['PROSPECTING', 'NEGOTIATION'] }
+        }
+      })
+
+      if (existing) {
+        throw new Error('Pendaftaran Reseller Anda sebelumnya masih dalam antrean/sedang diproses.')
+      }
+
+      const userObj = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { phone: true, email: true, name: true }
+      })
+
+      if (!userObj?.phone) {
+        throw new Error('Nomor WhatsApp wajib diisi di profil Anda sebelum mendaftar Reseller.')
+      }
+
+      const newDeal = await prisma.b2BDeal.create({
+        data: {
+          companyName,
+          contactName: userObj.name || 'Pelanggan',
+          phone: userObj.phone,
+          email: userObj.email || null,
+          dealName: 'Reseller Application',
+          notes: `Alamat Bisnis: ${address}\n\nCatatan Tambahan: ${notes || '-'}`,
+          stage: 'PROSPECTING',
+          ownerId: userId
+        }
+      })
+
+      return { success: true as const, data: newDeal }
+    } catch (err: any) {
+      console.error('[RESELLER_APPLY_ERROR]', err)
+      return { success: false as const, error: err.message || 'Gagal mengirimkan pendaftaran reseller.' }
+    }
+  })

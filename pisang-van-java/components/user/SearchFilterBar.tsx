@@ -5,6 +5,7 @@
 // Uses URL search params as the single source of truth — no hydration mismatch.
 
 import { useRouter, useSearchParams } from 'next/navigation'
+import { useQueryState } from 'nuqs'
 import { useEffect, useRef, useState } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 
@@ -51,11 +52,51 @@ export default function SearchFilterBar({ totalItems }: SearchFilterBarProps) {
   const { t } = useLanguage()
   const chipRowRef = useRef<HTMLDivElement>(null)
 
-  const [search, setSearch] = useState(searchParams.get('q') ?? '')
-  const [baseFilter, setBaseFilter] = useState(searchParams.get('filter') ?? 'all')
-  const [flavorFilter, setFlavorFilter] = useState(searchParams.get('flavor') ?? 'all')
-  const [sortBy, setSortBy] = useState(searchParams.get('sort') ?? 'default')
-  const [availableOnly, setAvailableOnly] = useState(searchParams.get('available') === 'true')
+  // RAG Source: components/user/SearchFilterBar.tsx
+  const [search, setSearch] = useQueryState('q', {
+    defaultValue: '',
+    shallow: false
+  })
+  const [localSearch, setLocalSearch] = useState(search)
+
+  const [baseFilter, setBaseFilter] = useQueryState('filter', {
+    defaultValue: 'all',
+    shallow: false
+  })
+  const [flavorFilter, setFlavorFilter] = useQueryState('flavor', {
+    defaultValue: 'all',
+    shallow: false
+  })
+  const [sortBy, setSortBy] = useQueryState('sort', {
+    defaultValue: 'default',
+    shallow: false
+  })
+  const [availableOnlyStr, setAvailableOnlyStr] = useQueryState('available', {
+    defaultValue: 'false',
+    shallow: false
+  })
+
+  const availableOnly = availableOnlyStr === 'true'
+  const setAvailableOnly = (val: boolean | ((prev: boolean) => boolean)) => {
+    const nextVal = typeof val === 'function' ? val(availableOnly) : val
+    setAvailableOnlyStr(nextVal ? 'true' : 'false')
+  }
+
+  // Debounce input search to url param 'q'
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (localSearch !== search) {
+        setSearch(localSearch || null)
+      }
+    }, 400)
+    return () => clearTimeout(timer)
+  }, [localSearch, search, setSearch])
+
+  // Sync external search param changes back to local input
+  useEffect(() => {
+    setLocalSearch(search)
+  }, [search])
+
   const [isDragging, setIsDragging] = useState(false)
   const dragStart = useRef<{ x: number; scrollLeft: number }>({ x: 0, scrollLeft: 0 })
   // Mobile-only: tabs/chips collapse behind the filter icon button (mirrors the
@@ -63,20 +104,6 @@ export default function SearchFilterBar({ totalItems }: SearchFilterBarProps) {
   const [isFilterOpen, setIsFilterOpen] = useState(false)
   const activeFilterCount =
     (baseFilter !== 'all' ? 1 : 0) + (flavorFilter !== 'all' ? 1 : 0) + (availableOnly ? 1 : 0)
-
-  // ── Debounced URL sync ───────────────────────────────────────────────────────
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      const params = new URLSearchParams()
-      if (search) params.set('q', search)
-      if (baseFilter !== 'all') params.set('filter', baseFilter)
-      if (flavorFilter !== 'all') params.set('flavor', flavorFilter)
-      if (sortBy !== 'default') params.set('sort', sortBy)
-      if (availableOnly) params.set('available', 'true')
-      router.push(`?${params.toString()}`, { scroll: false })
-    }, 400)
-    return () => clearTimeout(timer)
-  }, [search, baseFilter, flavorFilter, sortBy, availableOnly, router])
 
   // ── Mouse drag-to-scroll for flavor chip row (desktop UX) ───────────────────
   const onMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -123,15 +150,18 @@ export default function SearchFilterBar({ totalItems }: SearchFilterBarProps) {
           </svg>
           <input
             type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            value={localSearch}
+            onChange={(e) => setLocalSearch(e.target.value)}
             placeholder={t('menu_search_placeholder')}
             aria-label="Cari varian menu"
             className="w-full pl-11 pr-4 py-3 text-sm rounded-full outline-none transition-all bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-100 focus-visible:ring-2 focus-visible:ring-amber-400"
           />
-          {search && (
+          {localSearch && (
             <button
-              onClick={() => setSearch('')}
+              onClick={() => {
+                setLocalSearch('')
+                setSearch(null)
+              }}
               className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 transition-colors"
               aria-label="Hapus pencarian"
             >
