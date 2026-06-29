@@ -17,6 +17,9 @@ export const env = createEnv({
     DOPPLER_TOKEN: z.string().optional(),
     SUPABASE_SERVICE_ROLE_KEY: z.string().min(1).optional(),
     BACKUP_ENCRYPTION_KEY: z.string().min(1).optional(),
+    QSTASH_TOKEN: z.string().optional(),
+    QSTASH_CURRENT_SIGNING_KEY: z.string().optional(),
+    QSTASH_NEXT_SIGNING_KEY: z.string().optional(),
 
     // ✅ Tambahan yang tertinggal
     CLOUDINARY_API_SECRET: z.string().min(1).optional(),
@@ -44,7 +47,8 @@ export const env = createEnv({
     // ✅ Web Push VAPID public key (safe to expose to browser)
     // RAG Source: components/push/PushNotificationManager.tsx (applicationServerKey)
     // This is the SAME key as VAPID_PUBLIC_KEY — public keys are safe in client bundles.
-    NEXT_PUBLIC_VAPID_PUBLIC_KEY: z.string().optional()
+    NEXT_PUBLIC_VAPID_PUBLIC_KEY: z.string().optional(),
+    NEXT_PUBLIC_APP_URL: z.string().optional()
   },
   runtimeEnv: {
     DATABASE_URL: process.env.DATABASE_URL,
@@ -58,6 +62,9 @@ export const env = createEnv({
     DOPPLER_TOKEN: process.env.DOPPLER_TOKEN,
     SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
     BACKUP_ENCRYPTION_KEY: process.env.BACKUP_ENCRYPTION_KEY,
+    QSTASH_TOKEN: process.env.QSTASH_TOKEN,
+    QSTASH_CURRENT_SIGNING_KEY: process.env.QSTASH_CURRENT_SIGNING_KEY,
+    QSTASH_NEXT_SIGNING_KEY: process.env.QSTASH_NEXT_SIGNING_KEY,
     CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
     CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
     CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME,
@@ -74,7 +81,8 @@ export const env = createEnv({
     NEXT_PUBLIC_MIDTRANS_IS_PRODUCTION: process.env.NEXT_PUBLIC_MIDTRANS_IS_PRODUCTION,
     NEXT_PUBLIC_POSTHOG_KEY: process.env.NEXT_PUBLIC_POSTHOG_KEY,
     NEXT_PUBLIC_POSTHOG_HOST: process.env.NEXT_PUBLIC_POSTHOG_HOST,
-    NEXT_PUBLIC_VAPID_PUBLIC_KEY: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY
+    NEXT_PUBLIC_VAPID_PUBLIC_KEY: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
+    NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL
   },
   skipValidation: !!process.env.SKIP_ENV_VALIDATION || process.env.npm_lifecycle_event === 'lint',
   emptyStringAsUndefined: true

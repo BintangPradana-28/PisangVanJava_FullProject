@@ -1,4 +1,8 @@
 import * as Sentry from '@sentry/nextjs'
+import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi'
+import { z } from 'zod'
+
+extendZodWithOpenApi(z)
 
 export async function register() {
   if (process.env.NEXT_RUNTIME === 'nodejs') {

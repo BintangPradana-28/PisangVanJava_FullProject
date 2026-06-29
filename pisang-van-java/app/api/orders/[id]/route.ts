@@ -1,17 +1,14 @@
 import { type OrderStatus, Prisma } from '@prisma/client'
 import { type NextRequest, NextResponse } from 'next/server'
 import { logAudit } from '@/lib/audit'
-import { sendWhatsAppNotification } from '@/lib/notifications'
+import { inngest } from '@/src/lib/inngest'
 import { prisma } from '@/lib/prisma'
-// RAG Source: lib/push.ts (new) — sendPushNotification + buildOrderStatusPushPayload
-import { buildOrderStatusPushPayload, sendPushNotification } from '@/lib/push'
 import {
   ALLOWED_STATUS_TRANSITIONS,
   deliveryUpdateSchema,
   orderStatusInputSchema,
   paymentFormInputSchema
 } from '@/src/features/checkout/schemas'
-import { sendOrderStatusEmail } from '@/src/features/payment/email'
 import { hasValidSameOriginHeaders, requireCheckoutActor } from '@/src/services/checkout.service'
 
 interface OrderRouteContext {
@@ -270,40 +267,18 @@ export async function PATCH(req: NextRequest, { params }: OrderRouteContext) {
       order.status === 'READY' ||
       order.status === 'OUT_FOR_DELIVERY' ||
       order.status === 'DELIVERED' ||
-      order.status === 'CANCELED'
-    ) {
-      await sendWhatsAppNotification(
-        order.customerPhone,
-        order.customerName,
-        order.status,
-        order.id,
-        order.etaMinutes,
-        order.courierName
-      )
-    }
-
-    // Send email notification about status change (asynchronously)
-    if (
-      order.status === 'PROCESSING' ||
-      order.status === 'READY' ||
-      order.status === 'OUT_FOR_DELIVERY' ||
-      order.status === 'DELIVERED' ||
       order.status === 'COMPLETED' ||
       order.status === 'CANCELED'
     ) {
-      sendOrderStatusEmail(order.id, order.status).catch((err) =>
-        console.error('[EMAIL] Failed to send order status email', err)
-      )
-    }
-
-    // Web Push notification
-    if (order.userId) {
-      const pushPayload = buildOrderStatusPushPayload(order.id, order.status)
-      if (pushPayload) {
-        sendPushNotification(order.userId, pushPayload).catch((err) =>
-          console.error('[PUSH] Failed to send order status push notification', err)
-        )
-      }
+      inngest
+        .send({
+          name: 'order/status.changed',
+          data: {
+            orderId: order.id,
+            status: order.status
+          }
+        })
+        .catch((err) => console.error('[INNGEST ERROR] Failed to dispatch order status change event', err))
     }
 
     return NextResponse.json({

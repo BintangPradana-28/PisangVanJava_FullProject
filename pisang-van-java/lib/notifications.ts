@@ -67,3 +67,45 @@ export async function sendWhatsAppNotification(
     return { success: false, error }
   }
 }
+
+export async function queueWhatsAppNotification(
+  customerPhone: string,
+  customerName: string,
+  orderStatus: string,
+  orderId: string,
+  etaMinutes?: number | null,
+  courierName?: string | null
+) {
+  const qstashToken = env.QSTASH_TOKEN
+  if (!qstashToken) {
+    console.warn('[WA] QStash is not configured. Falling back to synchronous Fonnte send.')
+    return sendWhatsAppNotification(customerPhone, customerName, orderStatus, orderId, etaMinutes, courierName)
+  }
+
+  try {
+    const { qstash } = await import('@/src/lib/qstash')
+    const payload = {
+      customerPhone,
+      customerName,
+      orderStatus,
+      orderId,
+      etaMinutes,
+      courierName
+    }
+
+    const appUrl = env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+    const endpoint = `${appUrl}/api/webhooks/outgoing/whatsapp`
+
+    console.log(`[QSTASH] Queueing WA notification for order ${orderId} to endpoint: ${endpoint}`)
+    await qstash.publishJSON({
+      url: endpoint,
+      body: payload
+    })
+
+    return { success: true }
+  } catch (error) {
+    console.error('[QSTASH ERROR] Failed to queue WA notification:', error)
+    // Fallback to sync send on QStash publish failure to prevent missing notifications
+    return sendWhatsAppNotification(customerPhone, customerName, orderStatus, orderId, etaMinutes, courierName)
+  }
+}

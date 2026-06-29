@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
+import { idbStorage } from './idbStorage'
 
 // ── Types ────────────────────────────────────────────────────────────────────
 export interface CartTopping {
@@ -155,7 +156,7 @@ export const useCartStore = create<CartStore>()(
     })),
     {
       name: 'pvj-cart-v2',
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => idbStorage),
       // ✅ skipHydration — zero SSR mismatch
       skipHydration: true,
       partialize: (state) => ({ items: state.items }), // Jangan simpan conflictState ke storage

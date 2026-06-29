@@ -4,7 +4,7 @@ import { revalidatePath, revalidateTag } from 'next/cache'
 import { type NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { redis } from '@/lib/redis'
-import { sendOrderConfirmationEmail } from '@/src/features/payment/email'
+import { inngest } from '@/src/lib/inngest'
 import { mapMidtransStatusToPaymentStatus } from '@/src/features/payment/payment-status.mapper'
 import { verifyMidtransSignature } from '@/src/features/payment/service'
 import { logger } from '@/src/lib/logger'
@@ -220,8 +220,15 @@ export async function POST(req: NextRequest) {
     })
 
     if (sendEmail) {
-      // Trigger order confirmation email in the background
-      sendOrderConfirmationEmail(realOrderId).catch((err) => logger.error(err as Error, '[EMAIL ERROR]'))
+      // Trigger order confirmation email in the background via Inngest durable job queue
+      inngest
+        .send({
+          name: 'order/payment.settled',
+          data: {
+            orderId: realOrderId
+          }
+        })
+        .catch((err) => logger.error(err as Error, '[INNGEST ERROR] Failed to dispatch payment.settled event'))
     }
 
     // Force real-time Edge Cache purge for Storefront and Dashboard

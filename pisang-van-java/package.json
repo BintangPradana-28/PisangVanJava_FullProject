@@ -49,6 +49,7 @@
     ]
   },
   "dependencies": {
+    "@asteasolutions/zod-to-openapi": "^8.5.0",
     "@auth/prisma-adapter": "^2.11.2",
     "@hookform/resolvers": "^5.4.0",
     "@node-rs/argon2": "^2.0.2",
@@ -61,6 +62,7 @@
     "@supabase/supabase-js": "^2.106.1",
     "@t3-oss/env-nextjs": "^0.13.11",
     "@tanstack/react-query": "^5.101.0",
+    "@upstash/qstash": "^2.11.1",
     "@upstash/ratelimit": "^2.0.8",
     "@upstash/redis": "^1.38.0",
     "@vercel/analytics": "^2.0.1",
@@ -72,6 +74,7 @@
     "decimal.js": "^10.6.0",
     "framer-motion": "^11.18.2",
     "immer": "^11.1.8",
+    "inngest": "^4.11.0",
     "isomorphic-dompurify": "^3.16.0",
     "jose": "^6.2.3",
     "jspdf": "^4.2.1",
@@ -103,6 +106,7 @@
     "resend": "^6.12.4",
     "server-only": "^0.0.1",
     "sharp": "^0.34.5",
+    "swagger-ui-react": "^5.32.8",
     "tailwind-merge": "^3.6.0",
     "vaul": "^1.1.2",
     "web-push": "^3.6.7",
@@ -124,6 +128,7 @@
     "@types/qrcode": "^1.5.6",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "@types/swagger-ui-react": "^5.18.0",
     "@types/uuid": "^11.0.0",
     "@types/web-push": "^3.6.4",
     "@vitejs/plugin-react": "^6.0.2",
@@ -148,5 +153,12 @@
   },
   "resolutions": {
     "postcss": "^8.5.15"
-  }
+  },
+  "onlyBuiltDependencies": [
+    "@scarf/scarf",
+    "@tree-sitter-grammars/tree-sitter-yaml",
+    "core-js-pure",
+    "tree-sitter",
+    "tree-sitter-json"
+  ]
 }
