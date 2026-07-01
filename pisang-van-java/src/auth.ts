@@ -40,7 +40,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         // 2. IP-BASED RATE LIMITING
         const headerStore = await headers()
         const ip = headerStore.get('x-forwarded-for')?.split(',')[0] || 'unknown-ip'
-        logger.debug('Rate limiting IP:', ip)
+        logger.debug(`Rate limiting IP: ${ip}`)
 
         let rateLimitSuccess = true
         try {
@@ -58,7 +58,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const user = await prisma.user.findUnique({
           where: { email: username }
         })
-        logger.debug('User found in DB:', !!user)
+        logger.debug(`User found in DB: ${!!user}`)
 
         // 3. OPAQUE ERRORS & BAN CHECK
         if (!user || user.isDeleted || !user.passwordHash) {

@@ -2,8 +2,8 @@ import { type NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { rateLimit } from '@/lib/redis'
 import { registerSchema } from '@/src/features/auth/schemas'
-import { hashPassword } from '@/src/lib/password'
 import { logger } from '@/src/lib/logger'
+import { hashPassword } from '@/src/lib/password'
 
 export async function POST(req: NextRequest) {
   try {
