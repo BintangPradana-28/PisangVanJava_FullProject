@@ -15,7 +15,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: GitLeaks Scan
-        uses: gitleaks/gitleaks-action@cb7149a9c69f0f7c6a0c5b7b094889a91831ff7f # v2.3.2
+        uses: gitleaks/gitleaks-action@ff98106e23b2075780517833139366755490059c # v2.3.9
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
